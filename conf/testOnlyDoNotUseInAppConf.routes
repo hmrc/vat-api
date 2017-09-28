@@ -1,0 +1,13 @@
+# IF THE MICRO-SERVICE DOES NOT NEED ANY TEST-ONLY END-POINTS (ALWAYS PREFERRED) DELETE THIS FILE.
+
+# !!!WARNING!!! This file MUST NOT be referenced in the "application.conf" file to avoid risk of rolling test routes in the production environment.
+# If you need test routes when running tests in CI make sure that the profile for this micro-service (used by service-manager) defines this router as parameter.
+# To do so add the following line to the micro-service profile: "-Dapplication.router=testOnlyDoNotUseInAppConf.Routes"
+# To start the micro-service locally using the test routes run the following command: "sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes" 
+
+# Any test-only end-point should be defined here.
+# !!!WARNING!!! Every route defined in this file MUST be prefixed with "/test-only/". This is because NGINX is blocking every uri containing the string "test-only" in production.
+# Failing to follow this rule may result in test routes deployed in production.
+
+# Add all the application routes to the prod.routes file
+->         /                          prod.Routes
