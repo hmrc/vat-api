@@ -14,11 +14,11 @@ mediaType: application/json
       vrn:
         description: Vat registration number.
         type: string
-        example: "123456789"
+        example: "VRN1234567"
       periodKey:
         description: Identifier for the period of the VAT return
         type: string
-        example: "1234567"
+        example: "#001"
     post:
       description: Submit VAT return for period.
       body:
@@ -26,7 +26,7 @@ mediaType: application/json
           type: !include schemas/submitVatReturn.json
           example: !include examples/vatReturn.json
       responses:
-        201:
+        200:
           headers:
             X-CorrelationId:
               example: 5968c22d620000620096db5f
