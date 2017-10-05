@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Accounting period",
+  "description": "Accounting period",
+  "type": "object",
+  "properties": {
+    "vatDueSales": {
+      "title": "Vat due on sales",
+      "description": "Total VAT due on Total Sales",
+      "$ref": "#/definitions/monetaryPosNeg",
+      "example": "1000.45"
+    },
+    "vatDueAcquisitions": {
+      "title": "VAT due on acquisitions",
+      "description": "Total VAT due on acquisitions from EC Member States",
+      "$ref": "#/definitions/monetaryPosNeg",
+      "example": "1000.45"
+    },
+    "totalVatDue": {
+      "title": "Total VAT due",
+      "description": "SUM of (1) and (2) (Calculated by agent software)",
+      "$ref": "#/definitions/monetaryPosNeg",
+      "example": "1000.45"
+    },
+    "vatReclaimedCurrPeriod": {
+      "title": "Total VAT reclaimed",
+      "description": "Total VAT reclaimed on total purchases and other inputs",
+      "$ref": "#/definitions/monetaryPosNeg",
+      "example": "1000.45"
+    },
+    "netVatDue": {
+      "title": "Net VAT due",
+      "description": "DIFFERENCE between (3) and (4) (Calculated by agent software)",
+      "$ref": "#/definitions/monetaryPos",
+      "example": "1000.45"
+    },
+    "totalValueSalesExVAT": {
+      "title": "Total sales",
+      "description": "Total sales excluding VAT (including exempt sales)",
+      "$ref": "#/definitions/monetaryPos",
+      "example": "1000.45"
+    },
+    "totalValuePurchasesExVAT": {
+      "title": "Total purchases",
+      "description": "Total purchases excluding VAT (including exempt purchases)",
+      "$ref": "#/definitions/monetaryPos",
+      "example": "1000.45"
+    },
+    "totalValueGoodsSuppliedExVAT": {
+      "title": "Total supply",
+      "description": "Total supply of goods, excluding VAT, to EC Member States",
+      "$ref": "#/definitions/monetaryPos",
+      "example": "1000.45"
+    },
+    "totalAcquisitionsExVAT": {
+      "title": "Total acquisitions",
+      "description": "Total acquisitions of goods, excluding VAT, from EC Member States",
+      "$ref": "#/definitions/monetaryPos",
+      "example": "1000.45"
+    }
+  },
+  "required": [
+    "vatDueSales",
+    "vatDueAcquisitions",
+    "totalVatDue",
+    "vatReclaimedCurrPeriod",
+    "netVatDue",
+    "totalValueSalesExVAT",
+    "totalValuePurchasesExVAT",
+    "totalValueGoodsSuppliedExVAT",
+    "totalAcquisitionsExVAT"
+  ],
+  "definitions": {
+    "monetaryPos": {
+      "description": "Defines a monetary value (to 2 decimal places), between 0 and 99,999,999.99",
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 99999999.99,
+      "multipleOf": 0.01
+    },
+    "monetaryPosNeg": {
+      "description": "Defines a monetary value (to 2 decimal places), between -99,999,999.99 and 99,999,999.99",
+      "type": "number",
+      "minimum": -99999999.99,
+      "maximum": 99999999.99,
+      "multipleOf": 0.01
+    }
+  },
+  "additionalProperties": false
+}

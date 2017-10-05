@@ -1,0 +1,11 @@
+{
+  "vatDueSales": 100.25,
+  "vatDueAcquisitions": 100.25,
+  "totalVatDue": 100.25,
+  "vatReclaimedCurrPeriod": 100.25,
+  "netVatDue": 100.25,
+  "totalValueSalesExVAT": 100.25,
+  "totalValuePurchasesExVAT": 100.25,
+  "totalValueGoodsSuppliedExVAT": 100.25,
+  "totalAcquisitionsExVAT": 100.25
+}
