@@ -5,56 +5,47 @@
   "type": "object",
   "properties": {
     "vatDueSales": {
-      "title": "Vat due on sales",
-      "description": "Total VAT due on Total Sales",
+      "description": "VAT due on sales and other outputs. Box (1) on VAT Return form.",
       "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "vatDueAcquisitions": {
-      "title": "VAT due on acquisitions",
-      "description": "Total VAT due on acquisitions from EC Member States",
+      "description": "VAT due on acquisitions from other EC Member States. Box (2) on VAT Return form.",
       "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "totalVatDue": {
-      "title": "Total VAT due",
-      "description": "SUM of (1) and (2) (Calculated by agent software)",
+      "description": "Total VAT due (the sum of boxes 1 and 2). Box (3) on VAT Return form.",
       "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "vatReclaimedCurrPeriod": {
-      "title": "Total VAT reclaimed",
-      "description": "Total VAT reclaimed on total purchases and other inputs",
+      "description": "VAT reclaimed on purchases and other inputs (including acquisitions from the EC). Box (4) on VAT Return form.",
       "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "netVatDue": {
-      "title": "Net VAT due",
-      "description": "DIFFERENCE between (3) and (4) (Calculated by agent software)",
+      "description": "Net VAT to be paid to Customs or reclaimed by you (Difference between boxes 3 and 4). Box (5) on VAT Return form.",
       "$ref": "#/definitions/monetaryPos",
       "example": "1000.45"
     },
     "totalValueSalesExVAT": {
-      "title": "Total sales",
-      "description": "Total sales excluding VAT (including exempt sales)",
+      "description": "Total value of sales and all other outputs excluding any VAT. Box (6) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
-      "example": "1000.45"
+      "example": "1000"
     },
     "totalValuePurchasesExVAT": {
-      "title": "Total purchases",
-      "description": "Total purchases excluding VAT (including exempt purchases)",
+      "description": "Total value of purchases and all other inputs excluding any VAT (including exempt purchases). Box (7) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
     },
     "totalValueGoodsSuppliedExVAT": {
-      "title": "Total supply",
-      "description": "Total supply of goods, excluding VAT, to EC Member States",
+      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. Box (8) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
     },
     "totalAcquisitionsExVAT": {
-      "title": "Total acquisitions",
-      "description": "Total acquisitions of goods, excluding VAT, from EC Member States",
+      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. Box (8) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
     }
