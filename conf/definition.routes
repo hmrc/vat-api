@@ -1,0 +1,2 @@
+GET        /api/definition                                       uk.gov.hmrc.vatapi.controllers.definition.DocumentationController.definition()
+GET        /api/conf/:version/*file                              uk.gov.hmrc.vatapi.controllers.definition.DocumentationController.conf(version: String, file: String)

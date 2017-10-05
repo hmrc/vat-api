@@ -1,5 +1,4 @@
 # Add all the application routes to the app.routes file
-->         /vat-api              app.Routes
-->         /                          health.Routes
-
-GET        /admin/metrics             @com.kenshoo.play.metrics.MetricsController.metrics
+->         /                        app.Routes
+->         /                        definition.Routes
+->         /                        health.Routes

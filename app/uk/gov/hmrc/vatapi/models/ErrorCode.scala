@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers
+package uk.gov.hmrc.vatapi.models
 
-import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
-import play.api.mvc._
-import scala.concurrent.Future
+import play.api.libs.json.Format
 
-object MicroserviceHelloWorld extends MicroserviceHelloWorld
+object ErrorCode extends Enumeration {
+  type ErrorCode = Value
+  val
+  INVALID_VALUE,
+  NOT_IMPLEMENTED,
+  INVALID_REQUEST,
+  INVALID_TYPE = Value
 
-trait MicroserviceHelloWorld extends BaseController {
-
-	def hello() = Action.async { implicit request =>
-		Future.successful(Ok("Hello world"))
-	}
+  implicit val format: Format[ErrorCode] = EnumJson.enumFormat(ErrorCode,
+    Some(s"Recognized ErrorCode values: ${ErrorCode.values.mkString(", ")}"))
 }

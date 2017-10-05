@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers
+package uk.gov.hmrc.vatapi.controllers.definition
 
-import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
-import play.api.mvc._
-import scala.concurrent.Future
+import play.api.http.LazyHttpErrorHandler
+import play.api.libs.json.Json
+import play.api.mvc.Action
+import uk.gov.hmrc.vatapi.controllers.definition.JsonFormatters._
 
-object MicroserviceHelloWorld extends MicroserviceHelloWorld
 
-trait MicroserviceHelloWorld extends BaseController {
+abstract class DocumentationController extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
 
-	def hello() = Action.async { implicit request =>
-		Future.successful(Ok("Hello world"))
-	}
+  override def definition() = Action {
+    Ok(Json.toJson(VatApiDefinition.definition))
+  }
+
+  override def conf(version: String, file: String) = {
+    super.at(s"/public/api/conf/$version", file)
+  }
 }
+
+object DocumentationController extends DocumentationController
