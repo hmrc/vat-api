@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Accounting period",
-  "description": "Accounting period",
+  "title": "Submit VAT",
+  "description": "Submit VAT",
   "type": "object",
   "properties": {
     "vatDueSales": {
@@ -37,26 +37,26 @@
     "totalValueSalesExVAT": {
       "title": "Total sales",
       "description": "Total sales excluding VAT (including exempt sales)",
-      "$ref": "#/definitions/monetaryPos",
+      "$ref": "#/definitions/wholePounds",
       "example": "1000.45"
     },
     "totalValuePurchasesExVAT": {
       "title": "Total purchases",
       "description": "Total purchases excluding VAT (including exempt purchases)",
-      "$ref": "#/definitions/monetaryPos",
-      "example": "1000.45"
+      "$ref": "#/definitions/wholePounds",
+      "example": "1000"
     },
     "totalValueGoodsSuppliedExVAT": {
       "title": "Total supply",
       "description": "Total supply of goods, excluding VAT, to EC Member States",
-      "$ref": "#/definitions/monetaryPos",
-      "example": "1000.45"
+      "$ref": "#/definitions/wholePounds",
+      "example": "1000"
     },
     "totalAcquisitionsExVAT": {
       "title": "Total acquisitions",
       "description": "Total acquisitions of goods, excluding VAT, from EC Member States",
-      "$ref": "#/definitions/monetaryPos",
-      "example": "1000.45"
+      "$ref": "#/definitions/wholePounds",
+      "example": "1000"
     }
   },
   "required": [
@@ -72,18 +72,24 @@
   ],
   "definitions": {
     "monetaryPos": {
-      "description": "Defines a monetary value (to 2 decimal places), between 0 and 99,999,999.99",
+      "description": "Defines a monetary value (to 2 decimal places), between 0 and 49,999,999,999.99",
       "type": "number",
       "minimum": 0.0,
-      "maximum": 99999999.99,
+      "maximum": 49999999999.99,
       "multipleOf": 0.01
     },
     "monetaryPosNeg": {
-      "description": "Defines a monetary value (to 2 decimal places), between -99,999,999.99 and 99,999,999.99",
+      "description": "Defines a monetary value (to 2 decimal places), between -49,999,999,999.99 and 49,999,999,999.99",
       "type": "number",
-      "minimum": -99999999.99,
-      "maximum": 99999999.99,
+      "minimum": -49999999999.99,
+      "maximum": 49999999999.99,
       "multipleOf": 0.01
+    },
+    "wholePounds": {
+      "description": "Defines a whole pounds",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 49999999999
     }
   },
   "additionalProperties": false
