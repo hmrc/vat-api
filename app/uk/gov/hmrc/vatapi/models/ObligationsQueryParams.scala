@@ -18,46 +18,76 @@ package uk.gov.hmrc.vatapi.models
 
 
 import org.joda.time.LocalDate
-import play.api.mvc.Request
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
-case class ObligationsQueryParams(fromDate: LocalDate, toDate: LocalDate, status: String)
+case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: String) {
+  val map = Map("from" -> from, "to" -> to, "status" -> status)
+}
 
 object ObligationsQueryParams {
+  val dateRegex = """^\d{4}-\d{2}-\d{2}$"""
+  val statusRegex = "^[OCA]$"
 
-  def from(implicit request: Request[_]): Either[ErrorResult, ObligationsQueryParams] = {
-    val params = for {
-      fromDate <- getDateQueryParam("fromDate")
-      toDate <- getDateQueryParam("toDate")
-      status <- getStatus("status")
-      _ <- validateDateRange(fromDate, toDate)
-    } yield ObligationsQueryParams(fromDate, toDate, status)
-    params match {
-      case Success(x) => Right(x)
-      case Failure(ex) => Left(GenericErrorResult(ex.getMessage))
+  def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String]): Either[String, ObligationsQueryParams] = {
+    val from = dateQueryParam(fromOpt, "INVALID_DATE_FROM")
+    val to = dateQueryParam(toOpt, "INVALID_DATE_TO")
+    val status = statusQueryParam(statusOpt,  "INVALID_STATUS")
+
+    val errors = for {
+      paramOpt <- Seq(from, to, status, validDateRange(from, to))
+      param <- paramOpt
+      if param.isLeft
+    } yield param.left.get
+
+    if (errors.isEmpty) {
+      Right(ObligationsQueryParams(from.map(_.right.get).get, to.map(_.right.get).get, status.map(_.right.get).get))
+    } else {
+      Left(errors.head)
     }
   }
 
-  def getDateQueryParam(param: String)(implicit request: Request[_]) = {
-    Try(LocalDate.parse(request.getQueryString(param).getOrElse("").trim))
+
+  private def dateQueryParam(dateOpt: OptEither[String], errorCode: String): OptEither[LocalDate] = {
+    val paramValue = dateOpt match {
+      case Some(value) =>
+        val dateString = value.right.get
+        if (dateString.matches(dateRegex))
+          Try(Right(LocalDate.parse(dateString))).getOrElse(Left(errorCode))
+        else
+          Left(errorCode)
+      case None => Left(errorCode)
+    }
+    Some(paramValue)
   }
 
-  def getStatus(param: String)(implicit request: Request[_]) = {
-    val regex = "^[OCA]$"
-    val value = request.getQueryString(param).getOrElse("").trim
-    if (value.matches(regex))
-      Try(value)
-    else
-      Failure(new IllegalArgumentException(s"Query parameter [$param] is missing or invalid. Valid inputs are [O or C or A]"))
+
+  private def statusQueryParam(statusOpt: OptEither[String], errorCode: String): OptEither[String] = {
+    val paramValue = statusOpt match {
+      case Some(value) =>
+        val status = value.right.get
+        if (status.matches(statusRegex))
+          Right(status)
+        else
+          Left(errorCode)
+      case None => Left(errorCode)
+    }
+    Some(paramValue)
   }
 
-  def validateDateRange(fromDate: LocalDate, toDate: LocalDate) = {
-    if (toDate.isAfter(fromDate) && toDate.isBefore(fromDate.plusDays(366)))
-      Success(true)
-    else
-      Failure(new IllegalArgumentException(s"fromDate must be before toDate and date range should be less than or equal to 366 days"))
-  }
 
+  def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]) = {
+    for {
+      fromVal <- fromOpt
+      if fromVal.isRight
+      toVal <- toOpt
+      if toVal.isRight
+    } yield
+      (fromVal.right.get, toVal.right.get) match {
+        case (from, to) if !from.isBefore(to) || from.plusDays(365).isBefore(to) =>
+          Left("INVALID_DATE_RANGE")
+        case _ => Right(()) // object wrapped in Right irrelevant
+      }
+  }
 
 }

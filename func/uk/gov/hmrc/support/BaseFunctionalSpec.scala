@@ -825,8 +825,8 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
-        def returnObligationsFor(vrn: Vrn, id: String = "abc"): Givens = {
-          stubFor(get(urlEqualTo(s"/vat/obligation-data/$vrn"))
+        def returnObligationsFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s"/vat/obligation-data/$vrn.*"))
             .willReturn(
               aResponse()
                 .withStatus(200)

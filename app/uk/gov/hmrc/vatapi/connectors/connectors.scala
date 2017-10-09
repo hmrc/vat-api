@@ -18,14 +18,14 @@ package uk.gov.hmrc.vatapi
 
 import play.api.Logger
 import play.api.libs.json.Writes
-import uk.gov.hmrc.play.http.logging.Authorization
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 package object connectors {
   private val logger = Logger("connectors")
@@ -62,25 +62,25 @@ package object connectors {
     override def read(method: String, url: String, response: HttpResponse): HttpResponse = response
   }
 
-  def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier): Future[R] =
+  def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.GET(url)(NoExceptReads, _) map toResponse
+      WSHttp.GET(url)(NoExceptReads, _, ec) map toResponse
     }
 
   def httpPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-      implicit hc: HeaderCarrier): Future[R] =
+      implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.POST(url, elem)(implicitly[Writes[T]], NoExceptReads, _) map toResponse
+      WSHttp.POST(url, elem)(implicitly[Writes[T]], NoExceptReads, _, ec) map toResponse
     }
 
-  def httpEmptyPost[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier): Future[R] =
+  def httpEmptyPost[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.POSTEmpty(url)(NoExceptReads, _) map toResponse
+      WSHttp.POSTEmpty(url)(NoExceptReads, _, ec) map toResponse
     }
 
   def httpPut[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-      implicit hc: HeaderCarrier): Future[R] =
+      implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.PUT(url, elem)(implicitly[Writes[T]], NoExceptReads, _) map toResponse
+      WSHttp.PUT(url, elem)(implicitly[Writes[T]], NoExceptReads, _, ec) map toResponse
     }
 }

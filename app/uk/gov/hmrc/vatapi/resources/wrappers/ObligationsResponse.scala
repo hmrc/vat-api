@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.resources.wrappers
 
-import uk.gov.hmrc.play.http.HttpResponse
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.ObligationDetail
 import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
 

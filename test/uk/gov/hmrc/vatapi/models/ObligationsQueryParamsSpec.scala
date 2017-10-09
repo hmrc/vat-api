@@ -17,57 +17,64 @@
 package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
-import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.vatapi.UnitSpec
 
 class ObligationsQueryParamsSpec extends UnitSpec {
 
   "ObligationsQueryParams" should {
-    "return error when the fromDate query parameter is missing" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?toDate=2017-03-31&status=A")
-      ObligationsQueryParams.from(request).isLeft shouldBe true
+    "return error when the from date query parameter is missing" in {
+      val response = ObligationsQueryParams.from(None, Some(Right("2017-03-31")), Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_FROM"
     }
 
-    "return error when the fromDate query parameter is not a valid date" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=ABC&toDate=2017-03-31&status=A")
-      ObligationsQueryParams.from(request).isLeft  shouldBe true
+    "return error when the from date query parameter is not a valid date" in {
+      val response = ObligationsQueryParams.from(Some(Right("ABC")), Some(Right("2017-03-31")), Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_FROM"
     }
 
-    "return error when the toDate query parameter is missing" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-03-31&status=A")
-      ObligationsQueryParams.from(request).isLeft shouldBe true
+    "return error when the to date query parameter is missing" in {
+      val response = ObligationsQueryParams.from(Some(Right("2017-03-31")), None, Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_TO"
     }
 
-    "return error when the toDate query parameter is not a valid date" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?toDate=ABC&status=A")
-      ObligationsQueryParams.from(request).isLeft  shouldBe true
+    "return error when the to date query parameter is not a valid date" in {
+      val response = ObligationsQueryParams.from(Some(Right("2017-03-31")), Some(Right("ABC")), Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_TO"
     }
 
     "return error when the status query parameter is missing" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-01-01&toDate=2017-03-31")
-      ObligationsQueryParams.from(request).isLeft shouldBe true
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), None)
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_STATUS"
     }
 
     "return error when the status query parameter is not a valid status" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-01-01&toDate=2017-03-31&status=X")
-      ObligationsQueryParams.from(request).isLeft  shouldBe true
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), Some(Right("X")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_STATUS"
     }
 
-    "return error when fromDate is after toDate" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-01-02&toDate=2017-01-01&status=A")
-      ObligationsQueryParams.from(request).isLeft  shouldBe true
+    "return error when from date is after to date " in {
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-02")), Some(Right("2017-01-01")), Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_RANGE"
     }
 
 
-    "return error when the date range is not more than 365 days" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-01-01&toDate=2018-01-02&status=A")
-      ObligationsQueryParams.from(request).isLeft  shouldBe true
+    "return error when the date range is more than 365 days" in {
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2018-01-02")), Some(Right("A")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_DATE_RANGE"
     }
 
     "return an object when all the query params are valid" in {
-      val request = FakeRequest(Helpers.GET, "/obligations?fromDate=2017-01-01&toDate=2017-03-31&status=A")
-      ObligationsQueryParams.from(request).isRight  shouldBe true
-      ObligationsQueryParams.from(request).right.get.fromDate  shouldEqual  LocalDate.parse("2017-01-01")
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), Some(Right("A")))
+      response.isRight shouldBe true
+      response.right.get.from shouldEqual LocalDate.parse("2017-01-01")
     }
   }
 

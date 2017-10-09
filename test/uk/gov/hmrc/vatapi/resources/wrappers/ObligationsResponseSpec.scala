@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 
 import org.joda.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.play.http.HttpResponse
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.UnitSpec
 
 class ObligationsResponseSpec extends UnitSpec {

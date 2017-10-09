@@ -20,4 +20,4 @@ sealed trait ErrorResult
 
 case class GenericErrorResult(message: String) extends ErrorResult
 
-case class ValidationErrorResult(validationErrors: ValidationErrors) extends ErrorResult
+case class ValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult

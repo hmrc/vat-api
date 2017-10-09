@@ -125,7 +125,8 @@ object Jsons {
            |      "start": "2017-04-06",
            |      "end": "2017-07-05",
            |      "due": "2017-08-05",
-           |      "met": $firstMet
+           |      "met": $firstMet,
+           |      "metDate": "2017-08-01"
            |    },
            |    {
            |      "start": "2017-07-06",

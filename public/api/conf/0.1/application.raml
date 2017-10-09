@@ -7,6 +7,30 @@ protocols: [ HTTPS ]
 baseUri: https://api.service.hmrc.gov.uk/
 mediaType: application/json
 
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+
+traits:
+  contentType:
+    headers:
+      Content-Type:
+        description: Specifies the format of the request body, which must be JSON.
+        type: string
+        required: true
+        example: application/json
+  testScenarioHeader:
+    headers:
+      Gov-Test-Scenario:
+        description: Only in sandbox environment. See Test Data table for all header values.
+        type: string
+        required: false
+        example: '-'
+
+
 /vat:
   /{vrn}:
     uriParameters:
@@ -34,21 +58,24 @@ mediaType: application/json
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
     /obligations:
+      displayName: Retrieve all VAT obligations
       description: Retrieve all VAT obligations
+      (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
+      is: [contentType, testScenarioHeader]
       get:
         description: Retrieve all VAT obligations.
         queryParameters:
-         fromDate:
+         from:
            description: Obligations to return from date
            type: string
            example: 2017-01-25
            required: true
-         toDate:
+         to:
            description: Obligations to return up to date
            type: string
            example: 2017-01-25
            required: true
-         type:
+         status:
            description: Which obligation statuses to return (O=Open,C=Closed,A=All)
            type: string
            example: A
@@ -63,3 +90,28 @@ mediaType: application/json
                application/json:
                  type: !include schemas/Obligations.json
                  example: !include examples/Obligations.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: INVALID_DATE_FROM
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: INVALID_DATE_TO
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: INVALID_DATE_RANGE
+                  invalidStatus:
+                    description: Invalid status
+                    value:
+                      code: INVALID_STATUS

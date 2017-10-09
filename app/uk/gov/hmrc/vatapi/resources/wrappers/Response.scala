@@ -35,11 +35,10 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
-import play.api.mvc.Result
 import play.api.mvc.Results._
-import uk.gov.hmrc.play.http.HttpResponse
-import uk.gov.hmrc.vatapi.models.Errors
-import uk.gov.hmrc.vatapi.models._
+import play.api.mvc.{Request, Result}
+import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.vatapi.models.{Errors, _}
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
 import uk.gov.hmrc.vatapi.models.des.{DesError, MultiDesError}
 
@@ -51,6 +50,15 @@ trait Response {
   def json: JsValue = underlying.json
 
   val status: Int = underlying.status
+
+
+  def filter[A](pf: PartialFunction[Int, Result])(implicit request: Request[A]): Result =
+    status / 100 match {
+      case 4 | 5 =>
+        logResponse()
+        (pf orElse errorMapping) (status)
+      case _ => (pf andThen addCorrelationHeader) (status)
+    }
 
   private def logResponse(): Unit =
     logger.error(s"DES error occurred with status code ${underlying.status} and body ${underlying.body}")
@@ -86,7 +94,7 @@ trait Response {
     )
 
   private def errorMapping: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_VRN)    => BadRequest(toJson(Errors.VrnInvalid))
+    case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400
       if errorCodeIsOneOf(NOT_FOUND_NINO,
@@ -109,9 +117,9 @@ trait Response {
     case 403 if errorCodeIsOneOf(MISSING_EXEMPTION_INDICATOR) => BadRequest(toJson(Errors.badRequest(Errors.MissingExemptionIndicator)))
     case 403 if errorCodeIsOneOf(MISSING_EXEMPTION_REASON) => BadRequest(toJson(Errors.badRequest(Errors.MandatoryFieldMissing)))
     case 403 if errorCodeIsOneOf(INVALID_DATE_RANGE) => InternalServerError(toJson(Errors.InternalServerError))
-    case 403                                         => NotFound
-    case 404                                         => NotFound
-    case 409 if errorCodeIsOneOf(INVALID_PERIOD)     => BadRequest(toJson(Errors.badRequest(Errors.InvalidPeriod)))
+    case 403 => NotFound
+    case 404 => NotFound
+    case 409 if errorCodeIsOneOf(INVALID_PERIOD) => BadRequest(toJson(Errors.badRequest(Errors.InvalidPeriod)))
     case 409 if errorCodeIsOneOf(NOT_CONTIGUOUS_PERIOD) =>
       Forbidden(toJson(Errors.businessError(Errors.NotContiguousPeriod)))
     case 409 if errorCodeIsOneOf(OVERLAPS_IN_PERIOD) =>
@@ -123,9 +131,9 @@ trait Response {
       if isMultiDesError && errorCodesContainOneOf(NOT_CONTIGUOUS_PERIOD, OVERLAPS_IN_PERIOD, NOT_ALIGN_PERIOD) =>
       val apiErrors = desErrorsToApiErrors(json.asOpt[MultiDesError].get.failures)
       Forbidden(toJson(Errors.businessError(apiErrors)))
-    case 500 if errorCodeIsOneOf(SERVER_ERROR)        => InternalServerError(toJson(Errors.InternalServerError))
+    case 500 if errorCodeIsOneOf(SERVER_ERROR) => InternalServerError(toJson(Errors.InternalServerError))
     case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => InternalServerError(toJson(Errors.InternalServerError))
-    case _                                            => InternalServerError(toJson(Errors.InternalServerError))
+    case _ => InternalServerError(toJson(Errors.InternalServerError))
   }
 
   def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean =

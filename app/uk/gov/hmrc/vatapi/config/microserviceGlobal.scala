@@ -27,7 +27,7 @@ import play.api.{Application, Configuration, Play}
 import play.routing.Router.Tags
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
+import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, ErrorNotFound, HeaderValidator}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
@@ -74,7 +74,7 @@ object ControllerConfiguration extends ControllerConfig {
 }
 
 object MicroserviceAuditFilter
-    extends AuditFilter
+  extends AuditFilter
     with AppName
     with MicroserviceFilterSupport {
   override val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
@@ -87,7 +87,7 @@ object MicroserviceAuditFilter
 }
 
 object MicroserviceLoggingFilter
-    extends LoggingFilter
+  extends LoggingFilter
     with MicroserviceFilterSupport {
   override def controllerNeedsLogging(controllerName: String) =
     ControllerConfiguration.controllerParamsConfig(controllerName).needsLogging
@@ -95,8 +95,9 @@ object MicroserviceLoggingFilter
 
 object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
   val emptyHeader = "Gov-Empty-Response"
+
   override def apply(f: (RequestHeader) => Future[Result])(
-      rh: RequestHeader): Future[Result] =
+    rh: RequestHeader): Future[Result] =
     f(rh) map { res =>
       if ((res.header.status == 201 || res.header.status == 409) && res.body.isKnownEmpty) {
         val headers = res.header.headers
@@ -110,7 +111,7 @@ object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
 // this filter is a workaround for the issue reported here https://jira.tools.tax.service.gov.uk/browse/APSR-87
 object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
   override def apply(f: (RequestHeader) => Future[Result])(
-      rh: RequestHeader): Future[Result] =
+    rh: RequestHeader): Future[Result] =
     f(rh).map(_.as("application/json"))
 }
 
@@ -119,23 +120,23 @@ object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
 }
 
 object MicroserviceAuthFilter
-    extends AuthorisationFilter
+  extends AuthorisationFilter
     with MicroserviceFilterSupport {
 
   override def authConnector = MicroserviceAuthConnector
 
+
   override def authParamsConfig = AuthParamsControllerConfiguration
 
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
-
 }
 
 object HeaderValidatorFilter
-    extends Filter
+  extends Filter
     with HeaderValidator
     with MicroserviceFilterSupport {
   def apply(next: (RequestHeader) => Future[Result])(
-      rh: RequestHeader): Future[Result] = {
+    rh: RequestHeader): Future[Result] = {
     val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)
     val needsHeaderValidation =
       controller.forall(
@@ -145,7 +146,7 @@ object HeaderValidatorFilter
             .needsHeaderValidation)
 
     if (!needsHeaderValidation || acceptHeaderValidationRules(
-          rh.headers.get("Accept"))) next(rh)
+      rh.headers.get("Accept"))) next(rh)
     else
       Future.successful(
         Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
@@ -154,7 +155,7 @@ object HeaderValidatorFilter
 }
 
 trait MicroserviceRegistration
-    extends ServiceLocatorRegistration
+  extends ServiceLocatorRegistration
     with ServiceLocatorConfig {
   override lazy val registrationEnabled: Boolean =
     AppContext.registrationEnabled
@@ -164,7 +165,7 @@ trait MicroserviceRegistration
 }
 
 object MicroserviceGlobal
-    extends DefaultMicroserviceGlobal
+  extends DefaultMicroserviceGlobal
     with MicroserviceRegistration {
 
   private var application: Application = _
@@ -172,7 +173,7 @@ object MicroserviceGlobal
   override val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(
-      implicit app: Application): Option[Configuration] =
+                                          implicit app: Application): Option[Configuration] =
     app.configuration.getConfig(s"$env.microservice.metrics")
 
   override val loggingFilter: MicroserviceLoggingFilter.type = MicroserviceLoggingFilter
@@ -205,4 +206,14 @@ object MicroserviceGlobal
     }
   }
 
+
+  override def onBadRequest(request: RequestHeader, error: String) = {
+    super.onBadRequest(request, error).map { result =>
+      error match {
+        case "ERROR_VRN_INVALID" =>
+          BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid")))
+        case _ => result
+      }
+    }
+  }
 }

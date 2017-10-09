@@ -25,26 +25,24 @@ import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 object ObligationsResource extends BaseController {
   val logger: Logger = Logger(this.getClass)
 
   private val connector = ObligationsConnector
 
-  def retrieveObligations(vrn: Vrn) = Action.async { implicit request =>
-    ObligationsQueryParams.from(request) match {
-      case Left(errorResult) => Future.successful(handleValidationErrors(errorResult))
-      case Right(params) =>
-        connector.get(vrn, params) map { response =>
+  def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams) = Action.async { implicit request =>
+    connector.get(vrn, params) map { response =>
+      response.filter {
+        case 200 =>
           response.obligations match {
             case Right(obj) => obj.map(x => Ok(Json.toJson(x))).getOrElse(NotFound)
             case Left(ex) =>
               logger.error(ex.msg)
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
-        }
+      }
     }
-
   }
+
 }

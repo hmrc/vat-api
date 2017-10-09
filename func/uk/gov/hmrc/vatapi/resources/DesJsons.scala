@@ -76,9 +76,10 @@ object DesJsons {
          |      "type": "ITVAT",
          |      "details": [
          |        {
-         |          "status": "O",
+         |          "status": "F",
          |          "inboundCorrespondenceFromDate": "2017-04-06",
          |          "inboundCorrespondenceToDate": "2017-07-05",
+         |          "inboundCorrespondenceDateReceived": "2017-08-01",
          |          "inboundCorrespondenceDueDate": "2017-08-05",
          |          "periodKey": "004"
          |        },

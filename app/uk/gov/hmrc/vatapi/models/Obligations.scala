@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.models
 
 import com.github.nscala_time.time.OrderingImplicits
 import org.joda.time.LocalDate
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
 
@@ -31,6 +31,9 @@ object Obligations {
 case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, met: Boolean, metDate : Option[LocalDate] = None)
 
 object Obligation {
+  implicit val jodaDateWrites: Writes[LocalDate] = new Writes[LocalDate] {
+    def writes(d: LocalDate): JsValue = JsString(d.toString())
+  }
 
   implicit val from =  new DesTransformValidator[des.ObligationDetail, Obligation] {
     def from(desObligation: des.ObligationDetail) = {
