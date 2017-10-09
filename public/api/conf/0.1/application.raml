@@ -8,30 +8,58 @@ baseUri: https://api.service.hmrc.gov.uk/
 mediaType: application/json
 
 /vat:
-  /{vrn}/periods/{periodKey}:
-    description: Submit VAT return for period.
+  /{vrn}:
     uriParameters:
       vrn:
         description: Vat registration number.
         type: string
-        example: "VRN1234567"
-      periodKey:
-        description: Identifier for the period of the VAT return
-        type: string
-        example: "#001"
-    post:
+        example: "123456789"
+    /periods/{periodKey}:
       description: Submit VAT return for period.
-      body:
-        application/json:
-          type: !include schemas/submitVatReturn.json
-          example: !include examples/vatReturn.json
-      responses:
-        200:
-          headers:
-            X-CorrelationId:
-              example: 5968c22d620000620096db5f
-              description: Unique id for operation tracking
-
-
-
-
+      uriParameters:
+        periodKey:
+          description: Identifier for the period of the VAT return
+          type: string
+          example: "#001"
+      post:
+        description: Submit VAT return for period.
+        body:
+          application/json:
+            type: !include schemas/submitVatReturn.json
+            example: !include examples/vatReturn.json
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking
+    /obligations:
+      description: Retrieve all VAT obligations
+      get:
+        description: Retrieve all VAT obligations.
+        queryParameters:
+         fromDate:
+           description: Obligations to return from date
+           type: string
+           example: 2017-01-25
+           required: true
+         toDate:
+           description: Obligations to return up to date
+           type: string
+           example: 2017-01-25
+           required: true
+         type:
+           description: Which obligation statuses to return (O=Open,C=Closed,A=All)
+           type: string
+           example: A
+           required: true
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking
+            body:
+               application/json:
+                 type: !include schemas/Obligations.json
+                 example: !include examples/Obligations.json

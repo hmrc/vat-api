@@ -7,15 +7,17 @@ import org.skyscreamer.jsonassert.JSONAssert.assertEquals
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers.ErrorNotFound
-import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.{Nino, Vrn}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.vatapi.TestApplication
+import uk.gov.hmrc.vatapi.{TestApplication, VrnGenerator}
 import uk.gov.hmrc.vatapi.models.ErrorNotImplemented
+import uk.gov.hmrc.vatapi.resources.DesJsons
 
 import scala.collection.mutable
 import scala.util.matching.Regex
 
 trait BaseFunctionalSpec extends TestApplication {
+  protected val vrn = VrnGenerator().nextVrn()
 
   class Assertions(request: String, response: HttpResponse)(
       implicit urlPathVariables: mutable.Map[String, String])
@@ -799,8 +801,47 @@ trait BaseFunctionalSpec extends TestApplication {
         givens
       }
 
+      def invalidVrnFor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(400)
+              .withHeader("Content-Type", "application/json")
+              .withBody(DesJsons.Errors.invalidVrn)))
+
+        givens
+      }
+
+
+      object obligations {
+        def obligationNotFoundFor(vrn: Vrn): Givens = {
+          stubFor(get(urlEqualTo(s"/vat/obligation-data/$vrn"))
+            .willReturn(
+              aResponse()
+                .withStatus(404)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.Errors.notFound)))
+
+          givens
+        }
+
+        def returnObligationsFor(vrn: Vrn, id: String = "abc"): Givens = {
+          stubFor(get(urlEqualTo(s"/vat/obligation-data/$vrn"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withHeader("CorrelationId", "abc")
+                .withBody(DesJsons.Obligations())))
+
+          givens
+        }
+      }
+
+
     }
 
+    def des() = new Des(this)
   }
 
   def given() = new Givens()
