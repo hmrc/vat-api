@@ -5,7 +5,7 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.libs.ws.{WS, WSRequest, WSResponse}
 import play.api.mvc.Results
 import uk.gov.hmrc.play.http.ws.WSHttpResponse
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

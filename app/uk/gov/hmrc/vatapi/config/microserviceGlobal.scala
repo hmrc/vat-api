@@ -29,25 +29,27 @@ import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
 import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.auth.filter.{AuthorisationFilter, FilterConfig}
-import uk.gov.hmrc.play.audit.filters.AuditFilter
+import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
+import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 import uk.gov.hmrc.play.config.{AppName, RunMode}
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
-import uk.gov.hmrc.play.http.{HeaderCarrier, NotImplementedException}
+import uk.gov.hmrc.http.{HeaderCarrier, NotImplementedException}
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
+import play.api.Mode
 import uk.gov.hmrc.vatapi.models._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.matching.Regex
+import play.api.Mode.Mode
+import uk.gov.hmrc.play.config.ControllerConfig
 
 case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
                                   needsLogging: Boolean = true,
                                   needsAuditing: Boolean = true,
                                   needsTaxYear: Boolean = true)
 
-object ControllerConfiguration {
+object ControllerConfiguration extends ControllerConfig {
   private implicit val regexValueReader: ValueReader[Regex] =
     StringReader.stringValueReader.map(_.r)
   private implicit val controllerParamsReader: ValueReader[ControllerConfigParams] =
@@ -81,6 +83,7 @@ object MicroserviceAuditFilter
     AppContext.auditEnabled && ControllerConfiguration
       .controllerParamsConfig(controllerName)
       .needsAuditing
+
 }
 
 object MicroserviceLoggingFilter
@@ -111,12 +114,20 @@ object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
     f(rh).map(_.as("application/json"))
 }
 
+object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
+  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
+}
+
 object MicroserviceAuthFilter
     extends AuthorisationFilter
     with MicroserviceFilterSupport {
-  override def config: FilterConfig =
-    FilterConfig(ControllerConfiguration.controllerConfigs)
-  override def connector: AuthConnector = MicroserviceAuthConnector
+
+  override def authConnector = MicroserviceAuthConnector
+
+  override def authParamsConfig = AuthParamsControllerConfiguration
+
+  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
+
 }
 
 object HeaderValidatorFilter
@@ -154,8 +165,7 @@ trait MicroserviceRegistration
 
 object MicroserviceGlobal
     extends DefaultMicroserviceGlobal
-    with MicroserviceRegistration
-    with RunMode {
+    with MicroserviceRegistration {
 
   private var application: Application = _
 
@@ -194,4 +204,5 @@ object MicroserviceGlobal
       }
     }
   }
+
 }
