@@ -8,7 +8,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers.ErrorNotFound
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.TestApplication
 import uk.gov.hmrc.vatapi.models.ErrorNotImplemented
 
@@ -170,7 +170,7 @@ trait BaseFunctionalSpec extends TestApplication {
       val pathSeq =
         path.filter(!_.isWhitespace).split('\\').toSeq.filter(!_.isEmpty)
 
-      def op(js: Option[JsValue], pathElement: String) = {
+      def op(js: Option[JsValue], pathElement: String): Option[JsValue] = {
         val pattern = """(.*)\((\d+)\)""".r
         js match {
           case Some(v) =>
@@ -178,8 +178,8 @@ trait BaseFunctionalSpec extends TestApplication {
               case pattern(arrayName, index) =>
                 js match {
                   case Some(v) =>
-                    if (arrayName.isEmpty) v(index.toInt).toOption
-                    else (v \ arrayName)(index.toInt).toOption
+                    if (arrayName.isEmpty) Some(v(index.toInt))
+                    else Some((v \ arrayName)(index.toInt))
                   case None => None
                 }
               case _ => (v \ pathElement).toOption
