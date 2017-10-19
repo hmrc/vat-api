@@ -1,0 +1,4 @@
+# microservice specific routes
+
+# Obligations
+GET /vat/:vrn/obligations   uk.gov.hmrc.vatapi.resources.ObligationsResource.retrieveObligations(vrn: uk.gov.hmrc.domain.Vrn, queryParams: uk.gov.hmrc.vatapi.models.ObligationsQueryParams)

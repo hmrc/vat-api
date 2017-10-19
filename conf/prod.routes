@@ -1,4 +1,4 @@
 # Add all the application routes to the app.routes file
-->         /                        app.Routes
+->         /                        live.Routes
 ->         /                        definition.Routes
 ->         /                        health.Routes

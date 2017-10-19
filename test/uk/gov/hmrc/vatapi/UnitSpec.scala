@@ -34,9 +34,10 @@ trait UnitSpec extends WordSpec with BaseUnitSpec
 trait AsyncUnitSpec extends AsyncWordSpec with BaseUnitSpec
 
 trait TestUtils {
+  private val vrnGenerator = VrnGenerator()
 
   def now: DateTime = DateTime.now(DateTimeZone.UTC)
-
+  def generateVrn = vrnGenerator.nextVrn()
 }
 
 object TestUtils extends TestUtils

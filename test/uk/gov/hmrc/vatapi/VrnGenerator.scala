@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers
+package uk.gov.hmrc.vatapi
 
-import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
-import play.api.mvc._
-import scala.concurrent.Future
 
-object MicroserviceHelloWorld extends MicroserviceHelloWorld
+import uk.gov.hmrc.domain.Vrn
 
-trait MicroserviceHelloWorld extends BaseController {
+import scala.util.Random
 
-	def hello() = Action.async { implicit request =>
-		Future.successful(Ok("Hello world"))
-	}
+class VrnGenerator(random: Random) {
+  def nextVrn(): Vrn = {
+    val digits = (1 to 9).map(_ => random.nextInt(10)).foldLeft("")((acc, curr) => acc + curr.toString)
+    Vrn(s"$digits")
+  }
+}
+
+object VrnGenerator {
+  def apply(): VrnGenerator = new VrnGenerator(new Random)
+
+  def apply(seed: Long): VrnGenerator = new VrnGenerator(new Random(seed))
 }

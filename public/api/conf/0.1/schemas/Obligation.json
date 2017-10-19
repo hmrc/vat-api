@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Obligation",
+  "description": "Obligation",
+  "type": "object",
+  "properties": {
+    "start": {
+      "title": "Start date",
+      "description": "The start date of this obligation period",
+      "$ref": "FullDate.json"
+    },
+    "end": {
+      "title": "End date",
+      "description": "The end date of this obligation period",
+      "$ref": "FullDate.json"
+    },
+    "due": {
+      "title": "Due date",
+      "description": "The due date for this obligation period",
+      "$ref": "FullDate.json"
+    },
+    "met": {
+      "title": "Met",
+      "description": "True if this obligation period has been met; false otherwise",
+      "type": "boolean",
+      "example": "true or false"
+    },
+    "metDate": {
+      "title": "Met Date",
+      "description": "The obligation met date",
+      "$ref": "FullDate.json"
+    },
+    "periodKey": {
+      "title": "Period Key",
+      "description": "The period key this obligation belongs to",
+      "type": "string",
+      "example": "#001"
+    }
+  },
+  "required": [
+    "start",
+    "end",
+    "due",
+    "met",
+    "periodKey"
+  ],
+  "additionalProperties": false
+}
