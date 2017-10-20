@@ -27,7 +27,7 @@ case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: String
 
 object ObligationsQueryParams {
   val dateRegex = """^\d{4}-\d{2}-\d{2}$"""
-  val statusRegex = "^[OCA]$"
+  val statusRegex = "^[OFA]$"
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String]): Either[String, ObligationsQueryParams] = {
     val from = dateQueryParam(fromOpt, "INVALID_DATE_FROM")
