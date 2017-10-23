@@ -81,28 +81,28 @@ object DesJsons {
          |          "inboundCorrespondenceToDate": "2017-07-05",
          |          "inboundCorrespondenceDateReceived": "2017-08-01",
          |          "inboundCorrespondenceDueDate": "2017-08-05",
-         |          "periodKey": "004"
+         |          "periodKey": "#001"
          |        },
          |        {
          |          "status": "O",
          |          "inboundCorrespondenceFromDate": "2017-07-06",
          |          "inboundCorrespondenceToDate": "2017-10-05",
          |          "inboundCorrespondenceDueDate": "2017-11-05",
-         |          "periodKey": "004"
+         |          "periodKey": "#002"
          |        },
          |        {
          |          "status": "O",
          |          "inboundCorrespondenceFromDate": "2017-10-06",
          |          "inboundCorrespondenceToDate": "2018-01-05",
          |          "inboundCorrespondenceDueDate": "2018-02-05",
-         |          "periodKey": "004"
+         |          "periodKey": "#003"
          |        },
          |        {
          |          "status": "O",
          |          "inboundCorrespondenceFromDate": "2018-01-06",
          |          "inboundCorrespondenceToDate": "2018-04-05",
          |          "inboundCorrespondenceDueDate": "2018-05-06",
-         |          "periodKey": "004"
+         |          "periodKey": "#004"
          |        }
          |      ]
          |    },

@@ -38,30 +38,13 @@ traits:
         description: Vat registration number.
         type: string
         example: "123456789"
-    /periods/{periodKey}:
-      description: Submit VAT return for period.
-      uriParameters:
-        periodKey:
-          description: Identifier for the period of the VAT return
-          type: string
-          example: "#001"
-      post:
-        description: Submit VAT return for period.
-        body:
-          application/json:
-            type: !include schemas/submitVatReturn.json
-            example: !include examples/vatReturn.json
-        responses:
-          200:
-            headers:
-              X-CorrelationId:
-                example: 5968c22d620000620096db5f
-                description: Unique id for operation tracking
     /obligations:
       displayName: Retrieve all VAT obligations
       description: Retrieve all VAT obligations
       (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
       is: [contentType, testScenarioHeader]
+      (annotations.scope): "read:vat"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
       get:
         description: Retrieve all VAT obligations.
         queryParameters:
@@ -76,7 +59,7 @@ traits:
            example: 2017-01-25
            required: true
          status:
-           description: Which obligation statuses to return (O=Open,C=Closed,A=All)
+           description: Which obligation statuses to return (O=Open, F=Fulfilled, A=All)
            type: string
            example: A
            required: true
@@ -115,3 +98,24 @@ traits:
                     description: Invalid status
                     value:
                       code: INVALID_STATUS
+    /periods/{periodKey}:
+      description: Submit VAT return for period.
+      (annotations.scope): "write:vat"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
+      uriParameters:
+        periodKey:
+          description: Identifier for the period of the VAT return
+          type: string
+          example: "#001"
+      post:
+        description: Submit VAT return for period.
+        body:
+          application/json:
+            type: !include schemas/submitVatReturn.json
+            example: !include examples/vatReturn.json
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking

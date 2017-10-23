@@ -28,7 +28,7 @@ object Obligations {
   implicit val writes: Writes[Obligations] = Json.writes[Obligations]
 }
 
-case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, met: Boolean, metDate : Option[LocalDate] = None)
+case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, met: Boolean, periodKey : String, received : Option[LocalDate] = None)
 
 object Obligation {
   implicit val jodaDateWrites: Writes[LocalDate] = new Writes[LocalDate] {
@@ -42,7 +42,8 @@ object Obligation {
         end = LocalDate.parse(desObligation.inboundCorrespondenceToDate),
         due = LocalDate.parse(desObligation.inboundCorrespondenceDueDate),
         met = desObligation.isFulfilled,
-        metDate = desObligation.inboundCorrespondenceDateReceived.map(LocalDate.parse))
+        periodKey = desObligation.periodKey,
+        received = desObligation.inboundCorrespondenceDateReceived.map(LocalDate.parse))
       ) match {
         case Success(obj) => Right(obj)
         case Failure(ex) => Left(InvalidDateError(s"Unable to parse the date from des response $ex"))

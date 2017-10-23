@@ -25,9 +25,9 @@
       "type": "boolean",
       "example": "true or false"
     },
-    "metDate": {
-      "title": "Met Date",
-      "description": "The obligation met date",
+    "received": {
+      "title": "Received Date",
+      "description": "The obligation received date",
       "$ref": "FullDate.json"
     },
     "periodKey": {

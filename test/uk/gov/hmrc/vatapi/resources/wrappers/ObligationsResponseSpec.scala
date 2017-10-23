@@ -168,7 +168,7 @@ class ObligationsResponseSpec extends UnitSpec {
       val response = ObligationsResponse(HttpResponse(200, Some(obligationJson)))
 
       val obligations = response.obligations
-      obligations.right.get.get.obligations.find(o => o.metDate.get == new LocalDate("2017-04-25")) shouldBe defined
+      obligations.right.get.get.obligations.find(o => o.received.get == new LocalDate("2017-04-25")) shouldBe defined
     }
   }
 }
