@@ -28,7 +28,32 @@ class VatApiDefinition {
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
 
-  val vatEndpoints: Seq[Endpoint] = Seq.empty
+  val vatEndpoints: Seq[Endpoint] = {
+    Seq(
+      Endpoint(
+        uriPattern = "/{vrn}/obligations",
+        endpointName = "Retrieve all VAT obligations",
+        method = GET,
+        authType = USER,
+        throttlingTier = UNLIMITED,
+        scope = Some(readScope),
+        groupName = Vat)
+      ,
+      Endpoint(
+        uriPattern = "/{vrn}/return",
+        endpointName = "Submit VAT return for period.",
+        method = POST,
+        authType = USER,
+        throttlingTier = UNLIMITED,
+        scope = Some(writeScope),
+        groupName = Vat,
+        queryParameters = Some(Seq(
+          Parameter("from", true),
+          Parameter("to", true),
+          Parameter("status", true)
+        )))
+    )
+  }
 
 
   private val allEndpoints = vatEndpoints
@@ -54,7 +79,7 @@ class VatApiDefinition {
         context = AppContext.apiGatewayRegistrationContext,
         versions = Seq(
           APIVersion(
-            version = "0.1",
+            version = "1.0",
             access = buildWhiteListingAccess(),
             status = buildAPIStatus(),
             endpoints = allEndpoints
@@ -67,7 +92,7 @@ class VatApiDefinition {
   private def buildAPIStatus(): APIStatus = {
     AppContext.apiStatus match {
       case "PUBLISHED" => APIStatus.PUBLISHED
-      case _           => APIStatus.PROTOTYPED
+      case _ => APIStatus.PROTOTYPED
     }
   }
 

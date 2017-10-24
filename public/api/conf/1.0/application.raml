@@ -39,10 +39,10 @@ traits:
         type: string
         example: "123456789"
     /obligations:
-      displayName: Retrieve all VAT obligations
-      description: Retrieve all VAT obligations
+      displayName: Retrieve all VAT obligations 1
+      description: Retrieve all VAT obligations  2
       (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
-      is: [contentType, testScenarioHeader]
+      is: [headers.acceptHeader, contentType, testScenarioHeader]
       (annotations.scope): "read:vat"
       securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
       get:
@@ -99,7 +99,9 @@ traits:
                     value:
                       code: INVALID_STATUS
     /periods/{periodKey}:
-      description: Submit VAT return for period.
+      displayName: Submit VAT return for period 3.
+      description: Submit VAT return for period 4.
+      is: [headers.acceptHeader, contentType, testScenarioHeader]
       (annotations.scope): "write:vat"
       securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
       uriParameters:
