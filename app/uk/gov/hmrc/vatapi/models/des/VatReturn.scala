@@ -47,7 +47,7 @@ object VatReturn {
       vatDueTotal = vatReturn.totalVatDue,
       vatReclaimedCurrPeriod = vatReturn.vatReclaimedCurrPeriod,
       vatDueNet = vatReturn.netVatDue,
-      totalValueSalesExVAT = vatReturn.totalAcquisitionsExVAT,
+      totalValueSalesExVAT = vatReturn.totalValueSalesExVAT,
       totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
       totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
       totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
