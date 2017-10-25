@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.vatapi.models.des
 
+import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator.PaymentIndicator
+import uk.gov.hmrc.vatapi.models.dateFormat
 
-case class VatReturnsDES(paymentIndicator: PaymentIndicator,
+case class VatReturnsDES(processingDate: DateTime,
+                         paymentIndicator: PaymentIndicator,
                          formBundleNumber: String,
                          chargeRefNumber: Option[String])
 

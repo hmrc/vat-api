@@ -17,9 +17,10 @@
 package uk.gov.hmrc.vatapi.models.des
 
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.json.{Format, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import uk.gov.hmrc.vatapi.models
 import uk.gov.hmrc.vatapi.models.Amount
+import uk.gov.hmrc.vatapi.models.dateFormat
 
 case class VatReturn(periodKey: String,
                      vatDueSales: Amount,
@@ -35,11 +36,6 @@ case class VatReturn(periodKey: String,
                      receivedAt: DateTime)
 
 object VatReturn {
-  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-  implicit val dateFormat: Format[DateTime] = Format[DateTime](
-    Reads.jodaDateReads(pattern),
-    Writes.jodaDateWrites(pattern))
-
   implicit val writes: Writes[VatReturn] = Json.writes[VatReturn]
   implicit val reads: Reads[VatReturn] = Json.reads[VatReturn]
 

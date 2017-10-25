@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.vatapi
 
-import play.api.libs.json.{JsPath, JsonValidationError, Reads}
+import org.joda.time.DateTime
+import play.api.libs.json._
 
 package object models {
 
@@ -86,5 +87,10 @@ package object models {
   implicit class NullableTrimmer(reads: Reads[Option[String]]) {
     def trimNullable: Reads[Option[String]] = reads.map(_.map(_.trim))
   }
+
+  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+  implicit val dateFormat: Format[DateTime] = Format[DateTime](
+    Reads.jodaDateReads(pattern),
+    Writes.jodaDateWrites(pattern))
 
 }
