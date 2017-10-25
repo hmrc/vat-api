@@ -72,6 +72,7 @@ trait Response {
     Map(
       INVALID_VRN -> Some(Errors.VrnInvalid),
       INVALID_PAYLOAD -> Some(Errors.InvalidRequest),
+      INVALID_PERIOD_KEY -> Some(Errors.InvalidPeriodKey),
       INVALID_INCOMESOURCEID -> None,
       INVALID_BUSINESSID -> None,
       INVALID_INCOME_SOURCE -> None,
@@ -96,6 +97,7 @@ trait Response {
   private def errorMapping: PartialFunction[Int, Result] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
+    case 400 if errorCodeIsOneOf(INVALID_PERIOD_KEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
     case 400
       if errorCodeIsOneOf(NOT_FOUND_NINO,
         INVALID_BUSINESSID,

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Submit 9 Box Return Response",
+  "description": "Submit 9 Box Return Response",
+  "type": "object",
+  "properties": {
+    "processingDate": {
+      "description": "The date the message was processed.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "paymentIndicator": {
+      "$ref": "PaymentIndicator.json"
+    },
+    "formBundleNumber": {
+      "description": "Form bundle number.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10,
+      "pattern":"^[0-9]{12}$",
+      "example": "123456789234"
+    },
+    "chargeRefNumber": {
+      "description": "Not populated for NIL return, or when the submission relates to a claim.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16,
+      "example": "abc"
+    }
+  },
+  "required": [
+    "processingDate",
+    "formBundleNumber"
+  ],
+  "additionalProperties": false
+}
