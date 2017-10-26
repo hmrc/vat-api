@@ -2,7 +2,7 @@
 ---
 
 title: VAT (MTD)
-version: 0.1
+version: 1.0
 protocols: [ HTTPS ]
 baseUri: https://api.service.hmrc.gov.uk/
 mediaType: application/json
@@ -39,14 +39,15 @@ traits:
         type: string
         example: "123456789"
     /obligations:
-      displayName: Retrieve all VAT obligations 1
-      description: Retrieve all VAT obligations  2
-      (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
-      is: [headers.acceptHeader, contentType, testScenarioHeader]
-      (annotations.scope): "read:vat"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+      displayName: Retrieve all VAT obligations.
+      description: Retrieve all VAT obligations.
       get:
+        displayName: Retrieve all VAT obligations.
         description: Retrieve all VAT obligations.
+        (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
          from:
            description: Obligations to return from date
@@ -98,16 +99,20 @@ traits:
                     description: Invalid status
                     value:
                       code: INVALID_STATUS
-
     /return:
-      displayName: Submit VAT return for period 3.
-      description: Submit VAT return for period 4.
-      is: [headers.acceptHeader, contentType, testScenarioHeader]
-      (annotations.scope): "write:vat"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
+      displayName: Submit VAT return for period.
+      description: Submit VAT return for period.
+      uriParameters:
+        periodKey:
+          description: Identifier for the period of the VAT return
+          type: string
+          example: "#001"
       post:
         displayName: Submit VAT return for period.
         description: Submit VAT return for period.
+        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        (annotations.scope): "write:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
         body:
           application/json:
             type: !include schemas/submitVatReturn.json
