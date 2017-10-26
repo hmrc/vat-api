@@ -39,11 +39,11 @@ traits:
         type: string
         example: "123456789"
     /obligations:
-      displayName: Retrieve all VAT obligations.
-      description: Retrieve all VAT obligations.
+      displayName: Retrieve VAT obligations.
+      description: Retrieve VAT obligations.
       get:
-        displayName: Retrieve all VAT obligations.
-        description: Retrieve all VAT obligations.
+        displayName: Retrieve VAT obligations.
+        description: Retrieve VAT obligations.
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "read:vat"

@@ -114,10 +114,10 @@ object Jsons {
   }
 
   object Obligations {
-    def apply(firstMet: Boolean = false,
-              secondMet: Boolean = false,
-              thirdMet: Boolean = false,
-              fourthMet: Boolean = false): JsValue = {
+    def apply(firstMet: String = "F",
+              secondMet: String = "O",
+              thirdMet: String = "O",
+              fourthMet: String = "O"): JsValue = {
       Json.parse(s"""
            |{
            |  "obligations": [
@@ -125,7 +125,7 @@ object Jsons {
            |      "start": "2017-04-06",
            |      "end": "2017-07-05",
            |      "due": "2017-08-05",
-           |      "met": $firstMet,
+           |      "status": "$firstMet",
            |      "received": "2017-08-01",
            |      "periodKey": "#001"
            |    },
@@ -133,21 +133,21 @@ object Jsons {
            |      "start": "2017-07-06",
            |      "end": "2017-10-05",
            |      "due": "2017-11-05",
-           |      "met": $secondMet,
+           |      "status": "$secondMet",
            |      "periodKey": "#002"
            |    },
            |    {
            |      "start": "2017-10-06",
            |      "end": "2018-01-05",
            |      "due": "2018-02-05",
-           |      "met": $thirdMet,
+           |      "status": "$thirdMet",
            |      "periodKey": "#003"
            |    },
            |    {
            |      "start": "2018-01-06",
            |      "end": "2018-04-05",
            |      "due": "2018-05-06",
-           |      "met": $fourthMet,
+           |      "status": "$fourthMet",
            |      "periodKey": "#004"
            |    }
            |  ]

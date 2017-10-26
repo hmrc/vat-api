@@ -28,7 +28,7 @@ object Obligations {
   implicit val writes: Writes[Obligations] = Json.writes[Obligations]
 }
 
-case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, met: Boolean, periodKey : String, received : Option[LocalDate] = None)
+case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, status: String, periodKey : String, received : Option[LocalDate] = None)
 
 object Obligation {
   implicit val jodaDateWrites: Writes[LocalDate] = new Writes[LocalDate] {
@@ -41,7 +41,7 @@ object Obligation {
         start = LocalDate.parse(desObligation.inboundCorrespondenceFromDate),
         end = LocalDate.parse(desObligation.inboundCorrespondenceToDate),
         due = LocalDate.parse(desObligation.inboundCorrespondenceDueDate),
-        met = desObligation.isFulfilled,
+        status = desObligation.status,
         periodKey = desObligation.periodKey,
         received = desObligation.inboundCorrespondenceDateReceived.map(LocalDate.parse))
       ) match {
