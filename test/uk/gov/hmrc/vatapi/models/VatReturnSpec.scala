@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.vatapi.models
 
+import play.api.libs.json.Json.toJson
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.resources.JsonSpec
-import play.api.libs.json.Json.toJson
 
 class VatReturnSpec extends UnitSpec with JsonSpec {
 
@@ -59,23 +59,20 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
     )
   }
 
-  "reject VAT returns with negative amounts where non-negative amounts are expected" in {
-    assertValidationErrorWithCode(
+  "accept VAT returns with negative amounts where non" in {
+    assertValidationPasses(
       VatReturn(
         periodKey = "#001",
         vatDueSales = 10.00,
         vatDueAcquisitions = 100.30,
-        totalVatDue = 350.00,
+        totalVatDue = 110.30,
         vatReclaimedCurrPeriod = -450.00,
-        netVatDue = -2000.00,
+        netVatDue = 560.30,
         totalValueSalesExVAT = 1000,
         totalValuePurchasesExVAT = 200.00,
         totalValueGoodsSuppliedExVAT = 100.00,
         totalAcquisitionsExVAT = 540.00
-      ),
-      "/netVatDue",
-      ErrorCode.INVALID_MONETARY_AMOUNT
-    )
+      ))
   }
 
   "reject VAT returns with decimal amounts where whole amounts are expected" in {

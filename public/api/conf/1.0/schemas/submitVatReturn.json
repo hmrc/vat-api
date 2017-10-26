@@ -33,7 +33,7 @@
     },
     "netVatDue": {
       "description": "Net VAT to be paid to Customs or reclaimed by you (Difference between boxes 3 and 4). Box (5) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPos",
+      "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "totalValueSalesExVAT": {

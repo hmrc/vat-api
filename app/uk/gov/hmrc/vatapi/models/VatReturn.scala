@@ -46,7 +46,7 @@ object VatReturn {
       (__ \ "vatDueAcquisitions").read[Amount](vatAmountValidator) and
       (__ \ "totalVatDue").read[Amount](vatAmountValidator) and
       (__ \ "vatReclaimedCurrPeriod").read[Amount](vatAmountValidator) and
-      (__ \ "netVatDue").read[Amount](vatNonNegativeAmountValidator) and
+      (__ \ "netVatDue").read[Amount](vatAmountValidator) and
       (__ \ "totalValueSalesExVAT").read[Amount](vatWholeAmountValidator) and
       (__ \ "totalValuePurchasesExVAT")
         .read[Amount](vatWholeAmountValidator) and
