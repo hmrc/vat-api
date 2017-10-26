@@ -53,5 +53,10 @@ object VatReturn {
       totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
       receivedAt = DateTime.now(DateTimeZone.UTC)
     )
+}
 
+case class VatReturns(vatReturns: Seq[VatReturn])
+
+object VatReturns {
+  implicit val reads: Reads[VatReturns] = Json.reads[VatReturns]
 }

@@ -22,6 +22,7 @@ import uk.gov.hmrc.vatapi.models.{
   DesTransformError,
   DesTransformValidator,
   VatReturn,
+  VatReturns,
   des
 }
 
@@ -36,16 +37,20 @@ case class VatReturnsResponse(underlying: HttpResponse) extends Response {
         None
     }
 
-  def retrieve: Either[DesTransformError, VatReturn] =
-    json.validate[des.VatReturn] match {
+  def retrieve: Either[DesTransformError, VatReturns] =
+    json.validate[des.VatReturns] match {
       case JsError(errors) =>
         Left(
           ParseError(s"Unable to parse the response from DES as Json: $errors"))
-      case JsSuccess(vatReturn, _) =>
-        DesTransformValidator[des.VatReturn, VatReturn]
-          .from(vatReturn)
-          .left
-          .map(err => UnableToTransformFromDESVatReturn(err.msg))
+      case JsSuccess(vatReturns, _) =>
+        val vatReturnsOrError = for {
+          vatReturn <- vatReturns.vatReturns
+        } yield DesTransformValidator[des.VatReturn, VatReturn].from(vatReturn)
+
+        vatReturnsOrError.find(_.isLeft) match {
+          case Some(err) => Left(err.left.get)
+          case None => Right(VatReturns(vatReturnsOrError map (_.right.get)))
+        }
     }
 }
 
