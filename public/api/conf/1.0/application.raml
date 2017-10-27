@@ -14,6 +14,15 @@ uses:
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
 
+documentation:
+  - title: Context
+    content: !include docs/context.md
+  - title: Technical support
+    content: !include docs/technicalSupport.md
+  - title: Sandbox
+    content: !include docs/sandbox.md
+
+
 traits:
   contentType:
     headers:
@@ -39,11 +48,11 @@ traits:
         type: string
         example: "123456789"
     /obligations:
-      displayName: Retrieve VAT obligations.
-      description: Retrieve VAT obligations.
+      displayName: Retrieve VAT obligations
+      description: Retrieve VAT obligations
       get:
-        displayName: Retrieve VAT obligations.
-        description: Retrieve VAT obligations.
+        displayName: Retrieve VAT obligations
+        description: Retrieve VAT obligations
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "read:vat"
@@ -100,8 +109,8 @@ traits:
                     value:
                       code: INVALID_STATUS
     /periods/{periodKey}:
-      displayName: Submit VAT return for period.
-      description: Submit VAT return for period.
+      displayName: Submit VAT return for period
+      description: Submit VAT return for period
       uriParameters:
         periodKey:
           description: Identifier for the period of the VAT return
