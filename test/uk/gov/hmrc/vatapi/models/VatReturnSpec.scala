@@ -59,6 +59,25 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
     )
   }
 
+  "reject VAT returns with negative amounts where non-negative amounts are expected" in {
+    assertValidationErrorWithCode(
+      VatReturn(
+        periodKey = "#001",
+        vatDueSales = 10.00,
+        vatDueAcquisitions = 100.30,
+        totalVatDue = BigDecimal(10.00) + BigDecimal(100.30),
+        vatReclaimedCurrPeriod = 450.00,
+        netVatDue = BigDecimal(10.00) + BigDecimal(100.30) - BigDecimal(450.00),
+        totalValueSalesExVAT = 1000,
+        totalValuePurchasesExVAT = 200.00,
+        totalValueGoodsSuppliedExVAT = 100.00,
+        totalAcquisitionsExVAT = 540.00
+      ),
+      "/netVatDue",
+      ErrorCode.INVALID_MONETARY_AMOUNT
+    )
+  }
+
   "accept VAT returns with negative amounts where non" in {
     assertValidationPasses(
       VatReturn(

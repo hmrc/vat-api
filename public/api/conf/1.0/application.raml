@@ -144,3 +144,12 @@ traits:
                     description: Invalid request
                     value:
                       code: INVALID_REQUEST
+                  invalidTotalValue:
+                    description: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
+                    value:
+                      code: VAT_TOTAL_VALUE
+                  invalidNetValue:
+                    description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                    value:
+                      code: VAT_NET_VALUE
+

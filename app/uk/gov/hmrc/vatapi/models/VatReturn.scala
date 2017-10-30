@@ -46,7 +46,7 @@ object VatReturn {
       (__ \ "vatDueAcquisitions").read[Amount](vatAmountValidator) and
       (__ \ "totalVatDue").read[Amount](vatAmountValidator) and
       (__ \ "vatReclaimedCurrPeriod").read[Amount](vatAmountValidator) and
-      (__ \ "netVatDue").read[Amount](vatAmountValidator) and
+      (__ \ "netVatDue").read[Amount](vatNonNegativeAmountValidator) and
       (__ \ "totalValueSalesExVAT").read[Amount](vatWholeAmountValidator) and
       (__ \ "totalValuePurchasesExVAT")
         .read[Amount](vatWholeAmountValidator) and
@@ -67,9 +67,9 @@ object VatReturn {
         Validation[VatReturn](
           JsPath \ "netVatDue",
           vatReturn =>
-            vatReturn.netVatDue == vatReturn.totalVatDue - vatReturn.vatReclaimedCurrPeriod,
+            vatReturn.netVatDue == (vatReturn.totalVatDue - vatReturn.vatReclaimedCurrPeriod).abs,
           JsonValidationError(
-            "netVatDue should be equal to totalVatDue - vatReclaimedCurrPeriod",
+            "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
             ErrorCode.VAT_NET_VALUE)
         )
       )
