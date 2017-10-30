@@ -35,9 +35,7 @@ case class ObligationDetail(status: String,
                             inboundCorrespondenceToDate: String,
                             inboundCorrespondenceDateReceived: Option[String],
                             inboundCorrespondenceDueDate: String,
-                            periodKey: String) {
-  def isFulfilled: Boolean = status == "F"
-}
+                            periodKey: String)
 
 object ObligationDetail {
   implicit val reads: Reads[ObligationDetail] = Json.reads[ObligationDetail]

@@ -86,7 +86,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
         .statusIs(200)
-        .bodyIsLike(Jsons.Obligations(firstMet = true).toString)
+        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
     }
 
   }

@@ -19,15 +19,15 @@
       "description": "The due date for this obligation period",
       "$ref": "FullDate.json"
     },
-    "met": {
-      "title": "Met",
-      "description": "True if this obligation period has been met; false otherwise",
-      "type": "boolean",
-      "example": "true or false"
+    "status": {
+      "title": "Status",
+      "description": "Status of the obligation (O = Open, F = Fulfilled)",
+      "type": "string",
+      "example": "F"
     },
     "received": {
       "title": "Received Date",
-      "description": "The obligation received date",
+      "description": "The obligation received date, is returned when status is (F = Fulfilled)",
       "$ref": "FullDate.json"
     },
     "periodKey": {
@@ -41,7 +41,7 @@
     "start",
     "end",
     "due",
-    "met",
+    "status",
     "periodKey"
   ],
   "additionalProperties": false
