@@ -32,8 +32,8 @@
       "example": "1000.45"
     },
     "netVatDue": {
-      "description": "Net VAT to be paid to Customs or reclaimed by you (Difference between boxes 3 and 4). Box (5) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg",
+      "description": "The difference between boxes 3 and 4. Deduct the smaller from the larger and enter the difference in box 5. If the figure in box 3 is more than the figure in box 4, the difference is the amount you must pay.",
+      "$ref": "#/definitions/monetaryPos",
       "example": "1000.45"
     },
     "totalValueSalesExVAT": {
