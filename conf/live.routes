@@ -2,3 +2,7 @@
 
 # Obligations
 GET /:vrn/obligations   uk.gov.hmrc.vatapi.resources.ObligationsResource.retrieveObligations(vrn: uk.gov.hmrc.domain.Vrn, queryParams: uk.gov.hmrc.vatapi.models.ObligationsQueryParams)
+
+# Submit 9-box return
+POST /:vrn/return   uk.gov.hmrc.vatapi.resources.VatReturnsResource.submitVatReturn(vrn: uk.gov.hmrc.domain.Vrn)
+GET /:vrn/return   uk.gov.hmrc.vatapi.resources.VatReturnsResource.retrieveVatReturn(vrn: uk.gov.hmrc.domain.Vrn)

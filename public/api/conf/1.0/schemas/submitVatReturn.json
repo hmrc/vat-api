@@ -4,6 +4,13 @@
   "description": "Submit VAT",
   "type": "object",
   "properties": {
+    "periodKey": {
+      "description": "Identifier for the period of the VAT return.",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4,
+      "example": "#001"
+    },
     "vatDueSales": {
       "description": "VAT due on sales and other outputs. Box (1) on VAT Return form.",
       "$ref": "#/definitions/monetaryPosNeg",
@@ -26,7 +33,7 @@
     },
     "netVatDue": {
       "description": "Net VAT to be paid to Customs or reclaimed by you (Difference between boxes 3 and 4). Box (5) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPos",
+      "$ref": "#/definitions/monetaryPosNeg",
       "example": "1000.45"
     },
     "totalValueSalesExVAT": {
@@ -51,6 +58,7 @@
     }
   },
   "required": [
+    "periodKey",
     "vatDueSales",
     "vatDueAcquisitions",
     "totalVatDue",

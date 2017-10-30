@@ -108,7 +108,7 @@ traits:
                     description: Invalid status
                     value:
                       code: INVALID_STATUS
-    /periods/{periodKey}:
+    /return:
       displayName: Submit VAT return for period
       description: Submit VAT return for period
       uriParameters:
@@ -117,8 +117,8 @@ traits:
           type: string
           example: "#001"
       post:
-        displayName: Submit VAT return for period.
-        description: Submit VAT return for period.
+        displayName: Submit VAT return for period
+        description: Submit VAT return for period
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
@@ -132,3 +132,20 @@ traits:
               X-CorrelationId:
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidPeriodKey:
+                    description: Invalid period key
+                    value:
+                      code: INVALID_PERIOD_KEY
+                  invalidRequest:
+                    description: Invalid request
+                    value:
+                      code: INVALID_REQUEST

@@ -16,12 +16,8 @@
 
 package uk.gov.hmrc.vatapi
 
-import org.joda.time.LocalDate
-import play.api.Logger
-import play.api.libs.json.{JsPath, JsonValidationError, Reads}
-
-import scala.io.{Codec, Source}
-import scala.util.Try
+import org.joda.time.DateTime
+import play.api.libs.json._
 
 package object models {
 
@@ -36,6 +32,7 @@ package object models {
 
 
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
+  private val VAT_MAX_AMOUNT = BigDecimal("49999999999.99")
 
   /**
     * Asserts that amounts must have a maximum of two decimal places
@@ -55,6 +52,33 @@ package object models {
       ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount => amount >= 0 && amount.scale < 3 && amount <= MAX_AMOUNT)
 
+  val vatAmountValidator: Reads[Amount] = Reads
+    .of[Amount]
+    .filter(
+      JsonValidationError(
+        "amount should be a monetary value (to 2 decimal places), between -49,999,999,999.99 and 49,999,999,999.99",
+        ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
+      amount.scale < 3 && amount >= -VAT_MAX_AMOUNT && amount <= VAT_MAX_AMOUNT)
+
+  val vatNonNegativeAmountValidator: Reads[Amount] = Reads
+    .of[Amount]
+    .filter(
+      JsonValidationError(
+        "amount should be a monetary value (to 2 decimal places), between 0 and 49,999,999,999.99",
+        ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
+      amount.scale < 3 && amount >= 0 && amount <= VAT_MAX_AMOUNT)
+
+  val vatWholeAmountValidator: Reads[Amount] = Reads
+    .of[Amount]
+    .filter(
+      JsonValidationError(
+        "amount should be a whole monetary value between 0 and 49,999,999,999",
+        ErrorCode.INVALID_MONETARY_AMOUNT))(
+      amount =>
+        (amount.scale <= 0 || amount
+          .remainder(1) == 0) && amount.scale < 3 && amount >= 0 && amount
+          .toBigInt() <= VAT_MAX_AMOUNT.toBigInt)
+
 
   implicit class Trimmer(reads: Reads[String]) {
     def trim: Reads[String] = reads.map(_.trim)
@@ -63,5 +87,10 @@ package object models {
   implicit class NullableTrimmer(reads: Reads[Option[String]]) {
     def trimNullable: Reads[Option[String]] = reads.map(_.map(_.trim))
   }
+
+  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+  implicit val dateFormat: Format[DateTime] = Format[DateTime](
+    Reads.jodaDateReads(pattern),
+    Writes.jodaDateWrites(pattern))
 
 }

@@ -69,7 +69,7 @@ private object AppDependencies {
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
         "com.github.tomakehurst" % "wiremock" % "2.2.2" % scope,
-        "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.50.5" % scope,
+        "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "2.0.0" % scope,
         "org.mongodb" %% "casbah" % "3.1.1" % scope,
         // this line is only needed for coverage
         "org.scoverage" %% "scalac-scoverage-runtime" % "1.2.0" % scope,

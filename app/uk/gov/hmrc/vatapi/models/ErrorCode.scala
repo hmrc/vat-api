@@ -33,6 +33,7 @@ object ErrorCode extends Enumeration {
   START_DATE_INVALID,
   BOTH_EXPENSES_SUPPLIED,
   INVALID_PERIOD,
+  INVALID_PERIOD_KEY,
   INVALID_ACCOUNTING_PERIOD,
   ALREADY_EXISTS,
   TOO_MANY_SOURCES,
@@ -50,7 +51,10 @@ object ErrorCode extends Enumeration {
   MISALIGNED_PERIOD,
   MANDATORY_FIELD_MISSING,
   INVALID_REQUEST,
-  INVALID_TYPE = Value
+  INVALID_TYPE,
+  VAT_TOTAL_VALUE,
+  VAT_NET_VALUE
+  = Value
 
   implicit val format: Format[ErrorCode] = EnumJson.enumFormat(ErrorCode,
     Some(s"Recognized ErrorCode values: ${ErrorCode.values.mkString(", ")}"))
