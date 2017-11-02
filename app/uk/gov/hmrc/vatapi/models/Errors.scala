@@ -101,6 +101,7 @@ object Errors {
       case "error.expected.jodadate.format" => Error("INVALID_DATE", "please provide a date in ISO format (i.e. YYYY-MM-DD)", Some(errorPath))
       case "error.path.missing" => Error("MANDATORY_FIELD_MISSING", "a mandatory field is missing", Some(errorPath))
       case "error.expected.numberformatexception" => Error("INVALID_NUMERIC_VALUE", "please provide a numeric field", Some(errorPath))
+      case "error.expected.jsstring" => Error("INVALID_STRING_VALUE", "please provide a string field", Some(errorPath))
       case _ => Error("UNMAPPED_PLAY_ERROR", playError.message, Some(errorPath))
     }
   }
