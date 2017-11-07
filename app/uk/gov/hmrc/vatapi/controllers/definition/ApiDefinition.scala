@@ -82,8 +82,6 @@ case class Endpoint(uriPattern: String,
 
 case class Parameter(name: String, required: Boolean = false)
 
-case class PublishingException(message: String) extends Exception(message)
-
 object APIStatus extends Enumeration {
   type APIStatus = Value
   val PROTOTYPED, PUBLISHED, DEPRECATED, RETIRED = Value

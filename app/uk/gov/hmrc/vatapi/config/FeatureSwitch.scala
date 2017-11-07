@@ -29,10 +29,6 @@ case class FeatureSwitch(value: Option[Configuration]) {
     }
   }
 
-  def isAgentSimulationFilterEnabled: Boolean = value match {
-    case Some(config) => config.getBoolean("test-scenario-simulation.enabled").getOrElse(false)
-    case None => false
-  }
 
   def whiteListedApplicationIds: Seq[String] = {
     value match {
@@ -45,17 +41,3 @@ case class FeatureSwitch(value: Option[Configuration]) {
   }
 }
 
-sealed case class FeatureConfig(config: Configuration) {
-
-  def isSummaryEnabled(source: String, summary: String): Boolean = {
-    val summaryEnabled = config.getBoolean(s"$source.$summary.enabled") match {
-      case Some(flag) => flag
-      case None => true
-    }
-    isSourceEnabled(source) && summaryEnabled
-  }
-
-  def isSourceEnabled(source: String): Boolean = {
-    config.getBoolean(s"$source.enabled").getOrElse(true)
-  }
-}
