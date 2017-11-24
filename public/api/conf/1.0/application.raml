@@ -160,4 +160,12 @@ traits:
                     description: please provide a string field
                     value:
                       code: INVALID_STRING_VALUE
-
+          403:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  notDeclared:
+                    description: User has not declared VAT return as final
+                    value:
+                      code: NOT_FINALISED

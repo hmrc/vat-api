@@ -8,5 +8,6 @@
   "totalValueSalesExVAT": 100,
   "totalValuePurchasesExVAT": 100,
   "totalValueGoodsSuppliedExVAT": 100,
-  "totalAcquisitionsExVAT": 100
+  "totalAcquisitionsExVAT": 100,
+  "finalised": true
 }
