@@ -111,6 +111,14 @@ object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
     f(rh).map(_.as("application/json"))
 }
 
+
+object SetXContentTypeOptionsFilter extends Filter with MicroserviceFilterSupport {
+  val xContentTypeOptionsHeader = "X-Content-Type-Options"
+  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
+    f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
+  }
+}
+
 object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
   lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
 }
@@ -181,7 +189,7 @@ object MicroserviceGlobal
   private def enabledFilters: Seq[EssentialFilter] = Seq.empty
 
   override def microserviceFilters: Seq[EssentialFilter] =
-    Seq(HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter) ++ enabledFilters ++
+    Seq(HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter, SetXContentTypeOptionsFilter) ++ enabledFilters ++
       defaultMicroserviceFilters
 
   override def onStart(app: Application): Unit = {
