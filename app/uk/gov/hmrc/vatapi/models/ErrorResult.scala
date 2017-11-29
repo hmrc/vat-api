@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.vatapi.models
 
+import uk.gov.hmrc.vatapi.models.Errors.BusinessError
+
 sealed trait ErrorResult
 
 case class GenericErrorResult(message: String) extends ErrorResult
 
 case class ValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
+
+case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult

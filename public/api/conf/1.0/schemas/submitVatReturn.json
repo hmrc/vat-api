@@ -55,6 +55,11 @@
       "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. Box (8) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
+    },
+    "finalised": {
+      "description": "Declaration that the user has finalised their VAT return.",
+      "type": "boolean",
+      "example": "true"
     }
   },
   "required": [
@@ -67,7 +72,8 @@
     "totalValueSalesExVAT",
     "totalValuePurchasesExVAT",
     "totalValueGoodsSuppliedExVAT",
-    "totalAcquisitionsExVAT"
+    "totalAcquisitionsExVAT",
+    "finalised"
   ],
   "definitions": {
     "monetaryPos": {

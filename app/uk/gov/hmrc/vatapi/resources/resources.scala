@@ -19,8 +19,8 @@ package uk.gov.hmrc.vatapi
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError}
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, GenericErrorResult, ValidationErrorResult}
+import play.api.mvc.Results.{BadRequest, Forbidden, InternalServerError}
+import uk.gov.hmrc.vatapi.models.{AuthorisationErrorResult, ErrorResult, Errors, GenericErrorResult, ValidationErrorResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,10 +34,11 @@ package object resources {
     InternalServerError(Json.toJson(Errors.InternalServerError("An internal server error occurred")))
   }
 
-  def handleValidationErrors(errorResult: ErrorResult): Result = {
+  def handleErrors(errorResult: ErrorResult): Result = {
     errorResult match {
       case GenericErrorResult(message) => BadRequest(Json.toJson(Errors.badRequest(message)))
       case ValidationErrorResult(errors) => BadRequest(Json.toJson(Errors.badRequest(errors)))
+      case AuthorisationErrorResult(error) => Forbidden(Json.toJson(error))
     }
   }
 
@@ -46,4 +47,20 @@ package object resources {
       case JsSuccess(payload, _) => f(payload).map(Right(_))
       case JsError(errors) => Future.successful(Left(ValidationErrorResult(errors)))
     }
+
+  def validate[T](jsValue: JsValue)(implicit reads: Reads[T]): Future[Either[ErrorResult, T]] =
+    jsValue.validate[T] match {
+      case JsSuccess(payload, _) => Future.successful(Right(payload))
+      case JsError(errors) => Future.successful(Left(ValidationErrorResult(errors)))
+    }
+
+  def authorise[T, R](valueOrError: Either[ErrorResult, T], auth: T => Option[Errors.Error])(f: T => Future[R]): Future[Either[ErrorResult, R]] = 
+    valueOrError match {
+      case Right(value) => auth(value) match {
+        case Some(error) => Future.successful(Left(AuthorisationErrorResult(Errors.businessError(error))))
+        case  _          => f(value).map(Right(_))
+      }
+      case Left(error) => Future.successful(Left(error))
+    }
+
 }

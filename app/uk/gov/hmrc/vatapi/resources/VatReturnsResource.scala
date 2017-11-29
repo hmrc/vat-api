@@ -22,30 +22,39 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
-import uk.gov.hmrc.vatapi.models.VatReturn
+import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnsResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.vatapi.models.Errors
 
 object VatReturnsResource extends BaseController {
+
   val logger: Logger = Logger(this.getClass)
 
   private val connector = VatReturnsConnector
 
-  def submitVatReturn(vrn: Vrn): Action[JsValue] =
-    Action.async(parse.json) { implicit request =>
-      validate[VatReturn, VatReturnsResponse](request.body) { vatReturn =>
-        connector.post(vrn, vatReturn)
-      } map {
-        case Left(errorResult) =>
-          handleValidationErrors(errorResult)
-        case Right(response) =>
-          response.filter {
-            case 200 => Created(Json.toJson(response.vatReturn))
-            case _   => InternalServerError
-          }
+  def submitVatReturn(vrn: Vrn): Action[JsValue] = Action.async(parse.json) { implicit request =>
+
+    def isFinalised(vatReturn: VatReturnDeclaration): Option[Errors.Error] =
+      if(vatReturn.finalised) None
+      else Some(Errors.NotFinalisedDeclaration)
+
+    for {
+      validDeclaration <- validate[VatReturnDeclaration](request.body)
+      result <- authorise[VatReturnDeclaration, VatReturnsResponse](validDeclaration, isFinalised) { vatReturn =>
+        connector.post(vrn, vatReturn.toReturn)
       }
+    } yield result match {
+      case Left(errorResult) => handleErrors(errorResult)
+      case Right(response) =>
+        response.filter {
+          case 200 => Created(Json.toJson(response.vatReturn))
+          case _   => InternalServerError
+        }
     }
+
+  }
 
   def retrieveVatReturn(vrn: Vrn): Action[AnyContent] =
     Action.async {

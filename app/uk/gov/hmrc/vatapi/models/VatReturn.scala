@@ -54,26 +54,6 @@ object VatReturn {
         .read[Amount](vatWholeAmountValidator) and
       (__ \ "totalAcquisitionsExVAT").read[Amount](vatWholeAmountValidator)
   )(VatReturn.apply _)
-    .validate(
-      Seq(
-        Validation[VatReturn](
-          JsPath \ "totalVatDue",
-          vatReturn =>
-            vatReturn.totalVatDue == vatReturn.vatDueSales + vatReturn.vatDueAcquisitions,
-          JsonValidationError(
-            "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
-            ErrorCode.VAT_TOTAL_VALUE)
-        ),
-        Validation[VatReturn](
-          JsPath \ "netVatDue",
-          vatReturn =>
-            vatReturn.netVatDue == (vatReturn.totalVatDue - vatReturn.vatReclaimedCurrPeriod).abs,
-          JsonValidationError(
-            "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
-            ErrorCode.VAT_NET_VALUE)
-        )
-      )
-    )
 
   implicit val from: DesTransformValidator[des.VatReturn, VatReturn] =
     new DesTransformValidator[des.VatReturn, VatReturn] {

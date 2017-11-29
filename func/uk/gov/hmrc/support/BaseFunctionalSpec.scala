@@ -812,7 +812,6 @@ trait BaseFunctionalSpec extends TestApplication {
         givens
       }
 
-
       object obligations {
         def obligationNotFoundFor(vrn: Vrn): Givens = {
           stubFor(get(urlEqualTo(s"/vat/obligation-data/$vrn"))
@@ -838,10 +837,25 @@ trait BaseFunctionalSpec extends TestApplication {
         }
       }
 
+      object vatReturns {
+        def expectVatReturnFor(vrn: Vrn): Givens = {
+          stubFor(
+            any(urlMatching(s"/enterprise/return/vat/$vrn"))
+              .willReturn(
+                aResponse()
+                  .withStatus(200)
+                  .withBody("[]")
+              )
+          )
+
+          givens
+        }
+      }
 
     }
 
     def des() = new Des(this)
+
   }
 
   def given() = new Givens()
