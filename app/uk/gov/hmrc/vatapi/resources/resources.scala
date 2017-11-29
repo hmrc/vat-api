@@ -57,7 +57,7 @@ package object resources {
   def authorise[T, R](valueOrError: Either[ErrorResult, T], auth: T => Option[Errors.Error])(f: T => Future[R]): Future[Either[ErrorResult, R]] = 
     valueOrError match {
       case Right(value) => auth(value) match {
-        case Some(error) => Future.successful(Left(AuthorisationErrorResult(Errors.businessError(error))))
+        case Some(authError) => Future.successful(Left(AuthorisationErrorResult(Errors.businessError(authError))))
         case  _          => f(value).map(Right(_))
       }
       case Left(error) => Future.successful(Left(error))

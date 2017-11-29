@@ -47,6 +47,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         }""")))
         .thenAssertThat()
         .statusIs(403)
+        .bodyHasPath("\\errors(0)\\code", "NOT_FINALISED")
+        .bodyHasPath("\\errors(0)\\path", "/finalised")
     }
 
   }
