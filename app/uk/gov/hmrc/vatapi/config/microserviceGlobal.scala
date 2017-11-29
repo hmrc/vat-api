@@ -189,7 +189,7 @@ object MicroserviceGlobal
   private def enabledFilters: Seq[EssentialFilter] = Seq.empty
 
   override def microserviceFilters: Seq[EssentialFilter] =
-    Seq(HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter, SetXContentTypeOptionsFilter) ++ enabledFilters ++
+    Seq(SetXContentTypeOptionsFilter, HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter) ++ enabledFilters ++
       defaultMicroserviceFilters
 
   override def onStart(app: Application): Unit = {

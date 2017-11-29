@@ -53,6 +53,16 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .statusIs(404)
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
+
+    "be applied for api definition without accept header" in {
+      given()
+        .when()
+        .get("/api/definition")
+        .withoutAcceptHeader()
+        .thenAssertThat()
+        .statusIs(200)
+        .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
+    }
   }
 
 }
