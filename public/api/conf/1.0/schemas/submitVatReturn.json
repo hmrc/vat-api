@@ -52,7 +52,7 @@
       "example": "1000"
     },
     "totalAcquisitionsExVAT": {
-      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. Box (8) on VAT Return form.",
+      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. Box (9) on VAT Return form.",
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
     },
