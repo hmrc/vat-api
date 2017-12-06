@@ -30,7 +30,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "auth-client" % "2.3.0",
     "uk.gov.hmrc" %% "domain" % "5.0.0",
     "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
-    "ai.x" %% "play-json-extensions" % "0.10.0"
+    "ai.x" %% "play-json-extensions" % "0.10.0",
+    "com.typesafe.play" %% "play-json-joda" % "2.6.7"
   )
 
   trait TestDependencies {

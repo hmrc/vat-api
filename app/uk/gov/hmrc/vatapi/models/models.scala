@@ -88,9 +88,11 @@ package object models {
     def trimNullable: Reads[Option[String]] = reads.map(_.map(_.trim))
   }
 
-  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+  val datePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+
   implicit val dateFormat: Format[DateTime] = Format[DateTime](
-    Reads.jodaDateReads(pattern),
-    Writes.jodaDateWrites(pattern))
+    JodaReads.jodaDateReads(datePattern),
+    JodaWrites.jodaDateWrites(datePattern)
+  )
 
 }
