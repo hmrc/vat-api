@@ -56,7 +56,10 @@ object ErrorCode extends Enumeration {
   INVALID_TYPE,
   VAT_TOTAL_VALUE,
   VAT_NET_VALUE,
-  NOT_FINALISED
+  NOT_FINALISED,
+  INVALID_DATE,
+  INVALID_FROM_DATE,
+  INVALID_TO_DATE
   = Value
 
   implicit val format: Format[ErrorCode] = EnumJson.enumFormat(ErrorCode,

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Period",
+  "properties": {
+    "key": {
+      "title": "Period key",
+      "description": "Period key",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4,
+      "example": "#001"
+    },
+    "start": {
+      "description" : "The start date of this update period",
+      "title": "From date",
+      "$ref": "FullDate.json"
+    },
+    "end": {
+      "description" : "The end date of this update period",
+      "title": "To date",
+      "$ref": "FullDate.json"
+    }
+  },
+  "required": [
+    "key",
+    "start",
+    "end"
+  ],
+  "additionalProperties": false
+}

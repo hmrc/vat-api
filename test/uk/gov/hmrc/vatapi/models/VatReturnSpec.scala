@@ -18,14 +18,20 @@ package uk.gov.hmrc.vatapi.models
 
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.resources.JsonSpec
+import org.joda.time.LocalDate
 
 class VatReturnSpec extends UnitSpec with JsonSpec {
 
   "VatReturn" should {
+
     "round trip" in {
       roundTripJson(
         VatReturn(
-          periodKey = "#001",
+          period = Period(
+            key = "#001",
+            start = new LocalDate(),
+            end =  new LocalDate()
+          ),
           vatDueSales = 500.00,
           vatDueAcquisitions = 100.30,
           totalVatDue = 600.30,
@@ -34,9 +40,12 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
           totalValueSalesExVAT = 1000,
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
-          totalAcquisitionsExVAT = 540.00
-        ))
+          totalAcquisitionsExVAT = 540.00,
+          received = new LocalDate()
+        )
+      )
     }
+
   }
 
 }

@@ -16,14 +16,6 @@
 
 package uk.gov.hmrc.vatapi.models
 
-import uk.gov.hmrc.vatapi.models.Errors.BusinessError
+import org.joda.time.LocalDate
 
-sealed trait ErrorResult
-
-case class GenericErrorResult(message: String) extends ErrorResult
-
-case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
-
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
-
-case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult
+case class QueryDateRange(from: Option[LocalDate], to: Option[LocalDate])

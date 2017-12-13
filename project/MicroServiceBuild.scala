@@ -31,7 +31,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "domain" % "5.0.0",
     "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
     "ai.x" %% "play-json-extensions" % "0.10.0",
-    "com.typesafe.play" %% "play-json-joda" % "2.6.7"
+    "com.typesafe.play" %% "play-json-joda" % "2.6.7",
+    "org.typelevel" %% "cats-core" % "1.0.0-RC1"
   )
 
   trait TestDependencies {
@@ -47,7 +48,7 @@ private object AppDependencies {
         "org.pegdown" % "pegdown" % "1.6.0" % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "2.2.2" % scope,
+        "com.github.tomakehurst" % "wiremock" % "2.12.0" % scope,
         "uk.gov.hmrc" %% "reactivemongo-test" % "3.0.0" % scope,
         "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "2.0.0" % scope,
         "org.mongodb" %% "casbah" % "3.1.1" % scope,

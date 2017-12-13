@@ -58,29 +58,29 @@ package object connectors {
 
   // http-verbs converts non-2xx statuses into exceptions. We don't want this, so here we define
   // our own reader that returns the raw response.
-  private object NoExceptReads extends HttpReads[HttpResponse] {
+  private object NoExceptionsReads extends HttpReads[HttpResponse] {
     override def read(method: String, url: String, response: HttpResponse): HttpResponse = response
   }
 
   def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.GET(url)(NoExceptReads, _, ec) map toResponse
+      WSHttp.GET(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
       implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.POST(url, elem)(implicitly[Writes[T]], NoExceptReads, _, ec) map toResponse
+      WSHttp.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpEmptyPost[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.POSTEmpty(url)(NoExceptReads, _, ec) map toResponse
+      WSHttp.POSTEmpty(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpPut[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
       implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url) {
-      WSHttp.PUT(url, elem)(implicitly[Writes[T]], NoExceptReads, _, ec) map toResponse
+      WSHttp.PUT(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
     }
 }

@@ -19,48 +19,38 @@ package uk.gov.hmrc.vatapi.models
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.Validation._
+import org.joda.time.LocalDate
+import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
-case class VatReturn(periodKey: String,
-                     vatDueSales: Amount,
-                     vatDueAcquisitions: Amount,
-                     totalVatDue: Amount,
-                     vatReclaimedCurrPeriod: Amount,
-                     netVatDue: Amount,
-                     totalValueSalesExVAT: Amount,
-                     totalValuePurchasesExVAT: Amount,
-                     totalValueGoodsSuppliedExVAT: Amount,
-                     totalAcquisitionsExVAT: Amount)
+case class VatReturn(
+  period: Period,
+  vatDueSales: Amount,
+  vatDueAcquisitions: Amount,
+  totalVatDue: Amount,
+  vatReclaimedCurrPeriod: Amount,
+  netVatDue: Amount,
+  totalValueSalesExVAT: Amount,
+  totalValuePurchasesExVAT: Amount,
+  totalValueGoodsSuppliedExVAT: Amount,
+  totalAcquisitionsExVAT: Amount,
+  received: LocalDate
+)
 
 object VatReturn {
 
-  val periodKeyValidator: Reads[String] = Reads
-    .of[String]
-    .filter(JsonValidationError("period key should be a 4 character string",
-                                ErrorCode.INVALID_PERIOD_KEY))(_.length == 4)
-
   implicit val writes: OWrites[VatReturn] = Json.writes[VatReturn]
-
-  implicit val reads: Reads[VatReturn] = (
-    (__ \ "periodKey").read[String](periodKeyValidator) and
-      (__ \ "vatDueSales").read[Amount](vatAmountValidator) and
-      (__ \ "vatDueAcquisitions").read[Amount](vatAmountValidator) and
-      (__ \ "totalVatDue").read[Amount](vatAmountValidator) and
-      (__ \ "vatReclaimedCurrPeriod").read[Amount](vatAmountValidator) and
-      (__ \ "netVatDue").read[Amount](vatNonNegativeAmountValidator) and
-      (__ \ "totalValueSalesExVAT").read[Amount](vatWholeAmountValidator) and
-      (__ \ "totalValuePurchasesExVAT")
-        .read[Amount](vatWholeAmountValidator) and
-      (__ \ "totalValueGoodsSuppliedExVAT")
-        .read[Amount](vatWholeAmountValidator) and
-      (__ \ "totalAcquisitionsExVAT").read[Amount](vatWholeAmountValidator)
-  )(VatReturn.apply _)
+  implicit val reads: Reads[VatReturn] = Json.reads[VatReturn]
 
   implicit val from: DesTransformValidator[des.VatReturn, VatReturn] =
     new DesTransformValidator[des.VatReturn, VatReturn] {
       def from(vatReturn: des.VatReturn): Either[DesTransformError, VatReturn] =
         Right(
           VatReturn(
-            periodKey = vatReturn.periodKey,
+            period = Period(
+              key   = vatReturn.periodKey,
+              start = LocalDate.parse(vatReturn.inboundCorrespondenceFromDate),
+              end   = LocalDate.parse(vatReturn.inboundCorrespondenceToDate)
+            ),
             vatDueSales = vatReturn.vatDueSales,
             vatDueAcquisitions = vatReturn.vatDueAcquisitions,
             totalVatDue = vatReturn.vatDueTotal,
@@ -68,10 +58,11 @@ object VatReturn {
             netVatDue = vatReturn.vatDueNet,
             totalValueSalesExVAT = vatReturn.totalValueSalesExVAT,
             totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
-            totalValueGoodsSuppliedExVAT =
-              vatReturn.totalValueGoodsSuppliedExVAT,
-            totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT
-          ))
+            totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
+            totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
+            received = vatReturn.receivedAt.toLocalDate
+          )
+        )
     }
 }
 
