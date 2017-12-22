@@ -41,11 +41,11 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
     }
   }
 
-  "reject VAT returns with values greater than 50 billion" in {
+  "reject VAT returns with values greater than 9999999999999.99 (13 digits before decimal places)" in {
     assertValidationErrorWithCode(
       VatReturnDeclaration(
         periodKey = "#001",
-        vatDueSales = BigDecimal("50000000000"),
+        vatDueSales = BigDecimal("999999999999999.99"),
         vatDueAcquisitions = 100.30,
         totalVatDue = 350.00,
         vatReclaimedCurrPeriod = -450.00,
@@ -57,6 +57,46 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
         finalised = true
       ),
       "/vatDueSales",
+      ErrorCode.INVALID_MONETARY_AMOUNT
+    )
+  }
+
+  "reject VAT returns with values greater than 99999999999.99 (11 digits before decimal places)" in {
+    assertValidationErrorWithCode(
+      VatReturnDeclaration(
+        periodKey = "#001",
+        vatDueSales = 100.30,
+        vatDueAcquisitions = 100.30,
+        totalVatDue = 350.00,
+        vatReclaimedCurrPeriod = -450.00,
+        netVatDue = BigDecimal("999999999999999.99"),
+        totalValueSalesExVAT = 1000,
+        totalValuePurchasesExVAT = 200.00,
+        totalValueGoodsSuppliedExVAT = 100.00,
+        totalAcquisitionsExVAT = 540.00,
+        finalised = true
+      ),
+      "/netVatDue",
+      ErrorCode.INVALID_MONETARY_AMOUNT
+    )
+  }
+
+  "reject VAT returns with whole values greater than 9999999999999 (13 digits)" in {
+    assertValidationErrorWithCode(
+      VatReturnDeclaration(
+        periodKey = "#001",
+        vatDueSales = 100.30,
+        vatDueAcquisitions = 100.30,
+        totalVatDue = 350.00,
+        vatReclaimedCurrPeriod = -450.00,
+        netVatDue = 2000.00,
+        totalValueSalesExVAT = BigDecimal("999999999999999"),
+        totalValuePurchasesExVAT = 200.00,
+        totalValueGoodsSuppliedExVAT = 100.00,
+        totalAcquisitionsExVAT = 540.00,
+        finalised = true
+      ),
+      "/totalValueSalesExVAT",
       ErrorCode.INVALID_MONETARY_AMOUNT
     )
   }

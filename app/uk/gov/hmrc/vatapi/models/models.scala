@@ -32,7 +32,8 @@ package object models {
 
 
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
-  private val VAT_MAX_AMOUNT = BigDecimal("49999999999.99")
+  private val VAT_MAX_AMOUNT_13_DIGITS = BigDecimal("9999999999999.99")
+  private val VAT_MAX_AMOUNT_11_DIGITS = BigDecimal("99999999999.99")
 
   /**
     * Asserts that amounts must have a maximum of two decimal places
@@ -56,28 +57,28 @@ package object models {
     .of[Amount]
     .filter(
       JsonValidationError(
-        "amount should be a monetary value (to 2 decimal places), between -49,999,999,999.99 and 49,999,999,999.99",
+        "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
         ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
-      amount.scale < 3 && amount >= -VAT_MAX_AMOUNT && amount <= VAT_MAX_AMOUNT)
+      amount.scale < 3 && amount >= -VAT_MAX_AMOUNT_13_DIGITS && amount <= VAT_MAX_AMOUNT_13_DIGITS)
 
   val vatNonNegativeAmountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
       JsonValidationError(
-        "amount should be a monetary value (to 2 decimal places), between 0 and 49,999,999,999.99",
+        "amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99",
         ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
-      amount.scale < 3 && amount >= 0 && amount <= VAT_MAX_AMOUNT)
+      amount.scale < 3 && amount >= 0 && amount <= VAT_MAX_AMOUNT_11_DIGITS)
 
   val vatWholeAmountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
       JsonValidationError(
-        "amount should be a whole monetary value between 0 and 49,999,999,999",
+        "amount should be a whole monetary value between 0 and 9,999,999,999,999",
         ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount =>
         (amount.scale <= 0 || amount
           .remainder(1) == 0) && amount.scale < 3 && amount >= 0 && amount
-          .toBigInt() <= VAT_MAX_AMOUNT.toBigInt)
+          .toBigInt() <= VAT_MAX_AMOUNT_13_DIGITS.toBigInt)
 
 
   implicit class Trimmer(reads: Reads[String]) {
