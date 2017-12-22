@@ -13,27 +13,27 @@
     },
     "vatDueSales": {
       "description": "VAT due on sales and other outputs. Box (1) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg",
+      "$ref": "#/definitions/monetaryPosNeg13",
       "example": "1000.45"
     },
     "vatDueAcquisitions": {
       "description": "VAT due on acquisitions from other EC Member States. Box (2) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg",
+      "$ref": "#/definitions/monetaryPosNeg13",
       "example": "1000.45"
     },
     "totalVatDue": {
       "description": "Total VAT due (the sum of boxes 1 and 2). Box (3) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg",
+      "$ref": "#/definitions/monetaryPosNeg13",
       "example": "1000.45"
     },
     "vatReclaimedCurrPeriod": {
       "description": "VAT reclaimed on purchases and other inputs (including acquisitions from the EC). Box (4) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg",
+      "$ref": "#/definitions/monetaryPosNeg13",
       "example": "1000.45"
     },
     "netVatDue": {
       "description": "The difference between boxes 3 and 4. Deduct the smaller from the larger and enter the difference in box 5. If the figure in box 3 is more than the figure in box 4, the difference is the amount you must pay.",
-      "$ref": "#/definitions/monetaryPos",
+      "$ref": "#/definitions/monetaryPos11",
       "example": "1000.45"
     },
     "totalValueSalesExVAT": {
@@ -76,25 +76,25 @@
     "finalised"
   ],
   "definitions": {
-    "monetaryPos": {
-      "description": "Defines a monetary value (to 2 decimal places), between 0 and 49,999,999,999.99",
+    "monetaryPos11": {
+      "description": "Defines a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99",
       "type": "number",
       "minimum": 0.0,
-      "maximum": 49999999999.99,
+      "maximum": 99999999999.99,
       "multipleOf": 0.01
     },
-    "monetaryPosNeg": {
-      "description": "Defines a monetary value (to 2 decimal places), between -49,999,999,999.99 and 49,999,999,999.99",
+    "monetaryPosNeg13": {
+      "description": "Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
       "type": "number",
-      "minimum": -49999999999.99,
-      "maximum": 49999999999.99,
+      "minimum": -9999999999999.99,
+      "maximum": 9999999999999.99,
       "multipleOf": 0.01
     },
     "wholePounds": {
       "description": "Defines a whole pounds",
       "type": "number",
       "minimum": 0,
-      "maximum": 49999999999
+      "maximum": 9999999999999
     }
   },
   "additionalProperties": false
