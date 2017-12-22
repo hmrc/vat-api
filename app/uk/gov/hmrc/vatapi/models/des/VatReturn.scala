@@ -17,12 +17,14 @@
 package uk.gov.hmrc.vatapi.models.des
 
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Json, Format}
 import uk.gov.hmrc.vatapi.models
 import uk.gov.hmrc.vatapi.models.Amount
-import uk.gov.hmrc.vatapi.models.dateFormat
+import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturn(periodKey: String,
+                     inboundCorrespondenceFromDate: String,
+                     inboundCorrespondenceToDate: String,
                      vatDueSales: Amount,
                      vatDueAcquisitions: Amount,
                      vatDueTotal: Amount,
@@ -36,27 +38,11 @@ case class VatReturn(periodKey: String,
                      receivedAt: DateTime)
 
 object VatReturn {
-  implicit val writes: Writes[VatReturn] = Json.writes[VatReturn]
-  implicit val reads: Reads[VatReturn] = Json.reads[VatReturn]
-
-  def from(vatReturn: models.VatReturn): VatReturn =
-    VatReturn(
-      periodKey = vatReturn.periodKey,
-      vatDueSales = vatReturn.vatDueSales,
-      vatDueAcquisitions = vatReturn.vatDueAcquisitions,
-      vatDueTotal = vatReturn.totalVatDue,
-      vatReclaimedCurrPeriod = vatReturn.vatReclaimedCurrPeriod,
-      vatDueNet = vatReturn.netVatDue,
-      totalValueSalesExVAT = vatReturn.totalValueSalesExVAT,
-      totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
-      totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
-      totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
-      receivedAt = DateTime.now(DateTimeZone.UTC)
-    )
+  implicit val reads: Format[VatReturn] = Json.format[VatReturn]
 }
 
 case class VatReturns(vatReturns: Seq[VatReturn])
 
 object VatReturns {
-  implicit val reads: Reads[VatReturns] = Json.reads[VatReturns]
+  implicit val format: Format[VatReturns] = Json.format[VatReturns]
 }

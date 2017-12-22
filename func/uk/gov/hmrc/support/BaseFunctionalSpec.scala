@@ -15,6 +15,7 @@ import uk.gov.hmrc.vatapi.resources.DesJsons
 
 import scala.collection.mutable
 import scala.util.matching.Regex
+import org.joda.time.LocalDate
 
 trait BaseFunctionalSpec extends TestApplication {
   protected val vrn = VrnGenerator().nextVrn()
@@ -838,13 +839,58 @@ trait BaseFunctionalSpec extends TestApplication {
       }
 
       object vatReturns {
-        def expectVatReturnFor(vrn: Vrn): Givens = {
+        def expectVatReturnSubmissionFor(vrn: Vrn): Givens = {
           stubFor(
             any(urlMatching(s"/enterprise/return/vat/$vrn"))
               .willReturn(
                 aResponse()
                   .withStatus(200)
                   .withBody("[]")
+              )
+          )
+
+          givens
+        }
+
+        def expectVatReturnSearchFor(vrn: Vrn, from: LocalDate, to: LocalDate): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?from=$from&to=$to"))
+              .willReturn(
+                aResponse()
+                  .withStatus(200)
+                  .withBody("""
+                    {
+                      "vatReturns": [
+                        {
+                          "periodKey": "#001",
+                          "inboundCorrespondenceFromDate": "2017-01-01",
+                          "inboundCorrespondenceToDate": "2017-12-31",
+                          "vatDueSales": 100.25,
+                          "vatDueAcquisitions": 100.25,
+                          "vatDueTotal": 200.50,
+                          "vatReclaimedCurrPeriod": 100.25,
+                          "vatDueNet": 100.25,
+                          "totalValueSalesExVAT": 100,
+                          "totalValuePurchasesExVAT": 100,
+                          "totalValueGoodsSuppliedExVAT": 100,
+                          "totalAcquisitionsExVAT": 100,
+                          "receivedAt": "2017-12-18T16:49:20.678Z"
+                        }
+                      ]
+                    }""")
+              )
+          )
+
+          givens
+        }
+
+        def expectInvalidVatReturnSearchFor(vrn: Vrn, from: LocalDate, to: LocalDate): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?from=$from&to=$to"))
+              .willReturn(
+                aResponse()
+                  .withStatus(200)
+                  .withBody("not-json")
               )
           )
 

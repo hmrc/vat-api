@@ -16,16 +16,29 @@
 
 package uk.gov.hmrc.vatapi.models.des
 
+import uk.gov.hmrc.vatapi.models.Amount
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.vatapi.models.des.PaymentIndicator.PaymentIndicator
+import play.api.libs.json._
+import org.joda.time.DateTimeZone
 import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
-case class VatReturnsDES(processingDate: DateTime,
-                         paymentIndicator: PaymentIndicator,
-                         formBundleNumber: String,
-                         chargeRefNumber: Option[String])
+case class VatReturnDeclaration(
+  periodKey: String,
+  vatDueSales: Amount,
+  vatDueAcquisitions: Amount,
+  vatDueTotal: Amount,
+  vatReclaimedCurrPeriod: Amount,
+  vatDueNet: Amount,
+  totalValueSalesExVAT: Amount,
+  totalValuePurchasesExVAT: Amount,
+  totalValueGoodsSuppliedExVAT: Amount,
+  totalAcquisitionsExVAT: Amount,
+  agentReferenceNumber: Option[String] = None,
+  receivedAt: DateTime
+)
 
-object VatReturnsDES {
-  implicit val format: OFormat[VatReturnsDES] = Json.format[VatReturnsDES]
+object VatReturnDeclaration {
+
+  implicit val format: Format[VatReturnDeclaration] = Json.format[VatReturnDeclaration]
+
 }

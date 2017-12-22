@@ -19,24 +19,22 @@ package uk.gov.hmrc.vatapi.connectors
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.config.AppContext
-import uk.gov.hmrc.vatapi.models.{VatReturn, des}
+import uk.gov.hmrc.vatapi.models.{DateRange, VatReturnDeclaration, des}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnsResponse
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 object VatReturnsConnector {
-  private lazy val baseUrl: String = AppContext.desUrl
 
-  def post(vrn: Vrn, vatReturn: VatReturn)(
-      implicit hc: HeaderCarrier): Future[VatReturnsResponse] =
-    httpPost[des.VatReturn, VatReturnsResponse](
-      baseUrl + s"/enterprise/return/vat/$vrn",
-      des.VatReturn.from(vatReturn),
-      VatReturnsResponse)
+  private lazy val baseUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
 
-  def get(vrn: Vrn)(implicit hc: HeaderCarrier): Future[VatReturnsResponse] =
-    httpGet[VatReturnsResponse](baseUrl + s"/enterprise/return/vat/$vrn",
-                                VatReturnsResponse)
+  def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnsResponse] =
+    httpPost[des.VatReturnDeclaration, VatReturnsResponse](
+      url        = s"$baseUrl/$vrn",
+      elem       = vatReturn,
+      toResponse = VatReturnsResponse
+    )
+
+  def query(vrn: Vrn, dateRange: DateRange)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnsResponse] =
+    httpGet[VatReturnsResponse](s"$baseUrl/$vrn?from=${dateRange.from}&to=${dateRange.to}", VatReturnsResponse)
 
 }

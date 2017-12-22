@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "VAT Returns",
+  "type": "object",
+  "properties": {
+    "vat-returns": {
+      "title": "VAT Returns",
+      "description": "A list of all VAT returns, sorted by start date",
+      "type": "array",
+      "items": {
+        "$ref": "VatReturn.json"
+      }
+    }
+  },
+  "required": [
+    "vat-returns"
+  ],
+  "additionalProperties": false
+}

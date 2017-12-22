@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json._
 
 package object models {
@@ -89,11 +89,18 @@ package object models {
     def trimNullable: Reads[Option[String]] = reads.map(_.map(_.trim))
   }
 
-  val datePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+  val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
-  implicit val dateFormat: Format[DateTime] = Format[DateTime](
-    JodaReads.jodaDateReads(datePattern),
-    JodaWrites.jodaDateWrites(datePattern)
+  implicit val dateTimeFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.jodaDateReads(dateTimePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
+  )
+
+  val datePattern = "yyyy-MM-dd"
+
+  implicit val dateFormat: Format[LocalDate] = Format[LocalDate](
+    JodaReads.jodaLocalDateReads(datePattern),
+    JodaWrites.jodaLocalDateWrites(datePattern)
   )
 
 }

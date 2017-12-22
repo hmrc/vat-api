@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.models
+package uk.gov.hmrc.vatapi.resources
 
-import uk.gov.hmrc.vatapi.models.Errors.BusinessError
+import uk.gov.hmrc.vatapi.resources.wrappers.Response
+import play.api.mvc.Result
+import scala.concurrent.{ExecutionContext, Future}
 
-sealed trait ErrorResult
+case class DesBusinessResult[R <: Response](val businessResult: BusinessResult[R]) {
 
-case class GenericErrorResult(message: String) extends ErrorResult
+  def onSuccess(handleSuccess: R => Result)(implicit ec: ExecutionContext): Future[Result] =
+    for {
+      desResponseOrError <- businessResult.value
+    } yield desResponseOrError match {
+      case Left(errors)       => handleErrors(errors)
+      case Right(desResponse) => handleSuccess(desResponse)
+    }
 
-case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
-
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
-
-case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult
+}

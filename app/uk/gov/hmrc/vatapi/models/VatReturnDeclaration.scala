@@ -19,6 +19,8 @@ package uk.gov.hmrc.vatapi.models
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import uk.gov.hmrc.vatapi.models.Validation._
+import uk.gov.hmrc.vatapi.models.des
+import org.joda.time.DateTime
 
 case class VatReturnDeclaration(
   periodKey: String,
@@ -34,18 +36,19 @@ case class VatReturnDeclaration(
   finalised: Boolean
 ) {
 
-  def toReturn: VatReturn =
-    VatReturn(
+  def toDes: des.VatReturnDeclaration =
+    des.VatReturnDeclaration(
       periodKey = periodKey,
       vatDueSales = vatDueSales,
       vatDueAcquisitions = vatDueAcquisitions,
-      totalVatDue = totalVatDue,
+      vatDueTotal = totalVatDue,
       vatReclaimedCurrPeriod = vatReclaimedCurrPeriod,
-      netVatDue = netVatDue,
+      vatDueNet = netVatDue,
       totalValueSalesExVAT = totalValueSalesExVAT,
       totalValuePurchasesExVAT = totalValuePurchasesExVAT,
       totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
-      totalAcquisitionsExVAT = totalAcquisitionsExVAT
+      totalAcquisitionsExVAT = totalAcquisitionsExVAT,
+      receivedAt = new DateTime()
     )
 
 }
@@ -54,8 +57,13 @@ object VatReturnDeclaration {
 
   implicit val writes: OWrites[VatReturnDeclaration] = Json.writes[VatReturnDeclaration]
 
+  private val periodKeyValidator: Reads[String] = Reads
+    .of[String]
+    .filter(JsonValidationError("period key should be a 4 character string",
+                                ErrorCode.INVALID_PERIOD_KEY))(_.length == 4)
+
   implicit val reads: Reads[VatReturnDeclaration] = (
-    (__ \ "periodKey").read[String](VatReturn.periodKeyValidator) and
+    (__ \ "periodKey").read[String](periodKeyValidator) and
       (__ \ "vatDueSales").read[Amount](vatAmountValidator) and
       (__ \ "vatDueAcquisitions").read[Amount](vatAmountValidator) and
       (__ \ "totalVatDue").read[Amount](vatAmountValidator) and

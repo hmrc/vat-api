@@ -108,9 +108,64 @@ traits:
                     description: Invalid status
                     value:
                       code: INVALID_STATUS
-    /return:
-      displayName: Submit VAT return for period
-      description: Submit VAT return for period
+    /returns:
+      displayName: VAT Returns
+      description: Submit and read VAT returns
+      get:
+        displayName: View VAT Returns
+        description: Retrieve submitted VAT returns
+        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        (annotations.scope): "write:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
+        queryParameters:
+         from:
+           description: From date to search for VAT returns
+           type: string
+           example: 2017-01-25
+         to:
+           description: To date to search for VAT returns
+           type: string
+           example: 2017-01-25
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking
+            body:
+               application/json:
+                 type: !include schemas/VatReturns.json
+                 example: !include examples/VatReturns.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: INVALID_DATE_FROM
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: INVALID_DATE_TO
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: INVALID_DATE_RANGE
+          403:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  dateRangeTooLarge:
+                    description: The start date cannot be more than four years from the current date.
+                    value:
+                      code: DATE_RANGE_TOO_LARGE
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
@@ -119,8 +174,8 @@ traits:
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
         body:
           application/json:
-            type: !include schemas/submitVatReturn.json
-            example: !include examples/vatReturn.json
+            type: !include schemas/VatReturnDeclaration.json
+            example: !include examples/VatReturnDeclaration.json
         responses:
           200:
             headers:

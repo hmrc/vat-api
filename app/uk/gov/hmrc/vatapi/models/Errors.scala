@@ -72,6 +72,8 @@ object Errors {
   object BadRequest extends Error("INVALID_REQUEST", "Invalid request", None)
   object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None)
   object NotFinalisedDeclaration extends Error("NOT_FINALISED", "The return cannot be accepted without a declaration it is finalised.", Some("/finalised"))
+  object DateRangeTooLarge extends Error("DATE_RANGE_TOO_LARGE", "The start date cannot be more than four years from the current date.", None)
+  object InvalidDateRange extends Error("INVALID_DATE_RANGE", "The start date cannot after the end date.", None)
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")

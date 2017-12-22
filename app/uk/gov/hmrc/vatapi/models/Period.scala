@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.vatapi.models
 
-import uk.gov.hmrc.vatapi.models.Errors.BusinessError
+import org.joda.time.LocalDate
+import play.api.libs.json._
+import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
-sealed trait ErrorResult
+case class Period(key: String, start: LocalDate, end: LocalDate)
 
-case class GenericErrorResult(message: String) extends ErrorResult
-
-case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
-
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
-
-case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult
+object Period {
+  implicit val format: Format[Period] = Json.format[Period]
+}
