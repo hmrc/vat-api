@@ -207,6 +207,14 @@ traits:
                     description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
                     value:
                       code: VAT_NET_VALUE
+                  totalValueLimit:
+                    description: totalVatDue should not be greater than 20% of totalValueSalesExVAT
+                    value:
+                      code: VAT_TOTAL_VALUE_LIMIT
+                  vatReclaimedCurrPeriodLimit:
+                    description: vatReclaimedCurrPeriod should not be greater than 20% of totalValuePurchasesExVAT
+                    value:
+                      code: VAT_RECLAIMED_CURR_PERIOD_LIMIT
                   invalidNumericValue:
                     description: please provide a numeric field
                     value:
@@ -224,3 +232,7 @@ traits:
                     description: User has not declared VAT return as final
                     value:
                       code: NOT_FINALISED
+                  duplicateSubmission:
+                    description: User has has already submitted a VAT return for the given period
+                    value:
+                      code: DUPLICATE_SUBMISSION

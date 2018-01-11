@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,11 +55,14 @@ object ErrorCode extends Enumeration {
   INVALID_REQUEST,
   INVALID_TYPE,
   VAT_TOTAL_VALUE,
+  VAT_TOTAL_VALUE_LIMIT,
+  VAT_RECLAIMED_CURR_PERIOD_LIMIT,
   VAT_NET_VALUE,
   NOT_FINALISED,
   INVALID_DATE,
   INVALID_FROM_DATE,
-  INVALID_TO_DATE
+  INVALID_TO_DATE,
+  DUPLICATE_SUBMISSION
   = Value
 
   implicit val format: Format[ErrorCode] = EnumJson.enumFormat(ErrorCode,

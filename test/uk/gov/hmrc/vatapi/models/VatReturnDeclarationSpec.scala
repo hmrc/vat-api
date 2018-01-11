@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
       roundTripJson(
         VatReturnDeclaration(
           periodKey = "#001",
-          vatDueSales = 500.00,
+          vatDueSales = 50.00,
           vatDueAcquisitions = 100.30,
-          totalVatDue = 600.30,
-          vatReclaimedCurrPeriod = -450.00,
-          netVatDue = 1050.30,
+          totalVatDue = 150.30,
+          vatReclaimedCurrPeriod = 40.00,
+          netVatDue = 110.30,
           totalValueSalesExVAT = 1000,
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
@@ -183,11 +183,11 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
       toJson(
         VatReturnDeclaration(
           periodKey = "#001",
-          vatDueSales = 200.00,
-          vatDueAcquisitions = 100.00,
-          totalVatDue = 400.00,
-          vatReclaimedCurrPeriod = 100.00,
-          netVatDue = 300.00,
+          vatDueSales = 10.00,
+          vatDueAcquisitions = 100.30,
+          totalVatDue = 100.30,
+          vatReclaimedCurrPeriod = 40.00,
+          netVatDue = 60.30,
           totalValueSalesExVAT = 1000,
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
@@ -204,11 +204,11 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
       toJson(
         VatReturnDeclaration(
           periodKey = "#001",
-          vatDueSales = 200.00,
-          vatDueAcquisitions = 100.00,
-          totalVatDue = 300.00,
-          vatReclaimedCurrPeriod = 100.00,
-          netVatDue = 500.00,
+          vatDueSales = 50.00,
+          vatDueAcquisitions = 100.30,
+          totalVatDue = 150.30,
+          vatReclaimedCurrPeriod = 40.00,
+          netVatDue = 100.30,
           totalValueSalesExVAT = 1000,
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
@@ -217,6 +217,48 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
         )
       ),
       Map("/netVatDue" -> Seq(ErrorCode.VAT_NET_VALUE))
+    )
+  }
+
+  "reject VAT returns in which Vat Due Sales is more than 20% of Total Value Sales Ex VAT" in {
+    assertValidationErrorsWithCode[VatReturnDeclaration](
+      toJson(
+        VatReturnDeclaration(
+          periodKey = "#001",
+          vatDueSales = 300.00,
+          vatDueAcquisitions = 100.30,
+          totalVatDue = 400.30,
+          vatReclaimedCurrPeriod = 40.00,
+          netVatDue = 360.30,
+          totalValueSalesExVAT = 600,
+          totalValuePurchasesExVAT = 200.00,
+          totalValueGoodsSuppliedExVAT = 100.00,
+          totalAcquisitionsExVAT = 540.00,
+          finalised = true
+        )
+      ),
+      Map("/totalVatDue" -> Seq(ErrorCode.VAT_TOTAL_VALUE_LIMIT))
+    )
+  }
+
+  "reject VAT returns in which Vat Reclaimed for Current Period is more than 20% of Total Value Purchases Ex VAT" in {
+    assertValidationErrorsWithCode[VatReturnDeclaration](
+      toJson(
+        VatReturnDeclaration(
+          periodKey = "#001",
+          vatDueSales = 50.00,
+          vatDueAcquisitions = 100.30,
+          totalVatDue = 150.30,
+          vatReclaimedCurrPeriod = 40.00,
+          netVatDue = 110.30,
+          totalValueSalesExVAT = 1000,
+          totalValuePurchasesExVAT = 150.00,
+          totalValueGoodsSuppliedExVAT = 100.00,
+          totalAcquisitionsExVAT = 540.00,
+          finalised = true
+        )
+      ),
+      Map("/vatReclaimedCurrPeriod" -> Seq(ErrorCode.VAT_RECLAIMED_CURR_PERIOD_LIMIT))
     )
   }
 
