@@ -14,15 +14,15 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .when()
         .post(s"/$vrn/returns", Some(Json.parse("""{
           "periodKey": "#001",
-          "vatDueSales": 100.25,
-          "vatDueAcquisitions": 100.25,
-          "totalVatDue": 200.50,
-          "vatReclaimedCurrPeriod": 100.25,
-          "netVatDue": 100.25,
-          "totalValueSalesExVAT": 100,
-          "totalValuePurchasesExVAT": 100,
-          "totalValueGoodsSuppliedExVAT": 100,
-          "totalAcquisitionsExVAT": 100,
+          "vatDueSales": 50.00,
+          "vatDueAcquisitions": 100.30,
+          "totalVatDue": 150.30,
+          "vatReclaimedCurrPeriod": 40.00,
+          "netVatDue": 110.30,
+          "totalValueSalesExVAT": 1000,
+          "totalValuePurchasesExVAT": 200.00,
+          "totalValueGoodsSuppliedExVAT": 100.00,
+          "totalAcquisitionsExVAT": 540.00,
           "finalised": true
         }""")))
         .thenAssertThat()
@@ -35,15 +35,15 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .when()
         .post(s"/$vrn/returns", Some(Json.parse("""{
           "periodKey": "#001",
-          "vatDueSales": 100.25,
-          "vatDueAcquisitions": 100.25,
-          "totalVatDue": 200.50,
-          "vatReclaimedCurrPeriod": 100.25,
-          "netVatDue": 100.25,
-          "totalValueSalesExVAT": 100,
-          "totalValuePurchasesExVAT": 100,
-          "totalValueGoodsSuppliedExVAT": 100,
-          "totalAcquisitionsExVAT": 100,
+          "vatDueSales": 50.00,
+          "vatDueAcquisitions": 100.30,
+          "totalVatDue": 150.30,
+          "vatReclaimedCurrPeriod": 40.00,
+          "netVatDue": 110.30,
+          "totalValueSalesExVAT": 1000,
+          "totalValuePurchasesExVAT": 200.00,
+          "totalValueGoodsSuppliedExVAT": 100.00,
+          "totalAcquisitionsExVAT": 540.00,
           "finalised": false
         }""")))
         .thenAssertThat()

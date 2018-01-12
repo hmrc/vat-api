@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,22 @@ object VatReturnDeclaration {
           JsonValidationError(
             "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
             ErrorCode.VAT_TOTAL_VALUE)
+        ),
+        Validation[VatReturnDeclaration](
+          JsPath \ "totalVatDue",
+          vatReturn =>
+            vatReturn.totalVatDue <= vatReturn.totalValueSalesExVAT * 0.2,
+          JsonValidationError(
+            "totalVatDue should not be greater than 20% of totalValueSalesExVAT",
+            ErrorCode.VAT_TOTAL_VALUE_LIMIT)
+        ),
+        Validation[VatReturnDeclaration](
+          JsPath \ "vatReclaimedCurrPeriod",
+          vatReturn =>
+            vatReturn.vatReclaimedCurrPeriod <= vatReturn.totalValuePurchasesExVAT * 0.2,
+          JsonValidationError(
+            "vatReclaimedCurrPeriod should not be greater than 20% of totalValuePurchasesExVAT",
+            ErrorCode.VAT_RECLAIMED_CURR_PERIOD_LIMIT)
         ),
         Validation[VatReturnDeclaration](
           JsPath \ "netVatDue",
