@@ -237,7 +237,7 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
           finalised = true
         )
       ),
-      Map("/totalVatDue" -> Seq(ErrorCode.VAT_TOTAL_VALUE_LIMIT))
+      Map("/vatDueSales" -> Seq(ErrorCode.VAT_DUE_SALES_LIMIT))
     )
   }
 

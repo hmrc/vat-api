@@ -88,12 +88,12 @@ object VatReturnDeclaration {
             ErrorCode.VAT_TOTAL_VALUE)
         ),
         Validation[VatReturnDeclaration](
-          JsPath \ "totalVatDue",
+          JsPath \ "vatDueSales",
           vatReturn =>
-            vatReturn.totalVatDue <= vatReturn.totalValueSalesExVAT * 0.2,
+            vatReturn.vatDueSales <= vatReturn.totalValueSalesExVAT * 0.2,
           JsonValidationError(
-            "totalVatDue should not be greater than 20% of totalValueSalesExVAT",
-            ErrorCode.VAT_TOTAL_VALUE_LIMIT)
+            "vatDueSales should not be greater than 20% of totalValueSalesExVAT",
+            ErrorCode.VAT_DUE_SALES_LIMIT)
         ),
         Validation[VatReturnDeclaration](
           JsPath \ "vatReclaimedCurrPeriod",
