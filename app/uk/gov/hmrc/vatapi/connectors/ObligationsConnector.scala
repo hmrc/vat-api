@@ -30,7 +30,7 @@ object ObligationsConnector {
 
   def get(vrn: Vrn, queryParams: ObligationsQueryParams)(implicit hc: HeaderCarrier): Future[ObligationsResponse] = {
     val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
-    httpGet[ObligationsResponse](baseUrl + s"/vat/obligation-data/$vrn?$queryString", ObligationsResponse)
+    httpGet[ObligationsResponse](baseUrl + s"/enterprise/obligation-data/vrn/$vrn/VATC?$queryString", ObligationsResponse)
   }
 
 

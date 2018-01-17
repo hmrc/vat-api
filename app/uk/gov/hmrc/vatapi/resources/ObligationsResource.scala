@@ -35,7 +35,7 @@ object ObligationsResource extends BaseController {
     connector.get(vrn, params) map { response =>
       response.filter {
         case 200 =>
-          response.obligations match {
+          response.obligations(vrn) match {
             case Right(obj) => obj.map(x => Ok(Json.toJson(x))).getOrElse(NotFound)
             case Left(ex) =>
               logger.error(ex.msg)

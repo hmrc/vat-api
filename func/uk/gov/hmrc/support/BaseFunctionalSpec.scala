@@ -815,7 +815,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
       object obligations {
         def obligationNotFoundFor(vrn: Vrn): Givens = {
-          stubFor(get(urlEqualTo(s"/vat/obligation-data/$vrn"))
+          stubFor(get(urlMatching(s".*/vrn/$vrn.*"))
             .willReturn(
               aResponse()
                 .withStatus(404)
@@ -826,13 +826,13 @@ trait BaseFunctionalSpec extends TestApplication {
         }
 
         def returnObligationsFor(vrn: Vrn): Givens = {
-          stubFor(any(urlMatching(s"/vat/obligation-data/$vrn.*"))
+          stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
             .willReturn(
               aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
                 .withHeader("CorrelationId", "abc")
-                .withBody(DesJsons.Obligations())))
+                .withBody(DesJsons.Obligations(vrn.toString()))))
 
           givens
         }

@@ -71,10 +71,13 @@ object DesJsons {
       s"""
          |{
          |  "obligations": [
-         |    {
-         |      "id": "$id",
-         |      "type": "ITVAT",
-         |      "details": [
+         |        {
+         |        "identification": {
+         |          "incomeSourceType": "A",
+         |          "referenceNumber": "$id",
+         |          "referenceType": "VRN"
+         |        },
+         |      "obligationDetails": [
          |        {
          |          "status": "F",
          |          "inboundCorrespondenceFromDate": "2017-04-06",
@@ -103,40 +106,6 @@ object DesJsons {
          |          "inboundCorrespondenceToDate": "2018-04-05",
          |          "inboundCorrespondenceDueDate": "2018-05-06",
          |          "periodKey": "#004"
-         |        }
-         |      ]
-         |    },
-         |    {
-         |      "id": "$id",
-         |      "type": "ITSP",
-         |      "details": [
-         |        {
-         |          "status": "O",
-         |          "inboundCorrespondenceFromDate": "2017-04-06",
-         |          "inboundCorrespondenceToDate": "2017-07-05",
-         |          "inboundCorrespondenceDueDate": "2017-08-05",
-         |          "periodKey": "004"
-         |        },
-         |        {
-         |          "status": "O",
-         |          "inboundCorrespondenceFromDate": "2017-07-06",
-         |          "inboundCorrespondenceToDate": "2017-10-05",
-         |          "inboundCorrespondenceDueDate": "2017-11-05",
-         |          "periodKey": "004"
-         |        },
-         |        {
-         |          "status": "O",
-         |          "inboundCorrespondenceFromDate": "2017-10-06",
-         |          "inboundCorrespondenceToDate": "2018-01-05",
-         |          "inboundCorrespondenceDueDate": "2018-02-05",
-         |          "periodKey": "004"
-         |        },
-         |        {
-         |          "status": "O",
-         |          "inboundCorrespondenceFromDate": "2018-01-06",
-         |          "inboundCorrespondenceToDate": "2018-04-05",
-         |          "inboundCorrespondenceDueDate": "2018-05-06",
-         |          "periodKey": "004"
          |        }
          |      ]
          |    }
