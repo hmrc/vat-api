@@ -58,4 +58,3 @@ object Obligation {
 }
 
 case class InvalidDateError(msg: String) extends DesTransformError
-
