@@ -18,10 +18,12 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 
 import org.joda.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.UnitSpec
 
 class ObligationsResponseSpec extends UnitSpec {
+  val vrn = Vrn("123456789")
 
   val emptyJson: JsValue = Json.parse("""{ "obligations": [] }""")
 
@@ -30,8 +32,11 @@ class ObligationsResponseSpec extends UnitSpec {
      |{
      |  "obligations": [
      |  {
-     |    "id": "XAIS54321543215",
-     |    "type": "UnknownType",
+     |    "identification": {
+     |        "incomeSourceType": "A",
+     |        "referenceNumber": "123456789",
+     |        "referenceType": "UnknownType"
+     |    },
      |    "details": [
      |    {
      |      "status": "F",
@@ -73,9 +78,12 @@ class ObligationsResponseSpec extends UnitSpec {
        |{
        |  "obligations": [
        |  {
-       |    "id": "XAIS54321543215",
-       |    "type": "ITVAT",
-       |    "details": [
+       |    "identification": {
+       |        "incomeSourceType": "A",
+       |        "referenceNumber": "123456789",
+       |        "referenceType": "VRN"
+       |    },
+       |    "obligationDetails": [
        |    {
        |      "status": "F",
        |      "inboundCorrespondenceFromDate": "2017-01-01",
@@ -106,42 +114,6 @@ class ObligationsResponseSpec extends UnitSpec {
        |      "periodKey": "004"
        |    }
        |    ]
-       |  },
-       |  {
-       |    "id": "XAIS54321543215",
-       |    "type": "ITSP",
-       |    "details": [
-       |    {
-       |      "status": "F",
-       |      "inboundCorrespondenceFromDate": "2017-01-02",
-       |      "inboundCorrespondenceToDate": "2017-03-31",
-       |      "inboundCorrespondenceDateReceived": "2017-04-25",
-       |      "inboundCorrespondenceDueDate": "2017-04-30",
-       |      "periodKey": "001"
-       |    },
-       |    {
-       |      "status": "O",
-       |      "inboundCorrespondenceFromDate": "2017-04-01",
-       |      "inboundCorrespondenceToDate": "2017-06-30",
-       |      "inboundCorrespondenceDueDate": "2017-07-30",
-       |      "periodKey": "002"
-       |    },
-       |    {
-       |      "status": "O",
-       |      "inboundCorrespondenceFromDate": "2017-07-01",
-       |      "inboundCorrespondenceToDate": "2017-09-30",
-       |      "inboundCorrespondenceDueDate": "2017-10-30",
-       |      "periodKey": "003"
-       |    },
-       |    {
-       |      "status": "F",
-       |      "inboundCorrespondenceFromDate": "2017-10-01",
-       |      "inboundCorrespondenceToDate": "2017-12-01",
-       |      "inboundCorrespondenceDateReceived": "2017-12-25",
-       |      "inboundCorrespondenceDueDate": "2018-01-01",
-       |      "periodKey": "004"
-       |    }
-       |    ]
        |  }
        |  ]
        |}
@@ -152,7 +124,7 @@ class ObligationsResponseSpec extends UnitSpec {
     "wrap empty response" in {
       val response = ObligationsResponse(HttpResponse(200, Some(emptyJson)))
 
-      val obligations = response.obligations
+      val obligations = response.obligations(vrn)
       obligations.right.get shouldBe None
     }
 
@@ -160,14 +132,14 @@ class ObligationsResponseSpec extends UnitSpec {
     "wrap invalid json response" in {
       val response = ObligationsResponse(HttpResponse(200, Some(invalidTypeJson)))
 
-      val obligations = response.obligations
+      val obligations = response.obligations(vrn)
       obligations.right.get shouldBe None
     }
 
     "wrap valid response" in {
       val response = ObligationsResponse(HttpResponse(200, Some(obligationJson)))
 
-      val obligations = response.obligations
+      val obligations = response.obligations(vrn)
       obligations.right.get.get.obligations.find(o => o.received.get == new LocalDate("2017-04-25")) shouldBe defined
     }
   }

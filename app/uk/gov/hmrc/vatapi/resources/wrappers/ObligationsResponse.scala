@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.vatapi.resources.wrappers
 
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.ObligationDetail
 import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
 
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
-  def obligations : Either[DesTransformError, Option[Obligations]] = {
+  def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
     val desObligations = json.asOpt[des.Obligations]
     var errorMessage = s"The response from DES does not match the expected format. JSON: [$json]"
 
@@ -33,10 +34,10 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {
       errorMessage = "Obligation for VAT type was not found."
-      obligation.obligations.find(_.`type` == "ITVAT").fold(noneFound) {
+      obligation.obligations.find(obj => obj.identification.referenceNumber == vrn.toString() && obj.identification.referenceType == "VRN").fold(noneFound) {
         desObligation =>
           val obligationsOrError: Seq[Either[DesTransformError, Obligation]] = for {
-            details <- desObligation.details
+            details <- desObligation.obligationDetails
           } yield DesTransformValidator[ObligationDetail, Obligation].from(details)
 
           obligationsOrError.find(_.isLeft) match {
