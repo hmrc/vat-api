@@ -4,8 +4,13 @@
   "description": "Submit VAT",
   "type": "object",
   "properties": {
-    "period": {
-      "$ref": "Period.json"
+    "periodKey": {
+      "title": "Period key",
+      "description": "Period key",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4,
+      "example": "#001"
     },
     "vatDueSales": {
       "description": "VAT due on sales and other outputs. Box (1) on VAT Return form.",
@@ -52,14 +57,15 @@
       "$ref": "#/definitions/wholePounds",
       "example": "1000"
     },
-    "received": {
-      "title": "Received Date",
-      "description": "The obligation received date, is returned when status is (F = Fulfilled)",
-      "$ref": "FullDate.json"
+    "finalised": {
+      "title": "Finalised flag",
+      "description": "Indicates if the return has been finalised",
+      "type": "boolean",
+      "example": "true"
     }
   },
   "required": [
-    "period",
+    "periodKey",
     "vatDueSales",
     "vatDueAcquisitions",
     "totalVatDue",
@@ -69,7 +75,7 @@
     "totalValuePurchasesExVAT",
     "totalValueGoodsSuppliedExVAT",
     "totalAcquisitionsExVAT",
-    "received"
+    "finalised"
   ],
   "definitions": {
     "monetaryPos11": {

@@ -16,25 +16,17 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import cats.implicits._
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
-import uk.gov.hmrc.vatapi.models.{
-  DateRange,
-  ErrorCode,
-  Errors,
-  QueryDateRange,
-  VatReturnDeclaration
-}
-import org.joda.time.LocalDate
+import uk.gov.hmrc.vatapi.models.Errors.Error
+import uk.gov.hmrc.vatapi.models.{ErrorCode, Errors, VatReturnDeclaration}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import cats.implicits._
-import com.github.nscala_time.time.Imports._
-import uk.gov.hmrc.vatapi.models.Errors.Error
 
 object VatReturnsResource extends BaseController {
 
@@ -71,40 +63,25 @@ object VatReturnsResource extends BaseController {
 
   }
 
-  def retrieveVatReturns(vrn: Vrn,
-                         queryRange: QueryDateRange): Action[AnyContent] =
+  def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
     Action.async { implicit request =>
-      val today = new LocalDate
-      val fourYearsAgo = today.minusYears(4)
-
-      val range =
-        DateRange(
-          queryRange.from.getOrElse(fourYearsAgo),
-          queryRange.to.getOrElse(today)
-        )
-
       fromDes {
         for {
-          _ <- validate(queryRange) {
-            case _ if (range.from > range.to) => Errors.InvalidDateRange
-          }
-          _ <- authorise(queryRange) {
-            case _ if (range.from < fourYearsAgo) => Errors.DateRangeTooLarge
+          _ <- validate[String](periodKey) {
+            case _ if (periodKey.length != 4) => Errors.InvalidPeriodKey
           }
           response <- execute { _ =>
-            connector.query(vrn, range)
+            connector.query(vrn, periodKey)
           }
         } yield response
-      } onSuccess {
-        _.retrieve match {
-          case Right(vatReturns) => Ok(Json.toJson(vatReturns))
-          case Left(err) => {
-            logger.error(err.msg)
-            InternalServerError
+      } onSuccess { response =>
+        response.filter {
+          case 200 => response.retrieve match {
+            case Right(vatReturn) => Ok(Json.toJson(vatReturn))
+            case Left(error) => logger.error(error.msg)
+              InternalServerError
           }
         }
       }
-
     }
-
 }

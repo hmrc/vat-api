@@ -105,15 +105,13 @@ trait Response {
         INVALID_INCOMESOURCEID,
         INVALID_TYPE,
         INVALID_IDENTIFIER,
-        INVALID_CALCID) =>
-      NotFound
+        INVALID_CALCID) => NotFound
     case 400
       if errorCodeIsOneOf(INVALID_ORIGINATOR_ID,
         INVALID_DATE_FROM,
         INVALID_DATE_TO,
         INVALID_STATUS,
-        INVALID_TAX_YEAR) =>
-      InternalServerError(toJson(Errors.InternalServerError))
+        INVALID_TAX_YEAR) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(NOT_UNDER_16) => Forbidden(toJson(Errors.businessError(Errors.NotUnder16)))
     case 403 if errorCodeIsOneOf(NOT_OVER_STATE_PENSION) => Forbidden(toJson(Errors.businessError(Errors.NotOverStatePension)))
     case 403 if errorCodeIsOneOf(MISSING_EXEMPTION_INDICATOR) => BadRequest(toJson(Errors.badRequest(Errors.MissingExemptionIndicator)))

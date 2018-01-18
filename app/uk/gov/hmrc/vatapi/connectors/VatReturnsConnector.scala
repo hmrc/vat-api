@@ -16,25 +16,28 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
+import java.net.URLEncoder
+
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.config.AppContext
-import uk.gov.hmrc.vatapi.models.{DateRange, VatReturnDeclaration, des}
-import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnsResponse
+import uk.gov.hmrc.vatapi.models.des
+import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
+
 import scala.concurrent.{ExecutionContext, Future}
 
 object VatReturnsConnector {
 
   private lazy val baseUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
 
-  def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnsResponse] =
-    httpPost[des.VatReturnDeclaration, VatReturnsResponse](
+  def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] =
+    httpPost[des.VatReturnDeclaration, VatReturnResponse](
       url        = s"$baseUrl/$vrn",
       elem       = vatReturn,
-      toResponse = VatReturnsResponse
+      toResponse = VatReturnResponse
     )
 
-  def query(vrn: Vrn, dateRange: DateRange)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnsResponse] =
-    httpGet[VatReturnsResponse](s"$baseUrl/$vrn?from=${dateRange.from}&to=${dateRange.to}", VatReturnsResponse)
+  def query(vrn: Vrn, periodKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] =
+    httpGet[VatReturnResponse](s"$baseUrl/$vrn?periodKey=${URLEncoder.encode(periodKey, "UTF-8")}", VatReturnResponse)
 
 }

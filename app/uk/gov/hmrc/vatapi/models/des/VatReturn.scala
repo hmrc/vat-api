@@ -40,9 +40,3 @@ case class VatReturn(periodKey: String,
 object VatReturn {
   implicit val reads: Format[VatReturn] = Json.format[VatReturn]
 }
-
-case class VatReturns(vatReturns: Seq[VatReturn])
-
-object VatReturns {
-  implicit val format: Format[VatReturns] = Json.format[VatReturns]
-}

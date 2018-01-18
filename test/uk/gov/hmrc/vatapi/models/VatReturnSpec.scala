@@ -27,11 +27,7 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
     "round trip" in {
       roundTripJson(
         VatReturn(
-          period = Period(
-            key = "#001",
-            start = new LocalDate(),
-            end =  new LocalDate()
-          ),
+          periodKey = "#001",
           vatDueSales = 500.00,
           vatDueAcquisitions = 100.30,
           totalVatDue = 600.30,
@@ -41,7 +37,7 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
           totalAcquisitionsExVAT = 540.00,
-          received = new LocalDate()
+          finalised = false
         )
       )
     }
