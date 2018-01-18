@@ -40,7 +40,7 @@ class VatApiDefinition {
         groupName = Vat)
       ,
       Endpoint(
-        uriPattern = "/{vrn}/return",
+        uriPattern = "/{vrn}/returns",
         endpointName = "Submit VAT return for period.",
         method = POST,
         authType = USER,
@@ -52,6 +52,15 @@ class VatApiDefinition {
           Parameter("to", true),
           Parameter("status", true)
         )))
+        ,
+        Endpoint(
+        uriPattern = "/{vrn}/returns",
+        endpointName = "Retrieve submitted VAT returns",
+        method = GET,
+        authType = USER,
+        throttlingTier = UNLIMITED,
+        scope = Some(readScope),
+        groupName = Vat)
     )
   }
 
