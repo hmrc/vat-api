@@ -103,7 +103,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(400)
         .bodyHasPath("\\code", "INVALID_REQUEST")
-        .bodyHasPath("\\errors(0)\\code", "INVALID_PERIOD_KEY")
+        .bodyHasPath("\\errors(0)\\code", "INVALID_KEY_PERIOD")
     }
   }
 }
