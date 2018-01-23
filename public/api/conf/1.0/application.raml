@@ -118,8 +118,8 @@ traits:
             type: string
             example: "#001"
         get:
-          displayName: View VAT Returns
-          description: Retrieve submitted VAT returns
+          displayName: View VAT Return
+          description: Retrieve a submitted VAT return
           is: [headers.acceptHeader, contentType, testScenarioHeader]
           (annotations.scope): "write:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
