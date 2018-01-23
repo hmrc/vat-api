@@ -150,6 +150,7 @@ traits:
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
+        (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
