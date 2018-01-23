@@ -16,14 +16,10 @@
 
 package uk.gov.hmrc.vatapi.models
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.vatapi.models.Validation._
-import org.joda.time.LocalDate
-import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturn(
-  period: Period,
+  periodKey: String,
   vatDueSales: Amount,
   vatDueAcquisitions: Amount,
   totalVatDue: Amount,
@@ -33,7 +29,7 @@ case class VatReturn(
   totalValuePurchasesExVAT: Amount,
   totalValueGoodsSuppliedExVAT: Amount,
   totalAcquisitionsExVAT: Amount,
-  received: LocalDate
+  finalised: Boolean
 )
 
 object VatReturn {
@@ -46,11 +42,7 @@ object VatReturn {
       def from(vatReturn: des.VatReturn): Either[DesTransformError, VatReturn] =
         Right(
           VatReturn(
-            period = Period(
-              key   = vatReturn.periodKey,
-              start = LocalDate.parse(vatReturn.inboundCorrespondenceFromDate),
-              end   = LocalDate.parse(vatReturn.inboundCorrespondenceToDate)
-            ),
+            periodKey = vatReturn.periodKey,
             vatDueSales = vatReturn.vatDueSales,
             vatDueAcquisitions = vatReturn.vatDueAcquisitions,
             totalVatDue = vatReturn.vatDueTotal,
@@ -60,7 +52,7 @@ object VatReturn {
             totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
             totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
             totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
-            received = vatReturn.receivedAt.toLocalDate
+            finalised = true
           )
         )
     }

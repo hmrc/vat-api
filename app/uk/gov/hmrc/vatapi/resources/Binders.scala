@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.models.{ObligationsQueryParams, OptEither}
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
+
 import scala.util.{Failure, Success, Try}
-import uk.gov.hmrc.vatapi.models.QueryDateRange
 
 object Binders {
 
@@ -74,32 +74,4 @@ object Binders {
         }
 
   }
-
-  implicit def dateRangeQueryParamsBinder(implicit dateBinder: QueryStringBindable[LocalDate]) = new QueryStringBindable[QueryDateRange] {
-
-    override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, QueryDateRange]] = {
-
-      def invert[A](maybeErrorOrValue: Option[Either[String, A]]): Either[String, Option[A]] =
-        maybeErrorOrValue match {
-          case Some(Right(value)) => Right(Some(value))
-          case Some(Left(error))  => Left(error)
-          case None               => Right(None)
-        }
-
-      val maybeFromOrError = invert(dateBinder.bind("from", params)).left.map{ _ => "ERROR_INVALID_FROM_DATE" }
-      val maybeToOrError = invert(dateBinder.bind("to", params)).left.map{ _ => "ERROR_INVALID_TO_DATE" }
-
-      Some {
-        for {
-          from <- maybeFromOrError.right
-          to <- maybeToOrError.right
-        } yield QueryDateRange(from, to)
-      }
-
-    }
-
-    override def unbind(key: String, range: QueryDateRange): String = ???
-
-  }
-
 }

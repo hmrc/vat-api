@@ -20,7 +20,7 @@ import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import play.api.mvc.Result
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DesBusinessResult[R <: Response](val businessResult: BusinessResult[R]) {
+case class DesBusinessResult[R <: Response](businessResult: BusinessResult[R]) {
 
   def onSuccess(handleSuccess: R => Result)(implicit ec: ExecutionContext): Future[Result] =
     for {

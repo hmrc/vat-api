@@ -852,31 +852,27 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
-        def expectVatReturnSearchFor(vrn: Vrn, from: LocalDate, to: LocalDate): Givens = {
+        def expectVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?from=$from&to=$to"))
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
               .willReturn(
                 aResponse()
                   .withStatus(200)
                   .withBody("""
                     {
-                      "vatReturns": [
-                        {
-                          "periodKey": "#001",
-                          "inboundCorrespondenceFromDate": "2017-01-01",
-                          "inboundCorrespondenceToDate": "2017-12-31",
-                          "vatDueSales": 100.25,
-                          "vatDueAcquisitions": 100.25,
-                          "vatDueTotal": 200.50,
-                          "vatReclaimedCurrPeriod": 100.25,
-                          "vatDueNet": 100.25,
-                          "totalValueSalesExVAT": 100,
-                          "totalValuePurchasesExVAT": 100,
-                          "totalValueGoodsSuppliedExVAT": 100,
-                          "totalAcquisitionsExVAT": 100,
-                          "receivedAt": "2017-12-18T16:49:20.678Z"
-                        }
-                      ]
+                      "periodKey": "0001",
+                      "inboundCorrespondenceFromDate": "2017-01-01",
+                      "inboundCorrespondenceToDate": "2017-12-31",
+                      "vatDueSales": 100.25,
+                      "vatDueAcquisitions": 100.25,
+                      "vatDueTotal": 200.50,
+                      "vatReclaimedCurrPeriod": 100.25,
+                      "vatDueNet": 100.25,
+                      "totalValueSalesExVAT": 100,
+                      "totalValuePurchasesExVAT": 100,
+                      "totalValueGoodsSuppliedExVAT": 100,
+                      "totalAcquisitionsExVAT": 100,
+                      "receivedAt": "2017-12-18T16:49:20.678Z"
                     }""")
               )
           )
@@ -884,9 +880,9 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
-        def expectInvalidVatReturnSearchFor(vrn: Vrn, from: LocalDate, to: LocalDate): Givens = {
+        def expectInvalidVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?from=$from&to=$to"))
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
               .willReturn(
                 aResponse()
                   .withStatus(200)

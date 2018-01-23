@@ -72,7 +72,7 @@ trait Response {
     Map(
       INVALID_VRN -> Some(Errors.VrnInvalid),
       INVALID_PAYLOAD -> Some(Errors.InvalidRequest),
-      INVALID_PERIOD_KEY -> Some(Errors.InvalidPeriodKey),
+      INVALID_PERIODKEY -> Some(Errors.InvalidPeriodKey),
       INVALID_INCOMESOURCEID -> None,
       INVALID_BUSINESSID -> None,
       INVALID_INCOME_SOURCE -> None,
@@ -97,7 +97,7 @@ trait Response {
   private def errorMapping: PartialFunction[Int, Result] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
-    case 400 if errorCodeIsOneOf(INVALID_PERIOD_KEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
+    case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
     case 400
       if errorCodeIsOneOf(NOT_FOUND_NINO,
         INVALID_BUSINESSID,
@@ -105,15 +105,13 @@ trait Response {
         INVALID_INCOMESOURCEID,
         INVALID_TYPE,
         INVALID_IDENTIFIER,
-        INVALID_CALCID) =>
-      NotFound
+        INVALID_CALCID) => NotFound
     case 400
       if errorCodeIsOneOf(INVALID_ORIGINATOR_ID,
         INVALID_DATE_FROM,
         INVALID_DATE_TO,
         INVALID_STATUS,
-        INVALID_TAX_YEAR) =>
-      InternalServerError(toJson(Errors.InternalServerError))
+        INVALID_TAX_YEAR) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(NOT_UNDER_16) => Forbidden(toJson(Errors.businessError(Errors.NotUnder16)))
     case 403 if errorCodeIsOneOf(NOT_OVER_STATE_PENSION) => Forbidden(toJson(Errors.businessError(Errors.NotOverStatePension)))
     case 403 if errorCodeIsOneOf(MISSING_EXEMPTION_INDICATOR) => BadRequest(toJson(Errors.badRequest(Errors.MissingExemptionIndicator)))
