@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MTDFB - API 56 v1.0 Submit 9-Box Vat Return - Success response",
+  "description": "Submit 9-Box Vat Return - Success response",
+  "type": "object",
+  "required": [
+    "processingDate",
+    "formBundleNumber"
+  ],
+  "properties": {
+    "processingDate": {
+      "description": "Time stamp for when message was processed in the system",
+      "type": "string",
+      "format": "date-time"
+    },
+    "formBundleNumber": {
+      "description": "Unique number representing Form Bundle, the system creates forms to store return data, those are held in form bundle that is unique within the system",
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "paymentIndicator": {
+      "description":  "Can be either DD or BANK or not present at all, when return is a debit i.e. Trader has to pay and Direct Debit is set up for such trader we would return DD, when return is a claim i.e. credit where HMRC will pay out and bank details are present on master data then BANK indicator is sent, for NIL returns, or where bank / DD data does not exist nothing will be sent",
+      "type": "string",
+      "enum": [
+        "DD",
+        "BANK"
+      ]
+    },
+    "chargeRefNumber": {
+      "description": "Represents charge reference number, this number is only derived in case where charge is a debit, intention was to pass it to back end so that trader can make payment against this number, however I believe that business does not want to disturb current status quo where traders use VRN to pay",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16
+    }
+  },
+  "additionalProperties": false
+}

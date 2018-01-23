@@ -163,6 +163,10 @@ traits:
               X-CorrelationId:
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
+            body:
+              application/json:
+                type: !include schemas/VatReturnResponse.json
+                example: !include examples/VatReturnResponse.json
           400:
             body:
               application/json:
