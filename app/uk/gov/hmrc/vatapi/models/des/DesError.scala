@@ -36,6 +36,7 @@ object DesErrorCode extends Enumeration {
   type DesErrorCode = Value
 
   val INVALID_VRN,
+  INVALID_ARN,
   INVALID_PAYLOAD,
   NOT_FOUND_NINO,
   NOT_FOUND,
@@ -44,6 +45,7 @@ object DesErrorCode extends Enumeration {
   SERVICE_UNAVAILABLE,
   INVALID_PERIOD,
   INVALID_PERIODKEY,
+  DUPLICATE_SUBMISSION,
   INVALID_ORIGINATOR_ID,
   INVALID_REQUEST,
   INVALID_BUSINESSID,

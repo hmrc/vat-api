@@ -49,15 +49,6 @@ object VatReturnsResource extends BaseController {
       } onSuccess { response =>
         response.filter {
           case 200 => Created(Json.toJson(response.vatReturn))
-          case 400 =>
-            Forbidden(
-              Json.toJson(
-                Errors.businessError(
-                  Error(
-                    ErrorCode.DUPLICATE_SUBMISSION.toString,
-                    "The VAT return was already submitted for the given period",
-                    Some("")))))
-          case _ => InternalServerError
         }
       }
 

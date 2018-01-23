@@ -53,6 +53,7 @@ object Errors {
   }
 
   object VrnInvalid extends Error("VRN_INVALID", "The provided VRN is invalid", None)
+  object ArnInvalid extends Error("ARN_INVALID", "The provided ARN is invalid", None)
   object InvalidPeriodKey extends Error("INVALID_KEY_PERIOD", "The provided period key is invalid", None)
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
   object BothExpensesSupplied extends Error("BOTH_EXPENSES_SUPPLIED", "Elements: expenses and consolidatedElements cannot be both specified at the same time", None)
@@ -74,6 +75,8 @@ object Errors {
   object NotFinalisedDeclaration extends Error("NOT_FINALISED", "The return cannot be accepted without a declaration it is finalised.", Some("/finalised"))
   object DateRangeTooLarge extends Error("DATE_RANGE_TOO_LARGE", "The start date cannot be more than four years from the current date.", None)
   object InvalidDateRange extends Error("INVALID_DATE_RANGE", "The start date cannot after the end date.", None)
+  object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
+
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")
