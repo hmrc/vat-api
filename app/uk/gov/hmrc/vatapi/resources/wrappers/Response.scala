@@ -38,9 +38,10 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.Results._
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.vatapi.models.{Errors, _}
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
 import uk.gov.hmrc.vatapi.models.des.{DesError, MultiDesError}
+import uk.gov.hmrc.vatapi.models.{Errors, _}
+import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
 
 trait Response {
   val logger: Logger = Logger(this.getClass)
@@ -96,8 +97,11 @@ trait Response {
 
   private def errorMapping: PartialFunction[Int, Result] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
+    case 400 if errorCodeIsOneOf(INVALID_ARN) => BadRequest(toJson(Errors.ArnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
+    case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) =>  Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+
     case 400
       if errorCodeIsOneOf(NOT_FOUND_NINO,
         INVALID_BUSINESSID,

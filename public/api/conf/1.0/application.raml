@@ -118,8 +118,8 @@ traits:
             type: string
             example: "#001"
         get:
-          displayName: View VAT Returns
-          description: Retrieve submitted VAT returns
+          displayName: View VAT Return
+          description: Retrieve a submitted VAT return
           is: [headers.acceptHeader, contentType, testScenarioHeader]
           (annotations.scope): "write:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
@@ -150,6 +150,7 @@ traits:
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
+        (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
@@ -163,19 +164,27 @@ traits:
               X-CorrelationId:
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
+            body:
+              application/json:
+                type: !include schemas/VatReturnResponse.json
+                example: !include examples/VatReturnResponse.json
           400:
             body:
               application/json:
                 type: types.errorResponse
                 examples:
-                  invalidNino:
+                  invalidVrn:
                     description: Invalid VRN
                     value:
                       code: VRN_INVALID
+                  invalidArn:
+                    description: Provided ARN is invalid
+                    value:
+                      code: INVALID_ARN
                   invalidPeriodKey:
                     description: Invalid period key
                     value:
-                      code: INVALID_PERIOD_KEY
+                      code: INVALID_KEY_PERIOD
                   invalidRequest:
                     description: Invalid request
                     value:
@@ -204,6 +213,14 @@ traits:
                     description: please provide a string field
                     value:
                       code: INVALID_STRING_VALUE
+                  invalidPayload:
+                    description: Provided payload is invalid
+                    value:
+                      code: INVALID_PAYLOAD
+                  duplicateSubmission:
+                    description: Vat return already submitted for that period
+                    value:
+                      code: DUPLICATE_SUBMISSION
           403:
             body:
               application/json:
