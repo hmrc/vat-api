@@ -150,7 +150,6 @@ traits:
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
-        (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
@@ -177,10 +176,6 @@ traits:
                     description: Invalid VRN
                     value:
                       code: VRN_INVALID
-                  invalidArn:
-                    description: Provided ARN is invalid
-                    value:
-                      code: INVALID_ARN
                   invalidPeriodKey:
                     description: Invalid period key
                     value:
@@ -209,18 +204,6 @@ traits:
                     description: please provide a numeric field
                     value:
                       code: INVALID_NUMERIC_VALUE
-                  invalidStringValue:
-                    description: please provide a string field
-                    value:
-                      code: INVALID_STRING_VALUE
-                  invalidPayload:
-                    description: Provided payload is invalid
-                    value:
-                      code: INVALID_PAYLOAD
-                  duplicateSubmission:
-                    description: Vat return already submitted for that period
-                    value:
-                      code: DUPLICATE_SUBMISSION
           403:
             body:
               application/json:
