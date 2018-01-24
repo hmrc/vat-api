@@ -848,7 +848,23 @@ trait BaseFunctionalSpec extends TestApplication {
                   .withBody("[]")
               )
           )
+          givens
+        }
 
+        def expectVatReturnToFail(vrn: Vrn, code: String, reason: String = "Irrelevant"): Givens = {
+          stubFor(
+            any(urlMatching(s"/enterprise/return/vat/$vrn"))
+              .willReturn(
+                aResponse()
+                  .withStatus(400)
+                  .withBody(s"""
+                              |{
+                              |  "code": "$code",
+                              |  "reason": "$reason"
+                              |}
+                            """.stripMargin)
+              )
+          )
           givens
         }
 
@@ -876,7 +892,6 @@ trait BaseFunctionalSpec extends TestApplication {
                     }""")
               )
           )
-
           givens
         }
 
@@ -889,11 +904,9 @@ trait BaseFunctionalSpec extends TestApplication {
                   .withBody("not-json")
               )
           )
-
           givens
         }
       }
-
     }
 
     def des() = new Des(this)
