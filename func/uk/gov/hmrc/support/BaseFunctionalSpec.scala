@@ -868,6 +868,23 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
+        def expectVatReturnRetrieveToFail(vrn: Vrn, code: String, reason: String = "Irrelevant"): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=0001"))
+              .willReturn(
+                aResponse()
+                  .withStatus(403)
+                  .withBody(s"""
+                               |{
+                               |  "code": "$code",
+                               |  "reason": "$reason"
+                               |}
+                            """.stripMargin)
+              )
+          )
+          givens
+        }
+
         def expectVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
             get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
