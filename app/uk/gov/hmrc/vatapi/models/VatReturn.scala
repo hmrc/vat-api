@@ -28,8 +28,7 @@ case class VatReturn(
   totalValueSalesExVAT: Amount,
   totalValuePurchasesExVAT: Amount,
   totalValueGoodsSuppliedExVAT: Amount,
-  totalAcquisitionsExVAT: Amount,
-  finalised: Boolean
+  totalAcquisitionsExVAT: Amount
 )
 
 object VatReturn {
@@ -51,8 +50,7 @@ object VatReturn {
             totalValueSalesExVAT = vatReturn.totalValueSalesExVAT,
             totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
             totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
-            totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT,
-            finalised = true
+            totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT
           )
         )
     }

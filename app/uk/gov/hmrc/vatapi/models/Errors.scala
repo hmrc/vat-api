@@ -53,8 +53,7 @@ object Errors {
   }
 
   object VrnInvalid extends Error("VRN_INVALID", "The provided VRN is invalid", None)
-  object ArnInvalid extends Error("ARN_INVALID", "The provided ARN is invalid", None)
-  object InvalidPeriodKey extends Error("INVALID_KEY_PERIOD", "The provided period key is invalid", None)
+  object InvalidPeriodKey extends Error("PERIOD_KEY_INVALID", "The provided period key is invalid", None)
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
   object BothExpensesSupplied extends Error("BOTH_EXPENSES_SUPPLIED", "Elements: expenses and consolidatedElements cannot be both specified at the same time", None)
   object NotAllowedConsolidatedExpenses extends Error("NOT_ALLOWED_CONSOLIDATED_EXPENSES", "The submission contains consolidated expenses but the accumulative turnover amount exceeds the threshold", Some(""))

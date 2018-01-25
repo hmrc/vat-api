@@ -36,8 +36,7 @@ class VatReturnSpec extends UnitSpec with JsonSpec {
           totalValueSalesExVAT = 1000,
           totalValuePurchasesExVAT = 200.00,
           totalValueGoodsSuppliedExVAT = 100.00,
-          totalAcquisitionsExVAT = 540.00,
-          finalised = false
+          totalAcquisitionsExVAT = 540.00
         )
       )
     }
