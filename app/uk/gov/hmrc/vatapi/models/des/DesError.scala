@@ -20,12 +20,6 @@ import play.api.libs.json.{Format, Json, Reads}
 import uk.gov.hmrc.vatapi.models.EnumJson
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.DesErrorCode
 
-case class MultiDesError(failures: Seq[DesError])
-
-object MultiDesError {
-  implicit val reads: Reads[MultiDesError] = Json.reads[MultiDesError]
-}
-
 case class DesError(code: DesErrorCode, reason: String)
 
 object DesError {
@@ -38,38 +32,10 @@ object DesErrorCode extends Enumeration {
   val INVALID_VRN,
   INVALID_ARN,
   INVALID_PAYLOAD,
-  NOT_FOUND_NINO,
-  NOT_FOUND,
-  CONFLICT,
-  SERVER_ERROR,
-  SERVICE_UNAVAILABLE,
-  INVALID_PERIOD,
   INVALID_PERIODKEY,
   DUPLICATE_SUBMISSION,
-  INVALID_ORIGINATOR_ID,
-  INVALID_REQUEST,
-  INVALID_BUSINESSID,
-  INVALID_TAX_YEAR,
-  NOT_FOUND_TAX_YEAR,
-  INVALID_TYPE,
-  INVALID_IDENTIFIER,
-  INVALID_CALCID,
-  INVALID_INCOME_SOURCE,
-  INVALID_DATE_FROM,
-  INVALID_DATE_TO,
-  INVALID_STATUS,
-  NOT_CONTIGUOUS_PERIOD,
-  OVERLAPS_IN_PERIOD,
-  NOT_ALIGN_PERIOD,
-  INVALID_INCOMESOURCEID,
-  NOT_FOUND_INCOME_SOURCE,
-  BOTH_EXPENSES_SUPPLIED,
-  NOT_ALLOWED_CONSOLIDATED_EXPENSES,
-  NOT_UNDER_16,
-  NOT_OVER_STATE_PENSION,
-  MISSING_EXEMPTION_INDICATOR,
-  MISSING_EXEMPTION_REASON,
-  INVALID_DATE_RANGE = Value
+  SERVER_ERROR,
+  SERVICE_UNAVAILABLE = Value
 
   implicit val format: Format[DesErrorCode] = EnumJson.enumFormat(DesErrorCode,
     Some(s"Recognized DesErrorCode values: ${DesErrorCode.values.mkString(", ")}"))

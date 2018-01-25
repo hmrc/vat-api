@@ -73,7 +73,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         }""")))
         .thenAssertThat()
         .statusIs(400)
-        .bodyHasPath("\\code", "INVALID_KEY_PERIOD")
+        .bodyHasPath("\\code", "PERIOD_KEY_INVALID")
     }
 
     "reject submission with invalid ARN" in {
@@ -95,8 +95,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
           "finalised": true
         }""")))
         .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "ARN_INVALID")
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
     }
 
     "reject submission with invalid VRN" in {
@@ -188,7 +188,6 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\totalValuePurchasesExVAT", 100)
         .bodyHasPath("\\totalValueGoodsSuppliedExVAT", 100)
         .bodyHasPath("\\totalAcquisitionsExVAT", 100)
-        .bodyHasPath("\\finalised", true)
     }
 
     "return internal server error on malformed response" in {
@@ -218,7 +217,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(400)
         .bodyHasPath("\\code", "INVALID_REQUEST")
-        .bodyHasPath("\\errors(0)\\code", "INVALID_KEY_PERIOD")
+        .bodyHasPath("\\errors(0)\\code", "PERIOD_KEY_INVALID")
     }
   }
 }
