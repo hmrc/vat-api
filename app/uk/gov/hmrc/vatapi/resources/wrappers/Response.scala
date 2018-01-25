@@ -75,6 +75,7 @@ trait Response {
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
     case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) =>  Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+    case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) =>  Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 404 => NotFound
     case 500 if errorCodeIsOneOf(SERVER_ERROR) => InternalServerError(toJson(Errors.InternalServerError))
     case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => InternalServerError(toJson(Errors.InternalServerError))

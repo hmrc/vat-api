@@ -132,6 +132,17 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\code", "VRN_INVALID")
     }
 
+    "return forbidden (403) if the vat return was submitted longer than 4 years ago" in {
+      given()
+        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "DATE_RANGE_TOO_LARGE")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyHasPath("\\code", "BUSINESS_ERROR")
+        .bodyHasPath("\\errors(0)\\code", "DATE_RANGE_TOO_LARGE")
+    }
+
     "return bad request (400) if the periodKey is invalid" in {
       given()
         .des().vatReturns.expectVatReturnSearchFor(vrn, "001")
