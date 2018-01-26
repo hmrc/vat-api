@@ -120,6 +120,7 @@ traits:
         get:
           displayName: View VAT Return
           description: Retrieve a submitted VAT return
+          (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
           is: [headers.acceptHeader, contentType, testScenarioHeader]
           (annotations.scope): "write:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
@@ -146,10 +147,20 @@ traits:
                       description: Invalid period key
                       value:
                         code: PERIOD_KEY_INVALID
+            403:
+              body:
+                application/json:
+                  type: types.errorResponse
+                  examples:
+                    dateRangeTooLarge:
+                      description: The date of the requested return cannot be more than four years from the current date
+                      value:
+                        code: DATE_RANGE_TOO_LARGE
             404:
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
+        (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
