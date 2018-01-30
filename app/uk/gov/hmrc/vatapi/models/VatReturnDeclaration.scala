@@ -47,7 +47,7 @@ case class VatReturnDeclaration(
       totalValueSalesExVAT = totalValueSalesExVAT,
       totalValuePurchasesExVAT = totalValuePurchasesExVAT,
       totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
-      totalAcquisitionsExVAT = totalAcquisitionsExVAT,
+      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT,
       receivedAt = new DateTime()
     )
 

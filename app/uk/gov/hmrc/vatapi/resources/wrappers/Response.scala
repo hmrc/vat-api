@@ -41,7 +41,8 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
-import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
+
+import scala.PartialFunction.{apply => _, _}
 
 trait Response {
   val logger: Logger = Logger(this.getClass)
@@ -57,7 +58,7 @@ trait Response {
     status / 100 match {
       case 4 | 5 =>
         logResponse()
-        (pf orElse errorMapping) (status)
+        (pf orElse errorMappings orElse standardErrorMapping) (status)
       case _ => (pf andThen addCorrelationHeader) (status)
     }
 
@@ -69,13 +70,9 @@ trait Response {
       .header("CorrelationId")
       .fold(result)(correlationId => result.withHeaders("X-CorrelationId" -> correlationId))
 
-  private def errorMapping: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
-    case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
-    case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
-    case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) =>  Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
-    case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) =>  Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
+  def errorMappings: PartialFunction[Int, Result] = empty
+
+  private def standardErrorMapping: PartialFunction[Int, Result] = {
     case 404 => NotFound
     case 500 if errorCodeIsOneOf(SERVER_ERROR) => InternalServerError(toJson(Errors.InternalServerError))
     case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => InternalServerError(toJson(Errors.InternalServerError))

@@ -49,5 +49,4 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
     desObligations.fold(noneFound)(oneFound)
   }
-
 }
