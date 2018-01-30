@@ -55,9 +55,3 @@ object VatReturn {
         )
     }
 }
-
-//case class VatReturns(vatReturns: Seq[VatReturn])
-//
-//object VatReturns {
-//  implicit val writes: Writes[VatReturns] = Json.writes[VatReturns]
-//}
