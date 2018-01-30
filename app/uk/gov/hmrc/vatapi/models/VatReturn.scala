@@ -50,14 +50,14 @@ object VatReturn {
             totalValueSalesExVAT = vatReturn.totalValueSalesExVAT,
             totalValuePurchasesExVAT = vatReturn.totalValuePurchasesExVAT,
             totalValueGoodsSuppliedExVAT = vatReturn.totalValueGoodsSuppliedExVAT,
-            totalAcquisitionsExVAT = vatReturn.totalAcquisitionsExVAT
+            totalAcquisitionsExVAT = vatReturn.totalAllAcquisitionsExVAT
           )
         )
     }
 }
 
-case class VatReturns(vatReturns: Seq[VatReturn])
-
-object VatReturns {
-  implicit val writes: Writes[VatReturns] = Json.writes[VatReturns]
-}
+//case class VatReturns(vatReturns: Seq[VatReturn])
+//
+//object VatReturns {
+//  implicit val writes: Writes[VatReturns] = Json.writes[VatReturns]
+//}

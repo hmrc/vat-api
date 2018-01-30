@@ -904,7 +904,7 @@ trait BaseFunctionalSpec extends TestApplication {
                       "totalValueSalesExVAT": 100,
                       "totalValuePurchasesExVAT": 100,
                       "totalValueGoodsSuppliedExVAT": 100,
-                      "totalAcquisitionsExVAT": 100,
+                      "totalAllAcquisitionsExVAT": 100,
                       "receivedAt": "2017-12-18T16:49:20.678Z"
                     }""")
               )

@@ -20,6 +20,13 @@ import play.api.libs.json.{Format, Json, Reads}
 import uk.gov.hmrc.vatapi.models.EnumJson
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.DesErrorCode
 
+
+case class MultiDesError(failures: Seq[DesError])
+
+object MultiDesError {
+  implicit val reads: Reads[MultiDesError] = Json.reads[MultiDesError]
+}
+
 case class DesError(code: DesErrorCode, reason: String)
 
 object DesError {
