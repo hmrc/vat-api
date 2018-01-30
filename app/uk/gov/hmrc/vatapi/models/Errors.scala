@@ -53,7 +53,7 @@ object Errors {
   }
 
   object VrnInvalid extends Error("VRN_INVALID", "The provided VRN is invalid", None)
-  object InvalidPeriodKey extends Error("PERIOD_KEY_INVALID", "The provided period key is invalid", None)
+  object InvalidPeriodKey extends Error("PERIOD_KEY_INVALID", "Invalid period key", None)
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
   object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None)
   object NotFinalisedDeclaration extends Error("NOT_FINALISED", "The return cannot be accepted without a declaration it is finalised.", Some("/finalised"))
