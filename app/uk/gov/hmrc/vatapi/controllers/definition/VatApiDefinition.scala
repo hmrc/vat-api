@@ -60,7 +60,20 @@ class VatApiDefinition {
         authType = USER,
         throttlingTier = UNLIMITED,
         scope = Some(readScope),
-        groupName = Vat)
+        groupName = Vat),
+      Endpoint(
+        uriPattern = "/{vrn}/liabilities",
+        endpointName = "Retrieve VAT liabilities",
+        method = GET,
+        authType = USER,
+        throttlingTier = UNLIMITED,
+        scope = Some(readScope),
+        groupName = Vat,
+        queryParameters = Some(Seq(
+          Parameter("from", true),
+          Parameter("to", true)
+        ))
+      )
     )
   }
 

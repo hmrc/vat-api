@@ -18,8 +18,8 @@ package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue}
-import play.api.mvc.Action
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
@@ -36,7 +36,7 @@ object ObligationsResource extends BaseController {
 
   private val connector = ObligationsConnector
 
-  def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams) = Action.async { implicit request =>
+  def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = Action.async { implicit request =>
     fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }

@@ -20,7 +20,7 @@ import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.models.{ObligationsQueryParams, OptEither}
+import uk.gov.hmrc.vatapi.models.{FinancialDataQueryParams, ObligationsQueryParams, OptEither}
 
 import scala.util.{Failure, Success, Try}
 
@@ -56,6 +56,21 @@ object Binders {
 
     override def unbind(key: String, value: ObligationsQueryParams): String = stringBinder.unbind(key, value.map(key).toString)
 
+  }
+
+  implicit def financialDataQueryParamsBinder(implicit stringBinder: QueryStringBindable[String]) = new QueryStringBindable[FinancialDataQueryParams] {
+    override def bind(key:String, params: Map[String, Seq[String]]): OptEither[FinancialDataQueryParams] = {
+      val from = stringBinder.bind("from", params)
+      val to = stringBinder.bind("to", params)
+
+      val query = FinancialDataQueryParams.from(from, to)
+      if (query.isRight)
+        Some(Right(query.right.get))
+      else
+        Some(Left(query.left.get))
+    }
+
+    override def unbind(key: String, value: FinancialDataQueryParams): String = stringBinder.unbind(key, value.map(key).toString)
   }
 
   val format: String = "yyy-MM-dd"
