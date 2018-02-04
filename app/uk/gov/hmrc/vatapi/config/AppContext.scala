@@ -21,6 +21,7 @@ import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
 object AppContext extends ServicesConfig {
+
   private lazy val config = current.configuration
 
   lazy val desEnv: String = config.getString(s"$env.microservice.services.des.env").getOrElse(throw new RuntimeException("desEnv is not configured"))
@@ -37,4 +38,5 @@ object AppContext extends ServicesConfig {
   lazy val featureSwitch: Option[Configuration] = config.getConfig(s"$env.feature-switch")
   lazy val auditEnabled: Boolean = config.getBoolean(s"auditing.enabled").getOrElse(true)
   lazy val authEnabled: Boolean = config.getBoolean(s"$env.microservice.services.auth.enabled").getOrElse(true)
+
 }

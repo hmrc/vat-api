@@ -258,6 +258,11 @@ trait BaseFunctionalSpec extends TestApplication {
       new BodyListAssertions(myQuery(response.json), this)
     }
 
+    def hasHeader(headerName: String): Assertions = {
+      response.allHeaders(headerName) should not be 'empty
+      this
+    }
+
     class BodyAssertions(content: Option[JsValue], assertions: Assertions) {
       def is(value: String) = {
         content match {
@@ -920,6 +925,14 @@ trait BaseFunctionalSpec extends TestApplication {
                   .withStatus(200)
                   .withBody("not-json")
               )
+          )
+          givens
+        }
+
+        def expectNonExistentVrnFor(vrn: Vrn, periodKey: String): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
+              .willReturn(aResponse().withStatus(404))
           )
           givens
         }
