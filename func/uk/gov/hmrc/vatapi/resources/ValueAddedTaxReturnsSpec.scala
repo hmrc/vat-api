@@ -153,5 +153,23 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\code", "INVALID_REQUEST")
         .bodyHasPath("\\errors(0)\\code", "PERIOD_KEY_INVALID")
     }
+
+    "return not found (404) with non-existent VRN" in {
+      given()
+        .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(404)
+    }
+
+    "return X-Content-Type-Options header with non-existent VRN" in {
+      given()
+        .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .hasHeader("X-Content-Type-Options")
+    }
   }
 }

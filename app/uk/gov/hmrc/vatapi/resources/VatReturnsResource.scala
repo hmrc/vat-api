@@ -28,6 +28,7 @@ import uk.gov.hmrc.vatapi.models.{ErrorCode, Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.audit.AuditService.audit
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.audit.AuditEvent
+import play.api.libs.json.JsNull
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -46,7 +47,7 @@ object VatReturnsResource extends BaseController {
         _ <-  audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
-      response.filter { case 200 => Created(Json.toJson(response.vatReturn)) }
+      response.filter { case 200 => Created(Json.toJson(response.vatReturnOrError.toOption)) }
     }
   }
 
@@ -60,7 +61,7 @@ object VatReturnsResource extends BaseController {
         } yield response
       } onSuccess { response =>
         response.filter {
-          case 200 => response.retrieve match {
+          case 200 => response.vatReturnOrError match {
             case Right(vatReturn) => Ok(Json.toJson(vatReturn))
             case Left(error) => 
               logger.error(error.msg)
@@ -78,7 +79,7 @@ object VatReturnsResource extends BaseController {
     AuditEvent(
       auditType = "submitVatReturn",
       transactionName = "vat-return-create",
-      detail = SubmitVatReturn(vrn, response.status, request.body, response.json)
+      detail = SubmitVatReturn(vrn, response.status, request.body, response.jsonOrError.right.getOrElse(JsNull))
     )
 
   private case class RetrieveVatReturn(vrn: Vrn, httpStatus: Int, responsePayload: JsValue)
@@ -89,7 +90,7 @@ object VatReturnsResource extends BaseController {
     AuditEvent(
       auditType = "retrieveVatReturns",
       transactionName = "vat-retrieve-vat-returns",
-      detail = RetrieveVatReturn(vrn, response.status, response.json)
+      detail = RetrieveVatReturn(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
     )
 
 }

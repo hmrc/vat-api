@@ -41,18 +41,23 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
+import scala.util.{Failure, Success, Try}
 
 import scala.PartialFunction.{apply => _, _}
 
 trait Response {
+
   val logger: Logger = Logger(this.getClass)
 
   def underlying: HttpResponse
 
-  def json: JsValue = underlying.json
+  def jsonOrError: Either[Throwable, JsValue] =
+    Try { underlying.json } match {
+      case Success(json) => Right(json)
+      case Failure(e)    => Left(e)
+    }
 
   val status: Int = underlying.status
-
 
   def filter[A](pf: PartialFunction[Int, Result])(implicit request: Request[A]): Result =
     status / 100 match {
@@ -79,7 +84,10 @@ trait Response {
     case _ => InternalServerError(toJson(Errors.InternalServerError))
   }
 
-  def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean =
-    json.asOpt[DesError].exists(errorCode => errorCodes.contains(errorCode.code))
+  def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean = jsonOrError match {
+    case Right(json) => json.asOpt[DesError].exists(errorCode => errorCodes.contains(errorCode.code))
+    case Left(_)     => false
+  }
+
 }
 

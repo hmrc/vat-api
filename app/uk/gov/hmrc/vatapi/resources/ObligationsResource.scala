@@ -27,6 +27,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.audit.AuditService.audit
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 import uk.gov.hmrc.vatapi.audit.AuditEvent
+import play.api.libs.json.JsNull
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -62,7 +63,7 @@ object ObligationsResource extends BaseController {
     AuditEvent(
       auditType = "retrieveVatObligations",
       transactionName = "vat-retrieve-obligations",
-      detail = RetrieveVatObligations(vrn, response.status, response.json)
+      detail = RetrieveVatObligations(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
     )
 
 }
