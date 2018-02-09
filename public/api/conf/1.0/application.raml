@@ -228,3 +228,107 @@ traits:
                     description: User has has already submitted a VAT return for the given period
                     value:
                       code: DUPLICATE_SUBMISSION
+    /liabilities:
+      displayName: Retrieve VAT liabilities
+      description: Retrieve VAT liabilities
+      get:
+        displayName: Retrieve VAT liabilities
+        description: Retrieve VAT liabilities
+        (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        queryParameters:
+         from:
+           description: Liabilities to return from date
+           type: string
+           example: 2017-01-25
+           required: true
+         to:
+           description: Liabilities to return up to date
+           type: string
+           example: 2017-01-25
+           required: true
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking
+            body:
+               application/json:
+                 type: !include schemas/Liabilities.json
+                 example: !include examples/Liabilities.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: INVALID_DATE_FROM
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: INVALID_DATE_TO
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: INVALID_DATE_RANGE
+    /payments:
+      displayName: Retrieve VAT payments
+      description: Retrieve VAT payments
+      get:
+        displayName: Retrieve VAT payments
+        description: Retrieve VAT payments
+        (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        queryParameters:
+         from:
+           description: Payments to return from date
+           type: string
+           example: 2017-01-25
+           required: true
+         to:
+           description: Payments to return up to date
+           type: string
+           example: 2017-01-25
+           required: true
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: 5968c22d620000620096db5f
+                description: Unique id for operation tracking
+            body:
+               application/json:
+                 type: !include schemas/Payments.json
+                 example: !include examples/Payments.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: INVALID_DATE_FROM
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: INVALID_DATE_TO
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: INVALID_DATE_RANGE
