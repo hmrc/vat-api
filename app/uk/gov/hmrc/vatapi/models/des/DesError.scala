@@ -39,7 +39,8 @@ object DesErrorCode extends Enumeration {
   SERVICE_UNAVAILABLE,
   INVALID_IDNUMBER,
   INVALID_DATETO,
-  INVALID_DATEFROM
+  INVALID_DATEFROM,
+  NOT_FOUND
   = Value
 
   implicit val format: Format[DesErrorCode] = EnumJson.enumFormat(DesErrorCode,

@@ -53,12 +53,13 @@ object Errors {
   }
 
   object VrnInvalid extends Error("VRN_INVALID", "The provided VRN is invalid", None)
-  object InvalidDateFrom extends Error("INVALID_DATE_FROM", "The provided from date is invalid", None)
-  object InvalidDateTo extends Error("INVALID_DATE_TO", "The provided to date is invalid", None)
+  object InvalidDateFrom extends Error("DATE_FROM_INVALID", "The provided from date is invalid", None)
+  object InvalidDateTo extends Error("DATE_TO_INVALID", "The provided to date is invalid", None)
   object InvalidPeriodKey extends Error("PERIOD_KEY_INVALID", "Invalid period key", None)
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
   object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None)
   object NotFinalisedDeclaration extends Error("NOT_FINALISED", "The return cannot be accepted without a declaration it is finalised.", Some("/finalised"))
+  object NotFound extends Error("NOT_FOUND", "The remote endpoint has indicated that no data can be found", None)
   object DateRangeTooLarge extends Error("DATE_RANGE_TOO_LARGE", "The date of the requested return cannot be further than four years from the current date.", None)
   object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
 

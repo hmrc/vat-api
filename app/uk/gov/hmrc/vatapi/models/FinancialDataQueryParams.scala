@@ -33,8 +33,8 @@ object FinancialDataQueryParams {
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
 
-    val from = checkMinFromDate(dateQueryParam(fromOpt, "INVALID_DATE_FROM"))
-    val to = checkFutureToDate(dateQueryParam(toOpt, "INVALID_DATE_TO"))
+    val from = checkMinFromDate(dateQueryParam(fromOpt, "DATE_FROM_INVALID"))
+    val to = checkFutureToDate(dateQueryParam(toOpt, "DATE_TO_INVALID"))
 
     val errors = for {
       paramOpt <- Seq(from, to, validDateRange(from, to))
@@ -45,6 +45,7 @@ object FinancialDataQueryParams {
     if (errors.isEmpty) {
       Right(FinancialDataQueryParams(from.map(_.right.get).get, to.map(_.right.get).get))
     } else {
+      Logger.error(s"\n\n${errors.head}\n\n")
       Left(errors.head)
     }
   }
@@ -71,7 +72,7 @@ object FinancialDataQueryParams {
     } yield
       (fromVal.right.get, toVal.right.get) match {
         case (from, to) if !from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to) =>
-          Left("INVALID_DATE_RANGE")
+          Left("DATE_RANGE_INVALID")
         case _ => Right(()) // object wrapped in Right irrelevant
       }
   }
@@ -80,10 +81,10 @@ object FinancialDataQueryParams {
     val out = date match {
       case Some(value) =>
         value match {
-          case Right(d) if d.isBefore(minDate) => Left("INVALID_DATE_FROM")
+          case Right(d) if d.isBefore(minDate) => Left("DATE_FROM_INVALID")
           case _ => value
         }
-      case None => Left("INVALID_DATE_FROM")
+      case None => Left("DATE_FROM_INVALID")
     }
     Some(out)
   }
@@ -92,10 +93,10 @@ object FinancialDataQueryParams {
     val out = date match {
       case Some(value) =>
         value match {
-          case Right(d) if d.isAfter(LocalDate.now()) => Left("INVALID_DATE_TO")
+          case Right(d) if d.isAfter(LocalDate.now()) => Left("DATE_TO_INVALID")
           case _ => value
         }
-      case None => Left("INVALID_DATE_TO")
+      case None => Left("DATE_TO_INVALID")
     }
     Some(out)
   }
