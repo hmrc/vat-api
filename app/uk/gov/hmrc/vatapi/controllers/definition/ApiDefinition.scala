@@ -84,7 +84,7 @@ case class Parameter(name: String, required: Boolean = false)
 
 object APIStatus extends Enumeration {
   type APIStatus = Value
-  val PROTOTYPED, PUBLISHED, DEPRECATED, RETIRED = Value
+  val ALPHA, BETA, STABLE, DEPRECATED, RETIRED = Value
 }
 
 object AuthType extends Enumeration {

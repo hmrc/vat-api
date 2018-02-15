@@ -100,8 +100,12 @@ class VatApiDefinition {
 
   private def buildAPIStatus(): APIStatus = {
     AppContext.apiStatus match {
-      case "PUBLISHED" => APIStatus.PUBLISHED
-      case _ => APIStatus.PROTOTYPED
+      case "ALPHA" => APIStatus.ALPHA
+      case "BETA" => APIStatus.BETA
+      case "STABLE" => APIStatus.STABLE
+      case "DEPRECATED" => APIStatus.DEPRECATED
+      case "RETIRED" => APIStatus.RETIRED
+      case _ => APIStatus.ALPHA
     }
   }
 
