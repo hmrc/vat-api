@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
+import play.api.Logger
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
 import uk.gov.hmrc.vatapi.controllers.definition.AuthType._
@@ -105,7 +106,8 @@ class VatApiDefinition {
       case "STABLE" => APIStatus.STABLE
       case "DEPRECATED" => APIStatus.DEPRECATED
       case "RETIRED" => APIStatus.RETIRED
-      case _ => APIStatus.ALPHA
+      case _ => Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+        APIStatus.ALPHA
     }
   }
 
