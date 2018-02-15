@@ -55,7 +55,7 @@ object VatReturnsResource extends BaseController {
     Action.async { implicit request =>
       fromDes {
         for {
-          _ <- validate[String](periodKey) { case _ if (periodKey.length != 4) => Errors.InvalidPeriodKey }
+          _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }
           response <- execute { _ => connector.query(vrn, periodKey) }
         _ <-  audit(RetrieveVatReturnEvent(vrn, response))
         } yield response
