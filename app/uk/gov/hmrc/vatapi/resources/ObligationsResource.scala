@@ -16,13 +16,18 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import cats.implicits._
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.Action
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
+import uk.gov.hmrc.vatapi.audit.AuditService.audit
+import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
+import uk.gov.hmrc.vatapi.audit.AuditEvent
+import play.api.libs.json.JsNull
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -32,7 +37,12 @@ object ObligationsResource extends BaseController {
   private val connector = ObligationsConnector
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams) = Action.async { implicit request =>
-    connector.get(vrn, params) map { response =>
+    fromDes {
+      for {
+        response <- execute { _ => connector.get(vrn, params) }
+      _ <-  audit(RetrieveVatObligationsEvent(vrn, response))
+      } yield response
+    } onSuccess { response =>
       response.filter {
         case 200 =>
           response.obligations(vrn) match {
@@ -44,5 +54,16 @@ object ObligationsResource extends BaseController {
       }
     }
   }
+
+  private case class RetrieveVatObligations(vrn: Vrn, httpStatus: Int, responsePayload: JsValue)
+
+  private implicit val retrieveVatObligationFormat = Json.format[RetrieveVatObligations]
+
+  private def RetrieveVatObligationsEvent(vrn: Vrn, response: ObligationsResponse): AuditEvent[RetrieveVatObligations] =
+    AuditEvent(
+      auditType = "retrieveVatObligations",
+      transactionName = "vat-retrieve-obligations",
+      detail = RetrieveVatObligations(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
+    )
 
 }

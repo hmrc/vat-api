@@ -23,19 +23,19 @@ import org.joda.time.DateTimeZone
 import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturnDeclaration(
-  periodKey: String,
-  vatDueSales: Amount,
-  vatDueAcquisitions: Amount,
-  vatDueTotal: Amount,
-  vatReclaimedCurrPeriod: Amount,
-  vatDueNet: Amount,
-  totalValueSalesExVAT: Amount,
-  totalValuePurchasesExVAT: Amount,
-  totalValueGoodsSuppliedExVAT: Amount,
-  totalAcquisitionsExVAT: Amount,
-  agentReferenceNumber: Option[String] = None,
-  receivedAt: DateTime
-)
+                                 periodKey: String,
+                                 vatDueSales: Amount,
+                                 vatDueAcquisitions: Amount,
+                                 vatDueTotal: Amount,
+                                 vatReclaimedCurrPeriod: Amount,
+                                 vatDueNet: Amount,
+                                 totalValueSalesExVAT: Amount,
+                                 totalValuePurchasesExVAT: Amount,
+                                 totalValueGoodsSuppliedExVAT: Amount,
+                                 totalAllAcquisitionsExVAT: Amount,
+                                 agentReferenceNumber: Option[String] = None,
+                                 receivedAt: DateTime
+                               )
 
 object VatReturnDeclaration {
 

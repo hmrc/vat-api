@@ -41,23 +41,29 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
-import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
+import scala.util.{Failure, Success, Try}
+
+import scala.PartialFunction.{apply => _, _}
 
 trait Response {
+
   val logger: Logger = Logger(this.getClass)
 
   def underlying: HttpResponse
 
-  def json: JsValue = underlying.json
+  def jsonOrError: Either[Throwable, JsValue] =
+    Try { underlying.json } match {
+      case Success(json) => Right(json)
+      case Failure(e)    => Left(e)
+    }
 
   val status: Int = underlying.status
-
 
   def filter[A](pf: PartialFunction[Int, Result])(implicit request: Request[A]): Result =
     status / 100 match {
       case 4 | 5 =>
         logResponse()
-        (pf orElse errorMapping) (status)
+        (pf orElse errorMappings orElse standardErrorMapping) (status)
       case _ => (pf andThen addCorrelationHeader) (status)
     }
 
@@ -69,19 +75,19 @@ trait Response {
       .header("CorrelationId")
       .fold(result)(correlationId => result.withHeaders("X-CorrelationId" -> correlationId))
 
-  private def errorMapping: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
-    case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
-    case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
-    case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) =>  Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+  def errorMappings: PartialFunction[Int, Result] = empty
+
+  private def standardErrorMapping: PartialFunction[Int, Result] = {
     case 404 => NotFound
     case 500 if errorCodeIsOneOf(SERVER_ERROR) => InternalServerError(toJson(Errors.InternalServerError))
     case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => InternalServerError(toJson(Errors.InternalServerError))
     case _ => InternalServerError(toJson(Errors.InternalServerError))
   }
 
-  def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean =
-    json.asOpt[DesError].exists(errorCode => errorCodes.contains(errorCode.code))
+  def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean = jsonOrError match {
+    case Right(json) => json.asOpt[DesError].exists(errorCode => errorCodes.contains(errorCode.code))
+    case Left(_)     => false
+  }
+
 }
 

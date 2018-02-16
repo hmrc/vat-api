@@ -47,7 +47,7 @@ case class VatReturnDeclaration(
       totalValueSalesExVAT = totalValueSalesExVAT,
       totalValuePurchasesExVAT = totalValuePurchasesExVAT,
       totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
-      totalAcquisitionsExVAT = totalAcquisitionsExVAT,
+      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT,
       receivedAt = new DateTime()
     )
 
@@ -86,22 +86,6 @@ object VatReturnDeclaration {
           JsonValidationError(
             "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
             ErrorCode.VAT_TOTAL_VALUE)
-        ),
-        Validation[VatReturnDeclaration](
-          JsPath \ "vatDueSales",
-          vatReturn =>
-            vatReturn.vatDueSales <= vatReturn.totalValueSalesExVAT * 0.2,
-          JsonValidationError(
-            "vatDueSales should not be greater than 20% of totalValueSalesExVAT",
-            ErrorCode.VAT_DUE_SALES_LIMIT)
-        ),
-        Validation[VatReturnDeclaration](
-          JsPath \ "vatReclaimedCurrPeriod",
-          vatReturn =>
-            vatReturn.vatReclaimedCurrPeriod <= vatReturn.totalValuePurchasesExVAT * 0.2,
-          JsonValidationError(
-            "vatReclaimedCurrPeriod should not be greater than 20% of totalValuePurchasesExVAT",
-            ErrorCode.VAT_RECLAIMED_CURR_PERIOD_LIMIT)
         ),
         Validation[VatReturnDeclaration](
           JsPath \ "netVatDue",

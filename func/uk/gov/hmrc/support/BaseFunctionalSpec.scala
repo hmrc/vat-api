@@ -258,6 +258,11 @@ trait BaseFunctionalSpec extends TestApplication {
       new BodyListAssertions(myQuery(response.json), this)
     }
 
+    def hasHeader(headerName: String): Assertions = {
+      response.allHeaders(headerName) should not be 'empty
+      this
+    }
+
     class BodyAssertions(content: Option[JsValue], assertions: Assertions) {
       def is(value: String) = {
         content match {
@@ -868,6 +873,23 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
+        def expectVatReturnRetrieveToFail(vrn: Vrn, code: String, reason: String = "Irrelevant"): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=0001"))
+              .willReturn(
+                aResponse()
+                  .withStatus(403)
+                  .withBody(s"""
+                               |{
+                               |  "code": "$code",
+                               |  "reason": "$reason"
+                               |}
+                            """.stripMargin)
+              )
+          )
+          givens
+        }
+
         def expectVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
             get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
@@ -887,7 +909,7 @@ trait BaseFunctionalSpec extends TestApplication {
                       "totalValueSalesExVAT": 100,
                       "totalValuePurchasesExVAT": 100,
                       "totalValueGoodsSuppliedExVAT": 100,
-                      "totalAcquisitionsExVAT": 100,
+                      "totalAllAcquisitionsExVAT": 100,
                       "receivedAt": "2017-12-18T16:49:20.678Z"
                     }""")
               )
@@ -903,6 +925,14 @@ trait BaseFunctionalSpec extends TestApplication {
                   .withStatus(200)
                   .withBody("not-json")
               )
+          )
+          givens
+        }
+
+        def expectNonExistentVrnFor(vrn: Vrn, periodKey: String): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
+              .willReturn(aResponse().withStatus(404))
           )
           givens
         }

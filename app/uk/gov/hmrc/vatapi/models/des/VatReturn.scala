@@ -33,7 +33,7 @@ case class VatReturn(periodKey: String,
                      totalValueSalesExVAT: Amount,
                      totalValuePurchasesExVAT: Amount,
                      totalValueGoodsSuppliedExVAT: Amount,
-                     totalAcquisitionsExVAT: Amount,
+                     totalAllAcquisitionsExVAT: Amount,
                      agentReferenceNumber: Option[String] = None,
                      receivedAt: DateTime)
 
