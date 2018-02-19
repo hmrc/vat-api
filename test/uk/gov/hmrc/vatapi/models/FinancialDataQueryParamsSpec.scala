@@ -42,38 +42,38 @@ class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
     "return an error when the date range is greater than one year" in {
       val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(1).toString)), Some(Right(testTime.toString)))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_RANGE"
+      response.left.get shouldBe "DATE_RANGE_INVALID"
     }
 
     "return error when the from date query parameter is missing" in {
       val response = FinancialDataQueryParams.from(None, Some(Right("2019-03-31")))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_FROM"
+      response.left.get shouldBe "DATE_FROM_INVALID"
     }
 
     "return error when the from date query parameter is not a valid date" in {
       val response = FinancialDataQueryParams.from(Some(Right("ABC")), Some(Right("2019-03-31")))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_FROM"
+      response.left.get shouldBe "DATE_FROM_INVALID"
     }
 
     "return error when the from date query parameter is before mtd-date in Config" in {
 
       val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(11).toString)), Some(Right(testTime.minusYears(10).toString)))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_FROM"
+      response.left.get shouldBe "DATE_FROM_INVALID"
     }
 
     "return error when the to date query parameter is missing" in {
       val response = FinancialDataQueryParams.from(Some(Right("2019-03-31")), None)
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_TO"
+      response.left.get shouldBe "DATE_TO_INVALID"
     }
 
     "return error when the to date query parameter is not a valid date" in {
       val response = FinancialDataQueryParams.from(Some(Right("2019-03-31")), Some(Right("ABC")))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_TO"
+      response.left.get shouldBe "DATE_TO_INVALID"
     }
 
     "return error when the to date query parameter is a future date" in {
@@ -81,13 +81,13 @@ class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
 
       val response = FinancialDataQueryParams.from(Some(Right("2019-03-31")), Some(Right(futureDate.toString("yyyy-MM-dd"))))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_TO"
+      response.left.get shouldBe "DATE_TO_INVALID"
     }
 
     "return error when from date is after to date " in {
       val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(3).toString)), Some(Right(testTime.minusYears(3).minusDays(1).toString)))
       response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_RANGE"
+      response.left.get shouldBe "DATE_RANGE_INVALID"
     }
   }
 
