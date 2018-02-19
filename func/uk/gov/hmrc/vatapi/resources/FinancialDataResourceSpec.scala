@@ -52,7 +52,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
     "a date range of greater than 1 year is supplied" should {
       "return an INVALID_DATE_RANGE error" in {
         when()
-          .get(s"/$vrn/liabilities?from=2015-01-01&to=2017-12-31")
+          .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
           .thenAssertThat()
           .statusIs(400)
       }
@@ -131,7 +131,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
     "a date range of greater than 1 year is supplied" should {
       "return an INVALID_DATE_RANGE error" in {
         when()
-          .get(s"/$vrn/payments?from=2015-01-01&to=2017-12-31")
+          .get(s"/$vrn/payments?from=2015-01-01&to=2016-01-01")
           .thenAssertThat()
           .statusIs(400)
       }
