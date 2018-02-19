@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import org.joda.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.vatapi.models.{Liabilities, Liability, Payment, Payments, TaxPeriod}
 
 object Jsons {
 
@@ -103,10 +105,10 @@ object Jsons {
          |  "message": "Business validation error",
          |  "errors": [
          |    ${errors
-           .map {
-             case (code, msg) => errorWithMessage(code, msg)
-           }
-           .mkString(",")}
+        .map {
+          case (code, msg) => errorWithMessage(code, msg)
+        }
+        .mkString(",")}
          |  ]
          |}
          """.stripMargin
@@ -119,41 +121,136 @@ object Jsons {
               thirdMet: String = "O",
               fourthMet: String = "O"): JsValue = {
       Json.parse(s"""
-           |{
-           |  "obligations": [
-           |    {
-           |      "start": "2017-04-06",
-           |      "end": "2017-07-05",
-           |      "due": "2017-08-05",
-           |      "status": "$firstMet",
-           |      "received": "2017-08-01",
-           |      "periodKey": "#001"
-           |    },
-           |    {
-           |      "start": "2017-07-06",
-           |      "end": "2017-10-05",
-           |      "due": "2017-11-05",
-           |      "status": "$secondMet",
-           |      "periodKey": "#002"
-           |    },
-           |    {
-           |      "start": "2017-10-06",
-           |      "end": "2018-01-05",
-           |      "due": "2018-02-05",
-           |      "status": "$thirdMet",
-           |      "periodKey": "#003"
-           |    },
-           |    {
-           |      "start": "2018-01-06",
-           |      "end": "2018-04-05",
-           |      "due": "2018-05-06",
-           |      "status": "$fourthMet",
-           |      "periodKey": "#004"
-           |    }
-           |  ]
-           |}
+                    |{
+                    |  "obligations": [
+                    |    {
+                    |      "start": "2017-04-06",
+                    |      "end": "2017-07-05",
+                    |      "due": "2017-08-05",
+                    |      "status": "$firstMet",
+                    |      "received": "2017-08-01",
+                    |      "periodKey": "#001"
+                    |    },
+                    |    {
+                    |      "start": "2017-07-06",
+                    |      "end": "2017-10-05",
+                    |      "due": "2017-11-05",
+                    |      "status": "$secondMet",
+                    |      "periodKey": "#002"
+                    |    },
+                    |    {
+                    |      "start": "2017-10-06",
+                    |      "end": "2018-01-05",
+                    |      "due": "2018-02-05",
+                    |      "status": "$thirdMet",
+                    |      "periodKey": "#003"
+                    |    },
+                    |    {
+                    |      "start": "2018-01-06",
+                    |      "end": "2018-04-05",
+                    |      "due": "2018-05-06",
+                    |      "status": "$fourthMet",
+                    |      "periodKey": "#004"
+                    |    }
+                    |  ]
+                    |}
          """.stripMargin)
     }
+  }
+
+  object FinancialData {
+
+    lazy val oneLiability: JsValue =
+      Json.toJson(
+        Liabilities(
+          Seq(Liability(
+            Some(TaxPeriod(from = LocalDate.parse("2017-01-01"), to = LocalDate.parse("2018-01-02"))),
+            `type` = "VAT",
+            originalAmount = 463872,
+            outstandingAmount = Some(463872),
+            due = Some(LocalDate.parse("2018-04-02"))
+          ))
+        )
+      )
+    lazy val minLiability: JsValue =
+      Json.toJson(
+        Liabilities(
+          Seq(Liability(
+            `type` = "VAT",
+            originalAmount = 463872
+          ))
+        )
+      )
+    lazy val multipleLiabilities: JsValue =
+      Json.toJson(
+        Liabilities(
+          Seq(
+            Liability(
+              Some(TaxPeriod(from = LocalDate.parse("2017-01-01"), to = LocalDate.parse("2017-04-05"))),
+              `type` = "VAT",
+              originalAmount = 463872,
+              outstandingAmount = Some(463872),
+              due = Some(LocalDate.parse("2017-03-08"))
+            ),
+            Liability(
+              Some(TaxPeriod(from = LocalDate.parse("2017-04-01"), to = LocalDate.parse("2017-04-30"))),
+              `type` = "VAT Return Debit Charge",
+              originalAmount = 15.00,
+              outstandingAmount = Some(15.00),
+              due = Some(LocalDate.parse("2017-06-09"))
+            ),
+            Liability(
+              Some(TaxPeriod(from = LocalDate.parse("2017-08-01"), to = LocalDate.parse("2017-08-31"))),
+              `type` = "VAT CA Charge",
+              originalAmount = 8493.38,
+              outstandingAmount = Some(7493.38),
+              due = Some(LocalDate.parse("2017-10-07"))
+            )
+          )
+        )
+      )
+    lazy val onePayment: JsValue = Json.toJson(
+      Payments(Seq(
+        Payment(
+          amount = 1534.65,
+          received = Some(LocalDate.parse("2017-02-12"))
+        )
+      ))
+    )
+    lazy val minPayment: JsValue = Json.toJson(
+      Payments(Seq(
+        Payment(
+          amount = 123456
+        )
+      ))
+    )
+    lazy val multiplePayments: JsValue = Json.toJson(
+      Payments(Seq(
+        Payment(
+          amount = 5,
+          received = Some(LocalDate.parse("2017-02-11"))
+        ),
+        Payment(
+          amount = 50.00,
+          received = Some(LocalDate.parse("2017-03-11"))
+        ),
+        Payment(
+          amount = 1000,
+          received = Some(LocalDate.parse("2017-03-12"))
+        ),
+        Payment(
+          amount = 321.00,
+          received = Some(LocalDate.parse("2017-08-05"))
+        ),
+        Payment(
+          amount = 91.00
+        ),
+        Payment(
+          amount = 5.00,
+          received = Some(LocalDate.parse("2017-09-12"))
+        )
+      ))
+    )
   }
 
 }

@@ -23,7 +23,7 @@ import play.api.http.HttpEntity
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc._
-import play.api.{Application, Configuration, Play}
+import play.api.{Application, Configuration, Logger, Play}
 import play.routing.Router.Tags
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector

@@ -6,3 +6,9 @@ GET /:vrn/obligations   uk.gov.hmrc.vatapi.resources.ObligationsResource.retriev
 # VAT Returns
 POST /:vrn/returns   uk.gov.hmrc.vatapi.resources.VatReturnsResource.submitVatReturn(vrn: uk.gov.hmrc.domain.Vrn)
 GET /:vrn/returns/:periodKey   uk.gov.hmrc.vatapi.resources.VatReturnsResource.retrieveVatReturns(vrn: uk.gov.hmrc.domain.Vrn, periodKey: String)
+
+# VAT Liabilities
+GET 	/:vrn/liabilities            uk.gov.hmrc.vatapi.resources.FinancialDataResource.retrieveLiabilities(vrn: uk.gov.hmrc.domain.Vrn, queryParams: uk.gov.hmrc.vatapi.models.FinancialDataQueryParams)
+
+# VAT Payments
+GET 	/:vrn/payments               uk.gov.hmrc.vatapi.resources.FinancialDataResource.retrievePayments(vrn: uk.gov.hmrc.domain.Vrn, queryParams: uk.gov.hmrc.vatapi.models.FinancialDataQueryParams)

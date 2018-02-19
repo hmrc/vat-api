@@ -36,7 +36,12 @@ object DesErrorCode extends Enumeration {
   DUPLICATE_SUBMISSION,
   DATE_RANGE_TOO_LARGE,
   SERVER_ERROR,
-  SERVICE_UNAVAILABLE = Value
+  SERVICE_UNAVAILABLE,
+  INVALID_IDNUMBER,
+  INVALID_DATETO,
+  INVALID_DATEFROM,
+  NOT_FOUND
+  = Value
 
   implicit val format: Format[DesErrorCode] = EnumJson.enumFormat(DesErrorCode,
     Some(s"Recognized DesErrorCode values: ${DesErrorCode.values.mkString(", ")}"))

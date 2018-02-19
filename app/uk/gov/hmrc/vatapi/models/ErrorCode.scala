@@ -60,6 +60,7 @@ object ErrorCode extends Enumeration {
   INVALID_DATE,
   INVALID_FROM_DATE,
   INVALID_TO_DATE,
+  INVALID_DATE_RANGE,
   DUPLICATE_SUBMISSION
   = Value
 

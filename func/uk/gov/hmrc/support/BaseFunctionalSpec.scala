@@ -21,8 +21,8 @@ trait BaseFunctionalSpec extends TestApplication {
   protected val vrn = VrnGenerator().nextVrn()
 
   class Assertions(request: String, response: HttpResponse)(
-      implicit urlPathVariables: mutable.Map[String, String])
-      extends UrlInterpolation {
+    implicit urlPathVariables: mutable.Map[String, String])
+    extends UrlInterpolation {
     def jsonBodyIsEmptyObject() = response.json shouldBe Json.obj()
 
     def jsonBodyIsEmptyArray() = response.json shouldBe JsArray()
@@ -39,7 +39,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
     def butResponseHasNo(sourceName: String, summaryName: String = "") = {
       val jsvOpt =
-        // FIXME: use \\
+      // FIXME: use \\
         if (summaryName.isEmpty)
           (response.json \ "_embedded" \ sourceName).toOption
         else (response.json \ "_embedded" \ sourceName \ summaryName).toOption
@@ -143,7 +143,7 @@ trait BaseFunctionalSpec extends TestApplication {
     }
 
     def bodyHasPath[T](path: String, value: T)(
-        implicit reads: Reads[T]): Assertions = {
+      implicit reads: Reads[T]): Assertions = {
       extractPathElement(path) shouldEqual Some(value)
       this
     }
@@ -169,7 +169,7 @@ trait BaseFunctionalSpec extends TestApplication {
     }
 
     private def extractPathElement[T](path: String)(
-        implicit reads: Reads[T]): Option[T] = {
+      implicit reads: Reads[T]): Option[T] = {
       val pathSeq =
         path.filter(!_.isWhitespace).split('\\').toSeq.filter(!_.isEmpty)
 
@@ -317,12 +317,12 @@ trait BaseFunctionalSpec extends TestApplication {
                     path: String,
                     body: Option[JsValue],
                     hc: HeaderCarrier = HeaderCarrier())(
-      implicit urlPathVariables: mutable.Map[String, String])
-      extends UrlInterpolation {
+                     implicit urlPathVariables: mutable.Map[String, String])
+    extends UrlInterpolation {
 
     private val interpolatedPath: String = interpolated(path)
     assert(interpolatedPath.startsWith("/"),
-           "please provide only a path starting with '/'")
+      "please provide only a path starting with '/'")
 
     val url = s"http://localhost:$port$interpolatedPath"
     var addAcceptHeader = true
@@ -367,17 +367,17 @@ trait BaseFunctionalSpec extends TestApplication {
   }
 
   class HttpPostBodyWrapper(method: String, body: Option[JsValue])(
-      implicit urlPathVariables: mutable.Map[String, String]) {
+    implicit urlPathVariables: mutable.Map[String, String]) {
     def to(url: String) = new HttpRequest(method, url, body)
   }
 
   class HttpPutBodyWrapper(method: String, body: Option[JsValue])(
-      implicit urlPathVariables: mutable.Map[String, String]) {
+    implicit urlPathVariables: mutable.Map[String, String]) {
     def at(url: String) = new HttpRequest(method, url, body)
   }
 
   class HttpVerbs()(
-      implicit urlPathVariables: mutable.Map[String, String] = mutable.Map()) {
+    implicit urlPathVariables: mutable.Map[String, String] = mutable.Map()) {
 
     def post(body: JsValue) = {
       new HttpPostBodyWrapper("POST", Some(body))
@@ -419,7 +419,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"MissingBearerToken\"")))
+                "MDTP detail=\"MissingBearerToken\"")))
 
       this
     }
@@ -472,7 +472,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"InsufficientEnrolments\"")))
+                "MDTP detail=\"InsufficientEnrolments\"")))
 
       // The user is an 'Individual/Group', so the affinity check for 'Agent' should fail.
       stubFor(
@@ -483,7 +483,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"UnsupportedAffinityGroup\"")))
+                "MDTP detail=\"UnsupportedAffinityGroup\"")))
 
       this
     }
@@ -499,7 +499,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"InsufficientEnrolments\"")))
+                "MDTP detail=\"InsufficientEnrolments\"")))
 
       // Second call to auth to check affinity is equal to 'Agent' should succeed.
       stubFor(
@@ -508,28 +508,28 @@ trait BaseFunctionalSpec extends TestApplication {
           .willReturn(aResponse()
             .withStatus(200)
             .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "agentCode": "some-agent-code",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                        |{
+                        |  "internalId": "some-id",
+                        |  "affinityGroup": "Agent",
+                        |  "agentCode": "some-agent-code",
+                        |  "loginTimes": {
+                        |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                        |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                        |  },
+                        |  "authorisedEnrolments": [
+                        |   {
+                        |         "key":"HMRC-AS-AGENT",
+                        |         "identifiers":[
+                        |            {
+                        |               "key":"AgentReferenceNumber",
+                        |               "value":"1000051409"
+                        |            }
+                        |         ],
+                        |         "state":"Activated"
+                        |      }
+                        |  ]
+                        |}
+                      """.stripMargin)))
 
       // Third call to auth to check FOA subscription status should succeed.
       stubFor(
@@ -538,28 +538,28 @@ trait BaseFunctionalSpec extends TestApplication {
           .willReturn(aResponse()
             .withStatus(200)
             .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "agentCode": "some-agent-code",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                        |{
+                        |  "internalId": "some-id",
+                        |  "affinityGroup": "Agent",
+                        |  "agentCode": "some-agent-code",
+                        |  "loginTimes": {
+                        |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                        |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                        |  },
+                        |  "authorisedEnrolments": [
+                        |   {
+                        |         "key":"HMRC-AS-AGENT",
+                        |         "identifiers":[
+                        |            {
+                        |               "key":"AgentReferenceNumber",
+                        |               "value":"1000051409"
+                        |            }
+                        |         ],
+                        |         "state":"Activated"
+                        |      }
+                        |  ]
+                        |}
+                      """.stripMargin)))
 
       this
     }
@@ -574,7 +574,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"InsufficientEnrolments\"")))
+                "MDTP detail=\"InsufficientEnrolments\"")))
 
       // Second call to auth to check affinity is equal to 'Agent' should succeed.
       stubFor(
@@ -583,15 +583,15 @@ trait BaseFunctionalSpec extends TestApplication {
           .willReturn(aResponse()
             .withStatus(200)
             .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  }
-            |}
-          """.stripMargin)))
+                        |{
+                        |  "internalId": "some-id",
+                        |  "affinityGroup": "Agent",
+                        |  "loginTimes": {
+                        |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                        |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                        |  }
+                        |}
+                      """.stripMargin)))
 
       // Third call to auth to check FOA subscription status should fail.
       stubFor(
@@ -602,7 +602,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"InsufficientEnrolments\"")))
+                "MDTP detail=\"InsufficientEnrolments\"")))
 
       this
     }
@@ -618,7 +618,7 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(401)
               .withHeader("Content-Length", "0")
               .withHeader("WWW-Authenticate",
-                          "MDTP detail=\"InsufficientEnrolments\"")))
+                "MDTP detail=\"InsufficientEnrolments\"")))
 
       // Second call to auth to check affinity is equal to 'Agent' should succeed.
       stubFor(
@@ -627,27 +627,27 @@ trait BaseFunctionalSpec extends TestApplication {
           .willReturn(aResponse()
             .withStatus(200)
             .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                        |{
+                        |  "internalId": "some-id",
+                        |  "affinityGroup": "Agent",
+                        |  "loginTimes": {
+                        |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                        |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                        |  },
+                        |  "authorisedEnrolments": [
+                        |   {
+                        |         "key":"HMRC-AS-AGENT",
+                        |         "identifiers":[
+                        |            {
+                        |               "key":"AgentReferenceNumber",
+                        |               "value":"1000051409"
+                        |            }
+                        |         ],
+                        |         "state":"Activated"
+                        |      }
+                        |  ]
+                        |}
+                      """.stripMargin)))
 
       // Third call to auth to check FOA subscription status should succeed.
       stubFor(
@@ -656,27 +656,27 @@ trait BaseFunctionalSpec extends TestApplication {
           .willReturn(aResponse()
             .withStatus(200)
             .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                        |{
+                        |  "internalId": "some-id",
+                        |  "affinityGroup": "Agent",
+                        |  "loginTimes": {
+                        |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                        |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                        |  },
+                        |  "authorisedEnrolments": [
+                        |   {
+                        |         "key":"HMRC-AS-AGENT",
+                        |         "identifiers":[
+                        |            {
+                        |               "key":"AgentReferenceNumber",
+                        |               "value":"1000051409"
+                        |            }
+                        |         ],
+                        |         "state":"Activated"
+                        |      }
+                        |  ]
+                        |}
+                      """.stripMargin)))
 
       this
     }
@@ -688,27 +688,27 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Individual",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                          |{
+                          |  "internalId": "some-id",
+                          |  "affinityGroup": "Individual",
+                          |  "loginTimes": {
+                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                          |  },
+                          |  "authorisedEnrolments": [
+                          |   {
+                          |         "key":"HMRC-AS-AGENT",
+                          |         "identifiers":[
+                          |            {
+                          |               "key":"AgentReferenceNumber",
+                          |               "value":"1000051409"
+                          |            }
+                          |         ],
+                          |         "state":"Activated"
+                          |      }
+                          |  ]
+                          |}
+                        """.stripMargin)))
 
       this
     }
@@ -720,28 +720,28 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "agentCode": "some-agent-code",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                          |{
+                          |  "internalId": "some-id",
+                          |  "affinityGroup": "Agent",
+                          |  "agentCode": "some-agent-code",
+                          |  "loginTimes": {
+                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                          |  },
+                          |  "authorisedEnrolments": [
+                          |   {
+                          |         "key":"HMRC-AS-AGENT",
+                          |         "identifiers":[
+                          |            {
+                          |               "key":"AgentReferenceNumber",
+                          |               "value":"1000051409"
+                          |            }
+                          |         ],
+                          |         "state":"Activated"
+                          |      }
+                          |  ]
+                          |}
+                        """.stripMargin)))
 
       this
     }
@@ -753,27 +753,27 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "affinityGroup": "Agent",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  },
-            |  "authorisedEnrolments": [
-            |   {
-            |         "key":"HMRC-AS-AGENT",
-            |         "identifiers":[
-            |            {
-            |               "key":"AgentReferenceNumber",
-            |               "value":"1000051409"
-            |            }
-            |         ],
-            |         "state":"Activated"
-            |      }
-            |  ]
-            |}
-          """.stripMargin)))
+                          |{
+                          |  "internalId": "some-id",
+                          |  "affinityGroup": "Agent",
+                          |  "loginTimes": {
+                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                          |  },
+                          |  "authorisedEnrolments": [
+                          |   {
+                          |         "key":"HMRC-AS-AGENT",
+                          |         "identifiers":[
+                          |            {
+                          |               "key":"AgentReferenceNumber",
+                          |               "value":"1000051409"
+                          |            }
+                          |         ],
+                          |         "state":"Activated"
+                          |      }
+                          |  ]
+                          |}
+                        """.stripMargin)))
 
       this
     }
@@ -785,14 +785,14 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-            |{
-            |  "internalId": "some-id",
-            |  "loginTimes": {
-            |     "currentLogin": "2016-11-27T09:00:00.000Z",
-            |     "previousLogin": "2016-11-01T12:00:00.000Z"
-            |  }
-            |}
-          """.stripMargin)))
+                          |{
+                          |  "internalId": "some-id",
+                          |  "loginTimes": {
+                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                          |  }
+                          |}
+                        """.stripMargin)))
 
       this
     }
@@ -863,10 +863,10 @@ trait BaseFunctionalSpec extends TestApplication {
                 aResponse()
                   .withStatus(400)
                   .withBody(s"""
-                              |{
-                              |  "code": "$code",
-                              |  "reason": "$reason"
-                              |}
+                               |{
+                               |  "code": "$code",
+                               |  "reason": "$reason"
+                               |}
                             """.stripMargin)
               )
           )
@@ -933,6 +933,96 @@ trait BaseFunctionalSpec extends TestApplication {
           stubFor(
             get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
               .willReturn(aResponse().withStatus(404))
+          )
+          givens
+        }
+      }
+
+      object FinancialData {
+        def singleLiabilityFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.oneLiability.toString)
+            ))
+          givens
+        }
+        def minLiabilityFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.minLiability.toString)
+            ))
+          givens
+        }
+
+        def multipleLiabilitiesFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.multipleLiabilities.toString)
+            )
+          )
+          givens
+        }
+        def emptyLiabilitiesFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.emptyLiabilities.toString)
+            )
+          )
+          givens
+        }
+
+        def singlePaymentFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.onePayment.toString)
+            ))
+          givens
+        }
+        def minPaymentFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.minPayment.toString)
+            ))
+          givens
+        }
+
+        def multiplePaymentsFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.multiplePayments.toString)
+            )
+          )
+          givens
+        }
+        def emptyPaymentsFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.emptyLiabilities.toString)
+            )
           )
           givens
         }
