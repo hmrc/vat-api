@@ -48,10 +48,10 @@ traits:
         type: string
         example: "123456789"
     /obligations:
-      displayName: Retrieve VAT obligations
+      displayName: Retrieve VAT obligations [test only]
       description: Retrieve VAT obligations
       get:
-        displayName: Retrieve VAT obligations
+        displayName: Retrieve VAT obligations [test only]
         description: Retrieve VAT obligations
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
@@ -109,7 +109,7 @@ traits:
                     value:
                       code: INVALID_STATUS
     /returns:
-      displayName: VAT Returns
+      displayName: VAT Returns [test only]
       description: Submit and read VAT returns
       /{periodKey}:
         uriParameters:
@@ -118,7 +118,7 @@ traits:
             type: string
             example: "#001"
         get:
-          displayName: View VAT Return
+          displayName: View VAT Return [test only]
           description: Retrieve a submitted VAT return
           (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
           is: [headers.acceptHeader, contentType, testScenarioHeader]
@@ -158,7 +158,7 @@ traits:
                         code: DATE_RANGE_TOO_LARGE
             404:
       post:
-        displayName: Submit VAT return for period
+        displayName: Submit VAT return for period [test only]
         description: Submit VAT return for period
         (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
@@ -221,10 +221,10 @@ traits:
                     value:
                       code: DUPLICATE_SUBMISSION
     /liabilities:
-      displayName: Retrieve VAT liabilities
+      displayName: Retrieve VAT liabilities [test only]
       description: Retrieve VAT liabilities
       get:
-        displayName: Retrieve VAT liabilities
+        displayName: Retrieve VAT liabilities [test only]
         description: Retrieve VAT liabilities
         (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
@@ -273,10 +273,10 @@ traits:
                     value:
                       code: INVALID_DATE_RANGE
     /payments:
-      displayName: Retrieve VAT payments
+      displayName: Retrieve VAT payments [test only]
       description: Retrieve VAT payments
       get:
-        displayName: Retrieve VAT payments
+        displayName: Retrieve VAT payments [test only]
         description: Retrieve VAT payments
         (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader]
