@@ -12,7 +12,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         given().
           des().FinancialData.singleLiabilityFor(vrn)
           .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-01-02")
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
           .statusIs(200)
           .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
@@ -22,10 +22,19 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         given().
           des().FinancialData.minLiabilityFor(vrn)
           .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-01-02")
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
           .statusIs(200)
           .bodyIsLike(Jsons.FinancialData.minLiability.toString)
+      }
+      "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
+        given().
+          des().FinancialData.overlappingLiabilitiesFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(200)
+          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
       }
 
       "retrieve multiple liabilities where they exist" in {
@@ -38,14 +47,13 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.multipleLiabilities.toString)
       }
 
-      "return an empty list if no liabilities exist" in {
+      "return a 404 (Not Found) if no liabilities exist" in {
         given()
           .des().FinancialData.emptyLiabilitiesFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(200)
-          .bodyIsLike(Json.toJson(Liabilities(Seq())).toString)
+          .statusIs(404)
       }
     }
 
@@ -92,7 +100,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         given().
           des().FinancialData.singlePaymentFor(vrn)
           .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-01-02")
+          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
           .statusIs(200)
           .bodyIsLike(Jsons.FinancialData.onePayment.toString)
@@ -101,10 +109,20 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         given().
           des().FinancialData.minPaymentFor(vrn)
           .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-01-02")
+          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
           .statusIs(200)
           .bodyIsLike(Jsons.FinancialData.minPayment.toString)
+      }
+
+      "return only those payments belonging to a liability that falls before the 'to' date" in {
+        given().
+          des().FinancialData.overlappingPaymentsFor(vrn)
+          .when()
+          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(200)
+          .bodyIsLike(Jsons.FinancialData.onePayment.toString)
       }
 
       "retrieve multiple payments where they exist" in {
@@ -117,14 +135,13 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.multiplePayments.toString)
       }
 
-      "return an empty list if no payments exist" in {
+      "return a 404 (Not Found) if no payments exist" in {
         given()
           .des().FinancialData.emptyPaymentsFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(200)
-          .bodyIsLike(Json.toJson(Payments(Seq())).toString)
+          .statusIs(404)
       }
     }
 

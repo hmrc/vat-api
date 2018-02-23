@@ -949,6 +949,16 @@ trait BaseFunctionalSpec extends TestApplication {
             ))
           givens
         }
+        def overlappingLiabilitiesFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.liabilitiesOverlapping.toString)
+            ))
+          givens
+        }
         def minLiabilityFor(vrn: Vrn): Givens = {
           stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
             .willReturn(
@@ -990,6 +1000,16 @@ trait BaseFunctionalSpec extends TestApplication {
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
                 .withBody(DesJsons.FinancialData.onePayment.toString)
+            ))
+          givens
+        }
+        def overlappingPaymentsFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(DesJsons.FinancialData.overlappingPayment.toString)
             ))
           givens
         }

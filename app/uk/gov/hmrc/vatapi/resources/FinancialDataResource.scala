@@ -23,7 +23,7 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
-import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams}
+import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -42,8 +42,17 @@ object FinancialDataResource extends BaseController {
         case 200 =>
           response.getLiabilities(vrn) match {
             case Right(obj) =>
-              Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
-              Ok(Json.toJson(obj))
+              val liabilities = Liabilities(
+                obj.liabilities.filter(_.taxPeriod.isEmpty) ++ obj.liabilities.filter(_.taxPeriod.isDefined).filterNot(_.taxPeriod.get.to isAfter params.to)
+              )
+              liabilities.liabilities match {
+                case Seq() =>
+                  Logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
+                  NotFound(Json.toJson(Errors.NotFound))
+                case _ =>
+                  Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  Ok(Json.toJson(liabilities))
+              }
             case Left(ex) =>
               Logger.error(s"[FinancialDataResource][retrieveLiabilities] Error retrieving Liabilities from DES: ${ex.msg}")
               InternalServerError(Json.toJson(Errors.InternalServerError))
@@ -65,7 +74,17 @@ object FinancialDataResource extends BaseController {
           response.getPayments(vrn) match {
             case Right(obj) =>
               Logger.debug(s"[FinancialDataResource][retrievePayments] Successfully retrieved Payments from DES")
-              Ok(Json.toJson(obj))
+              val payments = Payments(
+                obj.payments.filter(_.taxPeriod.isEmpty) ++ obj.payments.filter(_.taxPeriod.isDefined).filterNot(_.taxPeriod.get.to isAfter params.to)
+              )
+              payments.payments match {
+                case Seq() =>
+                  Logger.error(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
+                  NotFound(Json.toJson(Errors.NotFound))
+                case _ =>
+                  Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  Ok(Json.toJson(payments))
+              }
             case Left(ex) =>
               Logger.error(s"[FinancialDataResource][retrievePayments] Error retrieving Payments from DES: ${ex.msg}")
               InternalServerError(Json.toJson(Errors.InternalServerError))

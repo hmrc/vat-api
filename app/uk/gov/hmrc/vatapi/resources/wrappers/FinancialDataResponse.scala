@@ -27,13 +27,12 @@ import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
 
 case class FinancialDataResponse(underlying: HttpResponse) extends Response {
 
-
-
   def getLiabilities(vrn: Vrn): Either[DesTransformError, Liabilities] = {
 
     def deserialise(js: JsValue) = js.validate[des.FinancialData] match {
       case JsError(errors) => Left(ParseError(s"Unable to parse the response from DES as Json: $errors"))
-      case JsSuccess(financialData, _) => DesTransformValidator[des.FinancialData, Liabilities].from(financialData)
+      case JsSuccess(financialData, _) =>
+        DesTransformValidator[des.FinancialData, Liabilities].from(financialData)
     }
     jsonOrError match {
       case Right(js) => deserialise(js)

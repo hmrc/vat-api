@@ -164,7 +164,7 @@ object Jsons {
       Json.toJson(
         Liabilities(
           Seq(Liability(
-            Some(TaxPeriod(from = LocalDate.parse("2017-01-01"), to = LocalDate.parse("2018-01-02"))),
+            Some(TaxPeriod(from = LocalDate.parse("2017-01-01"), to = LocalDate.parse("2017-03-31"))),
             `type` = "VAT",
             originalAmount = 463872,
             outstandingAmount = Some(463872),
