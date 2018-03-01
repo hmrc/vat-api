@@ -47,7 +47,8 @@ object VatReturnsResource extends BaseController {
         _ <-  audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
-      response.filter { case 200 => Created(Json.toJson(response.vatReturnOrError.toOption)) }
+      response.filter { case 200 => response.jsonOrError match {
+            case Right(vatReturn) => Created(Json.toJson(vatReturn))} }
     }
   }
 

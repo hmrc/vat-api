@@ -28,6 +28,9 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .thenAssertThat()
         .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
     }
 
     "not allow users to submit undeclared VAT returns" in {

@@ -850,7 +850,13 @@ trait BaseFunctionalSpec extends TestApplication {
               .willReturn(
                 aResponse()
                   .withStatus(200)
-                  .withBody("[]")
+                  .withBody(s"""
+                               |{
+                               |    "processingDate": "2018-03-01T11:43:43.195Z",
+                               |    "paymentIndicator": "BANK",
+                               |    "formBundleNumber": "891713832155"
+                               |}
+                            """.stripMargin)
               )
           )
           givens
