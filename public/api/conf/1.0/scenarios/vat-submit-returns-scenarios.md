@@ -27,5 +27,9 @@
             <td><p>DUPLICATE_SUBMISSION</p></td>
             <td><p>The remote endpoint has indicated that VAT has already been submitted for that period.</p></td>
         </tr>
+        <tr>
+            <td><p>CLIENT_NOT_SUBSCRIBED</p></td>
+            <td><p>Simulate client subscription to MTD VAT check failure</p></td>
+        </tr>
     </tbody>
 </table>

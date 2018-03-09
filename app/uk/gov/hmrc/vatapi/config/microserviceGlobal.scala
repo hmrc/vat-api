@@ -34,11 +34,13 @@ import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
+import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
 import uk.gov.hmrc.vatapi.models._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.matching.Regex
+import uk.gov.hmrc.vatapi.resources._
 
 case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
                                   needsLogging: Boolean = true,
@@ -186,7 +188,11 @@ object MicroserviceGlobal
 
   override val authFilter = Some(MicroserviceAuthFilter)
 
-  private def enabledFilters: Seq[EssentialFilter] = Seq.empty
+  private def enabledFilters: Seq[EssentialFilter] = {
+    val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
+    if (featureSwitch.isAgentSimulationFilterEnabled) Seq(AgentSimulationFilter)
+    else Seq.empty
+  }
 
   override def microserviceFilters: Seq[EssentialFilter] =
     Seq(SetXContentTypeOptionsFilter, HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter) ++ enabledFilters ++
@@ -220,6 +226,17 @@ object MicroserviceGlobal
         case "ERROR_INVALID_TO_DATE"   => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
         case _                         => result
       }
+    }
+  }
+}
+
+object AgentSimulationFilter extends Filter with MicroserviceFilterSupport {
+  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
+    val method = rh.method
+
+    rh.headers.get(GovTestScenarioHeader) match {
+      case Some("CLIENT_NOT_SUBSCRIBED") => ClientSubscriptionSimulation(f, rh, method)
+      case _                             => f(rh)
     }
   }
 }

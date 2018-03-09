@@ -72,6 +72,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 404 when obligations does not exist" in {
       given()
+        .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
@@ -81,6 +82,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 200 with a set of obligations" in {
       given()
+        .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsFor(vrn)
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")

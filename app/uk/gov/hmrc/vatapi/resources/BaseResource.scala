@@ -1,0 +1,72 @@
+/*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.vatapi.resources
+
+import org.joda.time.DateTime
+import play.api.Logger
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.mvc.{ActionBuilder, _}
+import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
+import uk.gov.hmrc.vatapi.contexts.{AuthContext, Organisation}
+import uk.gov.hmrc.vatapi.services.AuthorisationService
+
+import scala.concurrent.Future
+import scala.util.Right
+
+trait BaseResource extends BaseController {
+  val logger: Logger = Logger(this.getClass)
+
+  private val authService = AuthorisationService
+  private lazy val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
+
+  def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
+    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
+    override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
+      if (featureSwitch.isAuthEnabled){
+        implicit val ev: Request[A] = request
+        authService.authCheck(vrn) map {
+          case Right(authContext) => Right(new AuthRequest(authContext, request))
+          case Left(authError) => Left(authError)
+        }
+      } else
+          Future.successful(Right(new AuthRequest(Organisation, request)))
+  }
+
+  def APIAction(vrn: Vrn, summary: Option[String] = None): ActionBuilder[AuthRequest] =
+    new ActionBuilder[Request] with ActionFilter[Request] {
+      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
+        Future {
+          None
+        }
+    } andThen AuthAction(vrn)
+
+
+  def getRequestDateTimestamp(implicit request: AuthRequest[_]) = {
+    val requestTimestampHeader = "X-Request-Timestamp"
+    val requestTimestamp = request.headers.get(requestTimestampHeader) match {
+      case Some(timestamp) if timestamp.trim.length > 0 => timestamp.trim
+      case _ =>
+        logger.warn(s"$requestTimestampHeader header is not passed or is empty in the request.")
+        DateTime.now().toString()
+    }
+    requestTimestamp
+  }
+}
+
+class AuthRequest[A](val authContext: AuthContext, request: Request[A]) extends WrappedRequest[A](request)

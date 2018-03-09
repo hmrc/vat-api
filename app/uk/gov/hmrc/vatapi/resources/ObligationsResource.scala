@@ -31,12 +31,11 @@ import play.api.libs.json.JsNull
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object ObligationsResource extends BaseController {
-  val logger: Logger = Logger(this.getClass)
+object ObligationsResource extends BaseResource {
 
   private val connector = ObligationsConnector
 
-  def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = Action.async { implicit request =>
+  def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }
