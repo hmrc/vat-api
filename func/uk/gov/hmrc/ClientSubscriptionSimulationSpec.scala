@@ -1,0 +1,60 @@
+package uk.gov.hmrc
+
+import uk.gov.hmrc.support.BaseFunctionalSpec
+import uk.gov.hmrc.vatapi.models.ErrorCode
+import uk.gov.hmrc.vatapi.resources._
+
+class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
+
+  "Request for vat returns with Gov-Test-Scenario = CLIENT_NOT_SUBSCRIBED" should {
+    "return HTTP 403 with error code informing client should be subscribed to MTD" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .withHeaders(GovTestScenarioHeader, "CLIENT_NOT_SUBSCRIBED")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyIsError(ErrorCode.CLIENT_NOT_SUBSCRIBED.toString)
+    }
+  }
+
+  "Submit for vat returns with Gov-Test-Scenario = CLIENT_NOT_SUBSCRIBED" should {
+    "return HTTP 403 with error code informing client should be subscribed to MTD" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .when()
+        .post(s"/$vrn/returns")
+        .withHeaders(GovTestScenarioHeader, "CLIENT_NOT_SUBSCRIBED")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyIsError(ErrorCode.CLIENT_NOT_SUBSCRIBED.toString)
+    }
+  }
+
+  "Request for obligations with Gov-Test-Scenario = CLIENT_NOT_SUBSCRIBED" should {
+    "return HTTP 403 with error code informing client should be subscribed to MTD" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .when()
+        .post(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .withHeaders(GovTestScenarioHeader, "CLIENT_NOT_SUBSCRIBED")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyIsError(ErrorCode.CLIENT_NOT_SUBSCRIBED.toString)
+    }
+  }
+
+  "Request for payments with Gov-Test-Scenario = CLIENT_NOT_SUBSCRIBED" should {
+    "return HTTP 403 with error code informing client should be subscribed to MTD" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .when()
+        .post(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
+        .withHeaders(GovTestScenarioHeader, "CLIENT_NOT_SUBSCRIBED")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyIsError(ErrorCode.CLIENT_NOT_SUBSCRIBED.toString)
+    }
+  }
+}

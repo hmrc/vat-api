@@ -17,43 +17,40 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsNull, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
-import uk.gov.hmrc.vatapi.models.Errors.Error
-import uk.gov.hmrc.vatapi.models.{ErrorCode, Errors, VatReturnDeclaration}
-import uk.gov.hmrc.vatapi.audit.AuditService.audit
-import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.audit.AuditEvent
-import play.api.libs.json.JsNull
+import uk.gov.hmrc.vatapi.audit.AuditService.audit
+import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
+import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
+import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object VatReturnsResource extends BaseController {
-
-  val logger: Logger = Logger(this.getClass)
+object VatReturnsResource extends BaseResource {
 
   private val connector = VatReturnsConnector
 
-  def submitVatReturn(vrn: Vrn): Action[JsValue] = Action.async(parse.json) { implicit request =>
-    fromDes {
-      for {
-        vatReturn <- validateJson[VatReturnDeclaration](request.body)
-        _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
-        response <- execute { _ => connector.post(vrn, vatReturn.toDes) }
-        _ <-  audit(SubmitVatReturnEvent(vrn, response))
-      } yield response
-    } onSuccess { response =>
-      response.filter { case 200 => response.jsonOrError match {
-            case Right(vatReturn) => Created(Json.toJson(vatReturn))} }
-    }
+  def submitVatReturn(vrn: Vrn): Action[JsValue] =
+    APIAction(vrn).async(parse.json) { implicit request =>
+      logger.debug(s"[VatReturnsResource] [submitVatReturn] Submit VAT return for the VRN : $vrn")
+      fromDes {
+        for {
+          vatReturn <- validateJson[VatReturnDeclaration](request.body)
+          _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
+          response <- execute { _ => connector.post(vrn, vatReturn.toDes) }
+          _ <-  audit(SubmitVatReturnEvent(vrn, response))
+        } yield response
+      } onSuccess { response =>
+        response.filter { case 200 => response.jsonOrError match {
+              case Right(vatReturn) => Created(Json.toJson(vatReturn))} }
+      }
   }
 
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
-    Action.async { implicit request =>
+    APIAction(vrn).async { implicit request =>
+      logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for the VRN : $vrn")
       fromDes {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }

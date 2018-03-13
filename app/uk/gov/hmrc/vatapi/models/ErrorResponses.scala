@@ -39,3 +39,5 @@ object InvalidRequest {
   implicit val writes = Json.writes[InvalidRequest]
 }
 
+case object ErrorClientNotSubscribedToMTDVAT extends ErrorResponse(403, ErrorCode.CLIENT_NOT_SUBSCRIBED.toString, "The client is not subscribed to MTD VAT")
+
