@@ -80,6 +80,18 @@ package object models {
           .remainder(1) == 0) && amount.scale < 3 && amount >= 0 && amount
           .toBigInt() <= VAT_MAX_AMOUNT_13_DIGITS.toBigInt)
 
+  val vatAmountValidatorWithZeroDecimals: Reads[Amount] = Reads
+    .of[Amount]
+    .filter(
+      JsonValidationError(
+        "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00",
+        ErrorCode.INVALID_MONETARY_AMOUNT))(
+      amount =>
+        (amount.scale <= 0 || amount
+          .remainder(1) == 0) && amount.scale < 3 && amount
+          .toBigInt() >= -VAT_MAX_AMOUNT_13_DIGITS.toBigInt && amount
+          .toBigInt() <= VAT_MAX_AMOUNT_13_DIGITS.toBigInt)
+
 
   implicit class Trimmer(reads: Reads[String]) {
     def trim: Reads[String] = reads.map(_.trim)

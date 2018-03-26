@@ -21,7 +21,7 @@ import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, GenericErrorResult, InternalServerErrorResult, VatReturnDeclaration}
+import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
 
@@ -54,6 +54,7 @@ trait VatReturnsOrchestrator {
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
 }
+
 
 
 

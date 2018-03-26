@@ -72,12 +72,12 @@ object VatReturnDeclaration {
       (__ \ "totalVatDue").read[Amount](vatAmountValidator) and
       (__ \ "vatReclaimedCurrPeriod").read[Amount](vatAmountValidator) and
       (__ \ "netVatDue").read[Amount](vatNonNegativeAmountValidator) and
-      (__ \ "totalValueSalesExVAT").read[Amount](vatWholeAmountValidator) and
+      (__ \ "totalValueSalesExVAT").read[Amount](vatAmountValidatorWithZeroDecimals) and
       (__ \ "totalValuePurchasesExVAT")
-        .read[Amount](vatWholeAmountValidator) and
+        .read[Amount](vatAmountValidatorWithZeroDecimals) and
       (__ \ "totalValueGoodsSuppliedExVAT")
-        .read[Amount](vatWholeAmountValidator) and
-      (__ \ "totalAcquisitionsExVAT").read[Amount](vatWholeAmountValidator) and
+        .read[Amount](vatAmountValidatorWithZeroDecimals) and
+      (__ \ "totalAcquisitionsExVAT").read[Amount](vatAmountValidatorWithZeroDecimals) and
       (__ \ "finalised").read[Boolean]
   )(VatReturnDeclaration.apply _)
     .validate(

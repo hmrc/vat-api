@@ -111,7 +111,27 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
     )
   }
 
-  "accept VAT returns with negative amounts where non" in {
+  "reject VAT returns with negative decimal amounts where non decimal amounts are expected" in {
+    assertValidationErrorWithCode(
+      VatReturnDeclaration(
+        periodKey = "#001",
+        vatDueSales = 10.00,
+        vatDueAcquisitions = 100.30,
+        totalVatDue = 110.30,
+        vatReclaimedCurrPeriod = -450.00,
+        netVatDue = 560.30,
+        totalValueSalesExVAT = -1000.23,
+        totalValuePurchasesExVAT = -200,
+        totalValueGoodsSuppliedExVAT = -100,
+        totalAcquisitionsExVAT = 540,
+        finalised = true
+      ),
+      "/totalValueSalesExVAT",
+      ErrorCode.INVALID_MONETARY_AMOUNT
+    )
+  }
+
+  "accept VAT returns with parameters that allow negative amounts" in {
     assertValidationPasses(
       VatReturnDeclaration(
         periodKey = "#001",
@@ -121,8 +141,8 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
         vatReclaimedCurrPeriod = -450.00,
         netVatDue = 560.30,
         totalValueSalesExVAT = 1000,
-        totalValuePurchasesExVAT = 200.00,
-        totalValueGoodsSuppliedExVAT = 100.00,
+        totalValuePurchasesExVAT = -200.00,
+        totalValueGoodsSuppliedExVAT = -100.00,
         totalAcquisitionsExVAT = 540.00,
         finalised = true
       ))
