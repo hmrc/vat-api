@@ -16,8 +16,8 @@
     },
     "due": {
       "title": "Due date",
-      "description": "The due date for this obligation period",
-      "$ref": "FullDate.json"
+      "description": "The due date for this obligation period, in the format YYYY-MM-DD. For example: 2017-01-25. The due date for monthly/quarterly obligations is one month and seven days from the end date. The due date for Payment On Account customers is the last working day of the month after the end date. For example if the end date is 2018-02-28, the due date is 2018-03-29 (because the 31 March is a Saturday and the 30 March is Good Friday).",
+      "type" : "string"
     },
     "status": {
       "title": "Status",
