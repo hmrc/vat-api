@@ -29,10 +29,10 @@ case class VatReturnDeclaration(
                                  vatDueTotal: Amount,
                                  vatReclaimedCurrPeriod: Amount,
                                  vatDueNet: Amount,
-                                 totalValueSalesExVAT: Amount,
-                                 totalValuePurchasesExVAT: Amount,
-                                 totalValueGoodsSuppliedExVAT: Amount,
-                                 totalAllAcquisitionsExVAT: Amount,
+                                 totalValueSalesExVAT: String,
+                                 totalValuePurchasesExVAT: String,
+                                 totalValueGoodsSuppliedExVAT: String,
+                                 totalAllAcquisitionsExVAT: String,
                                  agentReferenceNumber: Option[String] = None,
                                  receivedAt: DateTime
                                )
