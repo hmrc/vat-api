@@ -18,20 +18,22 @@ package uk.gov.hmrc.vatapi.connectors
 
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.BaseConnector
+import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object ObligationsConnector {
+object ObligationsConnector extends BaseConnector {
+  override val http: WSHttp = WSHttp
+
   private lazy val baseUrl: String = AppContext.desUrl
 
   def get(vrn: Vrn, queryParams: ObligationsQueryParams)(implicit hc: HeaderCarrier): Future[ObligationsResponse] = {
     val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
     httpGet[ObligationsResponse](baseUrl + s"/enterprise/obligation-data/vrn/$vrn/VATC?$queryString", ObligationsResponse)
   }
-
 
 }

@@ -23,6 +23,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to submit VAT returns" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -31,10 +32,14 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
+        .hasHeader("Receipt-Id")
+        .hasHeader("Receipt-Signature")
+        .hasHeader("Receipt-TimeStamp")
     }
 
     "not allow users to submit undeclared VAT returns" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body(false))))
@@ -46,6 +51,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid period key" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY")
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -56,6 +62,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid ARN" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN")
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -66,6 +73,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid VRN" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN")
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -76,6 +84,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid payload" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD")
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -86,12 +95,23 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject duplicate submission" in {
       given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION")
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .thenAssertThat()
         .statusIs(403)
         .bodyHasPath("\\errors(0)\\code", "DUPLICATE_SUBMISSION")
+    }
+
+    "fail if submission to  Non-Repudiation service failed" in {
+      given()
+        .nrs().nrsFailurefor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .thenAssertThat()
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
     }
   }
 

@@ -16,16 +16,12 @@
 
 package uk.gov.hmrc.vatapi.models
 
-import uk.gov.hmrc.vatapi.models.Errors.BusinessError
 
-sealed trait ErrorResult
+trait NrsTransformError {
+  val msg : String
+}
 
-case class InternalServerErrorResult(code: String) extends ErrorResult
 
-case class GenericErrorResult(message: String) extends ErrorResult
-
-case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
-
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
-
-case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult
+object NrsTransformError {
+  def unapply(err: NrsTransformError): Option[String] = Some(err.msg)
+}

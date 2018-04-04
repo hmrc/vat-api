@@ -174,6 +174,15 @@ traits:
               X-CorrelationId:
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
+              Receipt-ID:
+                example: 2dd537bc-4244-4ebf-bac9-96321be13cdc
+                description: Unique reference number returned for a submission
+              Receipt-Timestamp:
+                example: 2018-02-14T09:32:15Z
+                description: The timestamp from the signature, in ISO8601 format
+              Receipt-Signature:
+                example: 30820b4f06092a864886f70c0445c464...
+                description: This is a formal receipt and includes an encoded version of the payload sent to HMRC with an encoded externally-verified timestamp and the HMRC certificate
             body:
               application/json:
                 type: !include schemas/VatReturnResponse.json

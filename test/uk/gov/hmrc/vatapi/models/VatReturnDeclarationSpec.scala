@@ -19,25 +19,15 @@ package uk.gov.hmrc.vatapi.models
 import play.api.libs.json.Json.toJson
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.resources.JsonSpec
+import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 
 class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
 
   "VatReturnDeclarationSpec" should {
     "round trip" in {
       roundTripJson(
-        VatReturnDeclaration(
-          periodKey = "#001",
-          vatDueSales = 50.00,
-          vatDueAcquisitions = 100.30,
-          totalVatDue = 150.30,
-          vatReclaimedCurrPeriod = 40.00,
-          netVatDue = 110.30,
-          totalValueSalesExVAT = 1000,
-          totalValuePurchasesExVAT = 200.00,
-          totalValueGoodsSuppliedExVAT = 100.00,
-          totalAcquisitionsExVAT = 540.00,
-          finalised = true
-        ))
+      vatReturnDeclaration
+      )
     }
   }
 
