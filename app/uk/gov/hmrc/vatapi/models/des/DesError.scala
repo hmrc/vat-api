@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.vatapi.models.des
 
-import play.api.libs.json.{Format, Json, Reads}
+import play.api.libs.json.{Format, Json, OFormat, Reads}
 import uk.gov.hmrc.vatapi.models.EnumJson
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.DesErrorCode
 
 case class DesError(code: DesErrorCode, reason: String)
 
 object DesError {
+  implicit val format: OFormat[DesError] = Json.format[DesError]
   implicit val reads: Reads[DesError] = Json.reads[DesError]
 }
 

@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.models
+package uk.gov.hmrc.vatapi.resources.wrappers
 
-import uk.gov.hmrc.vatapi.models.Errors.BusinessError
+import uk.gov.hmrc.http.HttpResponse
 
-sealed trait ErrorResult
+case class NRSResponse(underlying: HttpResponse) extends Response {
 
-case class InternalServerErrorResult(code: String) extends ErrorResult
-
-case class GenericErrorResult(message: String) extends ErrorResult
-
-case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
-
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
-
-case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult
+}

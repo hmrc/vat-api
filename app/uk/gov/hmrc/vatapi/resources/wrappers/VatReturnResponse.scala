@@ -21,6 +21,7 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DATE_RANGE_TOO_LARGE, DUPLICATE_SUBMISSION, INVALID_ARN, INVALID_PAYLOAD, INVALID_PERIODKEY, INVALID_VRN}
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, VatReturn, des}
 import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
@@ -38,8 +39,10 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
       case Left(e) => Left(ParseError(s"Unable to parse the response from DES as Json: ${e.getMessage}"))
       case Right(js) => deserialise(js)
     }
-
   }
+
+  var nrsData: NRSData = _
+  def withNrsData(data: NRSData): VatReturnResponse = {nrsData = data; this}
 
   override def errorMappings: PartialFunction[Int, Result] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))

@@ -104,7 +104,7 @@ object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
     }
 }
 
-// this filter is a workaround for the issue reported here https://jira.tools.tax.service.gov.uk/browse/APSR-87
+// this filter is a workaround for the issue reported in ticket APSR-87
 object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
   override def apply(f: (RequestHeader) => Future[Result])(
     rh: RequestHeader): Future[Result] =

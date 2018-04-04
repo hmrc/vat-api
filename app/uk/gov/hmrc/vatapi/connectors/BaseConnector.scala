@@ -27,11 +27,14 @@ import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-package object connectors {
+trait BaseConnector {
+
+  val http: WSHttp
+
   private val logger = Logger("connectors")
 
   private def withDesHeaders(hc: HeaderCarrier): HeaderCarrier = {
-    val newHc = hc
+    val newHc: HeaderCarrier = hc
       .copy(authorization = Some(Authorization(s"Bearer ${AppContext.desToken}")))
       .withExtraHeaders(
         "Environment" -> AppContext.desEnv,
@@ -49,9 +52,26 @@ package object connectors {
       .getOrElse(newHc)
   }
 
-  private def withAdditionalHeaders[R <: Response](url: String)(f: HeaderCarrier => Future[R])(
-      implicit hc: HeaderCarrier): Future[R] = {
-    val newHc = withDesHeaders(hc)
+  def withTestHeader(hc: HeaderCarrier): HeaderCarrier = {
+    val newHc: HeaderCarrier = hc
+      .copy()
+      .withExtraHeaders(
+        "Accept" -> "application/json"
+      )
+
+    // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
+    //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
+    //       and remove it from "otherHeaders" to prevent it from being removed again.
+    hc.otherHeaders
+      .find { case (name, _) => name == GovTestScenarioHeader }
+      .map(newHc.withExtraHeaders(_))
+      .map(headers => headers.copy(otherHeaders = headers.otherHeaders.filterNot(_._1 == GovTestScenarioHeader)))
+      .getOrElse(newHc)
+  }
+
+  private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
+    implicit hc: HeaderCarrier): Future[R] = {
+    val newHc = header(hc)
     logger.debug(s"URL:[$url] Headers:[${newHc.headers}]")
     f(newHc)
   }
@@ -63,24 +83,30 @@ package object connectors {
   }
 
   def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url) {
-      WSHttp.GET(url)(NoExceptionsReads, _, ec) map toResponse
+    withAdditionalHeaders[R](url, withDesHeaders) {
+      http.GET(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-      implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url) {
-      WSHttp.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
+    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
+    withAdditionalHeaders[R](url, withDesHeaders) {
+      http.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpEmptyPost[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url) {
-      WSHttp.POSTEmpty(url)(NoExceptionsReads, _, ec) map toResponse
+    withAdditionalHeaders[R](url, withDesHeaders) {
+      http.POSTEmpty(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
   def httpPut[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-      implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url) {
-      WSHttp.PUT(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
+    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
+    withAdditionalHeaders[R](url, withDesHeaders) {
+      http.PUT(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
+    }
+
+  def httpNonDesPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
+    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
+    withAdditionalHeaders[R](url, withTestHeader) {
+      http.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
     }
 }

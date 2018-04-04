@@ -5,17 +5,17 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import org.json.{JSONArray, JSONObject}
 import org.skyscreamer.jsonassert.JSONAssert.assertEquals
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
+import play.api.http.Status
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers.ErrorNotFound
 import uk.gov.hmrc.domain.{Nino, Vrn}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.vatapi.{TestApplication, VrnGenerator}
 import uk.gov.hmrc.vatapi.models.ErrorNotImplemented
-import uk.gov.hmrc.vatapi.resources.DesJsons
+import uk.gov.hmrc.vatapi.resources.{DesJsons, FuncJsons}
+import uk.gov.hmrc.vatapi.{TestApplication, VrnGenerator}
 
 import scala.collection.mutable
 import scala.util.matching.Regex
-import org.joda.time.LocalDate
 
 trait BaseFunctionalSpec extends TestApplication {
   protected val vrn = VrnGenerator().nextVrn()
@@ -260,6 +260,12 @@ trait BaseFunctionalSpec extends TestApplication {
 
     def hasHeader(headerName: String): Assertions = {
       response.allHeaders(headerName) should not be 'empty
+      this
+    }
+
+    def hasHeaderValues(h: Map[String, Seq[String]]): Assertions = {
+      val result = h.map( l => response.allHeaders.exists(_ == l))
+      result shouldBe true
       this
     }
 
@@ -1055,7 +1061,37 @@ trait BaseFunctionalSpec extends TestApplication {
       }
     }
 
+    class Nrs(givens: Givens) {
+      def nrsVatReturnSuccessFor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/submission/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(Status.ACCEPTED)
+                .withHeader("Content-Type", "application/json")
+                .withHeader("Receipt-Id", "de1249ad-c242-4f22-9fe6-f357b1bfcccf")
+                .withHeader("Receipt-Signature", "757b1365-d89e-4dac-8317-ba87efca6c21")
+                .withHeader("Receipt-Timestamp", "2018-03-27T15:10:44.798Z")
+                .withBody(FuncJsons.NRS.success().toString()
+                )
+            )
+        )
+        givens
+      }
+
+      def nrsFailurefor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/submission/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(Status.BAD_REQUEST)
+                .withBody("{}")
+          )
+        )
+        givens
+      }
+    }
+
     def des() = new Des(this)
+    def nrs() = new Nrs(this)
 
   }
 

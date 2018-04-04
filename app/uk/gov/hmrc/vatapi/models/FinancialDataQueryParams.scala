@@ -45,7 +45,6 @@ object FinancialDataQueryParams {
     if (errors.isEmpty) {
       Right(FinancialDataQueryParams(from.map(_.right.get).get, to.map(_.right.get).get))
     } else {
-      Logger.error(s"\n\n${errors.head}\n\n")
       Left(errors.head)
     }
   }

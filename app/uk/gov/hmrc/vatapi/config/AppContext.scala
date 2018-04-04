@@ -31,11 +31,15 @@ object AppContext extends ServicesConfig {
   lazy val apiGatewayRegistrationContext: String = apiGatewayContext.getOrElse(throw new RuntimeException("api.gateway.context is not configured"))
   lazy val apiGatewayLinkContext: String = apiGatewayContext.map(x => if(x.isEmpty) x else s"/$x").getOrElse("")
   lazy val apiStatus: String = config.getString("api.status").getOrElse(throw new RuntimeException("api.status is not configured"))
+
   lazy val serviceLocatorUrl: String = baseUrl("service-locator")
   lazy val desUrl: String = baseUrl("des")
+  lazy val nrsServiceUrl: String = baseUrl("non-repudiation")
+
   lazy val registrationEnabled: Boolean = current.configuration.getBoolean(s"$env.microservice.services.service-locator.enabled").getOrElse(true)
   lazy val featureSwitch: Option[Configuration] = config.getConfig(s"$env.feature-switch")
   lazy val auditEnabled: Boolean = config.getBoolean(s"auditing.enabled").getOrElse(true)
   lazy val authEnabled: Boolean = config.getBoolean(s"$env.microservice.services.auth.enabled").getOrElse(true)
   lazy val mtdDate: String = config.getString(s"$env.mtd-date").getOrElse(throw new RuntimeException("mtd-date is not configured"))
+  lazy val xApiKey: String = config.getString(s"$env.access-keys.xApiKey").getOrElse(throw new RuntimeException("X-API-Key is not configured"))
 }

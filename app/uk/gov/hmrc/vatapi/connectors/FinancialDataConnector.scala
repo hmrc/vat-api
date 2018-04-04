@@ -18,13 +18,16 @@ package uk.gov.hmrc.vatapi.connectors
 
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.BaseConnector
+import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.models.FinancialDataQueryParams
 import uk.gov.hmrc.vatapi.resources.wrappers.FinancialDataResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object FinancialDataConnector {
+object FinancialDataConnector extends BaseConnector {
+
+  override val http: WSHttp = WSHttp
 
   private lazy val baseUrl: String = s"${AppContext.desUrl}/enterprise/financial-data"
 

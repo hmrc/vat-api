@@ -44,7 +44,7 @@
 
     <logger name="uk.gov" level="INFO"/>
 
-    <logger name="application" level="WARN"/>
+    <logger name="application" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="ASYNC_FILE"/>

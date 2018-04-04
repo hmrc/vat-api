@@ -20,18 +20,11 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.Result
 import play.api.mvc.Results.{BadRequest, Forbidden, InternalServerError}
-import uk.gov.hmrc.vatapi.models.{
-  AuthorisationErrorResult,
-  ErrorResult,
-  Errors,
-  GenericErrorResult,
-  JsonValidationErrorResult,
-  ValidationErrorResult
-}
+import uk.gov.hmrc.vatapi.models.{AuthorisationErrorResult, ErrorResult, Errors, GenericErrorResult, InternalServerErrorResult, JsonValidationErrorResult, ValidationErrorResult}
 import cats.data.EitherT
+
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
-
 import cats.implicits._
 
 package object resources {
@@ -49,6 +42,7 @@ package object resources {
       case JsonValidationErrorResult(errors) => BadRequest(Json.toJson(Errors.badRequest(errors)))
       case ValidationErrorResult(error)      => BadRequest(Json.toJson(Errors.badRequest(error)))
       case AuthorisationErrorResult(error)   => Forbidden(Json.toJson(error))
+      case InternalServerErrorResult(error)  => InternalServerError(Json.toJson(Errors.InternalServerError(error)))
     }
   }
 
@@ -87,7 +81,7 @@ package object resources {
     BusinessResult {
       for {
         result <- torun(())
-      } yield (Right(result))
+      } yield Right(result)
     }
 
   def fromDes[R <: Response](result: BusinessResult[R]): DesBusinessResult[R] = DesBusinessResult(result)
