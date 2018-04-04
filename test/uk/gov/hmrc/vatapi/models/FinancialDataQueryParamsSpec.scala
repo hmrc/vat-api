@@ -18,12 +18,12 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.scalatest.TestData
-import org.scalatestplus.play.OneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.vatapi.UnitSpec
 
-class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
+class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
 
   val testTime: LocalDate = LocalDate.now()
 
