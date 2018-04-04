@@ -18,17 +18,17 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.scalatest.TestData
-import org.scalatestplus.play.OneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.vatapi.UnitSpec
 
-class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
+class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
 
   val testTime: LocalDate = LocalDate.now()
 
   implicit override def newAppForTest(testData: TestData): Application =
-    new GuiceApplicationBuilder().configure(Map("Test.mtd-date" -> testTime.minusYears(10).toString)).build()
+    new GuiceApplicationBuilder().configure(Map(s"Test.mtd-date" -> testTime.minusYears(10).toString)).build()
 
   "DateRangeQueryParams" should {
 
@@ -84,8 +84,8 @@ class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
       response.left.get shouldBe "DATE_TO_INVALID"
     }
 
-    "return error when from date is after to date " in {
-      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(3).toString)), Some(Right(testTime.minusYears(3).minusDays(1).toString)))
+    s"return error when from date is after to date" in {
+      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(1).toString)), Some(Right(testTime.minusYears(1).minusDays(1).toString)))
       response.isLeft shouldBe true
       response.left.get shouldBe "DATE_RANGE_INVALID"
     }
