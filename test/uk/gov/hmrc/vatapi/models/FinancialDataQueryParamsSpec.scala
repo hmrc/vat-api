@@ -28,7 +28,7 @@ class FinancialDataQueryParamsSpec extends UnitSpec with OneAppPerTest {
   val testTime: LocalDate = LocalDate.now()
 
   implicit override def newAppForTest(testData: TestData): Application =
-    new GuiceApplicationBuilder().configure(Map("Test.mtd-date" -> testTime.minusYears(10).toString)).build()
+    new GuiceApplicationBuilder().configure(Map(s"Test.mtd-date" -> testTime.minusYears(10).toString)).build()
 
   "DateRangeQueryParams" should {
 
