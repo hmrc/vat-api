@@ -84,8 +84,8 @@ class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
       response.left.get shouldBe "DATE_TO_INVALID"
     }
 
-    "return error when from date is after to date " in {
-      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(3).toString)), Some(Right(testTime.minusYears(3).minusDays(1).toString)))
+    s"return error when from date is after to date" in {
+      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(1).toString)), Some(Right(testTime.minusYears(1).minusDays(1).toString)))
       response.isLeft shouldBe true
       response.left.get shouldBe "DATE_RANGE_INVALID"
     }
