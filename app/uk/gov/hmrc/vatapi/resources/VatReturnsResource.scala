@@ -18,6 +18,7 @@ package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
 import play.api.Logger
+
 import play.api.libs.json.{JsNull, JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.domain.Vrn
@@ -39,6 +40,7 @@ object VatReturnsResource extends BaseController {
   private val orchestrator = VatReturnsOrchestrator
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = Action.async(parse.json) { implicit request =>
+
     val receiptId = "Receipt-ID"
     val receiptTimestamp = "Receipt-Timestamp"
     val receiptSignature = "Receipt-Signature"

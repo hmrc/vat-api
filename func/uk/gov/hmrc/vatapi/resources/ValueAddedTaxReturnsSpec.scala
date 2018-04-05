@@ -19,6 +19,20 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
           "finalised": $finalised
         }"""
 
+  private def requestWithNegativeAmounts(finalised: Boolean = true) =  s"""{
+          "periodKey": "#001",
+          "vatDueSales": 50.00,
+          "vatDueAcquisitions": 100.30,
+          "totalVatDue": 150.30,
+          "vatReclaimedCurrPeriod": 40.00,
+          "netVatDue": 110.30,
+          "totalValueSalesExVAT": -1000,
+          "totalValuePurchasesExVAT": 200.00,
+          "totalValueGoodsSuppliedExVAT": 100.00,
+          "totalAcquisitionsExVAT": 540.00,
+          "finalised": $finalised
+        }"""
+
   "VAT returns submission" should {
 
     "allow users to submit VAT returns" in {
@@ -27,6 +41,22 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .hasHeader("Receipt-Id")
+        .hasHeader("Receipt-Signature")
+        .hasHeader("Receipt-TimeStamp")
+    }
+
+    "allow users to submit VAT returns even with negative amounts" in {
+      given()
+        .nrs().nrsVatReturnSuccessFor(vrn)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(requestWithNegativeAmounts())))
         .thenAssertThat()
         .statusIs(201)
         .bodyHasPath("\\paymentIndicator", "BANK")
