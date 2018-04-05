@@ -32,19 +32,19 @@
       "$ref": "#/definitions/monetaryPos11"
     },
     "totalValueSalesExVAT": {
-      "description": "Total value of sales and all other outputs excluding any VAT. This corresponds to box 6 on the VAT Return form. The value must be between -9999999999999.00 and 9999999999999.00.",
+      "description": "Total value of sales and all other outputs excluding any VAT. This corresponds to box 6 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValuePurchasesExVAT": {
-      "description": "Total value of purchases and all other inputs excluding any VAT (including exempt purchases). This corresponds to box 7 on the VAT Return form. The value must be between -9999999999999.00 and 9999999999999.00.",
+      "description": "Total value of purchases and all other inputs excluding any VAT (including exempt purchases). This corresponds to box 7 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValueGoodsSuppliedExVAT": {
-      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. This corresponds to box 8 on the VAT Return form. The value must be between -9999999999999.00 and 9999999999999.00.",
+      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. This corresponds to box 8 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalAcquisitionsExVAT": {
-      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. This corresponds to box 9 on the VAT Return form. The value must be between -9999999999999.00 and 9999999999999.00.",
+      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. This corresponds to box 9 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     }
   },
