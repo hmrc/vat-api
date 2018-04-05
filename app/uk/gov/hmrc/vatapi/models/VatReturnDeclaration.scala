@@ -23,6 +23,7 @@ import play.api.libs.functional.syntax._
 import uk.gov.hmrc.vatapi.models.Validation._
 import uk.gov.hmrc.vatapi.models.des
 import org.joda.time.DateTime
+import uk.gov.hmrc.vatapi.utils.ImplicitCurrencyFormatter._
 
 case class VatReturnDeclaration(
   periodKey: String,
@@ -46,10 +47,10 @@ case class VatReturnDeclaration(
       vatDueTotal = totalVatDue,
       vatReclaimedCurrPeriod = vatReclaimedCurrPeriod,
       vatDueNet = netVatDue,
-      totalValueSalesExVAT = totalValueSalesExVAT,
-      totalValuePurchasesExVAT = totalValuePurchasesExVAT,
-      totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
-      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT,
+      totalValueSalesExVAT = totalValueSalesExVAT.toDesCurrency,
+      totalValuePurchasesExVAT = totalValuePurchasesExVAT.toDesCurrency,
+      totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT.toDesCurrency,
+      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT.toDesCurrency,
       receivedAt = timestamp
     )
 
