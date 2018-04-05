@@ -791,22 +791,35 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-                          |{
-                          |  "internalId": "some-id",
-                          |  "loginTimes": {
-                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
-                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
-                          |  }
-                          |}
+                         |{
+                         |  "internalId": "some-id",
+                         |  "affinityGroup": "Organisation",
+                         |  "loginTimes": {
+                         |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                         |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                         |  },
+                         |  "authorisedEnrolments": [
+                         |   {
+                         |         "key":"HMRC-MTD-VAT",
+                         |         "identifiers":[
+                         |            {
+                         |               "key":"VRN",
+                         |               "value":"1000051409"
+                         |            }
+                         |         ],
+                         |         "state":"Activated"
+                         |      }
+                         |  ]
+                         |}
                         """.stripMargin)))
 
       this
     }
 
     class Des(givens: Givens) {
-      def isATeapotFor(nino: Nino): Givens = {
+      def isATeapotFor(vrn: Vrn): Givens = {
         stubFor(
-          any(urlMatching(s".*/(calculation-data|nino)/$nino.*"))
+          any(urlMatching(s".*/(calculation-data|vrn)/$vrn.*"))
             .willReturn(aResponse()
               .withStatus(418)))
 

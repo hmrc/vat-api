@@ -27,11 +27,11 @@ import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities,
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FinancialDataResource extends BaseController {
+object FinancialDataResource extends BaseResource {
 
   private val connector = FinancialDataConnector
 
-  def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = Action.async { implicit request =>
+  def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
     fromDes {
       for {
@@ -62,7 +62,7 @@ object FinancialDataResource extends BaseController {
   }
 
 
-  def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = Action.async { implicit request =>
+  def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     Logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
     fromDes {
       for {

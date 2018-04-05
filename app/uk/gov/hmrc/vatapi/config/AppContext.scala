@@ -19,6 +19,7 @@ package uk.gov.hmrc.vatapi.config
 import play.api.Configuration
 import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.vatapi.contexts.VATAuthEnrolments
 
 object AppContext extends ServicesConfig {
   private lazy val config = current.configuration
@@ -42,4 +43,7 @@ object AppContext extends ServicesConfig {
   lazy val authEnabled: Boolean = config.getBoolean(s"$env.microservice.services.auth.enabled").getOrElse(true)
   lazy val mtdDate: String = config.getString(s"$env.mtd-date").getOrElse(throw new RuntimeException("mtd-date is not configured"))
   lazy val xApiKey: String = config.getString(s"$env.access-keys.xApiKey").getOrElse(throw new RuntimeException("X-API-Key is not configured"))
+  lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString("enrolmentToken").getOrElse(throw new RuntimeException("enrolmentToken is not configured")),
+    config.getString("identifier").getOrElse(throw new RuntimeException("identifier is not configured")),
+    config.getString("appName"))
 }

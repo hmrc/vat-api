@@ -38,7 +38,17 @@ traits:
         type: string
         required: false
         example: '-'
-
+  clientOrAgentNotAuthorised:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              clientNotSubscribedToMTD:
+                description: The client and/or agent is not authorised.
+                value:
+                  code: CLIENT_OR_AGENT_NOT_AUTHORISED
 
 /vat:
   /{vrn}:
@@ -54,7 +64,7 @@ traits:
         displayName: Retrieve VAT obligations [test only]
         description: Retrieve VAT obligations
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -121,7 +131,7 @@ traits:
           displayName: View VAT Return [test only]
           description: Retrieve a submitted VAT return
           (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
-          is: [headers.acceptHeader, contentType, testScenarioHeader]
+          is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
           (annotations.scope): "write:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
           responses:
@@ -161,7 +171,7 @@ traits:
         displayName: Submit VAT return for period [test only]
         description: Submit VAT return for period
         (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
         body:
@@ -236,7 +246,7 @@ traits:
         displayName: Retrieve VAT liabilities [test only]
         description: Retrieve VAT liabilities
         (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -288,7 +298,7 @@ traits:
         displayName: Retrieve VAT payments [test only]
         description: Retrieve VAT payments
         (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader]
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:

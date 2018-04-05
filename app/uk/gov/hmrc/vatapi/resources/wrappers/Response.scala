@@ -51,6 +51,8 @@ trait Response {
 
   def underlying: HttpResponse
 
+  def json: JsValue = underlying.json
+
   def jsonOrError: Either[Throwable, JsValue] =
     Try { underlying.json } match {
       case Success(json) => Right(json)

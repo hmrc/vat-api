@@ -39,3 +39,4 @@ object InvalidRequest {
   implicit val writes = Json.writes[InvalidRequest]
 }
 
+case object ErrorClientNotAuthorizedToMTDVAT extends ErrorResponse(403, ErrorCode.CLIENT_OR_AGENT_NOT_AUTHORISED.toString, "The client and/or agent is not authorised.")
