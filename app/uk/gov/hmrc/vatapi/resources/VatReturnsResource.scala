@@ -54,10 +54,8 @@ object VatReturnsResource extends BaseController {
         _ <-  audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
-      Logger.warn(s"\n\n$response\n\n")
       response.filter { case 200 => response.jsonOrError match {
         case Right(vatReturnDesResponse) =>
-
           Logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
           Created(Json.toJson(vatReturnDesResponse)).withHeaders(
             receiptId -> response.nrsData.nrSubmissionId,
@@ -66,10 +64,6 @@ object VatReturnsResource extends BaseController {
           )
       }
       }
-    } recover {
-      case e =>
-        Logger.error(s"\n\nRECOVER:${e.getMessage}\n\n")
-        InternalServerError(e.getMessage)
     }
   }
 
