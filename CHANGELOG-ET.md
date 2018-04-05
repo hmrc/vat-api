@@ -2,6 +2,7 @@
 
 * Modified VAT Returns (Submit 9 Box) to accept whole values ending in '.00' for boxes 7-10.
 * Modified VAT Returns (Submit 9 Box) to accept negative values for boxes 6-9.
+* Modified VAT Obligations dueDate response to be one Calendar month and 7 days after the PeriodEnd
 * Documentation changes for the above.
 * General improvements to documentation.
 

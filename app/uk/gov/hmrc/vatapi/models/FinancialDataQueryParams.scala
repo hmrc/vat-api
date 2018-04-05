@@ -63,6 +63,7 @@ object FinancialDataQueryParams {
   }
 
   def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]): Option[Either[SourceId, Unit] with Product with Serializable] = {
+
     for {
       fromVal <- fromOpt
       if fromVal.isRight
