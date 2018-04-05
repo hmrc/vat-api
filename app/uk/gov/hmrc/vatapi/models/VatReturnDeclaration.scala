@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.vatapi.models
 
-import java.sql.Timestamp
-
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import uk.gov.hmrc.vatapi.models.Validation._
-import uk.gov.hmrc.vatapi.models.des
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import uk.gov.hmrc.vatapi.models.Validation._
 import uk.gov.hmrc.vatapi.utils.ImplicitCurrencyFormatter._
 
 case class VatReturnDeclaration(
