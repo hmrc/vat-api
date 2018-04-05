@@ -5,57 +5,47 @@
   "type": "object",
   "properties": {
     "periodKey": {
-      "title": "Period key",
-      "description": "Period key",
+      "description": "The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol, which must be URL-encoded.",
       "type": "string",
       "minLength": 4,
       "maxLength": 4,
-      "example": "#001"
+      "example": "18AD, 18A1, #001"
     },
     "vatDueSales": {
-      "description": "VAT due on sales and other outputs. Box (1) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg13",
-      "example": "1000.45"
+      "description": "VAT due on sales and other outputs. This corresponds to box 1 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "$ref": "#/definitions/monetaryPosNeg13"
     },
     "vatDueAcquisitions": {
-      "description": "VAT due on acquisitions from other EC Member States. Box (2) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg13",
-      "example": "1000.45"
+      "description": "VAT due on acquisitions from other EC Member States. This corresponds to box 2 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "$ref": "#/definitions/monetaryPosNeg13"
     },
     "totalVatDue": {
-      "description": "Total VAT due (the sum of boxes 1 and 2). Box (3) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg13",
-      "example": "1000.45"
+      "description": "Total VAT due (the sum of vatDueSales and vatDueAcquisitions). This corresponds to box 3 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "$ref": "#/definitions/monetaryPosNeg13"
     },
     "vatReclaimedCurrPeriod": {
-      "description": "VAT reclaimed on purchases and other inputs (including acquisitions from the EC). Box (4) on VAT Return form.",
-      "$ref": "#/definitions/monetaryPosNeg13",
-      "example": "1000.45"
+      "description": "VAT reclaimed on purchases and other inputs (including acquisitions from the EC). This corresponds to box 4 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "$ref": "#/definitions/monetaryPosNeg13"
     },
     "netVatDue": {
-      "description": "The difference between boxes 3 and 4. Deduct the smaller from the larger and enter the difference in box 5. If the figure in box 3 is more than the figure in box 4, the difference is the amount you must pay.",
-      "$ref": "#/definitions/monetaryPos11",
-      "example": "1000.45"
+      "description": "The difference between totalVatDue and vatReclaimedCurrPeriod. This corresponds to box 5 on the VAT Return form. The value must be between 0.00 and 99999999999.99",
+      "$ref": "#/definitions/monetaryPos11"
     },
     "totalValueSalesExVAT": {
-      "description": "Total value of sales and all other outputs excluding any VAT. Box (6) on VAT Return form.",
-      "$ref": "#/definitions/wholePounds",
-      "example": "1000"
+      "description": "Total value of sales and all other outputs excluding any VAT. This corresponds to box 6 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValuePurchasesExVAT": {
-      "description": "Total value of purchases and all other inputs excluding any VAT (including exempt purchases). Box (7) on VAT Return form.",
-      "$ref": "#/definitions/wholePounds",
-      "example": "1000"
+      "description": "Total value of purchases and all other inputs excluding any VAT (including exempt purchases). This corresponds to box 7 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValueGoodsSuppliedExVAT": {
-      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. Box (8) on VAT Return form.",
-      "$ref": "#/definitions/wholePounds",
-      "example": "1000"
+      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. This corresponds to box 8 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalAcquisitionsExVAT": {
-      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. Box (9) on VAT Return form.",
-      "$ref": "#/definitions/wholePounds",
-      "example": "1000"
+      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. This corresponds to box 9 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "$ref": "#/definitions/monetaryPosNegZeroDec13"
     }
   },
   "required": [
@@ -85,11 +75,11 @@
       "maximum": 9999999999999.99,
       "multipleOf": 0.01
     },
-    "wholePounds": {
-      "description": "Defines a whole pounds",
+    "monetaryPosNegZeroDec13": {
+      "description": "Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00",
       "type": "number",
-      "minimum": 0,
-      "maximum": 9999999999999
+      "minimum": -9999999999999.00,
+      "maximum": 9999999999999.00
     }
   },
   "additionalProperties": false

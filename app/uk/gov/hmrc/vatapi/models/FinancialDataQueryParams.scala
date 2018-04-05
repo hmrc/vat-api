@@ -33,8 +33,6 @@ object FinancialDataQueryParams {
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
 
-    Logger.debug(s"[FinancialDataQueryParams][from] FromDate:$fromOpt  toDate:$toOpt  minDate: $minDate")
-
     val from = checkMinFromDate(dateQueryParam(fromOpt, "DATE_FROM_INVALID"))
     val to = checkFutureToDate(dateQueryParam(toOpt, "DATE_TO_INVALID"))
 
@@ -65,8 +63,6 @@ object FinancialDataQueryParams {
   }
 
   def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]): Option[Either[SourceId, Unit] with Product with Serializable] = {
-
-
     for {
       fromVal <- fromOpt
       if fromVal.isRight

@@ -114,9 +114,9 @@ traits:
       /{periodKey}:
         uriParameters:
           periodKey:
-            description: Period key.
+            description: The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the "#" symbol, which must be URL-encoded.
             type: string
-            example: "#001"
+            example: "18AD, 18A1, #001"
         get:
           displayName: View VAT Return [test only]
           description: Retrieve a submitted VAT return
