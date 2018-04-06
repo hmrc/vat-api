@@ -32,7 +32,7 @@ object FinancialDataResource extends BaseResource {
   private val connector = FinancialDataConnector
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
-    Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
+    logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
     fromDes {
       for {
         response <- execute{_ => connector.getFinancialData(vrn, params)}
@@ -47,14 +47,14 @@ object FinancialDataResource extends BaseResource {
               )
               liabilities.liabilities match {
                 case Seq() =>
-                  Logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
+                  logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
-                  Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
                   Ok(Json.toJson(liabilities))
               }
             case Left(ex) =>
-              Logger.error(s"[FinancialDataResource][retrieveLiabilities] Error retrieving Liabilities from DES: ${ex.msg}")
+              logger.error(s"[FinancialDataResource][retrieveLiabilities] Error retrieving Liabilities from DES: ${ex.msg}")
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
@@ -63,7 +63,7 @@ object FinancialDataResource extends BaseResource {
 
 
   def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
-    Logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
+    logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
     fromDes {
       for {
         response <- execute{_ => connector.getFinancialData(vrn, params)}
@@ -73,20 +73,20 @@ object FinancialDataResource extends BaseResource {
         case 200 =>
           response.getPayments(vrn) match {
             case Right(obj) =>
-              Logger.debug(s"[FinancialDataResource][retrievePayments] Successfully retrieved Payments from DES")
+              logger.debug(s"[FinancialDataResource][retrievePayments] Successfully retrieved Payments from DES")
               val payments = Payments(
                 obj.payments.filter(_.taxPeriod.isEmpty) ++ obj.payments.filter(_.taxPeriod.isDefined).filterNot(_.taxPeriod.get.to isAfter params.to)
               )
               payments.payments match {
                 case Seq() =>
-                  Logger.error(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
+                  logger.error(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
-                  Logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
                   Ok(Json.toJson(payments))
               }
             case Left(ex) =>
-              Logger.error(s"[FinancialDataResource][retrievePayments] Error retrieving Payments from DES: ${ex.msg}")
+              logger.error(s"[FinancialDataResource][retrievePayments] Error retrieving Payments from DES: ${ex.msg}")
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }

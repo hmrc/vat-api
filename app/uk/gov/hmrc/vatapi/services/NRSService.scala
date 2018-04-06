@@ -36,10 +36,12 @@ object NRSService extends NRSService {
 }
 
 trait NRSService {
+  val logger: Logger = Logger(this.getClass)
+
   val nrsConnector: NRSConnector
 
   def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
-    Logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
+    logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
     nrsConnector.submit(vrn, convertToNrsSubmission(payload))
   }
 

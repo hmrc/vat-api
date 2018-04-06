@@ -32,13 +32,12 @@ object VatReturnsService extends VatReturnsService {
 }
 
 trait VatReturnsService {
+
+  val logger: Logger = Logger(this.getClass)
   val vatReturnsConnector: VatReturnsConnector
 
   def submit(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
-    Logger.debug(s"[VatReturnsService][submit] - Submitting Vat Return")
+    logger.debug(s"[VatReturnsService][submit] - Submitting Vat Return")
     vatReturnsConnector.post(vrn, vatReturn)
   }
 }
-
-
-

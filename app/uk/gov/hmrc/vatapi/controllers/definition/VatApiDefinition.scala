@@ -26,6 +26,8 @@ import uk.gov.hmrc.vatapi.controllers.definition.ResourceThrottlingTier._
 
 class VatApiDefinition {
 
+  val logger: Logger = Logger(this.getClass)
+
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
 
@@ -120,7 +122,7 @@ class VatApiDefinition {
       case "STABLE" => APIStatus.STABLE
       case "DEPRECATED" => APIStatus.DEPRECATED
       case "RETIRED" => APIStatus.RETIRED
-      case _ => Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+      case _ => logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA
     }
   }

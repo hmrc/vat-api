@@ -43,7 +43,7 @@ object VatReturnsResource extends BaseResource {
     val receiptTimestamp = "Receipt-Timestamp"
     val receiptSignature = "Receipt-Signature"
 
-    Logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
+    logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
     fromDes {
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
@@ -54,7 +54,7 @@ object VatReturnsResource extends BaseResource {
     } onSuccess { response =>
       response.filter { case 200 => response.jsonOrError match {
         case Right(vatReturnDesResponse) =>
-          Logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
+          logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
           Created(Json.toJson(vatReturnDesResponse)).withHeaders(
             receiptId -> response.nrsData.nrSubmissionId,
             receiptTimestamp -> response.nrsData.timestamp,

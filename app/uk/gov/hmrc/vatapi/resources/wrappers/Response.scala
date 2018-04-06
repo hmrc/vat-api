@@ -41,17 +41,15 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
-import scala.util.{Failure, Success, Try}
 
 import scala.PartialFunction.{apply => _, _}
+import scala.util.{Failure, Success, Try}
 
 trait Response {
 
   val logger: Logger = Logger(this.getClass)
 
   def underlying: HttpResponse
-
-  def json: JsValue = underlying.json
 
   def jsonOrError: Either[Throwable, JsValue] =
     Try { underlying.json } match {

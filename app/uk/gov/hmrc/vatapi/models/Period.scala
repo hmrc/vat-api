@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import play.api.libs.json._
-import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class Period(key: String, start: LocalDate, end: LocalDate)
 
