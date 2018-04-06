@@ -42,7 +42,7 @@ object AuthorisationService extends AuthorisedFunctions {
   def authCheck(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
     authoriseAsClient(vrn)
 
-  def getOrganisationReference(enrolments: Enrolments): Option[String] =
+  def getClientReference(enrolments: Enrolments): Option[String] =
     enrolments.enrolments
       .flatMap(_.identifiers)
       .find(_.key == vatAuthEnrolments.identifier)
@@ -57,10 +57,10 @@ object AuthorisationService extends AuthorisedFunctions {
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))
       .retrieve(Retrievals.affinityGroup and Retrievals.authorisedEnrolments) {
         case Some(AffinityGroup.Organisation) ~ enrolments =>
-          logger.debug(s"[AuthorisationService] [authoriseAsClient] Client authorisation succeeded as fully-authorised organisation " +
-            s"for VRN ${getOrganisationReference(enrolments).getOrElse("")}.")
+          logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
+            s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
           Future.successful(Right(Organisation))
-        case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Client authorisation failed due to unsupported affinity group.")
+        case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
   }
@@ -69,8 +69,10 @@ object AuthorisationService extends AuthorisedFunctions {
     case _: InsufficientEnrolments =>
       logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
-    case _ => Future.successful(Left(InternalServerError(toJson(
-      Errors.InternalServerError("[AuthorisationService] [unhandledError] An internal server error occurred")))))
+    case _ =>
+      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error.")
+      Future.successful(Left(InternalServerError(toJson(
+      Errors.InternalServerError("An internal server error occurred")))))
   }
 
 }
