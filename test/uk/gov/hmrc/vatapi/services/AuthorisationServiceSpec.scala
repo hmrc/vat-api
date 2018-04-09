@@ -22,6 +22,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.HeaderNames
 import play.api.test.FakeRequest
+import uk.gov.hmrc.auth.core.InsufficientConfidenceLevel
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
@@ -65,6 +66,13 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()
+        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+      }
+    }
+
+    "verify the auth with invalid client confidenceLevel details" should {
+      "should reject the client " in {
+        setupMockAuthorisationException(new InsufficientConfidenceLevel())
         extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
       }
     }

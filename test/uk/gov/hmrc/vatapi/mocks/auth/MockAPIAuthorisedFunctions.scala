@@ -56,7 +56,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         })
   }
 
-  def setupMockAuthorisationException(exception: AuthorisationException = new InvalidBearerToken): Unit =
+  def setupMockAuthorisationException(exception: AuthorisationException = new InsufficientEnrolments()): Unit =
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
