@@ -18,23 +18,30 @@ package uk.gov.hmrc.vatapi.services
 
 import play.api.Logger
 import play.api.libs.json.Json.toJson
+import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
+import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.config.{AppContext, MicroserviceAuthConnector}
+import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.contexts.{AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object AuthorisationService extends AuthorisedFunctions {
+object AuthorisationService extends AuthorisationService{
+  override val aPIAuthorisedFunctions = APIAuthorisedFunctions
+}
+
+trait AuthorisationService {
   type AuthResult = Either[Result, AuthContext]
 
-  override def authConnector: AuthConnector = MicroserviceAuthConnector
+  val aPIAuthorisedFunctions : APIAuthorisedFunctions
   private lazy val vatAuthEnrolments = AppContext.vatAuthEnrolments
 
   private val logger = Logger(AuthorisationService.getClass)
@@ -52,9 +59,8 @@ object AuthorisationService extends AuthorisedFunctions {
                                               requestHeader: RequestHeader,
                                               ec: ExecutionContext): Future[AuthResult] = {
     logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN ${vrn}.")
-    authorised(
-      Enrolment(vatAuthEnrolments.enrolmentToken)
-        .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))
+    aPIAuthorisedFunctions.authorised(
+      RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)), Json.toJson(ConfidenceLevel.L200)))))
       .retrieve(Retrievals.affinityGroup and Retrievals.authorisedEnrolments) {
         case Some(AffinityGroup.Organisation) ~ enrolments =>
           logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +

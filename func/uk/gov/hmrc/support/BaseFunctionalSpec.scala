@@ -8,7 +8,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import play.api.http.Status
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers.ErrorNotFound
-import uk.gov.hmrc.domain.{Nino, Vrn}
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.models.ErrorNotImplemented
 import uk.gov.hmrc.vatapi.resources.{DesJsons, FuncJsons}
