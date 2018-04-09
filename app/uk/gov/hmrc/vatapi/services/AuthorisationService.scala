@@ -75,6 +75,9 @@ trait AuthorisationService {
     case _: InsufficientEnrolments =>
       logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
+    case _: InsufficientConfidenceLevel =>
+      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
+      Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
     case _ =>
       logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error.")
       Future.successful(Left(InternalServerError(toJson(
