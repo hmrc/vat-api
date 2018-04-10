@@ -47,7 +47,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
   )))
 
   def setupMockAuthRetrievalSuccess[X,Y](retrievalValue: X~Y): Unit = {
-    when(mockAPIAuthorisedFunctions.authorised(RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment("HMRC-MTD-VAT").withIdentifier("VRN", "123456789")), Json.toJson(ConfidenceLevel.L200))))))
+    when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
           override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray.empty), retrieval) {
