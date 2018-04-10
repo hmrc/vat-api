@@ -43,7 +43,7 @@ object AppContext extends ServicesConfig {
   lazy val authEnabled: Boolean = config.getBoolean(s"$env.microservice.services.auth.enabled").getOrElse(true)
   lazy val mtdDate: String = config.getString(s"$env.mtd-date").getOrElse(throw new RuntimeException("mtd-date is not configured"))
   lazy val xApiKey: String = config.getString(s"$env.access-keys.xApiKey").getOrElse(throw new RuntimeException("X-API-Key is not configured"))
-  lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString("enrolmentToken").getOrElse(throw new RuntimeException("enrolmentToken is not configured")),
-    config.getString("identifier").getOrElse(throw new RuntimeException("identifier is not configured")),
-    config.getString("appName"))
+  lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString(s"$env.enrolments.key").getOrElse(throw new RuntimeException("enrolments.key is not configured")),
+    config.getString(s"$env.enrolments.identifier").getOrElse(throw new RuntimeException("identifier is not configured")),
+    config.getString(s"$env.enrolments.auth-rule"))
 }
