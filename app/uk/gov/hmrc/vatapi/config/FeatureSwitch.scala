@@ -30,7 +30,7 @@ case class FeatureSwitch(value: Option[Configuration]) {
   }
 
   def isAgentSimulationFilterEnabled: Boolean = value match {
-    case Some(config) => config.getBoolean("test-scenario-simulation.enabled").getOrElse(false)
+    case Some(config) => config.getBoolean("client-agent-simulation.enabled").getOrElse(false)
     case None => false
   }
 
