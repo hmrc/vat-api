@@ -1,13 +1,22 @@
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.Json
 import uk.gov.hmrc.support.BaseFunctionalSpec
-import uk.gov.hmrc.vatapi.models.{Liabilities, Payments}
 
 class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
   "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
+
+      "reject client with no authorization" in {
+        given()
+          .userIsNotAuthorisedForTheResource
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(403)
+          .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
+      }
+
       "retrieve a single liability where they exist" in {
         given()
           .userIsFullyAuthorisedForTheResource

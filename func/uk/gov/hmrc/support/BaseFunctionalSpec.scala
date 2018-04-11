@@ -494,6 +494,18 @@ trait BaseFunctionalSpec extends TestApplication {
       this
     }
 
+    def userWithInsufficientConfidenceLevel: Givens = {
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(
+            aResponse()
+              .withStatus(401)
+              .withHeader("Content-Length", "0")
+              .withHeader("WWW-Authenticate",
+                "MDTP detail=\"InsufficientConfidenceLevel\"")))
+      this
+    }
+
     def userIsPartiallyAuthorisedForTheResource: Givens = {
 
       // First call to auth to check if fully authorised should fail.
@@ -815,6 +827,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
       this
     }
+
 
     class Des(givens: Givens) {
       def isATeapotFor(vrn: Vrn): Givens = {

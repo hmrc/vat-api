@@ -69,6 +69,16 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .hasHeader("Receipt-TimeStamp")
     }
 
+    "reject client with no authorization" in {
+      given()
+        .userIsNotAuthorisedForTheResource
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
+    }
+
     "not allow users to submit undeclared VAT returns" in {
       given()
         .userIsFullyAuthorisedForTheResource
@@ -184,6 +194,16 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .get(s"/$vrn/returns/0001")
         .thenAssertThat()
         .statusIs(500)
+    }
+
+    "reject client with no authorization" in {
+      given()
+        .userIsNotAuthorisedForTheResource
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
     }
 
     "return bad request (400) if the vrn is invalid" in {
