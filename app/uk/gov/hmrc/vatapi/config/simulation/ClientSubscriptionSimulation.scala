@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.models
+package uk.gov.hmrc.vatapi.config.simulation
 
-import org.joda.time.LocalDate
-import play.api.libs.json._
+import play.api.libs.json.Json
+import play.api.mvc.Results.Status
+import play.api.mvc.{RequestHeader, Result}
+import uk.gov.hmrc.vatapi.models.ErrorClientNotAuthorizedToMTDVAT
 
-case class Period(key: String, start: LocalDate, end: LocalDate)
+import scala.concurrent.{ExecutionContext, Future}
 
-object Period {
-  implicit val format: Format[Period] = Json.format[Period]
+object ClientSubscriptionSimulation extends Simulation {
+  override def apply(f: (RequestHeader) => Future[Result], rh: RequestHeader, method: String)(implicit ec: ExecutionContext): Future[Result] = {
+    Future.successful(Status(ErrorClientNotAuthorizedToMTDVAT.httpStatusCode)(Json.toJson(ErrorClientNotAuthorizedToMTDVAT)))
+  }
 }

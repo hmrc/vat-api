@@ -8,7 +8,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import play.api.http.Status
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers.ErrorNotFound
-import uk.gov.hmrc.domain.{Nino, Vrn}
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.models.ErrorNotImplemented
 import uk.gov.hmrc.vatapi.resources.{DesJsons, FuncJsons}
@@ -494,6 +494,18 @@ trait BaseFunctionalSpec extends TestApplication {
       this
     }
 
+    def userWithInsufficientConfidenceLevel: Givens = {
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(
+            aResponse()
+              .withStatus(401)
+              .withHeader("Content-Length", "0")
+              .withHeader("WWW-Authenticate",
+                "MDTP detail=\"InsufficientConfidenceLevel\"")))
+      this
+    }
+
     def userIsPartiallyAuthorisedForTheResource: Givens = {
 
       // First call to auth to check if fully authorised should fail.
@@ -791,22 +803,36 @@ trait BaseFunctionalSpec extends TestApplication {
             aResponse()
               .withStatus(200)
               .withBody("""
-                          |{
-                          |  "internalId": "some-id",
-                          |  "loginTimes": {
-                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
-                          |     "previousLogin": "2016-11-01T12:00:00.000Z"
-                          |  }
-                          |}
+                         |{
+                         |  "internalId": "some-id",
+                         |  "affinityGroup": "Organisation",
+                         |  "loginTimes": {
+                         |     "currentLogin": "2016-11-27T09:00:00.000Z",
+                         |     "previousLogin": "2016-11-01T12:00:00.000Z"
+                         |  },
+                         |  "authorisedEnrolments": [
+                         |   {
+                         |         "key":"HMRC-MTD-VAT",
+                         |         "identifiers":[
+                         |            {
+                         |               "key":"VRN",
+                         |               "value":"1000051409"
+                         |            }
+                         |         ],
+                         |         "state":"Activated"
+                         |      }
+                         |  ]
+                         |}
                         """.stripMargin)))
 
       this
     }
 
+
     class Des(givens: Givens) {
-      def isATeapotFor(nino: Nino): Givens = {
+      def isATeapotFor(vrn: Vrn): Givens = {
         stubFor(
-          any(urlMatching(s".*/(calculation-data|nino)/$nino.*"))
+          any(urlMatching(s".*/(calculation-data|vrn)/$vrn.*"))
             .willReturn(aResponse()
               .withStatus(418)))
 
