@@ -34,6 +34,9 @@ object VatReturnsOrchestrator extends VatReturnsOrchestrator {
 }
 
 trait VatReturnsOrchestrator {
+
+  val logger: Logger = Logger(this.getClass)
+
   val nrsService: NRSService
   val vatReturnsService: VatReturnsService
 
@@ -41,13 +44,13 @@ trait VatReturnsOrchestrator {
                       vatReturn: VatReturnDeclaration
                      )(implicit hc: HeaderCarrier): Future[Either[ErrorResult, VatReturnResponse]] = {
 
-    Logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
+    logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
     nrsService.submit(vrn, vatReturn) map {
       case Right(nrsData) =>
-        Logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS: $nrsData")
+        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS: $nrsData")
         vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp))) map { response => Right(response withNrsData nrsData)}
       case Left(e) =>
-        Logger.warn(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
+        logger.warn(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
     }
   }.flatMap{s => s}

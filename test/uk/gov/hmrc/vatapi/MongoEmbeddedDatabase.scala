@@ -45,6 +45,7 @@ trait MongoEmbeddedDatabase extends UnitSpec with BeforeAndAfterAll with BeforeA
 }
 
 object MongoEmbeddedDatabase {
+  val logger: Logger = Logger(this.getClass)
   private val diskPort = 27017
   private val embeddedPort = 12345
   private val localhost = "127.0.0.1"
@@ -60,7 +61,7 @@ object MongoEmbeddedDatabase {
 
   private def startEmbeddedMongo() = this.synchronized {
     if (mongod == null && useEmbeddedMongo) {
-      Logger.info("Starting embedded mongo")
+      logger.info("Starting embedded mongo")
       mongodExe = MongodStarter
         .getInstance(runtimeConfig)
         .prepare(new MongodConfigBuilder()

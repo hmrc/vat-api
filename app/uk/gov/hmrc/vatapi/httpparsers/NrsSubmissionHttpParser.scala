@@ -23,25 +23,27 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object NrsSubmissionHttpParser {
 
+  val logger: Logger = Logger(this.getClass)
+
   type NrsSubmissionOutcome = Either[NrsSubmissionFailure, NRSData]
 
   implicit object NrsSubmissionOutcomeReads extends HttpReads[NrsSubmissionOutcome] {
     override def read(method: String, url: String, response: HttpResponse): NrsSubmissionOutcome = {
-      Logger.debug(s"[NrsSubmissionHttpParser][#reads] - Reading NRS Response")
+      logger.debug(s"[NrsSubmissionHttpParser][#reads] - Reading NRS Response")
       response.status match {
         case ACCEPTED =>
           response.json.validate[NRSData].fold(
             invalid => {
-              Logger.warn(s"[NrsSubmissionHttpParser][#reads] - Error reading NRS Response: $invalid")
+              logger.warn(s"[NrsSubmissionHttpParser][#reads] - Error reading NRS Response: $invalid")
               Left(NrsError)
             },
             valid =>{
-              Logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
               Right(valid)
             }
           )
         case e =>
-          Logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e BODY: ${response.body}")
+          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e BODY: ${response.body}")
           Left(NrsError)
       }
     }
