@@ -1,16 +1,26 @@
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.Json
 import uk.gov.hmrc.support.BaseFunctionalSpec
-import uk.gov.hmrc.vatapi.models.{Liabilities, Payments}
 
 class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
   "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
+
+      "reject client with no authorization" in {
+        given()
+          .userIsNotAuthorisedForTheResource
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(403)
+          .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
+      }
+
       "retrieve a single liability where they exist" in {
-        given().
-          des().FinancialData.singleLiabilityFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.singleLiabilityFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -19,8 +29,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
 
       "retrieve a single liability where the minimum data exists" in {
-        given().
-          des().FinancialData.minLiabilityFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.minLiabilityFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -28,8 +39,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.minLiability.toString)
       }
       "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
-        given().
-          des().FinancialData.overlappingLiabilitiesFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.overlappingLiabilitiesFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -38,8 +50,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
 
       "retrieve multiple liabilities where they exist" in {
-        given().
-          des().FinancialData.multipleLiabilitiesFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.multipleLiabilitiesFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
@@ -49,6 +62,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "return a 404 (Not Found) if no liabilities exist" in {
         given()
+          .userIsFullyAuthorisedForTheResource
           .des().FinancialData.emptyLiabilitiesFor(vrn)
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
@@ -97,8 +111,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
   "FinancialDataResource.getPayments" when {
     "a valid request is made" should {
       "retrieve a single payment where they exist" in {
-        given().
-          des().FinancialData.singlePaymentFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.singlePaymentFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -106,8 +121,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.onePayment.toString)
       }
       "retrieve a single payment where the minimum data exists" in {
-        given().
-          des().FinancialData.minPaymentFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.minPaymentFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -116,8 +132,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
 
       "return only those payments belonging to a liability that falls before the 'to' date" in {
-        given().
-          des().FinancialData.overlappingPaymentsFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.overlappingPaymentsFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
@@ -126,8 +143,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
 
       "retrieve multiple payments where they exist" in {
-        given().
-          des().FinancialData.multiplePaymentsFor(vrn)
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.multiplePaymentsFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
@@ -137,6 +155,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "return a 404 (Not Found) if no payments exist" in {
         given()
+          .userIsFullyAuthorisedForTheResource
           .des().FinancialData.emptyPaymentsFor(vrn)
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")

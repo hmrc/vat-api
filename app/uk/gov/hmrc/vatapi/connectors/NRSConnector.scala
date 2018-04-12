@@ -49,6 +49,8 @@ object NRSConnector extends NRSConnector {
 
 trait NRSConnector extends BaseConnector {
 
+  val logger: Logger = Logger(this.getClass)
+
   private val xApiKeyHeader = "X-API-Key"
 
   val nrsSubmissionUrl: String => String = vrn => s"${AppContext.nrsServiceUrl}/submission/$vrn"
@@ -57,7 +59,7 @@ trait NRSConnector extends BaseConnector {
 
     val submitUrl = nrsSubmissionUrl(vrn.toString)
 
-    Logger.debug(s"[NRSConnector][submit] - POST $submitUrl")
+    logger.debug(s"[NRSConnector][submit] - POST $submitUrl")
     http.POST[NRSSubmission, NrsSubmissionOutcome](submitUrl, nrsSubmission)(
       implicitly[Writes[NRSSubmission]],
       NrsSubmissionOutcomeReads,

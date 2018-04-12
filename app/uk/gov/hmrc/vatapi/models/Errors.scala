@@ -62,7 +62,7 @@ object Errors {
   object NotFound extends Error("NOT_FOUND", "The remote endpoint has indicated that no data can be found", None)
   object DateRangeTooLarge extends Error("DATE_RANGE_TOO_LARGE", "The date of the requested return cannot be further than four years from the current date.", None)
   object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
-
+  object ClientOrAgentNotAuthorized extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.", None)
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")

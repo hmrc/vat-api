@@ -32,20 +32,18 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object VatReturnsResource extends BaseController {
-
-  val logger: Logger = Logger(this.getClass)
+object VatReturnsResource extends BaseResource {
 
   private val connector = VatReturnsConnector
   private val orchestrator = VatReturnsOrchestrator
 
-  def submitVatReturn(vrn: Vrn): Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn).async(parse.json) { implicit request =>
 
     val receiptId = "Receipt-ID"
     val receiptTimestamp = "Receipt-Timestamp"
     val receiptSignature = "Receipt-Signature"
 
-    Logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
+    logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
     fromDes {
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
@@ -56,7 +54,7 @@ object VatReturnsResource extends BaseController {
     } onSuccess { response =>
       response.filter { case 200 => response.jsonOrError match {
         case Right(vatReturnDesResponse) =>
-          Logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
+          logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
           Created(Json.toJson(vatReturnDesResponse)).withHeaders(
             receiptId -> response.nrsData.nrSubmissionId,
             receiptTimestamp -> response.nrsData.timestamp,
@@ -68,7 +66,8 @@ object VatReturnsResource extends BaseController {
   }
 
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
-    Action.async { implicit request =>
+    APIAction(vrn).async { implicit request =>
+      logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for the VRN : $vrn")
       fromDes {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }

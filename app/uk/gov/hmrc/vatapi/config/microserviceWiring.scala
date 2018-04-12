@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.vatapi.config
 
-import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
-import uk.gov.hmrc.play.audit.http.HttpAuditing
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
-import uk.gov.hmrc.play.audit.http.config.AuditingConfig
-import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
+import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
-import play.api.Configuration
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.audit.http.HttpAuditing
+import uk.gov.hmrc.play.audit.http.config.AuditingConfig
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
+import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
+import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
 
 object MicroserviceAuditConnector extends AuditConnector {
   lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"auditing")
@@ -51,6 +50,8 @@ trait WSHttp
 
 object WSHttp extends WSHttp
 
-object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp {
+object MicroserviceAuthConnector extends AuthConnector with PlayAuthConnector with ServicesConfig with WSHttp {
   override val authBaseUrl: String = baseUrl("auth")
+  override val serviceUrl: String = baseUrl("auth")
+  override lazy val http = WSHttp
 }

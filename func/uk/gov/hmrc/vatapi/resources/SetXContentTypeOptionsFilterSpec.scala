@@ -26,6 +26,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied for obligations " in {
       given()
+        .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsFor(vrn)
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
@@ -46,6 +47,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied when obligations does not exist" in {
       given()
+        .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
