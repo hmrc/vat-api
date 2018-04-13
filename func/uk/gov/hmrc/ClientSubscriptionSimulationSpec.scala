@@ -11,7 +11,7 @@ class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheResource
         .when()
-        .get(s"/$vrn/returns/0001")
+        .get(s"/vat/returns/vrn/$vrn")
         .withHeaders(GovTestScenarioHeader, "CLIENT_OR_AGENT_NOT_AUTHORISED")
         .thenAssertThat()
         .statusIs(403)

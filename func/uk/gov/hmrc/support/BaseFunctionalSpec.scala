@@ -913,7 +913,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
         def expectVatReturnRetrieveToFail(vrn: Vrn, code: String, reason: String = "Irrelevant"): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=0001"))
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=0001"))
               .willReturn(
                 aResponse()
                   .withStatus(403)
@@ -930,7 +930,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
         def expectVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
               .willReturn(
                 aResponse()
                   .withStatus(200)
@@ -957,7 +957,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
         def expectInvalidVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
               .willReturn(
                 aResponse()
                   .withStatus(200)
@@ -969,7 +969,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
         def expectNonExistentVrnFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
-            get(urlEqualTo(s"/enterprise/return/vat/$vrn?periodKey=$periodKey"))
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
               .willReturn(aResponse().withStatus(404))
           )
           givens

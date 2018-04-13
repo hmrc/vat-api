@@ -26,7 +26,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.config.WSHttp
+import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
@@ -56,7 +56,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
 
   "VatReturnsConnector.post" should {
 
-    lazy val testUrl: String = TestVatReturnsConnector.vatReturnsUrl+s"/$testVrn"
+    lazy val testUrl: String = s"${AppContext.desUrl}/enterprise/return/vat/" + testVrn
     def result(requestBody: des.VatReturnDeclaration): Future[VatReturnResponse] = TestVatReturnsConnector.post(testVrn, requestBody)
 
     "return a VatReturnsResponse model with correct body in case of success" in {
