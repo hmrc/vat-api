@@ -33,16 +33,22 @@ object VatReturnsConnector extends VatReturnsConnector {
 
 trait VatReturnsConnector extends BaseConnector {
 
-  lazy val vatReturnsUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
+  def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
 
-  def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] =
+    val postUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
+
     httpPost[des.VatReturnDeclaration, VatReturnResponse](
-      url        = s"$vatReturnsUrl/$vrn",
-      elem       = vatReturn,
+      url = s"$postUrl/$vrn",
+      elem = vatReturn,
       toResponse = VatReturnResponse
     )
+  }
 
-  def query(vrn: Vrn, periodKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] =
-    httpGet[VatReturnResponse](s"$vatReturnsUrl/$vrn?periodKey=${URLEncoder.encode(periodKey, "UTF-8")}", VatReturnResponse)
+  def query(vrn: Vrn, periodKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
+
+    val getUrl: String = s"${AppContext.desUrl}/vat/returns/vrn/$vrn?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
+
+    httpGet[VatReturnResponse](getUrl, VatReturnResponse)
+  }
 
 }
