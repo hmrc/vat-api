@@ -22,7 +22,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
-import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DATE_RANGE_TOO_LARGE, DUPLICATE_SUBMISSION, INVALID_ARN, INVALID_PAYLOAD, INVALID_PERIODKEY, INVALID_VRN}
+import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, VatReturn, des}
 import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
 
@@ -51,6 +51,7 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
     case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
+    case 403 if errorCodeIsOneOf(VRN_NOT_FOUND) => InternalServerError(toJson(Errors.InternalServerError))
   }
 }
 

@@ -229,6 +229,17 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\errors(0)\\code", "DATE_RANGE_TOO_LARGE")
     }
 
+    "return internal server error (500) if the vat returns with DES vrn not found error" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "VRN_NOT_FOUND")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    }
+
     "return bad request (400) if the periodKey is invalid" in {
       given()
         .userIsFullyAuthorisedForTheResource
