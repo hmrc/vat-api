@@ -22,8 +22,8 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.vatapi.auth.{AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
-import uk.gov.hmrc.vatapi.contexts.{AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.Future

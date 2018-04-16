@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.config
 import play.api.Configuration
 import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.vatapi.contexts.VATAuthEnrolments
+import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 
 object AppContext extends ServicesConfig {
   private lazy val config = current.configuration

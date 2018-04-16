@@ -26,9 +26,9 @@ import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
+import uk.gov.hmrc.vatapi.auth.AffinityGroupToAuthContext._
+import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AffinityGroupToAuthContext, AuthContext}
 import uk.gov.hmrc.vatapi.config.AppContext
-import uk.gov.hmrc.vatapi.contexts.{AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
@@ -62,10 +62,11 @@ trait AuthorisationService {
     aPIAuthorisedFunctions.authorised(
       RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))))))
       .retrieve(Retrievals.affinityGroup and Retrievals.authorisedEnrolments) {
-        case Some(AffinityGroup.Organisation) ~ enrolments =>
-          logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
+        case retrieval@Some(AffinityGroup.Organisation|AffinityGroup.Individual) ~ enrolments =>
+          val authAffinityGroup = retrieval.a.get
+          logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised ${authContext(authAffinityGroup).affinityGroup} " +
             s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
-          Future.successful(Right(Organisation))
+          Future.successful(Right(authContext(authAffinityGroup)))
         case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
@@ -83,5 +84,4 @@ trait AuthorisationService {
       Future.successful(Left(InternalServerError(toJson(
       Errors.InternalServerError("An internal server error occurred")))))
   }
-
 }
