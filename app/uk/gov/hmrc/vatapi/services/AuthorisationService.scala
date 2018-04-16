@@ -60,8 +60,7 @@ trait AuthorisationService {
                                               ec: ExecutionContext): Future[AuthResult] = {
     logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN ${vrn}.")
     aPIAuthorisedFunctions.authorised(
-      RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)),
-        Json.parse(s"""{"confidenceLevel": ${ConfidenceLevel.L200}}""")))))
+      RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))))))
       .retrieve(Retrievals.affinityGroup and Retrievals.authorisedEnrolments) {
         case Some(AffinityGroup.Organisation) ~ enrolments =>
           logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
