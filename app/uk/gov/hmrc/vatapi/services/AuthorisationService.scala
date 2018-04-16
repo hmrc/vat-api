@@ -79,8 +79,8 @@ trait AuthorisationService {
     case _: InsufficientConfidenceLevel =>
       logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
-    case _ =>
-      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error.")
+    case exception@_ =>
+      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
       Future.successful(Left(InternalServerError(toJson(
       Errors.InternalServerError("An internal server error occurred")))))
   }

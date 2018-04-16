@@ -21,13 +21,17 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.HeaderNames
+import play.api.libs.json.Json.toJson
+import play.api.mvc.Results
+import play.api.mvc.Results.Forbidden
 import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.InsufficientConfidenceLevel
+import uk.gov.hmrc.auth.core.{InsufficientConfidenceLevel, UnsupportedAuthProvider}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.contexts.Organisation
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
+import uk.gov.hmrc.vatapi.models.Errors
 
 import scala.concurrent.ExecutionContext
 import scala.util.Right
@@ -73,7 +77,16 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with invalid client confidenceLevel details" should {
       "should reject the client " in {
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
-        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+          Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
+      }
+    }
+
+    "verify the auth with unexpected auth error" should {
+      "should reject the client " in {
+        setupMockAuthorisationException(new UnsupportedAuthProvider)
+        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+          Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
       }
     }
   }
