@@ -22,15 +22,18 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
+import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.httpparsers.NrsError
 import uk.gov.hmrc.vatapi.mocks.services.{MockNRSService, MockVatReturnsService}
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
+import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
 
@@ -46,6 +49,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with Mocki
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContext, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
 
   val vatReturnSuccessResponse = VatReturnResponse(HttpResponse(OK, responseJson = Some(Json.toJson(vatReturnsDes))))
   val vatReturninvalidPayloadResponse =

@@ -21,6 +21,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.HeaderNames
+import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Results
 import play.api.mvc.Results.Forbidden
@@ -29,7 +30,8 @@ import uk.gov.hmrc.auth.core.{InsufficientConfidenceLevel, UnsupportedAuthProvid
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.auth.{Individual, Organisation}
+import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
+import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
@@ -40,13 +42,13 @@ import scala.util.Right
 class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockAPIAuthorisedFunctions {
 
   object TestAuthorisationService extends AuthorisationService {
-    override val aPIAuthorisedFunctions = mockAPIAuthorisedFunctions
+    override val apiAuthorisedFunctions: APIAuthorisedFunctions = mockAPIAuthorisedFunctions
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val testDateTime: DateTime = DateTime.now()
 
-  lazy val fakeRequestWithActiveSession = FakeRequest().withSession(
+  lazy val fakeRequestWithActiveSession: FakeRequest[_] = FakeRequest().withSession(
     SessionKeys.lastRequestTimestamp -> "1498236506662",
     SessionKeys.authToken -> "Bearer Token"
   ).withHeaders(
@@ -63,14 +65,14 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(Organisation)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(testAuthIndividualSuccessResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(Individual)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
       }
     }
 
@@ -86,6 +88,14 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
         extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
+      }
+    }
+
+    "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
+      "reject the client" in {
+        setupMockAuthorisationException(new JsResultException(errors = Seq()))
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        Left(Forbidden(toJson(Errors.InternalServerError)))
       }
     }
 

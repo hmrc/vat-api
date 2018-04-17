@@ -20,12 +20,13 @@ import org.mockito.Matchers
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.JsArray
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,7 +35,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
 
   self: Suite =>
 
-  val mockAPIAuthorisedFunctions = mock[APIAuthorisedFunctions]
+  val mockAPIAuthorisedFunctions: APIAuthorisedFunctions = mock[APIAuthorisedFunctions]
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -42,13 +43,59 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
     setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
   }
 
-  val testAuthOrganisationSuccessResponse = new ~(Option(AffinityGroup.Organisation), Enrolments(Set(
-    Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "134567890")), "activated")
-  )))
+  val testAuthOrganisationSuccessResponse =
+    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      Option(AffinityGroup.Organisation),
+      Enrolments(Set(
+        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+      orgIdentityData.internalId),
+      orgIdentityData.externalId),
+      None),
+      orgIdentityData.credentials),
+      orgIdentityData.confidenceLevel),
+      None),
+      None),
+      orgIdentityData.name)
+      ,None),
+      orgIdentityData.email),
+      orgIdentityData.agentInformation),
+      orgIdentityData.groupIdentifier),
+      orgIdentityData.credentialRole),
+      None),
+      orgIdentityData.itmpName),
+      None),
+      orgIdentityData.itmpAddress)
+      ,
+      orgIdentityData.credentialStrength),
+      orgIdentityData.loginTimes
+    )
 
-  val testAuthIndividualSuccessResponse = new ~(Option(AffinityGroup.Individual), Enrolments(Set(
-    Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "123456789")), "activated")
-  )))
+  val testAuthIndividualSuccessResponse =
+    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      Option(AffinityGroup.Individual),
+      Enrolments(Set(
+        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+      orgIdentityData.internalId),
+      orgIdentityData.externalId),
+      None),
+      orgIdentityData.credentials),
+      orgIdentityData.confidenceLevel),
+      None),
+      None),
+      orgIdentityData.name)
+      ,None),
+      orgIdentityData.email),
+      orgIdentityData.agentInformation),
+      orgIdentityData.groupIdentifier),
+      orgIdentityData.credentialRole),
+      None),
+      orgIdentityData.itmpName),
+      None),
+      orgIdentityData.itmpAddress)
+      ,
+      orgIdentityData.credentialStrength),
+      orgIdentityData.loginTimes
+    )
 
   def setupMockAuthRetrievalSuccess[X,Y](retrievalValue: X~Y): Unit = {
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
@@ -60,7 +107,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         })
   }
 
-  def setupMockAuthorisationException(exception: AuthorisationException = new InsufficientEnrolments()): Unit =
+  def setupMockAuthorisationException(exception: Exception = new InsufficientEnrolments()): Unit =
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
