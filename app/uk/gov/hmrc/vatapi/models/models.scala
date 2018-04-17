@@ -101,6 +101,13 @@ package object models {
     def trimNullable: Reads[Option[String]] = reads.map(_.map(_.trim))
   }
 
+  val isoInstantDatePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+
+  implicit val isoInstantDateFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.jodaDateReads(isoInstantDatePattern),
+    JodaWrites.jodaDateWrites(isoInstantDatePattern)
+  )
+
   val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
   implicit val dateTimeFormat: Format[DateTime] = Format[DateTime](

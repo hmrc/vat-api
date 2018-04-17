@@ -503,6 +503,32 @@ trait BaseFunctionalSpec extends TestApplication {
               .withBody("""
                          |{
                          |  "internalId": "some-id",
+                         |  "externalId": "some-id",
+                         |  "credentials" : {"providerId":"8124873381064832", "providerType":"GovernmentGateway"},
+                         |  "confidenceLevel": 200,
+                         |  "name": { "name": "test", "lastName": "test" },
+                         |  "dateOfBirth": "1985-01-01",
+                         |  "postCode":"NW94HD",
+                         |  "description" : "description",
+                         |  "agentInformation": {
+                         |        "agentCode" : "TZRXXV",
+                         |        "agentFriendlyName" : "Bodgitt & Legget LLP",
+                         |        "agentId": "BDGL"
+                         |    },
+                         |  "groupIdentifier" : "GroupId",
+                         |  "credentialRole": "admin",
+                         |  "itmpName" : { "givenName": "test", "middleName": "test", "familyName": "test" },
+                         |  "itmpDateOfBirth" : "1985-01-01",
+                         |  "itmpAddress" : {
+                         |    "line1" : "Line 1",
+                         |    "line2" : "",
+                         |    "line3" : "",
+                         |    "line4" : "",
+                         |    "line5" : "",
+                         |    "postCode" :"NW94HD",
+                         |    "countryName" : "United Kingdom",
+                         |    "countryCode" : "UK"
+                         |    },
                          |  "affinityGroup": "Organisation",
                          |  "loginTimes": {
                          |     "currentLogin": "2016-11-27T09:00:00.000Z",
@@ -522,7 +548,6 @@ trait BaseFunctionalSpec extends TestApplication {
                          |  ]
                          |}
                         """.stripMargin)))
-
       this
     }
 
@@ -799,7 +824,7 @@ trait BaseFunctionalSpec extends TestApplication {
 
     class Nrs(givens: Givens) {
       def nrsVatReturnSuccessFor(vrn: Vrn): Givens = {
-        stubFor(any(urlMatching(s".*/submission/$vrn.*"))
+        stubFor(any(urlMatching(s".*/submission.*"))
             .willReturn(
               aResponse()
                 .withStatus(Status.ACCEPTED)

@@ -17,13 +17,69 @@
 package uk.gov.hmrc.vatapi.assets
 
 import nrs.models._
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.DateTime
+import play.api.libs.json.Json
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.vatapi.auth.{AuthContext, Individual, Organisation}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator
 import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
 
 object TestConstants {
+
+  object Auth {
+
+    val orgIdentityData  = IdentityData(
+      internalId = Some("Int-a7688cda-d983-472d-9971-ddca5f124641"),
+      externalId = Some("Ext-c4ebc935-ac7a-4cc2-950a-19e6fac91f2a"),
+      agentCode = None,
+      credentials = retrieve.Credentials(
+        providerId = "8124873381064832",
+        providerType = "GovernmentGateway"
+      ),
+      confidenceLevel = ConfidenceLevel.L200,
+      name = Name(
+        name = Some("TestUser"),
+        lastName = None
+      ),
+      email = Some("user@test.com"),
+      agentInformation = AgentInformation(
+        agentCode = None,
+        agentFriendlyName = None,
+        agentId = None
+      ),
+      groupIdentifier = Some("testGroupId-840cf4e3-c8ad-48f4-80fd-ea267f916be5"),
+      credentialRole = Some(User),
+      itmpName = ItmpName(
+        givenName = Some("a"),
+        middleName = Some("b"),
+        familyName = Some("c")
+      ),
+      itmpAddress = ItmpAddress(
+        line1 = Some("1"),
+        line2 = Some("2"),
+        line3 = Some("3"),
+        line4 = Some("4"),
+        line5 = Some("5"),
+        postCode = Some("cw93nm"),
+        countryName = Some("uk"),
+        countryCode = Some("uk")
+      ),
+      affinityGroup = Some(AffinityGroup.Organisation),
+      credentialStrength = Some("strong"),
+      loginTimes = LoginTimes(
+        currentLogin = DateTime.parse("2018-04-16T11:00:55Z"),
+        previousLogin = None
+      )
+    )
+
+    val indIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Individual))
+
+    val orgAuthContext: AuthContext = Organisation(Some(orgIdentityData))
+    val indAuthContext: AuthContext = Individual(Some(indIdentityData))
+  }
 
   object VatReturn {
     val vatReturnDeclaration = VatReturnDeclaration(
@@ -58,22 +114,30 @@ object TestConstants {
     val nrsSubmission: NRSSubmission = NRSSubmission(
       payload = "payload",
       metadata = Metadata(
-        businessId = "",
-        notableEvent = "",
-        payloadContentType = "",
-        payloadSha256Checksum = Some(""),
-        userSubmissionTimestamp = DateTime.parse("2018-06-30T01:20"),
-        identityData = IdentityData(
-
-        ),
+        businessId = "vat",
+        notableEvent = "vat-return",
+        payloadContentType = "application/json",
+        payloadSha256Checksum = None,
+        userSubmissionTimestamp = timestamp,
+        identityData = Some(Auth.orgIdentityData),
         userAuthToken = "",
-        headerData = HeaderData(
-
-        ),
+        headerData = Json.toJson(
+          s"""
+             |{
+             |"Gov-Client-Public-IP":"198.51.100.0",
+             |"Gov-Client-Public-Port":"12345",
+             |"Gov-Client-Device-ID":"beec798b-b366-47fa-b1f8-92cede14a1ce",
+             |"Gov-Client-User-ID":"alice_desktop",
+             |"Gov-Client-Timezone":"GMT+3",
+             |"Gov-Client-Local-IP":"10.1.2.3",
+             |"Gov-Client-Screen-Resolution":"1920x1080",
+             |"Gov-Client-Window-Size":"1256x803",
+             |"Gov-Client-Colour-Depth":"24"
+             |}
+           """.stripMargin),
         searchKeys = SearchKeys(
-          vrn = Vrn("123456789"),
-          companyName = "",
-          taxPeriodEndDate = LocalDate.parse("2018-06-30")
+          vrn = Some(Vrn("123456789")),
+          periodKey = Some("AA34")
         )
       )
     )

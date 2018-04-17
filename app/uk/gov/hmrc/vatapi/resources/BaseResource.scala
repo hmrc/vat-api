@@ -45,7 +45,7 @@ trait BaseResource extends BaseController {
           case Left(authError) => Left(authError)
         }
       } else
-          Future.successful(Right(new AuthRequest(Organisation, request)))
+          Future.successful(Right(new AuthRequest(Organisation(), request)))
   }
 
   def APIAction(vrn: Vrn, summary: Option[String] = None): ActionBuilder[AuthRequest] =

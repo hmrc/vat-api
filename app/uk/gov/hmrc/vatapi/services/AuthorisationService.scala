@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.vatapi.services
 
+import nrs.models.IdentityData
 import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.{JsArray, JsResultException, Json}
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
@@ -27,7 +28,7 @@ import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.auth.AffinityGroupToAuthContext._
-import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AffinityGroupToAuthContext, AuthContext}
+import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AuthContext}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
@@ -35,13 +36,13 @@ import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 import scala.concurrent.{ExecutionContext, Future}
 
 object AuthorisationService extends AuthorisationService{
-  override val aPIAuthorisedFunctions = APIAuthorisedFunctions
+  override val apiAuthorisedFunctions: APIAuthorisedFunctions.type = APIAuthorisedFunctions
 }
 
 trait AuthorisationService {
   type AuthResult = Either[Result, AuthContext]
 
-  val aPIAuthorisedFunctions : APIAuthorisedFunctions
+  val apiAuthorisedFunctions: APIAuthorisedFunctions
   private lazy val vatAuthEnrolments = AppContext.vatAuthEnrolments
 
   private val logger = Logger(AuthorisationService.getClass)
@@ -56,17 +57,39 @@ trait AuthorisationService {
       .map(_.value)
 
   private def authoriseAsClient(vrn: Vrn)(implicit hc: HeaderCarrier,
-                                              requestHeader: RequestHeader,
-                                              ec: ExecutionContext): Future[AuthResult] = {
-    logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN ${vrn}.")
-    aPIAuthorisedFunctions.authorised(
+                                          requestHeader: RequestHeader,
+                                          ec: ExecutionContext): Future[AuthResult] = {
+    import Retrievals._
+
+    logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN $vrn.")
+    apiAuthorisedFunctions.authorised(
       RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))))))
-      .retrieve(Retrievals.affinityGroup and Retrievals.authorisedEnrolments) {
-        case retrieval@Some(AffinityGroup.Organisation|AffinityGroup.Individual) ~ enrolments =>
-          val authAffinityGroup = retrieval.a.get
-          logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised ${authContext(authAffinityGroup).affinityGroup} " +
+      .retrieve(
+        affinityGroup and authorisedEnrolments
+        and internalId and externalId and agentCode and credentials
+        and confidenceLevel and nino and saUtr and name and dateOfBirth
+        and email and agentInformation and groupIdentifier and credentialRole
+        and mdtpInformation and itmpName and itmpDateOfBirth and itmpAddress
+        and credentialStrength and loginTimes
+      ){
+        case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
+          ~ confLevel ~ ni ~ saRef ~ nme ~ dob
+          ~ eml ~ agInfo ~ groupId ~ credRole
+          ~ mdtpInfo ~ iname ~ idob ~ iaddress
+          ~ credStrength ~ logins
+            if affGroup.contains(AffinityGroup.Organisation) | affGroup.contains(AffinityGroup.Individual) =>
+
+          val identityData =
+            IdentityData(
+              inId, exId, agCode, creds,
+              confLevel, ni, saRef, nme, dob,
+              eml, agInfo, groupId,
+              credRole, mdtpInfo, iname, idob,
+              iaddress, affGroup, credStrength, logins)
+          val afGroup = affGroup.get
+          logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
             s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
-          Future.successful(Right(authContext(authAffinityGroup)))
+          Future.successful(Right(authContext(afGroup,Some(identityData))))
         case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
@@ -74,14 +97,17 @@ trait AuthorisationService {
 
   private def unauthorisedError: PartialFunction[Throwable, Future[AuthResult]] = {
     case _: InsufficientEnrolments =>
-      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
     case _: InsufficientConfidenceLevel =>
-      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
+    case _: JsResultException =>
+      logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
+      Future.successful(Left(Forbidden(toJson(Errors.InternalServerError))))
     case exception@_ =>
-      logger.error(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
       Future.successful(Left(InternalServerError(toJson(
-      Errors.InternalServerError("An internal server error occurred")))))
+        Errors.InternalServerError("An internal server error occurred")))))
   }
 }

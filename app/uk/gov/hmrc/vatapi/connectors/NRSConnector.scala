@@ -53,7 +53,7 @@ trait NRSConnector extends BaseConnector {
 
   private val xApiKeyHeader = "X-API-Key"
 
-  val nrsSubmissionUrl: String => String = vrn => s"${AppContext.nrsServiceUrl}/submission/$vrn"
+  val nrsSubmissionUrl: String => String = vrn => s"${AppContext.nrsServiceUrl}/submission"
 
   def submit(vrn: Vrn, nrsSubmission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
 

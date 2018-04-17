@@ -22,6 +22,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
+import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
 
@@ -42,7 +43,7 @@ trait VatReturnsOrchestrator {
 
   def submitVatReturn(vrn: Vrn,
                       vatReturn: VatReturnDeclaration
-                     )(implicit hc: HeaderCarrier): Future[Either[ErrorResult, VatReturnResponse]] = {
+                     )(implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
 
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
     nrsService.submit(vrn, vatReturn) map {

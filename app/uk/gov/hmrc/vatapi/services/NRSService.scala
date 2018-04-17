@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import nrs.models._
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
@@ -28,6 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
+import uk.gov.hmrc.vatapi.resources.AuthRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,33 +41,29 @@ trait NRSService {
 
   val nrsConnector: NRSConnector
 
-  def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
+  def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
-    nrsConnector.submit(vrn, convertToNrsSubmission(payload))
+    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload))
   }
 
-  private def convertToNrsSubmission(payload: VatReturnDeclaration): NRSSubmission = {
+  private def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {
 
+    // TODO - Add in validation to get rid of .get
     val encoder = Base64.getEncoder
     NRSSubmission(
       payload = encoder.encodeToString(Json.toJson(payload).toString.getBytes(StandardCharsets.UTF_8)),
       metadata = Metadata(
-        businessId = "",
-        notableEvent = "",
-        payloadContentType = "",
-        payloadSha256Checksum = Some(""),
-        userSubmissionTimestamp = DateTime.parse("2018-06-30T01:20"),
-        identityData = IdentityData(
-
-        ),
-        userAuthToken = "",
-        headerData = HeaderData(
-
-        ),
+        businessId = "vat",
+        notableEvent = "vat-return",
+        payloadContentType = "application/json",
+        payloadSha256Checksum = None,
+        userSubmissionTimestamp = DateTime.now(),
+        identityData = request.authContext.identityData,
+        userAuthToken = request.headers.get("Authorization").get,
+        headerData = Json.toJson(request.headers.toMap.map { h => h._1 -> h._2.head}),
         searchKeys = SearchKeys(
-          vrn = Vrn("123456789"),
-          companyName = "",
-          taxPeriodEndDate = LocalDate.parse("2018-06-30")
+          vrn = Some(vrn),
+          periodKey = Some(payload.periodKey)
         )
       )
     )

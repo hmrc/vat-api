@@ -18,28 +18,35 @@ package uk.gov.hmrc.vatapi.auth
 import uk.gov.hmrc.auth.core.AffinityGroup
 import AuthConstants._
 
+import nrs.models.IdentityData
+
 sealed trait AuthContext {
   val affinityGroup: String
   val agentCode: Option[String]
   val agentReference: Option[String]
   val userType: String
+
+  val identityData: Option[IdentityData]
 }
 
-case object Organisation extends AuthContext {
+case class Organisation(override val identityData: Option[IdentityData] = None) extends AuthContext {
   override val affinityGroup: String = ORGANISATION
   override val agentCode: Option[String] = None
   override val agentReference: Option[String] = None
   override val userType = "OrgVatPayer"
 }
 
-case object Individual extends AuthContext {
+case class Individual(override val identityData: Option[IdentityData]) extends AuthContext {
   override val affinityGroup: String = INDIVIDUAL
   override val agentCode: Option[String] = None
   override val agentReference: Option[String] = None
   override val userType = "IndVatPayer"
 }
 
-case class Agent(override val agentCode: Option[String], override val agentReference: Option[String]) extends AuthContext {
+case class Agent(override val agentCode: Option[String],
+                 override val agentReference: Option[String],
+                 override val identityData: Option[IdentityData] = None
+                ) extends AuthContext {
   override val affinityGroup: String = "agent"
   override val userType = "Agent"
 }
@@ -47,10 +54,10 @@ case class Agent(override val agentCode: Option[String], override val agentRefer
 case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
 
 object AffinityGroupToAuthContext {
-  def authContext(affinityGroup: AffinityGroup) = {
+  def authContext(affinityGroup: AffinityGroup, identityData: Option[IdentityData]) = {
     affinityGroup.getClass.getSimpleName.dropRight(1) match {
-      case ORGANISATION => Organisation
-      case INDIVIDUAL => Individual
+      case ORGANISATION => Organisation(identityData)
+      case INDIVIDUAL => Individual(identityData)
     }
   }
 }
