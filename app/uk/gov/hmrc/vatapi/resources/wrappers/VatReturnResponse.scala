@@ -31,13 +31,17 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
   def vatReturnOrError: Either[DesTransformError, VatReturn] = {
 
     def deserialise(js: JsValue) = js.validate[des.VatReturn] match {
-      case JsError(errors) => Left(ParseError(s"Unable to parse the response from DES as Json: $errors"))
+      case JsError(errors) => Left(ParseError(s"Json format from DES doesn't match the VatReturn model: $errors"))
       case JsSuccess(vatReturn, _) => DesTransformValidator[des.VatReturn, VatReturn].from(vatReturn)
     }
 
     jsonOrError match {
-      case Left(e) => Left(ParseError(s"Unable to parse the response from DES as Json: ${e.getMessage}"))
-      case Right(js) => deserialise(js)
+      case Left(e) =>
+        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : ${underlying.body}")
+        Left(ParseError(s"Unable to parse the response from DES as Json: ${e.getMessage}"))
+      case Right(js) =>
+        logger.info(s"[VatReturnResponse][vatReturnOrError] Json response body from DES : ${js}")
+        deserialise(js)
     }
   }
 

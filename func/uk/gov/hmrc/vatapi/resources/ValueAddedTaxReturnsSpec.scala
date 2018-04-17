@@ -196,6 +196,16 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .statusIs(500)
     }
 
+    "return internal server error on empty body response" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().vatReturns.expectEmptyVatReturnSearchFor(vrn, "0001")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(500)
+    }
+
     "reject client with no authorization" in {
       given()
         .userIsNotAuthorisedForTheResource

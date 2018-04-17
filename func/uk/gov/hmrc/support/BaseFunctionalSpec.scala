@@ -665,6 +665,18 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
+        def expectEmptyVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
+              .willReturn(
+                aResponse()
+                  .withStatus(200)
+                  .withBody("")
+              )
+          )
+          givens
+        }
+
         def expectNonExistentVrnFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
             get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
