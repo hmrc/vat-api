@@ -596,6 +596,30 @@ trait BaseFunctionalSpec extends TestApplication {
 
           givens
         }
+
+        def returnObligationsWithoutIdentificationFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withHeader("CorrelationId", "abc")
+                .withBody(DesJsons.ObligationsWithoutIdentification(vrn.toString()))))
+
+          givens
+        }
+
+        def returnObligationsWithIdentificationButNoIncomeSourceTypeFor(vrn: Vrn): Givens = {
+          stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withHeader("CorrelationId", "abc")
+                .withBody(DesJsons.ObligationsWithNoIncomeSourceType(vrn.toString()))))
+
+          givens
+        }
       }
 
       object vatReturns {
