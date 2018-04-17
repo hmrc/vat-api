@@ -39,10 +39,14 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
   override def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockAPIAuthorisedFunctions)
-    setupMockAuthRetrievalSuccess(testAuthSuccessResponse)
+    setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
   }
 
-  val testAuthSuccessResponse = new ~(Option(AffinityGroup.Organisation), Enrolments(Set(
+  val testAuthOrganisationSuccessResponse = new ~(Option(AffinityGroup.Organisation), Enrolments(Set(
+    Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "134567890")), "activated")
+  )))
+
+  val testAuthIndividualSuccessResponse = new ~(Option(AffinityGroup.Individual), Enrolments(Set(
     Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "123456789")), "activated")
   )))
 

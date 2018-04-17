@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.contexts
+package uk.gov.hmrc.vatapi.auth
+import uk.gov.hmrc.auth.core.AffinityGroup
+import AuthConstants._
 
 sealed trait AuthContext {
   val affinityGroup: String
@@ -24,10 +26,17 @@ sealed trait AuthContext {
 }
 
 case object Organisation extends AuthContext {
-  override val affinityGroup: String = "organisation"
+  override val affinityGroup: String = ORGANISATION
   override val agentCode: Option[String] = None
   override val agentReference: Option[String] = None
   override val userType = "OrgVatPayer"
+}
+
+case object Individual extends AuthContext {
+  override val affinityGroup: String = INDIVIDUAL
+  override val agentCode: Option[String] = None
+  override val agentReference: Option[String] = None
+  override val userType = "IndVatPayer"
 }
 
 case class Agent(override val agentCode: Option[String], override val agentReference: Option[String]) extends AuthContext {
@@ -36,4 +45,18 @@ case class Agent(override val agentCode: Option[String], override val agentRefer
 }
 
 case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
+
+object AffinityGroupToAuthContext {
+  def authContext(affinityGroup: AffinityGroup) = {
+    affinityGroup.getClass.getSimpleName.dropRight(1) match {
+      case ORGANISATION => Organisation
+      case INDIVIDUAL => Individual
+    }
+  }
+}
+
+object AuthConstants {
+  val ORGANISATION = "Organisation"
+  val INDIVIDUAL = "Individual"
+}
 

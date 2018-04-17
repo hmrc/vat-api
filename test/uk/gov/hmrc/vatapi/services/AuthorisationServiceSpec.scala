@@ -29,7 +29,7 @@ import uk.gov.hmrc.auth.core.{InsufficientConfidenceLevel, UnsupportedAuthProvid
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.contexts.Organisation
+import uk.gov.hmrc.vatapi.auth.{Individual, Organisation}
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
@@ -57,13 +57,20 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
 
   "TestAuthorisationService.authCheck" when {
 
-    lazy val testVrn: Vrn = Vrn("123456789")
-    lazy val invalidVrn: Vrn = Vrn("111111111")
+    val testVrn: Vrn = Vrn("123456789")
+    val invalidVrn: Vrn = Vrn("111111111")
 
-    "verify the auth with valid client details" should {
+    "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
-        setupMockAuthRetrievalSuccess(testAuthSuccessResponse)
+        setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
         extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(Organisation)
+      }
+    }
+
+    "verify the auth with valid individual client details" should {
+      "should return valid auth enrolments" in {
+        setupMockAuthRetrievalSuccess(testAuthIndividualSuccessResponse)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(Individual)
       }
     }
 
