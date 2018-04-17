@@ -91,6 +91,28 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
     }
 
+    "return code 200 with a set of obligations with out identifications" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.returnObligationsWithoutIdentificationFor(vrn)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(200)
+        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
+    }
+
+    "return code 200 with a set of obligations with identifications but no incomeSourceType" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.returnObligationsWithIdentificationButNoIncomeSourceTypeFor(vrn)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(200)
+        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
+    }
+
     "reject client with no authorization" in {
       given()
         .userIsNotAuthorisedForTheResource

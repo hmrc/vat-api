@@ -37,7 +37,7 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {
       errorMessage = "Obligation for VAT type was not found."
-      obligation.obligations.find(obj => obj.identification.referenceNumber == vrn.toString() && obj.identification.referenceType == "VRN").fold(noneFound) {
+      obligation.obligations.find(obj => obj.obligationDetails.nonEmpty).fold(noneFound) {
         desObligation =>
           val obligationsOrError: Seq[Either[DesTransformError, Obligation]] = for {
             details <- desObligation.obligationDetails
