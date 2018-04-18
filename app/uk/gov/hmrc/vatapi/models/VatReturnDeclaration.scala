@@ -44,10 +44,10 @@ case class VatReturnDeclaration(
       vatDueTotal = totalVatDue,
       vatReclaimedCurrPeriod = vatReclaimedCurrPeriod,
       vatDueNet = netVatDue,
-      totalValueSalesExVAT = totalValueSalesExVAT.toDesCurrency,
-      totalValuePurchasesExVAT = totalValuePurchasesExVAT.toDesCurrency,
-      totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT.toDesCurrency,
-      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT.toDesCurrency,
+      totalValueSalesExVAT = totalValueSalesExVAT,
+      totalValuePurchasesExVAT = totalValuePurchasesExVAT,
+      totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
+      totalAllAcquisitionsExVAT = totalAcquisitionsExVAT,
       receivedAt = timestamp
     )
 
@@ -81,8 +81,7 @@ object VatReturnDeclaration {
       Seq(
         Validation[VatReturnDeclaration](
           JsPath \ "totalVatDue",
-          vatReturn =>
-            vatReturn.totalVatDue == vatReturn.vatDueSales + vatReturn.vatDueAcquisitions,
+          vatReturn => vatReturn.totalVatDue == vatReturn.vatDueSales + vatReturn.vatDueAcquisitions,
           JsonValidationError(
             "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
             ErrorCode.VAT_TOTAL_VALUE)

@@ -51,4 +51,12 @@ trait MockHttp extends MockitoSugar with BeforeAndAfterEach { this: Suite =>
     ).thenReturn(
       Future.successful(response))
   }
+
+  def setupMockHttpPostString[R](url: String, elem: String)(response: R): OngoingStubbing[Future[R]] ={
+    when(
+      mockHttp.POSTString[R](Matchers.eq(url), Matchers.eq[String](elem), Matchers.any[Seq[(String, String)]]())
+        (Matchers.any[HttpReads[R]](), Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]())
+    ).thenReturn(
+      Future.successful(response))
+  }
 }

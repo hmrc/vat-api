@@ -60,12 +60,12 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
     def result(requestBody: des.VatReturnDeclaration): Future[VatReturnResponse] = TestVatReturnsConnector.post(testVrn, requestBody)
 
     "return a VatReturnsResponse model with correct body in case of success" in {
-      setupMockHttpPost(testUrl, desVatReturnDeclaration(testDateTime))(successResponse)
+      setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
       await(result(desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
     }
 
     "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" in {
-      setupMockHttpPost(testUrl, desVatReturnDeclaration(testDateTime))(invalidPayloadResponse)
+      setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
       await(result(desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(invalidPayloadResponse)
     }
   }

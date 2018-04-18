@@ -17,34 +17,21 @@
 package uk.gov.hmrc.vatapi.models.des
 
 import org.joda.time.DateTime
-import play.api.libs.json._
 import uk.gov.hmrc.vatapi.UnitSpec
+import uk.gov.hmrc.vatapi.assets.TestConstants
 
 class VatReturnDeclarationSpec extends UnitSpec {
-  "VatReturnDeclaration" should {
+  "Des VatReturnDeclaration" should {
     "correctly convert to Json" in {
 
-      val receivedAt = new DateTime(2018,12,11,9,8,7)
+      val receivedAt = new DateTime(2018,12,11,9,8,7).toDateTimeISO
 
-      val json: JsObject = Json.obj(
-        "periodKey" -> JsString("#001"),
-        "vatDueSales" -> JsNumber(50.00),
-        "vatDueAcquisitions" -> JsNumber(100.30),
-        "vatDueTotal" -> JsNumber(50.00),
-        "vatReclaimedCurrPeriod" -> JsNumber(40.00),
-        "vatDueNet" -> JsNumber(110.30),
-        "totalValueSalesExVAT" -> JsString("1000.00"),
-        "totalValuePurchasesExVAT" -> JsString("200.00"),
-        "totalValueGoodsSuppliedExVAT" -> JsString("100.00"),
-        "totalAllAcquisitionsExVAT" -> JsString("540.00"),
-        "receivedAt" -> JsString(receivedAt.toString("yyyy-MM-dd'T'HH:mm:ss.SSSZ"))
-      )
+      val actualDesVatReturn = TestConstants.VatReturn.desVatReturnDeclaration(receivedAt)
 
-      val model = VatReturnDeclaration(
-        "#001", 50.00, 100.30, 50.00, 40.00, 110.30, "1000.00", "200.00", "100.00", "540.00", None, receivedAt
-      )
+      val expectedDesVATReturnJsonString =
+        """{"periodKey":"#001","vatDueSales":-3600.15,"vatDueAcquisitions":12000.05,"vatDueTotal":8399.90,"vatReclaimedCurrPeriod":124.15,"vatDueNet":8275.75,"totalValueSalesExVAT":1000.00,"totalValuePurchasesExVAT":200.00,"totalValueGoodsSuppliedExVAT":100.00,"totalAllAcquisitionsExVAT":540.00,"receivedAt":"2018-12-11T09:08:07.000Z"}"""
 
-      Json.toJson(model) shouldBe json
+      actualDesVatReturn.toJsonString shouldBe expectedDesVATReturnJsonString
     }
   }
 }

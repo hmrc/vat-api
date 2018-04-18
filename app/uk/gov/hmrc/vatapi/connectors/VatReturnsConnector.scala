@@ -37,9 +37,9 @@ trait VatReturnsConnector extends BaseConnector {
 
     val postUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
 
-    httpPost[des.VatReturnDeclaration, VatReturnResponse](
+    httpDesPostString[VatReturnResponse](
       url = s"$postUrl/$vrn",
-      elem = vatReturn,
+      elem = vatReturn.toJsonString,
       toResponse = VatReturnResponse
     )
   }
