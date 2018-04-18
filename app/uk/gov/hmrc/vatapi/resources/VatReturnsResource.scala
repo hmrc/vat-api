@@ -75,7 +75,7 @@ object VatReturnsResource extends BaseResource {
           case 200 => response.vatReturnOrError match {
             case Right(vatReturn) => Ok(Json.toJson(vatReturn))
             case Left(error) =>
-              logger.error(error.msg)
+              logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
               InternalServerError
           }
         }
