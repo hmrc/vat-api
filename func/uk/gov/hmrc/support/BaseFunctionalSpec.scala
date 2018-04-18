@@ -702,6 +702,32 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
+        def expectVatReturnSearchForWithoutReceivedAt(vrn: Vrn, periodKey: String): Givens = {
+          stubFor(
+            get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))
+              .willReturn(
+                aResponse()
+                  .withStatus(200)
+                  .withBody("""
+                    {
+                      "periodKey": "0001",
+                      "inboundCorrespondenceFromDate": "2017-01-01",
+                      "inboundCorrespondenceToDate": "2017-12-31",
+                      "vatDueSales": 100.25,
+                      "vatDueAcquisitions": 100.25,
+                      "vatDueTotal": 200.50,
+                      "vatReclaimedCurrPeriod": 100.25,
+                      "vatDueNet": 100.25,
+                      "totalValueSalesExVAT": 100,
+                      "totalValuePurchasesExVAT": 100,
+                      "totalValueGoodsSuppliedExVAT": 100,
+                      "totalAllAcquisitionsExVAT": 100
+                    }""")
+              )
+          )
+          givens
+        }
+
         def expectInvalidVatReturnSearchFor(vrn: Vrn, periodKey: String): Givens = {
           stubFor(
             get(urlEqualTo(s"/vat/returns/vrn/$vrn?period-key=$periodKey"))

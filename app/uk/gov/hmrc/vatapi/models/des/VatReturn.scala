@@ -35,7 +35,7 @@ case class VatReturn(periodKey: String,
                      totalValueGoodsSuppliedExVAT: Amount,
                      totalAllAcquisitionsExVAT: Amount,
                      agentReferenceNumber: Option[String] = None,
-                     receivedAt: DateTime)
+                     receivedAt: Option[DateTime] = None)
 
 object VatReturn {
   implicit val reads: Format[VatReturn] = Json.format[VatReturn]

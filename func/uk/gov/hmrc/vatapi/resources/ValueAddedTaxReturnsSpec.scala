@@ -194,6 +194,26 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\totalAcquisitionsExVAT", 100)
     }
 
+    "allow users to retrieve VAT returns without receivedAt field for last four years" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().vatReturns.expectVatReturnSearchForWithoutReceivedAt(vrn, "0001")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(200)
+        .bodyHasPath("\\periodKey", "0001")
+        .bodyHasPath("\\vatDueSales", 100.25)
+        .bodyHasPath("\\vatDueAcquisitions", 100.25)
+        .bodyHasPath("\\totalVatDue", 200.50)
+        .bodyHasPath("\\vatReclaimedCurrPeriod", 100.25)
+        .bodyHasPath("\\netVatDue", 100.25)
+        .bodyHasPath("\\totalValueSalesExVAT", 100)
+        .bodyHasPath("\\totalValuePurchasesExVAT", 100)
+        .bodyHasPath("\\totalValueGoodsSuppliedExVAT", 100)
+        .bodyHasPath("\\totalAcquisitionsExVAT", 100)
+    }
+
     "return internal server error on malformed response" in {
       given()
         .userIsFullyAuthorisedForTheResource

@@ -25,18 +25,20 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
   def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
     val desObligations = jsonOrError match {
-      case Right(js) => js.asOpt[des.Obligations]
-      case _ => None
+      case Right(js) =>
+        logger.info(s"[ObligationsResponse][desObligations] Json response body from DES : ${js}")
+        js.asOpt[des.Obligations]
+      case _ => logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.body}")
+        None
     }
     var errorMessage = s"The response from DES does not match the expected format. JSON: [$jsonOrError]"
 
     def noneFound: Either[DesTransformError, Option[Obligations]] = {
-      logger.error(errorMessage)
+      logger.error(s"[ObligationsResponse][noneFound] The response from DES does not match the expected format. JSON: ${underlying.body}")
       Right(None)
     }
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {
-      errorMessage = "Obligation for VAT type was not found."
       obligation.obligations.find(obj => obj.obligationDetails.nonEmpty).fold(noneFound) {
         desObligation =>
           val obligationsOrError: Seq[Either[DesTransformError, Obligation]] = for {
