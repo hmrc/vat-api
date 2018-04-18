@@ -19,7 +19,8 @@ package uk.gov.hmrc.vatapi
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, PostHttpTransport}
+import uk.gov.hmrc.play.http.ws.WSPost
 import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
@@ -33,7 +34,7 @@ trait BaseConnector {
 
   private val logger = Logger("connectors")
 
-  private def withDesHeaders(hc: HeaderCarrier): HeaderCarrier = {
+  private def withDesHeaders: HeaderCarrier => HeaderCarrier = { hc =>
     val newHc: HeaderCarrier = hc
       .copy(authorization = Some(Authorization(s"Bearer ${AppContext.desToken}")))
       .withExtraHeaders(
@@ -45,14 +46,15 @@ trait BaseConnector {
     // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
     //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
     //       and remove it from "otherHeaders" to prevent it from being removed again.
-    hc.otherHeaders
+    val lastHc = hc.otherHeaders
       .find { case (name, _) => name == GovTestScenarioHeader }
       .map(newHc.withExtraHeaders(_))
       .map(headers => headers.copy(otherHeaders = headers.otherHeaders.filterNot(_._1 == GovTestScenarioHeader)))
       .getOrElse(newHc)
+        lastHc
   }
 
-  def withTestHeader(hc: HeaderCarrier): HeaderCarrier = {
+  def withTestHeader: HeaderCarrier => HeaderCarrier = { hc =>
     val newHc: HeaderCarrier = hc
       .copy()
       .withExtraHeaders(
@@ -67,6 +69,10 @@ trait BaseConnector {
       .map(newHc.withExtraHeaders(_))
       .map(headers => headers.copy(otherHeaders = headers.otherHeaders.filterNot(_._1 == GovTestScenarioHeader)))
       .getOrElse(newHc)
+  }
+
+  def withContentTypeJsonHeader : HeaderCarrier => HeaderCarrier = { hc =>
+        hc.copy().withExtraHeaders(("Content-Type" -> "application/json"))
   }
 
   private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
@@ -108,5 +114,11 @@ trait BaseConnector {
     implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url, withTestHeader) {
       http.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
+    }
+
+  def httpDesPostString[R <: Response](url: String, elem: String, toResponse: HttpResponse => R)(
+    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
+    withAdditionalHeaders[R](url, withContentTypeJsonHeader andThen withTestHeader andThen withDesHeaders) {
+      http.POSTString(url, elem)(NoExceptionsReads, _, ec) map toResponse
     }
 }

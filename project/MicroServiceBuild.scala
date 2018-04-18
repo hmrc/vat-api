@@ -32,7 +32,9 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
     "ai.x" %% "play-json-extensions" % "0.10.0",
     "com.typesafe.play" %% "play-json-joda" % "2.6.7",
-    "org.typelevel" %% "cats-core" % "1.0.0-RC1"
+    "org.typelevel" %% "cats-core" % "1.0.0-RC1",
+    "org.json4s" %% "json4s-native" % "3.5.3",
+    "org.json4s" %% "json4s-ext" % "3.5.3"
   )
 
   trait TestDependencies {

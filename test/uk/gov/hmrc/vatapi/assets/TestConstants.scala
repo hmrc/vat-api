@@ -84,19 +84,22 @@ object TestConstants {
   object VatReturn {
     val vatReturnDeclaration = VatReturnDeclaration(
       periodKey = "#001",
-      vatDueSales = 50.00,
-      vatDueAcquisitions = 100.30,
-      totalVatDue = 150.30,
-      vatReclaimedCurrPeriod = 40.00,
-      netVatDue = 110.30,
+      vatDueSales = -3600.15,
+      vatDueAcquisitions = 12000.05,
+      totalVatDue = 8399.90,
+      vatReclaimedCurrPeriod = 124.15,
+      netVatDue = 8275.75,
       totalValueSalesExVAT = 1000,
-      totalValuePurchasesExVAT = 200.00,
-      totalValueGoodsSuppliedExVAT = 100.00,
-      totalAcquisitionsExVAT = 540.00,
+      totalValuePurchasesExVAT = 200,
+      totalValueGoodsSuppliedExVAT = 100,
+      totalAcquisitionsExVAT = 540,
       finalised = true
     )
 
-    val desVatReturnDeclaration: DateTime => des.VatReturnDeclaration = time => vatReturnDeclaration.toDes().copy(receivedAt = time)
+    val desVatReturnDeclaration : DateTime =>  des.VatReturnDeclaration = time => vatReturnDeclaration.toDes().copy(receivedAt = time)
+
+    val desVatReturnDeclarationAsJsonString : des.VatReturnDeclaration => String = desVatReturnDeclaration =>
+      desVatReturnDeclaration.toJsonString
 
     val vatReturnsDes = des.VatReturnsDES(
       processingDate = DateTime.parse("2018-06-30T01:20"),
