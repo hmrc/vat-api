@@ -36,7 +36,7 @@ object ObligationsResource extends BaseResource {
   private val connector = ObligationsConnector
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
-    logger.debug(s"[ObligationsResource][retrieveObligations] - Get Obligations")
+    logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for vrn : $vrn")
     fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }
@@ -48,7 +48,7 @@ object ObligationsResource extends BaseResource {
           response.obligations(vrn) match {
             case Right(obj) => obj.map(x => Ok(Json.toJson(x))).getOrElse(NotFound)
             case Left(ex) =>
-              logger.error(ex.msg)
+              logger.error(s"[ObligationsResource][retrieveObligations] Json format from DES doesn't match the Obligations model: ${ex.msg}")
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
