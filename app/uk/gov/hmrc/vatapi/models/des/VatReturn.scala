@@ -23,8 +23,6 @@ import uk.gov.hmrc.vatapi.models.Amount
 import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturn(periodKey: String,
-                     inboundCorrespondenceFromDate: String,
-                     inboundCorrespondenceToDate: String,
                      vatDueSales: Amount,
                      vatDueAcquisitions: Amount,
                      vatDueTotal: Amount,
