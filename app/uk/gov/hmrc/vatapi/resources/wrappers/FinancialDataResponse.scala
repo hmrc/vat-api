@@ -30,13 +30,17 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
   def getLiabilities(vrn: Vrn): Either[DesTransformError, Liabilities] = {
 
     def deserialise(js: JsValue) = js.validate[des.FinancialData] match {
-      case JsError(errors) => Left(ParseError(s"Unable to parse the response from DES as Json: $errors"))
+      case JsError(errors) => Left(ParseError(s"[FinancialDataResponse][getLiabilities - deserialise] Json format from DES doesn't match the FinancialData model:  $errors"))
       case JsSuccess(financialData, _) =>
         DesTransformValidator[des.FinancialData, Liabilities].from(financialData)
     }
     jsonOrError match {
-      case Right(js) => deserialise(js)
-      case Left(e) => Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
+      case Right(js) =>
+        logger.info(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES : ${js}")
+        deserialise(js)
+      case Left(e) =>
+        logger.error(s"[FinancialDataResponse][getLiabilities - jsonOrError] Non json response from DES : ${underlying.body}")
+        Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
     }
   }
 
