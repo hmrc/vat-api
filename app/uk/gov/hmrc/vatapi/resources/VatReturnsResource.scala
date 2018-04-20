@@ -17,7 +17,9 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
+import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsNull, JsValue, Json, OFormat}
+import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.AuditEvent
@@ -48,15 +50,19 @@ object VatReturnsResource extends BaseResource {
         _ <-  audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
-      response.filter { case 200 => response.jsonOrError match {
-        case Right(vatReturnDesResponse) =>
-          logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
-          Created(Json.toJson(vatReturnDesResponse)).withHeaders(
-            receiptId -> response.nrsData.nrSubmissionId,
-            receiptTimestamp -> response.nrsData.timestamp,
-            receiptSignature -> response.nrsData.cadesTSignature
-          )
-      }
+      response.filter {
+        case 200 => response.jsonOrError match {
+          case Right(vatReturnDesResponse) =>
+            logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
+            Created(Json.toJson(vatReturnDesResponse)).withHeaders(
+              receiptId -> response.nrsData.nrSubmissionId,
+              receiptTimestamp -> response.nrsData.timestamp,
+              receiptSignature -> response.nrsData.cadesTSignature
+            )
+          case Left(error) =>
+            logger.error(s"[VatReturnsResource] [submitVatReturn] Non json response from DES : ${error.getLocalizedMessage}")
+            InternalServerError(toJson(Errors.InternalServerError))
+        }
       }
     }
   }

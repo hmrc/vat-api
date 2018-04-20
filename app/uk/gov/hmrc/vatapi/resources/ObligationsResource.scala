@@ -47,8 +47,8 @@ object ObligationsResource extends BaseResource {
         case 200 =>
           response.obligations(vrn) match {
             case Right(obj) => obj.map(x => Ok(Json.toJson(x))).getOrElse(NotFound)
-            case Left(ex) =>
-              logger.error(s"[ObligationsResource][retrieveObligations] Json format from DES doesn't match the Obligations model: ${ex.msg}")
+            case _ =>
+              logger.error(s"[ObligationsResource][retrieveObligations] Json format from DES doesn't match the Obligations model: ${response.underlying.body}")
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
