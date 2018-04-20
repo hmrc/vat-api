@@ -54,9 +54,7 @@ trait Response {
   def jsonOrError: Either[Throwable, JsValue] =
     Try { underlying.json } match {
       case Success(json) => Right(json)
-      case Failure(e)    =>
-        logger.error(s"[VatReturnResponse][vatReturnOrError] Response from DES ${underlying.body}")
-        Left(e)
+      case Failure(e)    => Left(e)
     }
 
   val status: Int = underlying.status

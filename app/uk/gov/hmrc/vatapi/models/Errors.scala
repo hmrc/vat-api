@@ -18,6 +18,8 @@ package uk.gov.hmrc.vatapi.models
 
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode.ErrorCode
+import uk.gov.hmrc.vatapi.models.des.DesError
+import uk.gov.hmrc.vatapi.models.des.DesErrorCode.INVALID_INCLUDELOCKS
 
 object Errors {
 
@@ -39,6 +41,12 @@ object Errors {
   }
 
   case class Error(code: String, message: String, path: Option[String])
+
+  case class DesError(code: String, reason: String)
+
+  object DesError {
+    implicit val reads: Reads[DesError] = Json.reads[DesError]
+  }
 
   case class BadRequest(errors: Seq[Error], message: String) {
     val code = "INVALID_REQUEST"
@@ -64,6 +72,16 @@ object Errors {
   object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
   object ClientOrAgentNotAuthorized extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.", None)
   object InvalidVatSubmission extends Error("INVALID_SUBMISSION", "The VAT return submitted contains invalid data.", None)
+  object InvalidIdType extends Error("INVALID_IDTYPE", "The provided data is failed validation, invalid idType", None)
+  object InvalidIdNumber extends Error("INVALID_IDNUMBER", "The provided data is failed validation, invalid idNumber", None)
+  object InvalidStatus extends Error("INVALID_STATUS", "The provided data is failed validation, invalid status", None)
+  object InvalidRegime extends Error("INVALID_STATUS", "The provided data is failed validation, invalid regimeType", None)
+  object NotFoundBPKey extends Error("NOT_FOUND_BPKEY", "The business partner key information cannot be found for the idNumber.", None)
+  object InvalidOnlyOpenItems extends Error("INVALID_ONLYOPENITEMS", "The provided data is failed validation, invalid parameter onlyOpenItems", None)
+  object InvalidIncludeLocks extends Error("INVALID_INCLUDELOCKS", "The provided data is failed validation, invalid parameter includeLocks", None)
+  object InvalidCalculatedAccruedInterest extends Error("INVALID_CALCULATEACCRUEDINTEREST", "The provided data is failed validation, invalid parameter calculateAccruedInterest", None)
+  object InvalidCustomerPaymentInformation extends Error("INVALID_CUSTOMERPAYMENTINFORMATION", "The provided data is failed validation, invalid parameter customerPaymentInformation", None)
+  object InvalidData extends Error("INVALID_DATA", "The provided data is failed validation, contains invalid data", None)
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")
@@ -99,5 +117,14 @@ object Errors {
     }
   }
 
+  def businessJsonError(error: Errors.Error) = Json.toJson(Errors.businessError(error))
+
+  def desErrorsToApiErrors(desErrors: Seq[JsValue]): Seq[JsValue] = desErrors.map(e => desErrorToApiError(e))
+
+  def desErrorToApiError(jsValue: JsValue): JsValue =
+    jsValue.validate[DesError] match {
+      case JsSuccess(payload, _) => Json.toJson(Error(payload.code, payload.reason, None))
+      case JsError(errors) => jsValue
+    }
 
 }
