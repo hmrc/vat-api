@@ -76,6 +76,13 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
       }
     }
 
+    "verify the auth with valid agent details" should {
+      "should return valid auth enrolments" in {
+        setupMockAuthRetrievalSuccess(testAuthAgentSuccessResponse)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
+      }
+    }
+
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()

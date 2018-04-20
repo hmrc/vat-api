@@ -97,6 +97,33 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
       orgIdentityData.loginTimes
     )
 
+  val testAuthAgentSuccessResponse =
+    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      Option(AffinityGroup.Agent),
+      Enrolments(Set(
+        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+      agentIdentityData.internalId),
+      agentIdentityData.externalId),
+      None),
+      agentIdentityData.credentials),
+      agentIdentityData.confidenceLevel),
+      None),
+      None),
+      agentIdentityData.name)
+      ,None),
+      agentIdentityData.email),
+      agentIdentityData.agentInformation),
+      agentIdentityData.groupIdentifier),
+      agentIdentityData.credentialRole),
+      None),
+      agentIdentityData.itmpName),
+      None),
+      agentIdentityData.itmpAddress)
+      ,
+      agentIdentityData.credentialStrength),
+      agentIdentityData.loginTimes
+    )
+
   def setupMockAuthRetrievalSuccess[X,Y](retrievalValue: X~Y): Unit = {
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
       .thenReturn(

@@ -17,8 +17,8 @@
 package uk.gov.hmrc.vatapi.auth
 import uk.gov.hmrc.auth.core.AffinityGroup
 import AuthConstants._
-
 import nrs.models.IdentityData
+import uk.gov.hmrc.auth.core.retrieve.AgentInformation
 
 sealed trait AuthContext {
   val affinityGroup: String
@@ -54,10 +54,14 @@ case class Agent(override val agentCode: Option[String],
 case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
 
 object AffinityGroupToAuthContext {
-  def authContext(affinityGroup: AffinityGroup, identityData: Option[IdentityData]) = {
+  def authContext(affinityGroup: AffinityGroup, identityData: Option[IdentityData], agentInformation: Option[AgentInformation] = None) = {
     affinityGroup.getClass.getSimpleName.dropRight(1) match {
       case ORGANISATION => Organisation(identityData)
       case INDIVIDUAL => Individual(identityData)
+      case AGENT => agentInformation match {
+        case Some(agent) => Agent(agentCode = agent.agentCode, agentReference = agent.agentId, identityData)
+        case None => Agent(None, None, identityData)
+      }
     }
   }
 }
@@ -65,5 +69,6 @@ object AffinityGroupToAuthContext {
 object AuthConstants {
   val ORGANISATION = "Organisation"
   val INDIVIDUAL = "Individual"
+  val AGENT = "Agent"
 }
 

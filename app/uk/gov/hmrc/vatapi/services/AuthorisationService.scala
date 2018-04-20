@@ -63,7 +63,8 @@ trait AuthorisationService {
 
     logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(
-      RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn))))))
+      RawJsonPredicate(JsArray.apply(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))))))
       .retrieve(
         affinityGroup and authorisedEnrolments
         and internalId and externalId and agentCode and credentials
@@ -77,7 +78,7 @@ trait AuthorisationService {
           ~ eml ~ agInfo ~ groupId ~ credRole
           ~ mdtpInfo ~ iname ~ idob ~ iaddress
           ~ credStrength ~ logins
-            if affGroup.contains(AffinityGroup.Organisation) | affGroup.contains(AffinityGroup.Individual) =>
+            if affGroup.contains(AffinityGroup.Organisation) || affGroup.contains(AffinityGroup.Individual) || affGroup.contains(AffinityGroup.Agent) =>
 
           val identityData =
             IdentityData(
@@ -89,7 +90,7 @@ trait AuthorisationService {
           val afGroup = affGroup.get
           logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
             s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
-          Future.successful(Right(authContext(afGroup,Some(identityData))))
+          Future.successful(Right(authContext(afGroup,Some(identityData), Some(agInfo))))
         case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
