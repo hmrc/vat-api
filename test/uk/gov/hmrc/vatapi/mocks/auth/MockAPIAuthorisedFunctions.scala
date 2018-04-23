@@ -40,89 +40,161 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
   override def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockAPIAuthorisedFunctions)
-    setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
+    setupMockAuthRetrievalSuccess(testAuthSuccessResponse.organisationResponse)
   }
 
-  val testAuthOrganisationSuccessResponse =
-    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Organisation),
-      Enrolments(Set(
-        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
-      orgIdentityData.internalId),
-      orgIdentityData.externalId),
-      None),
-      orgIdentityData.credentials),
-      orgIdentityData.confidenceLevel),
-      None),
-      None),
-      orgIdentityData.name)
-      ,None),
-      orgIdentityData.email),
-      orgIdentityData.agentInformation),
-      orgIdentityData.groupIdentifier),
-      orgIdentityData.credentialRole),
-      None),
-      orgIdentityData.itmpName),
-      None),
-      orgIdentityData.itmpAddress)
-      ,
-      orgIdentityData.credentialStrength),
-      orgIdentityData.loginTimes
-    )
+  object testAuthSuccessResponseWithNrsData {
+    val organisationResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Organisation),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        orgIdentityData.internalId),
+        orgIdentityData.externalId),
+        None),
+        orgIdentityData.credentials),
+        orgIdentityData.confidenceLevel),
+        None),
+        None),
+        orgIdentityData.name)
+        ,None),
+        orgIdentityData.email),
+        orgIdentityData.agentInformation),
+        orgIdentityData.groupIdentifier),
+        orgIdentityData.credentialRole),
+        None),
+        orgIdentityData.itmpName),
+        None),
+        orgIdentityData.itmpAddress),
+        orgIdentityData.credentialStrength),
+        orgIdentityData.loginTimes
+      )
 
-  val testAuthIndividualSuccessResponse =
-    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Individual),
-      Enrolments(Set(
-        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
-      orgIdentityData.internalId),
-      orgIdentityData.externalId),
-      None),
-      orgIdentityData.credentials),
-      orgIdentityData.confidenceLevel),
-      None),
-      None),
-      orgIdentityData.name)
-      ,None),
-      orgIdentityData.email),
-      orgIdentityData.agentInformation),
-      orgIdentityData.groupIdentifier),
-      orgIdentityData.credentialRole),
-      None),
-      orgIdentityData.itmpName),
-      None),
-      orgIdentityData.itmpAddress)
-      ,
-      orgIdentityData.credentialStrength),
-      orgIdentityData.loginTimes
-    )
+    val individualResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Individual),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        orgIdentityData.internalId),
+        orgIdentityData.externalId),
+        None),
+        orgIdentityData.credentials),
+        orgIdentityData.confidenceLevel),
+        None),
+        None),
+        orgIdentityData.name)
+        ,None),
+        orgIdentityData.email),
+        orgIdentityData.agentInformation),
+        orgIdentityData.groupIdentifier),
+        orgIdentityData.credentialRole),
+        None),
+        orgIdentityData.itmpName),
+        None),
+        orgIdentityData.itmpAddress),
+        orgIdentityData.credentialStrength),
+        orgIdentityData.loginTimes
+      )
 
-  val testAuthAgentSuccessResponse =
-    new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Agent),
-      Enrolments(Set(
-        Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
-      agentIdentityData.internalId),
-      agentIdentityData.externalId),
-      None),
-      agentIdentityData.credentials),
-      agentIdentityData.confidenceLevel),
-      None),
-      None),
-      agentIdentityData.name)
-      ,None),
-      agentIdentityData.email),
-      agentIdentityData.agentInformation),
-      agentIdentityData.groupIdentifier),
-      agentIdentityData.credentialRole),
-      None),
-      agentIdentityData.itmpName),
-      None),
-      agentIdentityData.itmpAddress)
-      ,
-      agentIdentityData.credentialStrength),
-      agentIdentityData.loginTimes
-    )
+    val agentResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Agent),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        agentIdentityData.internalId),
+        agentIdentityData.externalId),
+        None),
+        agentIdentityData.credentials),
+        agentIdentityData.confidenceLevel),
+        None),
+        None),
+        agentIdentityData.name)
+        ,None),
+        agentIdentityData.email),
+        agentIdentityData.agentInformation),
+        agentIdentityData.groupIdentifier),
+        agentIdentityData.credentialRole),
+        None),
+        agentIdentityData.itmpName),
+        None),
+        agentIdentityData.itmpAddress),
+        agentIdentityData.credentialStrength),
+        agentIdentityData.loginTimes
+      )
+
+  }
+
+  object testAuthSuccessResponse {
+    val organisationResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Organisation),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        orgIdentityData.internalId),
+        orgIdentityData.externalId),
+        None),
+        orgIdentityData.credentials),
+        orgIdentityData.confidenceLevel),
+        None),
+        None),
+        orgIdentityData.name)
+        ,None),
+        orgIdentityData.email),
+        orgIdentityData.agentInformation),
+        orgIdentityData.groupIdentifier),
+        orgIdentityData.credentialRole),
+        None),
+        orgIdentityData.credentialStrength),
+        orgIdentityData.loginTimes
+      )
+
+    val individualResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Individual),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        orgIdentityData.internalId),
+        orgIdentityData.externalId),
+        None),
+        orgIdentityData.credentials),
+        orgIdentityData.confidenceLevel),
+        None),
+        None),
+        orgIdentityData.name)
+        ,None),
+        orgIdentityData.email),
+        orgIdentityData.agentInformation),
+        orgIdentityData.groupIdentifier),
+        orgIdentityData.credentialRole),
+        None),
+        orgIdentityData.credentialStrength),
+        orgIdentityData.loginTimes
+      )
+
+    val agentResponse =
+      new~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+        Option(AffinityGroup.Agent),
+        Enrolments(Set(
+          Enrolment("HMRC-MTD-VAT",List(EnrolmentIdentifier("VRN", "666350722")),"activated")))),
+        agentIdentityData.internalId),
+        agentIdentityData.externalId),
+        None),
+        agentIdentityData.credentials),
+        agentIdentityData.confidenceLevel),
+        None),
+        None),
+        agentIdentityData.name)
+        ,None),
+        agentIdentityData.email),
+        agentIdentityData.agentInformation),
+        agentIdentityData.groupIdentifier),
+        agentIdentityData.credentialRole),
+        None),
+        agentIdentityData.credentialStrength),
+        agentIdentityData.loginTimes
+      )
+
+  }
 
   def setupMockAuthRetrievalSuccess[X,Y](retrievalValue: X~Y): Unit = {
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
@@ -134,7 +206,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         })
   }
 
-  def setupMockAuthorisationException(exception: Exception = new InsufficientEnrolments()): Unit =
+  def setupMockAuthorisationException(exception: Exception = InsufficientEnrolments()): Unit =
     when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
