@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.auth.{AuthContext, Individual, Organisation}
+import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Individual, Organisation}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator
 import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
@@ -77,8 +77,15 @@ object TestConstants {
 
     val indIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Individual))
 
+    val agentIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Agent)).copy(agentInformation = AgentInformation(
+      agentCode = Some("AGENT007"),
+      agentFriendlyName = Some("James"),
+      agentId = Some("JB007")
+    ))
+
     val orgAuthContext: AuthContext = Organisation(Some(orgIdentityData))
     val indAuthContext: AuthContext = Individual(Some(indIdentityData))
+    val agentAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData))
   }
 
   object VatReturn {
