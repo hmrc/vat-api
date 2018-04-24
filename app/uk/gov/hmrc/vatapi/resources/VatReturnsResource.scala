@@ -34,7 +34,7 @@ object VatReturnsResource extends BaseResource {
   private val connector = VatReturnsConnector
   private val orchestrator = VatReturnsOrchestrator
 
-  def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn).async(parse.json) { implicit request =>
+  def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
     val receiptTimestamp = "Receipt-Timestamp"
     val receiptSignature = "Receipt-Signature"

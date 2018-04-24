@@ -86,9 +86,6 @@ trait AuthorisationService {
                                                             ec: ExecutionContext): Future[AuthResult] = {
     import Retrievals._
 
-    val individualName = OptionalRetrieval(itmpName.propertyNames.head, itmpName.reads)
-    val individualAddress = OptionalRetrieval(itmpAddress.propertyNames.head, itmpAddress.reads)
-
     logger.debug(s"[AuthorisationService] [authoriseAsClientWithNrsRequirement] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(
       RawJsonPredicate(JsArray(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
@@ -98,7 +95,7 @@ trait AuthorisationService {
           and internalId and externalId and agentCode and credentials
           and confidenceLevel and nino and saUtr and name and dateOfBirth
           and email and agentInformation and groupIdentifier and credentialRole
-          and mdtpInformation and individualName and itmpDateOfBirth and individualAddress
+          and mdtpInformation and itmpName and itmpDateOfBirth and itmpAddress
           and credentialStrength and loginTimes
       ) {
         case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
@@ -131,8 +128,9 @@ trait AuthorisationService {
     case _: InsufficientConfidenceLevel =>
       logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
       Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
-    case _: JsResultException =>
+    case ex: JsResultException =>
       logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
+      println(ex)
       Future.successful(Left(Forbidden(toJson(Errors.InternalServerError))))
     case exception@_ =>
       logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")

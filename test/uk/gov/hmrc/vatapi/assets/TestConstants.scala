@@ -52,12 +52,12 @@ object TestConstants {
       ),
       groupIdentifier = Some("testGroupId-840cf4e3-c8ad-48f4-80fd-ea267f916be5"),
       credentialRole = Some(User),
-      itmpName = Some(ItmpName(
+      itmpName = ItmpName(
         givenName = Some("a"),
         middleName = Some("b"),
         familyName = Some("c")
-      )),
-      itmpAddress = Some(ItmpAddress(
+      ),
+      itmpAddress = ItmpAddress(
         line1 = Some("1"),
         line2 = Some("2"),
         line3 = Some("3"),
@@ -66,7 +66,7 @@ object TestConstants {
         postCode = Some("cw93nm"),
         countryName = Some("uk"),
         countryCode = Some("uk")
-      )),
+      ),
       affinityGroup = Some(AffinityGroup.Organisation),
       credentialStrength = Some("strong"),
       loginTimes = LoginTimes(
