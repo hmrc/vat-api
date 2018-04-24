@@ -502,26 +502,12 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(200)
               .withBody("""
                          |{
-                         |  "internalId": "some-id",
-                         |  "externalId": "some-id",
-                         |  "credentials" : {"providerId":"8124873381064832", "providerType":"GovernmentGateway"},
-                         |  "confidenceLevel": 200,
-                         |  "name": { "name": "test", "lastName": "test" },
-                         |  "dateOfBirth": "1985-01-01",
-                         |  "postCode":"NW94HD",
-                         |  "description" : "description",
                          |  "agentInformation": {
                          |        "agentCode" : "TZRXXV",
                          |        "agentFriendlyName" : "Bodgitt & Legget LLP",
                          |        "agentId": "BDGL"
                          |    },
-                         |  "groupIdentifier" : "GroupId",
-                         |  "credentialRole": "admin",
                          |  "affinityGroup": "Organisation",
-                         |  "loginTimes": {
-                         |     "currentLogin": "2016-11-27T09:00:00.000Z",
-                         |     "previousLogin": "2016-11-01T12:00:00.000Z"
-                         |  },
                          |  "authorisedEnrolments": [
                          |   {
                          |         "key":"HMRC-MTD-VAT",

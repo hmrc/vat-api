@@ -62,7 +62,7 @@ object VatReturnsResource extends BaseResource {
   }
 
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
-    APIAction(vrn, nrsRequired = true).async { implicit request =>
+    APIAction(vrn).async { implicit request =>
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for the VRN : $vrn")
       fromDes {
         for {

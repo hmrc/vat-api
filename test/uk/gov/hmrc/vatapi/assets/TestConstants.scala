@@ -83,13 +83,13 @@ object TestConstants {
       agentId = Some("JB007")
     ))
 
-    val orgAuthContext: AuthContext = Organisation(Some(orgIdentityData))
-    val indAuthContext: AuthContext = Individual(Some(indIdentityData))
-    val agentAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData))
+    val orgAuthContextWithNrsData: AuthContext = Organisation(Some(orgIdentityData))
+    val indAuthContextWithNrsData: AuthContext = Individual(Some(indIdentityData))
+    val agentAuthContextWithNrsData: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData))
 
-    val orgWithoutNrsDataAuthContext: AuthContext = Organisation(Some(orgIdentityData.copy(itmpName = None, itmpAddress = None)))
-    val indWithoutNrsDataAuthContext: AuthContext = Individual(Some(indIdentityData.copy(itmpName = None, itmpAddress = None)))
-    val agentWithoutNrsDataAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData.copy(itmpName = None, itmpAddress = None)))
+    val orgAuthContext: AuthContext = Organisation(None)
+    val indAuthContext: AuthContext = Individual(None)
+    val agentAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), None)
   }
 
   object VatReturn {

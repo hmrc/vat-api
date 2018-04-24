@@ -49,7 +49,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with Mocki
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContext, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
+  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContextWithNrsData, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
 
   val vatReturnSuccessResponse = VatReturnResponse(HttpResponse(OK, responseJson = Some(Json.toJson(vatReturnsDes))))
   val vatReturninvalidPayloadResponse =

@@ -66,21 +66,21 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContextWithNrsData)
       }
     }
 
@@ -125,21 +125,21 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgWithoutNrsDataAuthContext)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indWithoutNrsDataAuthContext)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentWithoutNrsDataAuthContext)
+        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
       }
     }
 

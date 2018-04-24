@@ -69,29 +69,13 @@ trait AuthorisationService {
       RawJsonPredicate(JsArray(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
         .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))))))
       .retrieve(
-        affinityGroup and authorisedEnrolments
-          and internalId and externalId and agentCode and credentials
-          and confidenceLevel and nino and saUtr and name and dateOfBirth
-          and email and agentInformation and groupIdentifier and credentialRole
-          and mdtpInformation and credentialStrength and loginTimes
+        affinityGroup and authorisedEnrolments and agentInformation
       ) {
-        case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
-          ~ confLevel ~ ni ~ saRef ~ nme ~ dob
-          ~ eml ~ agInfo ~ groupId ~ credRole
-          ~ mdtpInfo ~ credStrength ~ logins
-          if affGroup.contains(AffinityGroup.Organisation) || affGroup.contains(AffinityGroup.Individual) || affGroup.contains(AffinityGroup.Agent) =>
-
-          val identityData =
-            IdentityData(
-              inId, exId, agCode, creds,
-              confLevel, ni, saRef, nme, dob,
-              eml, agInfo, groupId,
-              credRole, mdtpInfo, None, None,
-              None, affGroup, credStrength, logins)
-          val afGroup = affGroup.get
+        case Some(userType) ~ enrolments ~ agentInfo
+          if userType == AffinityGroup.Organisation || userType == AffinityGroup.Individual || userType == AffinityGroup.Agent =>
           logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
             s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
-          Future.successful(Right(authContext(afGroup, Some(identityData), Some(agInfo))))
+          Future.successful(Right(authContext(userType, None, Some(agentInfo))))
         case _ => logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
