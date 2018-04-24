@@ -23,7 +23,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.assets.TestConstants.Auth.orgAuthContext
+import uk.gov.hmrc.vatapi.assets.TestConstants.Auth.orgAuthContextWithNrsData
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
@@ -43,7 +43,7 @@ class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContext, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
+  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContextWithNrsData, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
 
   val testDateTime: DateTime = DateTime.now()
 

@@ -57,28 +57,88 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  "TestAuthorisationService.authCheck" when {
+  "TestAuthorisationService.authCheckWithNrsRequirement" when {
 
+    import testAuthSuccessResponseWithNrsData._
     val testVrn: Vrn = Vrn("123456789")
     val invalidVrn: Vrn = Vrn("111111111")
 
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
-        setupMockAuthRetrievalSuccess(testAuthOrganisationSuccessResponse)
+        setupMockAuthRetrievalSuccess(organisationResponse)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContextWithNrsData)
+      }
+    }
+
+    "verify the auth with valid individual client details" should {
+      "should return valid auth enrolments" in {
+        setupMockAuthRetrievalSuccess(individualResponse)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContextWithNrsData)
+      }
+    }
+
+    "verify the auth with valid agent details" should {
+      "should return valid auth enrolments" in {
+        setupMockAuthRetrievalSuccess(agentResponse)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContextWithNrsData)
+      }
+    }
+
+    "verify the auth with invalid client details" should {
+      "should reject the client " in {
+        setupMockAuthorisationException()
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+      }
+    }
+
+    "verify the auth with invalid client confidenceLevel details" should {
+      "should reject the client " in {
+        setupMockAuthorisationException(new InsufficientConfidenceLevel())
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+          Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
+      }
+    }
+
+    "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
+      "reject the client" in {
+        setupMockAuthorisationException(new JsResultException(errors = Seq()))
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        Left(Forbidden(toJson(Errors.InternalServerError)))
+      }
+    }
+
+    "verify the auth with unexpected auth error" should {
+      "should reject the client " in {
+        setupMockAuthorisationException(new UnsupportedAuthProvider)
+        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+          Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
+      }
+    }
+  }
+
+  "TestAuthorisationService.authCheck" when {
+
+    import testAuthSuccessResponse._
+    val testVrn: Vrn = Vrn("123456789")
+    val invalidVrn: Vrn = Vrn("111111111")
+
+    "verify the auth with valid organisation client details" should {
+      "should return valid auth enrolments " in {
+        setupMockAuthRetrievalSuccess(organisationResponse)
         extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
-        setupMockAuthRetrievalSuccess(testAuthIndividualSuccessResponse)
+        setupMockAuthRetrievalSuccess(individualResponse)
         extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
-        setupMockAuthRetrievalSuccess(testAuthAgentSuccessResponse)
+        setupMockAuthRetrievalSuccess(agentResponse)
         extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
       }
     }

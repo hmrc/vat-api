@@ -35,7 +35,7 @@ trait BaseResource extends BaseController {
   private val authService = AuthorisationService
   private lazy val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
 
-  def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
+  def AuthAction(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
       if (featureSwitch.isAuthEnabled){
@@ -48,16 +48,37 @@ trait BaseResource extends BaseController {
           Future.successful(Right(new AuthRequest(Organisation(), request)))
   }
 
-  def APIAction(vrn: Vrn, summary: Option[String] = None): ActionBuilder[AuthRequest] =
+  def AuthActionWithNrsRequirement(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
+    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn and retrieve NRS data")
+    override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
+      if (featureSwitch.isAuthEnabled){
+        implicit val ev: Request[A] = request
+        authService.authCheckWithNrsRequirement(vrn) map {
+          case Right(authContext) => Right(new AuthRequest(authContext, request))
+          case Left(authError) => Left(authError)
+        }
+      } else
+          Future.successful(Right(new AuthRequest(Organisation(), request)))
+  }
+
+  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = if (nrsRequired) {
+    new ActionBuilder[Request] with ActionFilter[Request] {
+      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
+        Future {
+          None
+        }
+    } andThen AuthActionWithNrsRequirement(vrn)
+  } else {
     new ActionBuilder[Request] with ActionFilter[Request] {
       override protected def filter[A](request: Request[A]): Future[Option[Result]] =
         Future {
           None
         }
     } andThen AuthAction(vrn)
+  }
 
 
-  def getRequestDateTimestamp(implicit request: AuthRequest[_]) = {
+  def getRequestDateTimestamp(implicit request: AuthRequest[_]): String = {
     val requestTimestampHeader = "X-Request-Timestamp"
     val requestTimestamp = request.headers.get(requestTimestampHeader) match {
       case Some(timestamp) if timestamp.trim.length > 0 => timestamp.trim

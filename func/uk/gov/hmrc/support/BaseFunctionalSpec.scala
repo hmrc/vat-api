@@ -502,6 +502,37 @@ trait BaseFunctionalSpec extends TestApplication {
               .withStatus(200)
               .withBody("""
                          |{
+                         |  "agentInformation": {
+                         |        "agentCode" : "TZRXXV",
+                         |        "agentFriendlyName" : "Bodgitt & Legget LLP",
+                         |        "agentId": "BDGL"
+                         |    },
+                         |  "affinityGroup": "Organisation",
+                         |  "authorisedEnrolments": [
+                         |   {
+                         |         "key":"HMRC-MTD-VAT",
+                         |         "identifiers":[
+                         |            {
+                         |               "key":"VRN",
+                         |               "value":"1000051409"
+                         |            }
+                         |         ],
+                         |         "state":"Activated"
+                         |      }
+                         |  ]
+                         |}
+                        """.stripMargin)))
+      this
+    }
+
+    def userIsFullyAuthorisedForTheNrsDependantResource: Givens = {
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody("""
+                         |{
                          |  "internalId": "some-id",
                          |  "externalId": "some-id",
                          |  "credentials" : {"providerId":"8124873381064832", "providerType":"GovernmentGateway"},

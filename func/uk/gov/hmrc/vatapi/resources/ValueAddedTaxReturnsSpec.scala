@@ -37,7 +37,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to submit VAT returns" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
@@ -55,7 +55,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to submit VAT returns even with negative amounts" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
@@ -83,7 +83,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "not allow users to submit undeclared VAT returns" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
         .when()
@@ -96,7 +96,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid period key" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY")
         .when()
@@ -109,7 +109,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid ARN" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN")
         .when()
@@ -122,7 +122,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid VRN" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN")
         .when()
@@ -135,7 +135,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid payload" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD")
         .when()
@@ -148,7 +148,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject duplicate submission" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION")
         .when()
@@ -161,7 +161,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "fail if submission to  Non-Repudiation service failed" in {
       given()
-        .userIsFullyAuthorisedForTheResource
+        .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsFailurefor(vrn)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
