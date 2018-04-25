@@ -63,7 +63,7 @@ object VatReturnsResource extends BaseResource {
 
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
     APIAction(vrn).async { implicit request =>
-      logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for the VRN : $vrn")
+      logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns")
       fromDes {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }

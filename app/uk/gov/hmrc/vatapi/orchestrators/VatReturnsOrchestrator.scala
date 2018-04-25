@@ -48,10 +48,10 @@ trait VatReturnsOrchestrator {
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
     nrsService.submit(vrn, vatReturn) map {
       case Right(nrsData) =>
-        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS: $nrsData")
+        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS.")
         vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp))) map { response => Right(response withNrsData nrsData)}
       case Left(e) =>
-        logger.warn(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
+        logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
     }
   }.flatMap{s => s}

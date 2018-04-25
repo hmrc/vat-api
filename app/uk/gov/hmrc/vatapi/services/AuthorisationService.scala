@@ -65,7 +65,7 @@ trait AuthorisationService {
                                           ec: ExecutionContext): Future[AuthResult] = {
     import Retrievals._
 
-    logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN $vrn.")
+    logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN.")
     apiAuthorisedFunctions.authorised(
       RawJsonPredicate(JsArray(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
         .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))))))

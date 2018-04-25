@@ -38,12 +38,12 @@ object NrsSubmissionHttpParser {
               Left(NrsError)
             },
             valid =>{
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data")
               Right(valid)
             }
           )
         case e =>
-          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e BODY: ${response.body}")
+          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e")
           Left(NrsError)
       }
     }

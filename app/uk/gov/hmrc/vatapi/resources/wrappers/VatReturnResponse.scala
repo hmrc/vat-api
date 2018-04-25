@@ -37,10 +37,9 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
 
     jsonOrError match {
       case Left(e) =>
-        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : ${underlying.body}")
+        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : ${e.getMessage}")
         Left(ParseError(s"Unable to parse the response from DES as Json: ${e.getMessage}"))
       case Right(js) =>
-        logger.info(s"[VatReturnResponse][vatReturnOrError] Json response body from DES : ${js}")
         deserialise(js)
     }
   }

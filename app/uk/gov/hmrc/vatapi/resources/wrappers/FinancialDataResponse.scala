@@ -36,10 +36,10 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     }
     jsonOrError match {
       case Right(js) =>
-        logger.info(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES : ${js}")
+        logger.debug(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES")
         deserialise(js)
       case Left(e) =>
-        logger.error(s"[FinancialDataResponse][getLiabilities - jsonOrError] Non json response from DES : ${underlying.body}")
+        logger.error(s"[FinancialDataResponse][getLiabilities - jsonOrError] Non json response from DES : ${e.getMessage}")
         Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
     }
   }
@@ -51,10 +51,10 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     }
     jsonOrError match {
       case Right(js) =>
-        logger.info(s"[FinancialDataResponse][getPayments - jsonOrError] Json response body from DES : ${js}")
+        logger.info(s"[FinancialDataResponse][getPayments - jsonOrError] Json response body from DES")
         deserialise(js)
       case Left(e) =>
-        logger.error(s"[FinancialDataResponse][getPayments - jsonOrError] Non json response from DES : ${underlying.body}")
+        logger.error(s"[FinancialDataResponse][getPayments - jsonOrError] Non json response from DES : ${e.getMessage}")
         Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
     }
   }
