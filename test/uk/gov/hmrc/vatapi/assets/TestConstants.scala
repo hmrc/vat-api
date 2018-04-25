@@ -53,19 +53,19 @@ object TestConstants {
       groupIdentifier = Some("testGroupId-840cf4e3-c8ad-48f4-80fd-ea267f916be5"),
       credentialRole = Some(User),
       itmpName = ItmpName(
-        givenName = Some("a"),
-        middleName = Some("b"),
-        familyName = Some("c")
+        givenName = None,
+        middleName = None,
+        familyName = None
       ),
       itmpAddress = ItmpAddress(
-        line1 = Some("1"),
-        line2 = Some("2"),
-        line3 = Some("3"),
-        line4 = Some("4"),
-        line5 = Some("5"),
-        postCode = Some("cw93nm"),
-        countryName = Some("uk"),
-        countryCode = Some("uk")
+        line1 = None,
+        line2 = None,
+        line3 = None,
+        line4 = None,
+        line5 = None,
+        postCode = None,
+        countryName = None,
+        countryCode = None
       ),
       affinityGroup = Some(AffinityGroup.Organisation),
       credentialStrength = Some("strong"),

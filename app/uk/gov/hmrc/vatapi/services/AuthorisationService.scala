@@ -17,13 +17,14 @@
 package uk.gov.hmrc.vatapi.services
 
 import nrs.models.IdentityData
+import org.joda.time.LocalDate
 import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsArray, JsResultException, Json}
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
-import uk.gov.hmrc.auth.core.retrieve.{OptionalRetrieval, Retrievals, ~}
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -95,23 +96,26 @@ trait AuthorisationService {
           and internalId and externalId and agentCode and credentials
           and confidenceLevel and nino and saUtr and name and dateOfBirth
           and email and agentInformation and groupIdentifier and credentialRole
-          and mdtpInformation and itmpName and itmpDateOfBirth and itmpAddress
-          and credentialStrength and loginTimes
+          and mdtpInformation and credentialStrength and loginTimes
       ) {
         case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
           ~ confLevel ~ ni ~ saRef ~ nme ~ dob
           ~ eml ~ agInfo ~ groupId ~ credRole
-          ~ mdtpInfo ~ iname ~ idob ~ iaddress
-          ~ credStrength ~ logins
+          ~ mdtpInfo ~ credStrength ~ logins
           if affGroup.contains(AffinityGroup.Organisation) || affGroup.contains(AffinityGroup.Individual) || affGroup.contains(AffinityGroup.Agent) =>
+
+          // setup dummy data for ITMP data
+          val dummyItmpName: ItmpName = ItmpName(None, None, None)
+          val dummyItmpDob: Option[LocalDate] = None
+          val dummyItmpAddress: ItmpAddress = ItmpAddress(None, None, None, None, None, None, None, None)
 
           val identityData =
             IdentityData(
               inId, exId, agCode, creds,
               confLevel, ni, saRef, nme, dob,
               eml, agInfo, groupId,
-              credRole, mdtpInfo, iname, idob,
-              iaddress, affGroup, credStrength, logins)
+              credRole, mdtpInfo, dummyItmpName, dummyItmpDob,
+              dummyItmpAddress, affGroup, credStrength, logins)
           val afGroup = affGroup.get
           logger.debug(s"[AuthorisationService] [authoriseAsClientWithNrsRequirement] Authorisation succeeded as fully-authorised organisation " +
             s"for VRN ${getClientReference(enrolments).getOrElse("")}.")
