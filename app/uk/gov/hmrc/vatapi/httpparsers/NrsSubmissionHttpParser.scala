@@ -38,7 +38,7 @@ object NrsSubmissionHttpParser {
               Left(NrsError)
             },
             valid =>{
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
               Right(valid)
             }
           )

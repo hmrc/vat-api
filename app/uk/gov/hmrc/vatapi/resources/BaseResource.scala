@@ -36,7 +36,7 @@ trait BaseResource extends BaseController {
   private lazy val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
 
   def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
-    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the given VRN.")
+    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
       if (featureSwitch.isAuthEnabled){
         implicit val ev: Request[A] = request
@@ -49,7 +49,7 @@ trait BaseResource extends BaseController {
   }
 
   def AuthActionWithNrsRequirement(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
-    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the given VRN and retrieve NRS data")
+    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn and retrieve NRS data")
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
       if (featureSwitch.isAuthEnabled){
         implicit val ev: Request[A] = request

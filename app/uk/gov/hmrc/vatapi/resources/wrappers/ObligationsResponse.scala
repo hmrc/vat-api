@@ -26,7 +26,7 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
   def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
     val desObligations = jsonOrError match {
       case Right(js) =>
-        logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES")
+        logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES : ${js}")
         js.asOpt[des.Obligations]
       case _ => logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.status}")
         None

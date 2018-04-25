@@ -33,7 +33,7 @@ object ObligationsResource extends BaseResource {
   private val connector = ObligationsConnector
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
-    logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations")
+    logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
     fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }

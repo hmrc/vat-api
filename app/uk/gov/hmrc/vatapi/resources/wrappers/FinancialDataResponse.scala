@@ -36,7 +36,7 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     }
     jsonOrError match {
       case Right(js) =>
-        logger.debug(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES")
+        logger.debug(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES : ${js}")
         deserialise(js)
       case Left(e) =>
         logger.error(s"[FinancialDataResponse][getLiabilities - jsonOrError] Non json response from DES : ${e.getMessage}")
@@ -51,7 +51,7 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     }
     jsonOrError match {
       case Right(js) =>
-        logger.info(s"[FinancialDataResponse][getPayments - jsonOrError] Json response body from DES")
+        logger.info(s"[FinancialDataResponse][getPayments - jsonOrError] Json response body from DES : ${js}")
         deserialise(js)
       case Left(e) =>
         logger.error(s"[FinancialDataResponse][getPayments - jsonOrError] Non json response from DES : ${e.getMessage}")
