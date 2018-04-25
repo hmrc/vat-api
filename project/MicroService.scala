@@ -1,7 +1,8 @@
 import play.routes.compiler.StaticRoutesGenerator
 import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
-import sbt._
+import sbt.{Def, _}
+import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 trait MicroService {
@@ -19,11 +20,22 @@ trait MicroService {
 
   lazy val FuncTest = config("func") extend Test
 
+  lazy val scoverageSettings: Seq[Def.Setting[_]] = {
+
+    Seq(
+      ScoverageKeys.coverageExcludedPackages := "<empty>;.*(Reverse|BuildInfo|Routes).*",
+      ScoverageKeys.coverageMinimum := 80,
+      ScoverageKeys.coverageFailOnMinimum := true,
+      ScoverageKeys.coverageHighlighting := true
+    )
+  }
+
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(Seq(play.sbt.PlayScala) ++ plugins: _*)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
+    .settings(scoverageSettings: _*)
     .settings(defaultSettings(): _*)
     .settings(
       targetJvm := "jvm-1.8",
@@ -39,7 +51,8 @@ trait MicroService {
         "-language:postfixOps",
         "-language:implicitConversions",
         "-Ywarn-numeric-widen",
-        "-Yno-adapted-args"),
+        "-Yno-adapted-args",
+        "-Ypartial-unification"),
       libraryDependencies ++= appDependencies,
       parallelExecution in Test := false,
       fork in Test := false,
