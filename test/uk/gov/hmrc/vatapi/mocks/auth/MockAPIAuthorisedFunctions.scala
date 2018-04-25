@@ -45,7 +45,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
 
   object testAuthSuccessResponseWithNrsData {
     val organisationResponse =
-      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Organisation),
         Enrolments(Set(
           Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
@@ -63,15 +63,12 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         orgIdentityData.groupIdentifier),
         orgIdentityData.credentialRole),
         None),
-        orgIdentityData.itmpName),
-        None),
-        orgIdentityData.itmpAddress),
         orgIdentityData.credentialStrength),
         orgIdentityData.loginTimes
       )
 
     val individualResponse =
-      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Individual),
         Enrolments(Set(
           Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
@@ -89,15 +86,12 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         orgIdentityData.groupIdentifier),
         orgIdentityData.credentialRole),
         None),
-        orgIdentityData.itmpName),
-        None),
-        orgIdentityData.itmpAddress),
         orgIdentityData.credentialStrength),
         orgIdentityData.loginTimes
       )
 
     val agentResponse =
-      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Agent),
         Enrolments(Set(
           Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
@@ -115,9 +109,6 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
         agentIdentityData.groupIdentifier),
         agentIdentityData.credentialRole),
         None),
-        agentIdentityData.itmpName),
-        None),
-        agentIdentityData.itmpAddress),
         agentIdentityData.credentialStrength),
         agentIdentityData.loginTimes
       )
