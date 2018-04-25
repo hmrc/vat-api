@@ -35,7 +35,7 @@ trait BaseResource extends BaseController {
   private val authService = AuthorisationService
   private lazy val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
 
-  def AuthAction(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
+  def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
       if (featureSwitch.isAuthEnabled){

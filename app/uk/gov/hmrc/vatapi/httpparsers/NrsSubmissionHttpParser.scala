@@ -43,7 +43,7 @@ object NrsSubmissionHttpParser {
             }
           )
         case e =>
-          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e BODY: ${response.body}")
+          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e")
           Left(NrsError)
       }
     }

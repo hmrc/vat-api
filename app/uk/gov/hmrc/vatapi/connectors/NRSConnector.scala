@@ -59,7 +59,7 @@ trait NRSConnector extends BaseConnector {
 
     val submitUrl = nrsSubmissionUrl(vrn.toString)
 
-    logger.debug(s"[NRSConnector][submit] - POST $submitUrl")
+    logger.debug(s"[NRSConnector][submit] - POST")
     http.POST[NRSSubmission, NrsSubmissionOutcome](submitUrl, nrsSubmission)(
       implicitly[Writes[NRSSubmission]],
       NrsSubmissionOutcomeReads,
