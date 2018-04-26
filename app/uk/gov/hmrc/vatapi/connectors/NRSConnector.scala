@@ -57,9 +57,10 @@ trait NRSConnector extends BaseConnector {
 
   def submit(vrn: Vrn, nrsSubmission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
 
+    logger.debug(s"[NRSConnector][submit] - Submission to NRS for 9 box vat return for VRN: $vrn")
+
     val submitUrl = nrsSubmissionUrl(vrn.toString)
 
-    logger.debug(s"[NRSConnector][submit] - POST")
     http.POST[NRSSubmission, NrsSubmissionOutcome](submitUrl, nrsSubmission)(
       implicitly[Writes[NRSSubmission]],
       NrsSubmissionOutcomeReads,

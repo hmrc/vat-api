@@ -98,7 +98,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY")
+        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY", 400)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
@@ -111,7 +111,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN")
+        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN", 400)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
@@ -124,7 +124,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN")
+        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN", 400)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
@@ -137,7 +137,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD")
+        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD", 400)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
@@ -150,7 +150,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION")
+        .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION", 409)
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
@@ -271,6 +271,17 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "VRN_NOT_FOUND")
+        .when()
+        .get(s"/$vrn/returns/0001")
+        .thenAssertThat()
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    }
+
+    "return internal server error (500) if the vat returns from DES got NOT_FOUND_VRN error" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "NOT_FOUND_VRN")
         .when()
         .get(s"/$vrn/returns/0001")
         .thenAssertThat()

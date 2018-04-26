@@ -37,8 +37,8 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
 
     jsonOrError match {
       case Left(e) =>
-        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : ${e.getMessage}")
-        Left(ParseError(s"Unable to parse the response from DES as Json: ${e.getMessage}"))
+        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : $e")
+        Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
       case Right(js) =>
         deserialise(js)
     }
@@ -52,9 +52,10 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 400 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 403 if errorCodeIsOneOf(VRN_NOT_FOUND) => InternalServerError(toJson(Errors.InternalServerError))
+    case 403 if errorCodeIsOneOf(NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
   }
 }
 

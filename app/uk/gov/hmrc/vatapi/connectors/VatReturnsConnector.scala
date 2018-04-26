@@ -18,6 +18,7 @@ package uk.gov.hmrc.vatapi.connectors
 
 import java.net.URLEncoder
 
+import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.BaseConnector
@@ -33,7 +34,11 @@ object VatReturnsConnector extends VatReturnsConnector {
 
 trait VatReturnsConnector extends BaseConnector {
 
+  val logger: Logger = Logger(this.getClass)
+
   def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
+
+    logger.debug(s"[VatReturnsConnector][post] - Submission for 9 box vat return for VRN: $vrn")
 
     val postUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
 
@@ -45,6 +50,8 @@ trait VatReturnsConnector extends BaseConnector {
   }
 
   def query(vrn: Vrn, periodKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
+
+    logger.debug(s"[VatReturnsConnector][query] - Retrieve vat returns for VRN: $vrn and periodKey: $periodKey")
 
     val getUrl: String = s"${AppContext.desUrl}/vat/returns/vrn/$vrn?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
 
