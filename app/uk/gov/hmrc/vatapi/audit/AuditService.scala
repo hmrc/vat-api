@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.audit
 
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.Logger
 import play.api.libs.json.{Format, Json}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.AuditExtensions
@@ -30,6 +31,7 @@ import scala.concurrent.ExecutionContext
 
 trait AuditService {
 
+  val logger: Logger = Logger(this.getClass)
   private val connector: AuditConnector = MicroserviceAuditConnector
 
   def audit[T](event: AuditEvent[T])(
@@ -39,6 +41,7 @@ trait AuditService {
     ec: ExecutionContext
   ): BusinessResult[Unit] = {
 
+    logger.debug(s"[AuditService][audit] Generating ${event.auditType} audit event for vat-api.")
     val auditEvent =
       ExtendedDataEvent(
         auditSource = "vat-api",

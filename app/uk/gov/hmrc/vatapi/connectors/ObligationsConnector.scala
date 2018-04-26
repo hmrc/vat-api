@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
+import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.BaseConnector
@@ -29,9 +30,14 @@ import scala.concurrent.Future
 object ObligationsConnector extends BaseConnector {
   override val http: WSHttp = WSHttp
 
+  val logger: Logger = Logger(this.getClass)
+
   private lazy val baseUrl: String = AppContext.desUrl
 
   def get(vrn: Vrn, queryParams: ObligationsQueryParams)(implicit hc: HeaderCarrier): Future[ObligationsResponse] = {
+
+    logger.debug(s"[ObligationsConnector][get] Retrieve obligations for VRN $vrn with the given query parameters.")
+
     val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
     httpGet[ObligationsResponse](baseUrl + s"/enterprise/obligation-data/vrn/$vrn/VATC?$queryString", ObligationsResponse)
   }

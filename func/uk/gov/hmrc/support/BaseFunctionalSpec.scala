@@ -672,12 +672,12 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
-        def expectVatReturnToFail(vrn: Vrn, code: String, reason: String = "Irrelevant"): Givens = {
+        def expectVatReturnToFail(vrn: Vrn, code: String, status: Int, reason: String = "Irrelevant"): Givens = {
           stubFor(
             any(urlMatching(s"/enterprise/return/vat/$vrn"))
               .willReturn(
                 aResponse()
-                  .withStatus(400)
+                  .withStatus(status)
                   .withBody(s"""
                                |{
                                |  "code": "$code",

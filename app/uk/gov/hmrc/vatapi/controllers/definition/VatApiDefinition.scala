@@ -122,7 +122,7 @@ class VatApiDefinition {
       case "STABLE" => APIStatus.STABLE
       case "DEPRECATED" => APIStatus.DEPRECATED
       case "RETIRED" => APIStatus.RETIRED
-      case _ => logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+      case _ => logger.error(s"[ApiDefinition][buildApiStatus] no API status found in config. Reverting to alpha")
         APIStatus.ALPHA
     }
   }

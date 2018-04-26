@@ -42,7 +42,9 @@ object DesErrorCode extends Enumeration {
   INVALID_DATETO,
   INVALID_DATEFROM,
   NOT_FOUND,
-  VRN_NOT_FOUND
+  VRN_NOT_FOUND,
+  INVALID_SUBMISSION,
+  NOT_FOUND_VRN
   = Value
 
   implicit val format: Format[DesErrorCode] = EnumJson.enumFormat(DesErrorCode,
