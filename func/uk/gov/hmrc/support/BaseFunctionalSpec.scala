@@ -616,6 +616,17 @@ trait BaseFunctionalSpec extends TestApplication {
           givens
         }
 
+        def obligationParamsFor(vrn: Vrn, responseBody: String): Givens = {
+          stubFor(get(urlMatching(s".*/vrn/$vrn.*"))
+            .willReturn(
+              aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "application/json")
+                .withBody(responseBody)))
+
+          givens
+        }
+
         def returnObligationsFor(vrn: Vrn): Givens = {
           stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
             .willReturn(

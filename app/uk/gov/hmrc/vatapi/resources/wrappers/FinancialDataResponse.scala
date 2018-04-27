@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
-import play.api.mvc.Results.BadRequest
+import play.api.mvc.Results._
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
@@ -63,7 +63,15 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_DATEFROM) => BadRequest(toJson(Errors.InvalidDateFrom))
     case 400 if errorCodeIsOneOf(INVALID_DATETO) => BadRequest(toJson(Errors.InvalidDateTo))
-    case 400 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
+    case 400 if errorCodeIsOneOf(INVALID_IDTYPE) => BadRequest(toJson(Errors.InvalidIdType))
+    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => InternalServerError(toJson(Errors.InvalidIdNumber))
+    case 400 if errorCodeIsOneOf(INVALID_ONLYOPENITEMS) => BadRequest(toJson(Errors.InvalidOnlyOpenItems))
+    case 400 if errorCodeIsOneOf(INVALID_REGIMETYPE) => BadRequest(toJson(Errors.InvalidRegime))
+    case 400 if errorCodeIsOneOf(INVALID_INCLUDELOCKS) => BadRequest(toJson(Errors.InvalidIncludeLocks))
+    case 400 if errorCodeIsOneOf(INVALID_CALCULATEACCRUEDINTEREST) => BadRequest(toJson(Errors.InvalidCalculatedAccruedInterest))
+    case 400 if errorCodeIsOneOf(INVALID_CUSTOMERPAYMENTINFORMATION) => BadRequest(toJson(Errors.InvalidCustomerPaymentInformation))
+    case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
+    case 422 if errorCodeIsOneOf(INVALID_DATA) => BadRequest(toJson(Errors.InvalidData))
   }
 
 }

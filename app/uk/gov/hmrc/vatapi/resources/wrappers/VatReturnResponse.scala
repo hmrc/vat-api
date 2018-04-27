@@ -52,10 +52,11 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+    case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) => BadRequest(toJson(Errors.InvalidVatSubmission))
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 403 if errorCodeIsOneOf(VRN_NOT_FOUND) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
+    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
   }
 }
 

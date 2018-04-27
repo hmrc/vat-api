@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.vatapi.resources.wrappers
 
+import play.api.libs.json.Json.toJson
+import play.api.mvc.Result
+import play.api.mvc.Results.{BadRequest, InternalServerError}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.des.ObligationDetail
 import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
+import uk.gov.hmrc.vatapi.resources.VatReturnsResource.{Forbidden, NotFound}
 
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
@@ -52,5 +57,17 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
     }
 
     desObligations.fold(noneFound)(oneFound)
+  }
+
+  override def errorMappings: PartialFunction[Int, Result] = {
+    case 400 if errorCodeIsOneOf(INVALID_IDTYPE) => BadRequest(toJson(Errors.InvalidIdType))
+    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => InternalServerError(toJson(Errors.InvalidIdNumber))
+    case 400 if errorCodeIsOneOf(INVALID_STATUS) => BadRequest(toJson(Errors.InvalidStatus))
+    case 400 if errorCodeIsOneOf(INVALID_REGIME) => BadRequest(toJson(Errors.InvalidRegime))
+    case 400 if errorCodeIsOneOf(INVALID_DATE_TO) => BadRequest(toJson(Errors.InvalidDateTo))
+    case 400 if errorCodeIsOneOf(INVALID_DATE_FROM) => BadRequest(toJson(Errors.InvalidDateFrom))
+    case 400 if errorCodeIsOneOf(INVALID_DATE_RANGE) => BadRequest(toJson(Errors.DateRangeTooLarge))
+    case 403 if errorCodeIsOneOf(NOT_FOUND_BPKEY) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
+    case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
   }
 }

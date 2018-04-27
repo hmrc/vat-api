@@ -30,6 +30,18 @@ object DesJsons {
     val notFound: String = error("NOT_FOUND", "The remote endpoint has indicated that no data can be found.")
     val serverError: String = error("SERVER_ERROR", "DES is currently experiencing problems that require live service intervention.")
     val serviceUnavailable: String = error("SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.")
+    val InvalidVatSubmission: String = error("INVALID_SUBMISSION", "The VAT return submitted contains invalid data.")
+    val InvalidIdType: String = error("INVALID_IDTYPE", "The provided data is failed validation, invalid idType")
+    val InvalidIdNumber: String = error("INVALID_IDNUMBER", "The provided data is failed validation, invalid idNumber")
+    val InvalidStatus: String = error("INVALID_STATUS", "The provided data is failed validation, invalid status")
+    val InvalidRegime: String = error("INVALID_STATUS", "The provided data is failed validation, invalid regimeType")
+    val NotFoundBPKey: String = error("NOT_FOUND_BPKEY", "The business partner key information cannot be found for the idNumber.")
+    val InvalidOnlyOpenItems: String = error("INVALID_ONLYOPENITEMS", "The provided data is failed validation, invalid parameter onlyOpenItems")
+    val InvalidIncludeLocks: String = error("INVALID_INCLUDELOCKS", "The provided data is failed validation, invalid parameter includeLocks")
+    val InvalidCalculatedAccruedInterest: String = error("INVALID_CALCULATEACCRUEDINTEREST", "The provided data is failed validation, invalid parameter calculateAccruedInterest")
+    val InvalidCustomerPaymentInformation: String = error("INVALID_CUSTOMERPAYMENTINFORMATION", "The provided data is failed validation, invalid parameter customerPaymentInformation")
+    val InvalidData: String = error("INVALID_DATA", "The provided data is failed validation, contains invalid data")
+
   }
 
 
