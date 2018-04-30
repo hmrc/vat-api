@@ -63,13 +63,8 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_DATEFROM) => BadRequest(toJson(Errors.InvalidDateFrom))
     case 400 if errorCodeIsOneOf(INVALID_DATETO) => BadRequest(toJson(Errors.InvalidDateTo))
-    case 400 if errorCodeIsOneOf(INVALID_IDTYPE) => BadRequest(toJson(Errors.InvalidIdType))
-    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => InternalServerError(toJson(Errors.InvalidIdNumber))
-    case 400 if errorCodeIsOneOf(INVALID_ONLYOPENITEMS) => BadRequest(toJson(Errors.InvalidOnlyOpenItems))
-    case 400 if errorCodeIsOneOf(INVALID_REGIMETYPE) => BadRequest(toJson(Errors.InvalidRegime))
-    case 400 if errorCodeIsOneOf(INVALID_INCLUDELOCKS) => BadRequest(toJson(Errors.InvalidIncludeLocks))
-    case 400 if errorCodeIsOneOf(INVALID_CALCULATEACCRUEDINTEREST) => BadRequest(toJson(Errors.InvalidCalculatedAccruedInterest))
-    case 400 if errorCodeIsOneOf(INVALID_CUSTOMERPAYMENTINFORMATION) => BadRequest(toJson(Errors.InvalidCustomerPaymentInformation))
+    case 400 if errorCodeIsOneOf(INVALID_IDTYPE, INVALID_IDNUMBER, INVALID_ONLYOPENITEMS, INVALID_REGIMETYPE, INVALID_INCLUDELOCKS,
+      INVALID_CALCULATEACCRUEDINTEREST, INVALID_CUSTOMERPAYMENTINFORMATION) => InternalServerError(toJson(Errors.InternalServerError))
     case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
     case 422 if errorCodeIsOneOf(INVALID_DATA) => BadRequest(toJson(Errors.InvalidData))
   }

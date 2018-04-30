@@ -60,14 +60,11 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
   }
 
   override def errorMappings: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_IDTYPE) => BadRequest(toJson(Errors.InvalidIdType))
-    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => InternalServerError(toJson(Errors.InvalidIdNumber))
-    case 400 if errorCodeIsOneOf(INVALID_STATUS) => BadRequest(toJson(Errors.InvalidStatus))
-    case 400 if errorCodeIsOneOf(INVALID_REGIME) => BadRequest(toJson(Errors.InvalidRegime))
+    case 400 if errorCodeIsOneOf(INVALID_IDTYPE, INVALID_IDNUMBER, INVALID_STATUS, INVALID_REGIME, NOT_FOUND_BPKEY) =>
+                InternalServerError(toJson(Errors.InternalServerError))
     case 400 if errorCodeIsOneOf(INVALID_DATE_TO) => BadRequest(toJson(Errors.InvalidDateTo))
     case 400 if errorCodeIsOneOf(INVALID_DATE_FROM) => BadRequest(toJson(Errors.InvalidDateFrom))
     case 400 if errorCodeIsOneOf(INVALID_DATE_RANGE) => BadRequest(toJson(Errors.DateRangeTooLarge))
-    case 403 if errorCodeIsOneOf(NOT_FOUND_BPKEY) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
   }
 }
