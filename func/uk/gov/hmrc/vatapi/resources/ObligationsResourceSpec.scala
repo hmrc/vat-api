@@ -80,6 +80,46 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .statusIs(404)
     }
 
+    "return code 400 when idType parameter is invalid" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, DesJsons.Errors.InvalidIdType)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(500)
+    }
+
+    "return code 400 when idNumber parameter is invalid" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, DesJsons.Errors.InvalidIdNumber)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(500)
+    }
+
+    "return code 400 when regime type parameter is invalid" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, DesJsons.Errors.InvalidRegime)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(500)
+    }
+
+    "return code 400 when status parameter is invalid" in {
+      given()
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, DesJsons.Errors.InvalidStatus)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(500)
+    }
+
     "return code 200 with a set of obligations" in {
       given()
         .userIsFullyAuthorisedForTheResource
