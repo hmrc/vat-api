@@ -30,6 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object VatReturnsConnector extends VatReturnsConnector {
   override val http: WSHttp = WSHttp
+  override val appContext = AppContext
 }
 
 trait VatReturnsConnector extends BaseConnector {

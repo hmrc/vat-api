@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi
 
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.{AsyncWordSpec, Matchers, OptionValues, WordSpec}
 
 import scala.concurrent.duration._
@@ -38,6 +38,8 @@ trait TestUtils {
 
   def now: DateTime = DateTime.now(DateTimeZone.UTC)
   def generateVrn = vrnGenerator.nextVrn()
+
+  implicit def toLocalDate(d: DateTime): LocalDate = d.toLocalDate
 }
 
 object TestUtils extends TestUtils

@@ -31,6 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait BaseConnector {
 
   val http: WSHttp
+  val appContext: AppContext
 
   private val logger = Logger("connectors")
 

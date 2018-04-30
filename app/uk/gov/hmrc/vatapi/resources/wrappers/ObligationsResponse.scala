@@ -24,17 +24,15 @@ import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
   def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
-    val desObligations = jsonOrError match {
-      case Right(js) =>
-        logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES : ${js}")
-        js.asOpt[des.Obligations]
-      case _ => logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.status}")
-        None
-    }
 
     def noneFound: Either[DesTransformError, Option[Obligations]] = {
-      logger.error(s"[ObligationsResponse][noneFound] The response from DES does not match the expected format. JSON: ${underlying.status}")
+      logger.error(s"[ObligationsResponse][noneFound] No obligation details found. JSON: ${underlying.status}")
       Right(None)
+    }
+
+    def error(message: String): Either[DesTransformError, Option[Obligations]] = {
+      logger.error(s"[ObligationsResponse][error] $message. status: ${underlying.status}")
+      Left(new DesTransformError{ val msg = message })
     }
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {
@@ -51,6 +49,14 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
       }
     }
 
-    desObligations.fold(noneFound)(oneFound)
+    jsonOrError match {
+      case Right(js) => logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES : $js")
+        js.asOpt[des.Obligations] match {
+          case Some(obligations) => oneFound(obligations)
+          case _ => error("The response from DES does not match the expected format")
+        }
+      case _ => logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.status}")
+        error("Non json response from DES")
+    }
   }
 }

@@ -17,22 +17,28 @@
 package uk.gov.hmrc.vatapi.mocks
 
 import org.mockito.Matchers
-import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.scalatest.Suite
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.vatapi.config.WSHttp
 
 import scala.concurrent.{ExecutionContext, Future}
-trait MockHttp extends MockitoSugar with BeforeAndAfterEach { this: Suite =>
+
+
+trait MockHttp extends Mock { _: Suite =>
 
   val mockHttp: WSHttp = mock[WSHttp]
 
-  override def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockHttp)
+  }
+
+  object MockHttp{
+    def GET[T](url: String): OngoingStubbing[Future[T]] = {
+      when(mockHttp.GET[T](eqTo(url))(any(), any(), any()))
+    }
   }
 
   def setupMockHttpGet(url: String)(response: HttpResponse): OngoingStubbing[Future[HttpResponse]] =

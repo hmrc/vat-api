@@ -17,8 +17,6 @@
 package uk.gov.hmrc.vatapi.connectors
 
 import org.joda.time.DateTime
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -28,6 +26,7 @@ import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.mocks.MockHttp
+import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
@@ -35,10 +34,13 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockHttp {
+class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
+  with MockHttp
+  with MockAppContext {
 
   object TestVatReturnsConnector extends VatReturnsConnector {
     override val http: WSHttp = mockHttp
+    override val appContext = mockAppContext
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()

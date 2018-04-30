@@ -30,6 +30,7 @@ object FinancialDataConnector extends BaseConnector {
 
   val logger: Logger = Logger(this.getClass)
   override val http: WSHttp = WSHttp
+  override val appContext = AppContext
 
   private lazy val baseUrl: String = s"${AppContext.desUrl}/enterprise/financial-data"
 
