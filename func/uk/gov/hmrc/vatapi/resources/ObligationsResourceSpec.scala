@@ -87,7 +87,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(500)
     }
 
     "return code 400 when idNumber parameter is invalid" in {
@@ -97,7 +97,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(500)
     }
 
     "return code 400 when regime type parameter is invalid" in {
@@ -107,7 +107,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(500)
     }
 
     "return code 400 when status parameter is invalid" in {
@@ -117,7 +117,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(500)
     }
 
     "return code 200 with a set of obligations" in {
