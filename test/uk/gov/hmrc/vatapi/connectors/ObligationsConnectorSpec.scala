@@ -18,6 +18,7 @@ package uk.gov.hmrc.vatapi.connectors
 
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
+import play.mvc.Http.{HeaderNames, MimeTypes}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
@@ -40,8 +41,12 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
       override val appContext = mockAppContext
     }
     MockAppContext.desUrl returns desBaseUrl
+    MockAppContext.desToken returns desToken
+    MockAppContext.desEnv returns desEnvironment
   }
 
+  lazy val desToken = "test-token"
+  lazy val desEnvironment = "test-env"
   lazy val desBaseUrl = "des-base-url"
 
   val vrn: Vrn = generateVrn
@@ -50,13 +55,26 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
   val desUrl = s"$desBaseUrl/enterprise/obligation-data/vrn/$vrn/VATC?$queryString"
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
 
+  val desHttpResponse = HttpResponse(200, Some(desObligationsJson))
+
   implicit val hc = HeaderCarrier()
 
   "get" should {
-    "returns an ObligationsResponse" when {
-      "DES returns a 200 response" in new Setup {
-        val desHttpResponse = HttpResponse(200, Some(desObligationsJson))
+    "have the DES headers in the request" in new Setup {
+      MockHttp.GET[HttpResponse](desUrl)
+        .returns(Future.successful(desHttpResponse))
 
+      await(testObligationsConnector.get(vrn, queryParams))
+
+      val headers = MockHttp.fetchHeaderCarrier.headers.toMap
+      headers("Accept") shouldBe MimeTypes.JSON
+      headers("Environment") shouldBe desEnvironment
+      headers("Authorization") shouldBe s"Bearer $desToken"
+      headers("Originator-Id") shouldBe "DA_SDI"
+    }
+
+    "return an ObligationsResponse" when {
+      "DES returns a 200 response" in new Setup {
         MockHttp.GET[HttpResponse](desUrl)
           .returns(Future.successful(desHttpResponse))
 

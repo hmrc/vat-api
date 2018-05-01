@@ -42,6 +42,7 @@ trait ObligationsConnector extends BaseConnector {
     logger.debug(s"[ObligationsConnector][get] Retrieve obligations for VRN $vrn with the given query parameters.")
 
     val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
+
     httpGet[ObligationsResponse](baseUrl + s"/enterprise/obligation-data/vrn/$vrn/VATC?$queryString", ObligationsResponse)
   }
 }

@@ -37,9 +37,9 @@ trait BaseConnector {
 
   private def withDesHeaders: HeaderCarrier => HeaderCarrier = { hc =>
     val newHc: HeaderCarrier = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${AppContext.desToken}")))
+      .copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
       .withExtraHeaders(
-        "Environment" -> AppContext.desEnv,
+        "Environment" -> appContext.desEnv,
         "Accept" -> "application/json",
         "Originator-Id" -> "DA_SDI"
       )
