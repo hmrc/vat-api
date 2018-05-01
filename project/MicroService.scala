@@ -25,7 +25,7 @@ trait MicroService {
     Seq(
       ScoverageKeys.coverageExcludedPackages := "<empty>;.*(Reverse|BuildInfo|Routes).*",
       ScoverageKeys.coverageMinimum := 80,
-      ScoverageKeys.coverageFailOnMinimum := false,
+      ScoverageKeys.coverageFailOnMinimum := true,
       ScoverageKeys.coverageHighlighting := true
     )
   }

@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.vatapi.services
+
 import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar

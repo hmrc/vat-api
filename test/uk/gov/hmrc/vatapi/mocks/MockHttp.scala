@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.mocks
 
-import org.mockito.Matchers
+import org.mockito.{ArgumentCaptor, Matchers}
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Suite
 import play.api.libs.json.Writes
@@ -35,10 +35,14 @@ trait MockHttp extends Mock { _: Suite =>
     reset(mockHttp)
   }
 
-  object MockHttp{
+  object MockHttp {
+    private val headerCarrierCaptor = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+
     def GET[T](url: String): OngoingStubbing[Future[T]] = {
-      when(mockHttp.GET[T](eqTo(url))(any(), any(), any()))
+      when(mockHttp.GET[T](eqTo(url))(any(), headerCarrierCaptor.capture(), any()))
     }
+
+    def fetchHeaderCarrier: HeaderCarrier = headerCarrierCaptor.getValue
   }
 
   def setupMockHttpGet(url: String)(response: HttpResponse): OngoingStubbing[Future[HttpResponse]] =
