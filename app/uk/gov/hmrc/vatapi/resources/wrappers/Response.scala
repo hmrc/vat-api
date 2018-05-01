@@ -51,11 +51,13 @@ trait Response {
 
   def underlying: HttpResponse
 
-  def jsonOrError: Either[Throwable, JsValue] =
-    Try { underlying.json } match {
+  def jsonOrError: Either[Throwable, JsValue] = {
+    Try(underlying.json) match {
+      case Success(null) => Left(new RuntimeException)
       case Success(json) => Right(json)
-      case Failure(e)    => Left(e)
+      case Failure(e) => Left(e)
     }
+  }
 
   val status: Int = underlying.status
 

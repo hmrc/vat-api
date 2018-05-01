@@ -133,7 +133,7 @@ class ObligationsResponseSpec extends UnitSpec {
       val response = ObligationsResponse(HttpResponse(200, Some(invalidTypeJson)))
 
       val obligations = response.obligations(vrn)
-      obligations.right.get shouldBe None
+      obligations.left.get.msg shouldBe "The response from DES does not match the expected format"
     }
 
     "wrap valid response" in {

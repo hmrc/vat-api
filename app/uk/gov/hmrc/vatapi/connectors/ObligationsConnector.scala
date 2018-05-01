@@ -27,19 +27,21 @@ import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object ObligationsConnector extends BaseConnector {
+object ObligationsConnector extends ObligationsConnector {
   override val http: WSHttp = WSHttp
+  override val appContext = AppContext
+}
 
-  val logger: Logger = Logger(this.getClass)
+trait ObligationsConnector extends BaseConnector {
+  val http: WSHttp
 
-  private lazy val baseUrl: String = AppContext.desUrl
+  private lazy val baseUrl = appContext.desUrl
+  private val logger: Logger = Logger(this.getClass)
 
   def get(vrn: Vrn, queryParams: ObligationsQueryParams)(implicit hc: HeaderCarrier): Future[ObligationsResponse] = {
-
     logger.debug(s"[ObligationsConnector][get] Retrieve obligations for VRN $vrn with the given query parameters.")
 
     val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
     httpGet[ObligationsResponse](baseUrl + s"/enterprise/obligation-data/vrn/$vrn/VATC?$queryString", ObligationsResponse)
   }
-
 }

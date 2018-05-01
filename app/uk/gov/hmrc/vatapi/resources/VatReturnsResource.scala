@@ -22,10 +22,12 @@ import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.AuditEvent
 import uk.gov.hmrc.vatapi.audit.AuditService.audit
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
+import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,6 +35,8 @@ object VatReturnsResource extends BaseResource {
 
   private val connector = VatReturnsConnector
   private val orchestrator = VatReturnsOrchestrator
+  override val authService = AuthorisationService
+  override val appContext = AppContext
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -103,5 +107,4 @@ object VatReturnsResource extends BaseResource {
       transactionName = "vat-retrieve-vat-returns",
       detail = RetrieveVatReturn(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
     )
-
 }

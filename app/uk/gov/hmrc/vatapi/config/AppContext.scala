@@ -21,8 +21,12 @@ import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 
-object AppContext extends ServicesConfig {
-  private lazy val config = current.configuration
+object AppContext extends AppContext with ServicesConfig {
+  lazy val config: Configuration = current.configuration
+}
+
+trait AppContext extends ServicesConfig {
+  val config: Configuration
 
   lazy val desEnv: String = config.getString(s"$env.microservice.services.des.env").getOrElse(throw new RuntimeException("desEnv is not configured"))
   lazy val desToken: String = config.getString(s"$env.microservice.services.des.token").getOrElse(throw new RuntimeException("desEnv is not configured"))

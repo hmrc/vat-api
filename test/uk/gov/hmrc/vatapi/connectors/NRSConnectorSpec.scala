@@ -17,8 +17,6 @@
 package uk.gov.hmrc.vatapi.connectors
 
 import nrs.models.NRSSubmission
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -29,14 +27,18 @@ import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.config.WSHttp
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.mocks.MockHttp
+import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NRSConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockHttp {
+class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
+  with MockHttp
+  with MockAppContext {
 
   object TestNRSConnector extends NRSConnector {
     override val http: WSHttp = mockHttp
+    override val appContext = mockAppContext
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
