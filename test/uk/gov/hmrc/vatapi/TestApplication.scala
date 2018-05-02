@@ -20,16 +20,17 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers}
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.play.OneServerPerSuite
+import play.api.http.Status._
 
 import scala.concurrent.duration._
 
 trait TestApplication
   extends UnitSpec
-    with Matchers
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with OneServerPerSuite
@@ -46,25 +47,26 @@ trait TestApplication
   protected val wiremockBaseUrl: String = s"http://$stubHost:$WIREMOCK_PORT"
   private val wireMockServer = new WireMockServer(wireMockConfig().port(WIREMOCK_PORT))
 
-  protected def baseBeforeAll() = {
+  protected def baseBeforeAll(): StubMapping = {
     wireMockServer.stop()
     wireMockServer.start()
     WireMock.configureFor(stubHost, WIREMOCK_PORT)
     // the below stub is here so that the application finds the registration endpoint which is called on startup
-    stubFor(post(urlPathEqualTo("/registration")).willReturn(aResponse().withStatus(200)))
+    stubFor(post(urlPathEqualTo("/registration")).willReturn(aResponse().withStatus(OK)))
+    stubFor(post(urlPathMatching("/write/audit/")).willReturn(aResponse().withStatus(OK)))
   }
 
-  override def beforeAll() = {
+  override def beforeAll(): Unit = {
     super.beforeAll()
     baseBeforeAll()
   }
 
-  override def afterAll() = {
+  override def afterAll(): Unit = {
     super.afterAll()
     wireMockServer.stop()
   }
 
-  override def beforeEach() = {
+  override def beforeEach(): Unit = {
     super.beforeEach()
     WireMock.reset()
   }

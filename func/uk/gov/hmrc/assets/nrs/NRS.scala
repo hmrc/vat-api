@@ -1,8 +1,6 @@
-package uk.gov.hmrc.vatapi.resources
+package uk.gov.hmrc.assets.nrs
 
 import play.api.libs.json.{JsValue, Json}
-
-object FuncJsons {
 
   object NRS {
     def success(): JsValue =
@@ -15,5 +13,3 @@ object FuncJsons {
            |}
          """.stripMargin)
   }
-
-}

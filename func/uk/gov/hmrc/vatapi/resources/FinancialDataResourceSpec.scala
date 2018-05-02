@@ -1,13 +1,17 @@
 package uk.gov.hmrc.vatapi.resources
 
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlMatching}
+import play.api.http.Status.OK
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
   "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
-
       "reject client with no authorization" in {
+
+        stubFor(post(urlMatching("/write/audit.*")).willReturn(aResponse().withStatus(OK)))
+
         given()
           .userIsNotAuthorisedForTheResource
           .when()
