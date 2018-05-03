@@ -17,19 +17,16 @@
 package uk.gov.hmrc.vatapi.mocks.connectors
 
 import nrs.models.NRSSubmission
-import org.mockito.Matchers
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
+import uk.gov.hmrc.vatapi.mocks.Mock
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockNRSConnector extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockNRSConnector extends UnitSpec with Mock {
 
   val mockNRSConnector: NRSConnector = mock[NRSConnector]
 
@@ -41,7 +38,7 @@ trait MockNRSConnector extends UnitSpec with MockitoSugar with BeforeAndAfterEac
   def setupNrsSubmission(vrn: Vrn, submission: NRSSubmission)(response: NrsSubmissionOutcome): Unit =
     when(mockNRSConnector
       .submit(
-        Matchers.eq(vrn),
-        Matchers.any[NRSSubmission]())(Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]()))
+        eqTo(vrn),
+        any[NRSSubmission]())(any[HeaderCarrier](), any[ExecutionContext]()))
       .thenReturn(Future.successful(response))
 }

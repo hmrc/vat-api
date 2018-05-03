@@ -17,6 +17,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied for application.raml" in {
       given()
+        .stubAudit
         .when()
         .get("/api/conf/1.0/application.raml")
         .thenAssertThat()
@@ -26,6 +27,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied for obligations " in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsFor(vrn)
         .when()
@@ -37,6 +39,8 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
 
     "be applied when vrn is invalid" in {
+      given()
+        .stubAudit
       when()
         .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
         .thenAssertThat()
@@ -47,6 +51,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied when obligations does not exist" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
@@ -58,6 +63,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
     "be applied for api definition without accept header" in {
       given()
+        .stubAudit
         .when()
         .get("/api/definition")
         .withoutAcceptHeader()

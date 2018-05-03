@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.vatapi.mocks.config
 
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Suite
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.mocks.Mock
 
 trait MockAppContext extends Mock { _: Suite =>
 
-  val mockAppContext = mock[AppContext]
+  val mockAppContext: AppContext = mock[AppContext]
 
   object MockAppContext {
-    def desUrl = when(mockAppContext.desUrl)
-    def desToken = when(mockAppContext.desToken)
-    def desEnv = when(mockAppContext.desEnv)
+    def desUrl: OngoingStubbing[String] = when(mockAppContext.desUrl)
+    def desToken: OngoingStubbing[String] = when(mockAppContext.desToken)
+    def desEnv: OngoingStubbing[String] = when(mockAppContext.desEnv)
   }
 
   override protected def beforeEach(): Unit = {

@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.vatapi.mocks
 
-import org.mockito.{ArgumentCaptor, Matchers}
 import org.mockito.stubbing.OngoingStubbing
+import org.mockito.{ArgumentCaptor, ArgumentMatchers => Matchers}
 import org.scalatest.Suite
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
@@ -46,26 +46,26 @@ trait MockHttp extends Mock { _: Suite =>
   }
 
   def setupMockHttpGet(url: String)(response: HttpResponse): OngoingStubbing[Future[HttpResponse]] =
-    when(mockHttp.GET[HttpResponse](Matchers.eq(url))
-      (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(response))
+    when(mockHttp.GET[HttpResponse](eqTo(url))
+      (any(), any(), any())).thenReturn(Future.successful(response))
 
 
   def setupMockFailedHttpGet(url: String)(response: HttpResponse): OngoingStubbing[Future[HttpResponse]] =
-    when(mockHttp.GET[HttpResponse](Matchers.eq(url))
-      (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.failed(new Exception))
+    when(mockHttp.GET[HttpResponse](eqTo(url))
+      (any(), any(), any())).thenReturn(Future.failed(new Exception))
 
   def setupMockHttpPost[T, R](url: String, elem: T)(response: R): OngoingStubbing[Future[R]] ={
     when(
-      mockHttp.POST[T, R](Matchers.eq(url), Matchers.eq[T](elem), Matchers.any[Seq[(String, String)]]())
-      (Matchers.any[Writes[T]](), Matchers.any[HttpReads[R]](), Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]())
+      mockHttp.POST[T, R](eqTo(url), eqTo[T](elem), any[Seq[(String, String)]]())
+      (any[Writes[T]](), any[HttpReads[R]](), any[HeaderCarrier](), any[ExecutionContext]())
     ).thenReturn(
       Future.successful(response))
   }
 
   def setupMockHttpPostString[R](url: String, elem: String)(response: R): OngoingStubbing[Future[R]] ={
     when(
-      mockHttp.POSTString[R](Matchers.eq(url), Matchers.eq[String](elem), Matchers.any[Seq[(String, String)]]())
-        (Matchers.any[HttpReads[R]](), Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]())
+      mockHttp.POSTString[R](eqTo(url), eqTo[String](elem), any[Seq[(String, String)]]())
+        (any[HttpReads[R]](), any[HeaderCarrier](), any[ExecutionContext]())
     ).thenReturn(
       Future.successful(response))
   }

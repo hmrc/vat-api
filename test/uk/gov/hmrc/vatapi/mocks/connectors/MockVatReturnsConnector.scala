@@ -16,20 +16,17 @@
 
 package uk.gov.hmrc.vatapi.mocks.connectors
 
-import org.mockito.Matchers
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
+import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.des.VatReturnDeclaration
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockVatReturnsConnector extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockVatReturnsConnector extends UnitSpec with Mock {
 
   val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
 
@@ -41,7 +38,7 @@ trait MockVatReturnsConnector extends UnitSpec with MockitoSugar with BeforeAndA
   def setupVatReturnSubmission(vrn: Vrn, submission: VatReturnDeclaration)(response: VatReturnResponse): Unit =
     when(mockVatReturnsConnector
       .post(
-        Matchers.eq(vrn),
-        Matchers.any[VatReturnDeclaration]())(Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]()))
+        eqTo(vrn),
+        any[VatReturnDeclaration]())(any[HeaderCarrier](), any[ExecutionContext]()))
       .thenReturn(Future.successful(response))
 }

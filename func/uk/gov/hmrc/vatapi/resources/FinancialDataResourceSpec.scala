@@ -6,9 +6,9 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
   "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
-
       "reject client with no authorization" in {
         given()
+          .stubAudit
           .userIsNotAuthorisedForTheResource
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
@@ -19,6 +19,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "retrieve a single liability where they exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.singleLiabilityFor(vrn)
           .when()
@@ -30,6 +31,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "retrieve a single liability where the minimum data exists" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.minLiabilityFor(vrn)
           .when()
@@ -40,6 +42,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
       "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.overlappingLiabilitiesFor(vrn)
           .when()
@@ -51,6 +54,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "retrieve multiple liabilities where they exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.multipleLiabilitiesFor(vrn)
           .when()
@@ -62,6 +66,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "return a 404 (Not Found) if no liabilities exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.emptyLiabilitiesFor(vrn)
           .when()
@@ -73,6 +78,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "a date range of greater than 1 year is supplied" should {
       "return an INVALID_DATE_RANGE error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
           .thenAssertThat()
@@ -82,6 +89,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid 'from' date is supplied" should {
       "return an INVALID_DATE_TO error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
           .thenAssertThat()
@@ -91,6 +100,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid 'to' date is supplied" should {
       "return and INVALID_DATE_FROM error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
           .thenAssertThat()
@@ -100,6 +111,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid VRN is supplied" should {
       "return an INVALID_VRN error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
           .thenAssertThat()
@@ -112,6 +125,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
     "a valid request is made" should {
       "retrieve a single payment where they exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.singlePaymentFor(vrn)
           .when()
@@ -122,6 +136,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
       "retrieve a single payment where the minimum data exists" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.minPaymentFor(vrn)
           .when()
@@ -133,6 +148,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "return only those payments belonging to a liability that falls before the 'to' date" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.overlappingPaymentsFor(vrn)
           .when()
@@ -144,6 +160,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "retrieve multiple payments where they exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.multiplePaymentsFor(vrn)
           .when()
@@ -155,6 +172,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
       "return a 404 (Not Found) if no payments exist" in {
         given()
+          .stubAudit
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.emptyPaymentsFor(vrn)
           .when()
@@ -166,6 +184,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "a date range of greater than 1 year is supplied" should {
       "return an INVALID_DATE_RANGE error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/payments?from=2015-01-01&to=2016-01-01")
           .thenAssertThat()
@@ -175,6 +195,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid 'from' date is supplied" should {
       "return an INVALID_DATE_TO error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/payments?from=2017-01-01&to=3017-12-31")
           .thenAssertThat()
@@ -184,6 +206,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid 'to' date is supplied" should {
       "return and INVALID_DATE_FROM error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/$vrn/payments?from=2001-01-01&to=2017-12-31")
           .thenAssertThat()
@@ -193,6 +217,8 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
 
     "an invalid VRN is supplied" should {
       "return an INVALID_VRN error" in {
+        given()
+          .stubAudit
         when()
           .get(s"/invalidvrn/payments?from=2015-01-01&to=2017-12-31")
           .thenAssertThat()

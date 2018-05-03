@@ -22,7 +22,7 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 trait MockAuthorisationService extends Mock{ _: Suite =>
 
-  val mockAuthorisationService = mock[AuthorisationService]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object MockAuthorisationService {
 

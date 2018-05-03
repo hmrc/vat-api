@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.mocks
 
-import org.mockito.Matchers
+import org.mockito.{ArgumentMatchers => Matchers}
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.mockito.MockitoSugar

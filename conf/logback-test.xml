@@ -42,11 +42,15 @@
         <appender-ref ref="STDOUT"/>
     </appender>
 
-    <logger name="uk.gov.hmrc.vatapi" level="DEBUG"/>
-    <logger name="uk.gov.hmrc.audit" level="WARN"/>
+    <logger name="application" level="ERROR"/>
+    <logger name="uk.gov.hmrc.vatapi" level="OFF"/>
+    <logger name="uk.gov.hmrc.audit" level="ERROR"/>
+    <logger name="connector" level="ERROR"/>
+
+    <logger name="org.eclipse.jetty" level="ERROR"/>
     <logger name="akka" level="ERROR"/>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="ASYNC_STDOUT"/>
     </root>

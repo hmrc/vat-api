@@ -16,18 +16,22 @@
 
 package uk.gov.hmrc.vatapi.mocks.connectors
 
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Suite
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
+import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
+
+import scala.concurrent.Future
 
 trait MockObligationsConnector extends Mock { _: Suite =>
 
-  val mockObligationsConnector = mock[ObligationsConnector]
+  val mockObligationsConnector: ObligationsConnector = mock[ObligationsConnector]
 
   object MockObligationsConnector {
-    def get(vrn: Vrn, queryParams: ObligationsQueryParams) = {
+    def get(vrn: Vrn, queryParams: ObligationsQueryParams): OngoingStubbing[Future[ObligationsResponse]] = {
       when(mockObligationsConnector.get(eqTo(vrn), eqTo(queryParams))(any()))
     }
   }
