@@ -16,21 +16,18 @@
 
 package uk.gov.hmrc.vatapi.mocks.services
 
-import org.mockito.Matchers
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
+import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.services.NRSService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockNRSService extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockNRSService extends UnitSpec with Mock {
 
   val mockNrsService: NRSService = mock[NRSService]
 
@@ -42,7 +39,7 @@ trait MockNRSService extends UnitSpec with MockitoSugar with BeforeAndAfterEach 
   def setupNrsSubmission(vrn: Vrn, submission: VatReturnDeclaration)(response: NrsSubmissionOutcome): Unit =
     when(mockNrsService
       .submit(
-        Matchers.eq(vrn),
-        Matchers.any[VatReturnDeclaration]())(Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext](), Matchers.any[AuthRequest[_]]()))
+        eqTo(vrn),
+        any[VatReturnDeclaration]())(any[HeaderCarrier](), any[ExecutionContext](), any[AuthRequest[_]]()))
       .thenReturn(Future.successful(response))
 }

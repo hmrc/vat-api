@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.vatapi.mocks.auth
 
-import org.mockito.Matchers
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.mockito.{ArgumentMatchers => Matchers}
+import org.scalatest.Suite
 import play.api.libs.json.JsArray
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
@@ -28,10 +26,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
+import uk.gov.hmrc.vatapi.mocks.Mock
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
 
   self: Suite =>
 
@@ -137,7 +136,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
   }
 
   def setupMockAuthRetrievalSuccess[X, Y](retrievalValue: X ~ Y): Unit = {
-    when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
+    when(mockAPIAuthorisedFunctions.authorised(any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
           override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray.empty), retrieval) {
@@ -147,7 +146,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with MockitoSugar with BeforeA
   }
 
   def setupMockAuthorisationException(exception: Exception = InsufficientEnrolments()): Unit =
-    when(mockAPIAuthorisedFunctions.authorised(Matchers.any()))
+    when(mockAPIAuthorisedFunctions.authorised(any()))
       .thenReturn(
         new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
           override def apply[A](body: => Future[A])(implicit hc: HeaderCarrier, executionContext: ExecutionContext) = Future.failed(exception)

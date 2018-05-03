@@ -16,20 +16,17 @@
 
 package uk.gov.hmrc.vatapi.mocks.services
 
-import org.mockito.Matchers
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.VatReturnsService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockVatReturnsService extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+trait MockVatReturnsService extends UnitSpec with Mock {
 
   val mockVatReturnsService: VatReturnsService = mock[VatReturnsService]
 
@@ -41,7 +38,7 @@ trait MockVatReturnsService extends UnitSpec with MockitoSugar with BeforeAndAft
   def setupVatReturnSubmission(vrn: Vrn, submission: des.VatReturnDeclaration)(response: VatReturnResponse): Unit =
     when(mockVatReturnsService
       .submit(
-        Matchers.eq(vrn),
-        Matchers.any[des.VatReturnDeclaration]())(Matchers.any[HeaderCarrier](), Matchers.any[ExecutionContext]()))
+        eqTo(vrn),
+        any[des.VatReturnDeclaration]())(any[HeaderCarrier](), any[ExecutionContext]()))
       .thenReturn(Future.successful(response))
 }

@@ -55,7 +55,7 @@ trait MicroService {
         "-Ypartial-unification"),
       libraryDependencies ++= appDependencies,
       parallelExecution in Test := false,
-      fork in Test := false,
+      fork in Test := true,
       javaOptions in Test += "-Dlogger.resource=logback-test.xml",
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)

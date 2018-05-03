@@ -10,13 +10,13 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date{ISO8601} level=[%level] logger=[%logger] thread=[%thread] rid=[%X{X-Request-ID}] user=[%X{Authorization}] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
+            <pattern>%date{ISO8601} level=[%level] logger=[%logger] rid=[%X{X-Request-ID}] user=[%X{Authorization}] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT_IGNORE_NETTY" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date{ISO8601} level=[%level] logger=[%logger] thread=[%thread] rid=[not-available] user=[not-available] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
+            <pattern>%date{ISO8601} level=[%level] logger=[%logger] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
 
@@ -42,9 +42,9 @@
         <appender-ref ref="STDOUT"/>
     </appender>
 
-    <logger name="uk.gov" level="INFO"/>
-
-    <logger name="application" level="DEBUG"/>
+    <logger name="uk.gov.hmrc.vatapi" level="DEBUG"/>
+    <logger name="uk.gov.hmrc.audit" level="WARN"/>
+    <logger name="akka" level="ERROR"/>
 
     <root level="INFO">
         <appender-ref ref="ASYNC_FILE"/>

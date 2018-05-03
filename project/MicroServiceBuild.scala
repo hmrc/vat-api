@@ -23,17 +23,41 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
+  val reactiveMongoVersion = "6.2.0"
+  val microserviceBootstrapVersion = "6.17.0"
+  val authClientVersion = "2.5.0"
+  val domainVersion = "5.1.0"
+  val hmrcApiVersion = "2.1.0"
+  val jsonExtensionsVersion = "0.10.0"
+  val jsonJodaVersion = "2.6.7"
+  val catsCoreVersion = "1.0.1"
+  val json4SnativeVersion = "3.5.3"
+  val json4SextVersion = "3.5.3"
+
+  val hmrcTestVersion = "3.0.0"
+  val scalaTestVersion = "3.0.1"
+  val pegdownVersion = "1.6.0"
+  val scalaTestPlusVerson = "2.0.0"
+  val wiremockversion = "2.12.0"
+  val reactiveMongoTestVersion = "3.1.0"
+  val scalacheckVersion = "1.13.4"
+  val jsonAssertVersion = "1.4.0"
+  val restAssuredVersion = "2.9.0"
+  val mockitoVersion = "2.13.0"
+  val scoverageVersion = "1.2.0"
+
   val compile = Seq(
+    "uk.gov.hmrc" %% "play-reactivemongo" % reactiveMongoVersion,
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc" %% "microservice-bootstrap" % "6.17.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.3.0",
-    "uk.gov.hmrc" %% "domain" % "5.0.0",
-    "uk.gov.hmrc" %% "play-hmrc-api" % "2.1.0",
-    "ai.x" %% "play-json-extensions" % "0.10.0",
-    "com.typesafe.play" %% "play-json-joda" % "2.6.7",
-    "org.typelevel" %% "cats-core" % "1.0.1",
-    "org.json4s" %% "json4s-native" % "3.5.3",
-    "org.json4s" %% "json4s-ext" % "3.5.3"
+    "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
+    "uk.gov.hmrc" %% "auth-client" % authClientVersion,
+    "uk.gov.hmrc" %% "domain" % domainVersion,
+    "uk.gov.hmrc" %% "play-hmrc-api" % hmrcApiVersion,
+    "ai.x" %% "play-json-extensions" % jsonExtensionsVersion,
+    "com.typesafe.play" %% "play-json-joda" % jsonJodaVersion,
+    "org.typelevel" %% "cats-core" % catsCoreVersion,
+    "org.json4s" %% "json4s-native" % json4SnativeVersion,
+    "org.json4s" %% "json4s-ext" % json4SextVersion
   )
 
   trait TestDependencies {
@@ -42,40 +66,23 @@ private object AppDependencies {
   }
 
   object Test {
-    def apply(): Seq[ModuleID] = new TestDependencies {
+    def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
-        "org.scalatest" %% "scalatest" % "3.0.1" % scope,
+        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
+        "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
+        "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "2.12.0" % scope,
-        "uk.gov.hmrc" %% "reactivemongo-test" % "3.0.0" % scope,
-        "org.scalacheck" %% "scalacheck" % "1.13.4" % scope,
-        "org.skyscreamer" % "jsonassert" % "1.4.0" % scope,
-        "org.mockito" % "mockito-core" % "1.9.5" % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusVerson % scope,
+        "com.github.tomakehurst" % "wiremock" % wiremockversion % scope,
+        "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope,
+        "org.skyscreamer" % "jsonassert" % jsonAssertVersion % scope,
+        "com.jayway.restassured" % "rest-assured" % restAssuredVersion % scope,
+        "org.mockito" % "mockito-core" % mockitoVersion % scope,
+        "org.scoverage" %% "scalac-scoverage-runtime" % scoverageVersion % scope
       )
+
     }.test
   }
-
-  object IntegrationTest {
-    def apply(): Seq[ModuleID] = new TestDependencies {
-
-      override lazy val scope: String = "func"
-
-      override lazy val test = Seq(
-        "org.scalatest" %% "scalatest" % "3.0.1" % scope,
-        "org.pegdown" % "pegdown" % "1.6.0" % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "2.2.2" % scope,
-        "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "2.0.0" % scope,
-        "org.mongodb" %% "casbah" % "3.1.1" % scope,
-        // this line is only needed for coverage
-        "org.scoverage" %% "scalac-scoverage-runtime" % "1.2.0" % scope,
-        "org.mockito" % "mockito-core" % "1.9.5" % scope
-      )
-    }.test
-  }
-
-  def apply(): Seq[ModuleID] = compile ++ Test() ++ IntegrationTest()
+  
+  def apply(): Seq[ModuleID] = compile ++ Test()
 }
