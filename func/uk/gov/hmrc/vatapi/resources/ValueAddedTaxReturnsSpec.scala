@@ -37,6 +37,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to submit VAT returns" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
@@ -55,6 +56,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to submit VAT returns even with negative amounts" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
@@ -73,6 +75,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject client with no authorization" in {
       given()
+        .stubAudit
         .userIsNotAuthorisedForTheResource
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
@@ -83,6 +86,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "not allow users to submit undeclared VAT returns" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnSubmissionFor(vrn)
@@ -96,6 +100,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid period key" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY", 400)
@@ -109,6 +114,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid ARN" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN", 400)
@@ -122,6 +128,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid VRN" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN", 400)
@@ -135,6 +142,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject submission with invalid payload" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD", 400)
@@ -148,6 +156,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject duplicate submission" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsVatReturnSuccessFor(vrn)
         .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION", 409)
@@ -161,6 +170,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "fail if submission to  Non-Repudiation service failed" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
         .nrs().nrsFailurefor(vrn)
         .when()
@@ -176,6 +186,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to retrieve VAT returns for last four years" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnSearchFor(vrn, "0001")
         .when()
@@ -196,6 +207,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "allow users to retrieve VAT returns without receivedAt field for last four years" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnSearchForWithoutReceivedAt(vrn, "0001")
         .when()
@@ -216,6 +228,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return internal server error on malformed response" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectInvalidVatReturnSearchFor(vrn, "0001")
         .when()
@@ -226,6 +239,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return internal server error on empty body response" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectEmptyVatReturnSearchFor(vrn, "0001")
         .when()
@@ -236,6 +250,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "reject client with no authorization" in {
       given()
+        .stubAudit
         .userIsNotAuthorisedForTheResource
         .when()
         .get(s"/$vrn/returns/0001")
@@ -246,6 +261,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return bad request (400) if the vrn is invalid" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnSearchFor(vrn, "0001")
         .when()
@@ -257,6 +273,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return forbidden (403) if the vat return was submitted longer than 4 years ago" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "DATE_RANGE_TOO_LARGE")
         .when()
@@ -269,6 +286,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return internal server error (500) if the vat returns with DES vrn not found error" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "VRN_NOT_FOUND")
         .when()
@@ -280,6 +298,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return internal server error (500) if the vat returns from DES got NOT_FOUND_VRN error" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "NOT_FOUND_VRN")
         .when()
@@ -291,6 +310,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return bad request (400) if the periodKey is invalid" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectVatReturnSearchFor(vrn, "001")
         .when()
@@ -303,6 +323,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return not found (404) with non-existent VRN" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
         .when()
@@ -313,6 +334,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
     "return X-Content-Type-Options header with non-existent VRN" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
         .when()

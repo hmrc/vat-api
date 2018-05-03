@@ -53,7 +53,6 @@ trait TestApplication
     WireMock.configureFor(stubHost, WIREMOCK_PORT)
     // the below stub is here so that the application finds the registration endpoint which is called on startup
     stubFor(post(urlPathEqualTo("/registration")).willReturn(aResponse().withStatus(OK)))
-    stubFor(post(urlPathMatching("/write/audit/")).willReturn(aResponse().withStatus(OK)))
   }
 
   override def beforeAll(): Unit = {

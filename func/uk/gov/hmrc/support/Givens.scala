@@ -1,7 +1,7 @@
 package uk.gov.hmrc.support
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import play.api.http.Status
+import play.api.http.Status._
 import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.assets.des.FinancialData._
 import uk.gov.hmrc.assets.des.Obligations.{Obligations, ObligationsWithNoIncomeSourceType, ObligationsWithoutIdentification}
@@ -12,6 +12,14 @@ import uk.gov.hmrc.domain.Vrn
 class Givens(httpVerbs: HttpVerbs) {
 
   def when(): HttpVerbs = httpVerbs
+
+  def stubAudit: Givens = {
+    stubFor(post(urlPathMatching(s"/write/audit.*"))
+        .willReturn(
+          aResponse()
+              .withStatus(NO_CONTENT)))
+    this
+  }
 
   def missingBearerToken: Givens = {
     stubFor(
@@ -504,7 +512,7 @@ class Givens(httpVerbs: HttpVerbs) {
       stubFor(any(urlMatching(s".*/submission.*"))
         .willReturn(
           aResponse()
-            .withStatus(Status.ACCEPTED)
+            .withStatus(ACCEPTED)
             .withHeader("Content-Type", "application/json")
             .withHeader("Receipt-Id", "de1249ad-c242-4f22-9fe6-f357b1bfcccf")
             .withHeader("Receipt-Signature", "757b1365-d89e-4dac-8317-ba87efca6c21")
@@ -517,10 +525,10 @@ class Givens(httpVerbs: HttpVerbs) {
     }
 
     def nrsFailurefor(vrn: Vrn): Givens = {
-      stubFor(any(urlMatching(s".*/submission/$vrn.*"))
+      stubFor(any(urlMatching(s".*/submission.*"))
         .willReturn(
           aResponse()
-            .withStatus(Status.BAD_REQUEST)
+            .withStatus(BAD_REQUEST)
             .withBody("{}")
         )
       )

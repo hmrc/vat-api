@@ -7,6 +7,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
   "retrieveObligations" should {
 
     "return code 400 when vrn is invalid" in {
+      given()
+        .stubAudit
       when()
         .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
         .thenAssertThat()
@@ -15,6 +17,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when from is missing" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?to=2017-03-31&status=A")
         .thenAssertThat()
@@ -22,6 +26,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when from is invalid" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=abc&to=2017-03-31&status=A")
         .thenAssertThat()
@@ -29,6 +35,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when to is missing" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&status=A")
         .thenAssertThat()
@@ -36,6 +44,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when to is invalid" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=abc&status=A")
         .thenAssertThat()
@@ -43,6 +53,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when status is missing" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31")
         .thenAssertThat()
@@ -50,6 +62,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when status is invalid" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31&status=X")
         .thenAssertThat()
@@ -57,6 +71,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when from is after to" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-04-01&to=2017-03-31&status=A")
         .thenAssertThat()
@@ -64,6 +80,8 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
     }
 
     "return code 400 when date range between from and to is more than 366 days" in {
+      given()
+        .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2018-01-02&status=A")
         .thenAssertThat()
@@ -72,6 +90,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 404 when obligations does not exist" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
@@ -82,6 +101,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 200 with a set of obligations" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsFor(vrn)
         .when()
@@ -93,6 +113,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 200 with a set of obligations with out identifications" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsWithoutIdentificationFor(vrn)
         .when()
@@ -104,6 +125,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "return code 200 with a set of obligations with identifications but no incomeSourceType" in {
       given()
+        .stubAudit
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsWithIdentificationButNoIncomeSourceTypeFor(vrn)
         .when()
@@ -115,6 +137,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
 
     "reject client with no authorization" in {
       given()
+        .stubAudit
         .userIsNotAuthorisedForTheResource
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
