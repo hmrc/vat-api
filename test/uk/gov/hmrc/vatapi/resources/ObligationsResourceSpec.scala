@@ -94,6 +94,19 @@ class ObligationsResourceSpec extends ResourceSpec
       }
     }
 
+    "return a 500 with a json body for a failure" when {
+      "DES returns some unexpected error" in new Setup {
+
+        MockObligationsConnector.get(vrn, queryParams)
+          .returns(Future.failed(new Exception("Connection refused error")))
+
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        status(result) shouldBe 500
+        contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+      }
+    }
+
     "DES returns a 200 response with a non-json body" in new Setup {
       val nonJsonDesResponse = ObligationsResponse(HttpResponse(200, responseString = Some("non-json")))
 

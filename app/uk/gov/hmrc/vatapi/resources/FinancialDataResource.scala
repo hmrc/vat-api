@@ -37,7 +37,7 @@ object FinancialDataResource extends BaseResource {
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
-    fromDes {
+    val result = fromDes {
       for {
         response <- execute{_ => connector.getFinancialData(vrn, params)}
       } yield response
@@ -63,12 +63,17 @@ object FinancialDataResource extends BaseResource {
           }
       }
     }
+
+    result.recover {
+      case ex => logger.warn(ex.getMessage)
+        InternalServerError(Json.toJson(Errors.InternalServerError))
+    }
   }
 
 
   def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
-    fromDes {
+    val result = fromDes {
       for {
         response <- execute{_ => connector.getFinancialData(vrn, params)}
       } yield response
@@ -94,6 +99,11 @@ object FinancialDataResource extends BaseResource {
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
+    }
+
+    result.recover {
+      case ex => logger.warn(ex.getMessage)
+        InternalServerError(Json.toJson(Errors.InternalServerError))
     }
   }
 }

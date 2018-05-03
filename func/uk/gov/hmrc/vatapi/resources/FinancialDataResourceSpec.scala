@@ -69,6 +69,46 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(404)
       }
+
+      "return code 500 when idType parameter is invalid" in {
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, DesJsons.Errors.InvalidIdType)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(500)
+      }
+
+      "return code 500 when idNumber parameter is invalid" in {
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, DesJsons.Errors.InvalidIdNumber)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(500)
+      }
+
+      "return code 400 when regime type parameter is invalid" in {
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, DesJsons.Errors.InvalidRegimeType)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(500)
+      }
+
+      "return code 500 when openitems parameter is invalid" in {
+        given()
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, DesJsons.Errors.InvalidOnlyOpenItems)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(500)
+      }
     }
 
     "a date range of greater than 1 year is supplied" should {

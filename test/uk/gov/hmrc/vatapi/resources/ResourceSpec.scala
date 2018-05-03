@@ -21,10 +21,14 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, OptionValues, WordSpec}
 import play.api.Configuration
 import play.api.http.{HeaderNames, Status}
-import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, Result}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, ResultExtractors}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.TestUtils
 import uk.gov.hmrc.vatapi.config.AppContext
+
+import scala.concurrent.Future
 
 trait ResourceSpec extends WordSpec
   with Matchers
@@ -44,5 +48,10 @@ trait ResourceSpec extends WordSpec
     val config = Configuration("auth.enabled" -> authEnabled)
     when(mockAppContext.featureSwitch)
       .thenReturn(Some(config))
+  }
+
+  def submitWithSessionAndAuth(action: Action[JsValue], requestJson: String)(test: Future[Result] => Any) {
+    val result = action.apply(FakeRequest().withBody(Json.parse(requestJson)))
+    test(result)
   }
 }

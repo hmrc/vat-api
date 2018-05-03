@@ -42,7 +42,7 @@ trait ObligationsResource extends BaseResource {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
-    fromDes {
+    val result = fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }
         _        <- auditService.audit(RetrieveVatObligationsEvent(vrn, response))
@@ -58,6 +58,11 @@ trait ObligationsResource extends BaseResource {
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
+    }
+
+    result.recover {
+      case ex => logger.warn(ex.getMessage)
+        InternalServerError(Json.toJson(Errors.InternalServerError))
     }
   }
 
