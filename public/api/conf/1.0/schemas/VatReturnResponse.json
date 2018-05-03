@@ -9,17 +9,17 @@
   ],
   "properties": {
     "processingDate": {
-      "description": "Time stamp for when message was processed in the system",
+      "description": "The time that the message was processed in the system.",
       "type": "string",
       "format": "date-time"
     },
     "formBundleNumber": {
-      "description": "Unique number representing Form Bundle, the system creates forms to store return data, those are held in form bundle that is unique within the system",
+      "description": "Unique number that represents the form bundle. The system stores VAT Return data in forms, which are held in a unique form bundle.",
       "type": "string",
       "pattern": "^[0-9]{12}$"
     },
     "paymentIndicator": {
-      "description":  "Can be either DD or BANK or not present at all, when return is a debit i.e. Trader has to pay and Direct Debit is set up for such trader we would return DD, when return is a claim i.e. credit where HMRC will pay out and bank details are present on master data then BANK indicator is sent, for NIL returns, or where bank / DD data does not exist nothing will be sent",
+      "description":  "Is DD if the netVatDue value is a debit and HMRC holds a Direct Debit Instruction for the client. Is BANK if the netVatDue value is a credit and HMRC holds the client’s bank data. Otherwise not present.",
       "type": "string",
       "enum": [
         "DD",
@@ -27,7 +27,7 @@
       ]
     },
     "chargeRefNumber": {
-      "description": "Represents charge reference number, this number is only derived in case where charge is a debit, intention was to pass it to back end so that trader can make payment against this number, however I believe that business does not want to disturb current status quo where traders use VRN to pay",
+      "description": "The charge reference number is returned, only if the netVatDue value is a debit.",
       "type": "string",
       "minLength": 1,
       "maxLength": 16
