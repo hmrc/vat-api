@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError}
+import play.api.mvc.Results._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
@@ -65,8 +65,8 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 403 if errorCodeIsOneOf(VRN_NOT_FOUND) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
-    case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => BadRequest(toJson(Errors.InvalidRequest))
+    case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => NotFound(toJson(Errors.InvalidPeriodKey))
+    case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => Forbidden(toJson(Errors.InvalidRequest))
     case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
   }
 }

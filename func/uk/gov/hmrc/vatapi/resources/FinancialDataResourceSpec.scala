@@ -90,7 +90,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .statusIs(500)
       }
 
-      "return code 400 when regime type parameter is invalid" in {
+      "return code 500 when regime type parameter is invalid" in {
         given()
           .userIsFullyAuthorisedForTheResource
           .des().FinancialData.invalidPaymentsParamsFor(vrn, DesJsons.Errors.InvalidRegimeType)
