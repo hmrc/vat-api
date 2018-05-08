@@ -1,6 +1,7 @@
 package uk.gov.hmrc.support
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.http.Fault
 import play.api.http.Status._
 import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.assets.des.FinancialData._
@@ -15,9 +16,9 @@ class Givens(httpVerbs: HttpVerbs) {
 
   def stubAudit: Givens = {
     stubFor(post(urlPathMatching(s"/write/audit.*"))
-        .willReturn(
-          aResponse()
-              .withStatus(NO_CONTENT)))
+      .willReturn(
+        aResponse()
+          .withStatus(NO_CONTENT)))
     this
   }
 
@@ -209,6 +210,7 @@ class Givens(httpVerbs: HttpVerbs) {
     }
 
     object obligations {
+
       def obligationNotFoundFor(vrn: Vrn): Givens = {
         stubFor(get(urlMatching(s".*/vrn/$vrn.*"))
           .willReturn(
@@ -219,6 +221,27 @@ class Givens(httpVerbs: HttpVerbs) {
 
         givens
       }
+
+
+      def obligationParamsFor(vrn: Vrn, responseBody: String): Givens = {
+        stubFor(get(urlMatching(s".*/vrn/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(400)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseBody)))
+
+        givens
+      }
+
+      def connectionFailureException(vrn: Vrn): Givens = {
+        stubFor(get(urlMatching(s".*/vrn/$vrn.*"))
+          .willReturn(
+            aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)))
+
+        givens
+      }
+
 
       def returnObligationsFor(vrn: Vrn): Givens = {
         stubFor(any(urlMatching(s".*/vrn/$vrn.*"))
@@ -504,6 +527,17 @@ class Givens(httpVerbs: HttpVerbs) {
         )
         givens
       }
+      def invalidPaymentsParamsFor(vrn: Vrn, responseBody: String): Givens = {
+        stubFor(any(urlMatching(s"/enterprise/financial-data/VRN/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(400)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseBody)))
+
+        givens
+      }
+
     }
   }
 
