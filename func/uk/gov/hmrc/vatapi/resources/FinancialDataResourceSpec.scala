@@ -66,6 +66,60 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.multipleLiabilities.toString)
       }
 
+      "return code 400 when idNumber parameter is invalid" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdNumber)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(BAD_REQUEST)
+      }
+
+      "a date range of greater than 1 year is supplied" should {
+        "return an INVALID_DATE_RANGE error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid 'from' date is supplied" should {
+        "return an INVALID_DATE_TO error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid 'to' date is supplied" should {
+        "return and INVALID_DATE_FROM error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid VRN is supplied" should {
+        "return an INVALID_VRN error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
       "return a 404 (Not Found) if no liabilities exist" in {
         given()
           .stubAudit
@@ -76,17 +130,6 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(NOT_FOUND)
       }
-    }
-
-    "return code 400 when idNumber parameter is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdNumber)
-        .when()
-        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-        .thenAssertThat()
-        .statusIs(BAD_REQUEST)
     }
 
     "return code 500 when idType parameter is invalid" in {
@@ -108,7 +151,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
         .thenAssertThat()
-         .statusIs(INTERNAL_SERVER_ERROR)
+        .statusIs(INTERNAL_SERVER_ERROR)
     }
 
     "return code 500 when openitems parameter is invalid" in {
@@ -120,50 +163,6 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
         .thenAssertThat()
         .statusIs(INTERNAL_SERVER_ERROR)
-    }
-
-    "a date range of greater than 1 year is supplied" should {
-      "return an INVALID_DATE_RANGE error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
-      }
-    }
-
-    "an invalid 'from' date is supplied" should {
-      "return an INVALID_DATE_TO error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
-      }
-    }
-
-    "an invalid 'to' date is supplied" should {
-      "return and INVALID_DATE_FROM error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
-      }
-    }
-
-    "an invalid VRN is supplied" should {
-      "return an INVALID_VRN error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
-      }
     }
   }
 

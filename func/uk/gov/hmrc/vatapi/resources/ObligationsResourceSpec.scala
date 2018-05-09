@@ -90,17 +90,6 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .statusIs(BAD_REQUEST)
     }
 
-    "return code 404 when obligations does not exist" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().obligations.obligationNotFoundFor(vrn)
-        .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
-        .thenAssertThat()
-        .statusIs(NOT_FOUND)
-    }
-
     "return code 400 when idNumber parameter is invalid" in {
       given()
         .stubAudit
@@ -112,7 +101,18 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .statusIs(BAD_REQUEST)
     }
 
-    "return code 400 when regime type parameter is invalid" in {
+    "return code 404 when obligations does not exist" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationNotFoundFor(vrn)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(NOT_FOUND)
+    }
+
+    "return code 500 when regime type parameter is invalid" in {
       given()
         .stubAudit
         .userIsFullyAuthorisedForTheResource
@@ -123,7 +123,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .statusIs(INTERNAL_SERVER_ERROR)
     }
 
-    "return code 400 when status parameter is invalid" in {
+    "return code 500 when status parameter is invalid" in {
       given()
         .stubAudit
         .userIsFullyAuthorisedForTheResource
