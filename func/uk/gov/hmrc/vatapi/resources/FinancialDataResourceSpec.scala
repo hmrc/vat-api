@@ -1,5 +1,7 @@
 package uk.gov.hmrc.vatapi.resources
 
+import play.api.http.Status._
+import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class FinancialDataResourceSpec extends BaseFunctionalSpec {
@@ -13,7 +15,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(403)
+          .statusIs(FORBIDDEN)
           .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
       }
 
@@ -25,7 +27,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
       }
 
@@ -37,7 +39,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.minLiability.toString)
       }
       "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
@@ -48,7 +50,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
       }
 
@@ -60,10 +62,64 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.multipleLiabilities.toString)
       }
 
+      "return code 400 when idNumber parameter is invalid" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdNumber)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(BAD_REQUEST)
+      }
+
+      "a date range of greater than 1 year is supplied" should {
+        "return an INVALID_DATE_RANGE error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid 'from' date is supplied" should {
+        "return an INVALID_DATE_TO error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid 'to' date is supplied" should {
+        "return and INVALID_DATE_FROM error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
+
+      "an invalid VRN is supplied" should {
+        "return an INVALID_VRN error" in {
+          given()
+            .stubAudit
+          when()
+            .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
+            .thenAssertThat()
+            .statusIs(BAD_REQUEST)
+        }
+      }
       "return a 404 (Not Found) if no liabilities exist" in {
         given()
           .stubAudit
@@ -72,52 +128,41 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(404)
+          .statusIs(NOT_FOUND)
       }
     }
 
-    "a date range of greater than 1 year is supplied" should {
-      "return an INVALID_DATE_RANGE error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
-          .thenAssertThat()
-          .statusIs(400)
-      }
+    "return code 500 when idType parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdType)
+        .when()
+        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
     }
 
-    "an invalid 'from' date is supplied" should {
-      "return an INVALID_DATE_TO error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
-          .thenAssertThat()
-          .statusIs(400)
-      }
+    "return code 500 when regime type parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidRegimeType)
+        .when()
+        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
     }
 
-    "an invalid 'to' date is supplied" should {
-      "return and INVALID_DATE_FROM error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(400)
-      }
-    }
-
-    "an invalid VRN is supplied" should {
-      "return an INVALID_VRN error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(400)
-      }
+    "return code 500 when openitems parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidOnlyOpenItems)
+        .when()
+        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -131,7 +176,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.onePayment.toString)
       }
       "retrieve a single payment where the minimum data exists" in {
@@ -142,7 +187,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.minPayment.toString)
       }
 
@@ -154,7 +199,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.onePayment.toString)
       }
 
@@ -166,7 +211,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(200)
+          .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.multiplePayments.toString)
       }
 
@@ -178,7 +223,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(404)
+          .statusIs(NOT_FOUND)
       }
     }
 
@@ -189,7 +234,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         when()
           .get(s"/$vrn/payments?from=2015-01-01&to=2016-01-01")
           .thenAssertThat()
-          .statusIs(400)
+          .statusIs(BAD_REQUEST)
       }
     }
 
@@ -200,7 +245,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         when()
           .get(s"/$vrn/payments?from=2017-01-01&to=3017-12-31")
           .thenAssertThat()
-          .statusIs(400)
+          .statusIs(BAD_REQUEST)
       }
     }
 
@@ -211,7 +256,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         when()
           .get(s"/$vrn/payments?from=2001-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(400)
+          .statusIs(BAD_REQUEST)
       }
     }
 
@@ -222,7 +267,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
         when()
           .get(s"/invalidvrn/payments?from=2015-01-01&to=2017-12-31")
           .thenAssertThat()
-          .statusIs(400)
+          .statusIs(BAD_REQUEST)
       }
     }
   }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError}
+import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
@@ -44,6 +44,15 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     }
   }
 
+  def vatSubmissionReturnOrError: Either[DesTransformError, JsValue] = {
+    jsonOrError match {
+      case Left(e) =>
+        logger.error(s"[VatReturnResponse][vatReturnOrError] Non json response from DES : $e")
+        Left(ParseError(s"Unable to parse the response from DES as Json: $e"))
+      case Right(js) => Right(js)
+    }
+  }
+
   var nrsData: NRSData = _
   def withNrsData(data: NRSData): VatReturnResponse = {nrsData = data; this}
 
@@ -52,10 +61,13 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+    case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
-    case 403 if errorCodeIsOneOf(VRN_NOT_FOUND) => InternalServerError(toJson(Errors.InternalServerError))
-    case 403 if errorCodeIsOneOf(NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
+    case 403 if errorCodeIsOneOf(VRN_NOT_FOUND, NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
+    case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => NotFound(toJson(Errors.InvalidPeriodKey))
+    case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => Forbidden(toJson(Errors.InvalidRequest))
+    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+
   }
 }
 

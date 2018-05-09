@@ -41,7 +41,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
     "be applied when vrn is invalid" in {
       given()
         .stubAudit
-      when()
+        .when()
         .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
         .thenAssertThat()
         .statusIs(400)

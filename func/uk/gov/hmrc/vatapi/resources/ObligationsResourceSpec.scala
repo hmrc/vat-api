@@ -1,5 +1,7 @@
 package uk.gov.hmrc.vatapi.resources
 
+import play.api.http.Status._
+import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class ObligationsResourceSpec extends BaseFunctionalSpec {
@@ -12,7 +14,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
         .isBadRequest("VRN_INVALID")
     }
 
@@ -22,7 +24,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?to=2017-03-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when from is invalid" in {
@@ -31,7 +33,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=abc&to=2017-03-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when to is missing" in {
@@ -40,7 +42,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when to is invalid" in {
@@ -49,7 +51,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=abc&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when status is missing" in {
@@ -58,7 +60,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when status is invalid" in {
@@ -67,7 +69,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31&status=X")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when from is after to" in {
@@ -76,7 +78,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-04-01&to=2017-03-31&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 400 when date range between from and to is more than 366 days" in {
@@ -85,7 +87,18 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2018-01-02&status=A")
         .thenAssertThat()
-        .statusIs(400)
+        .statusIs(BAD_REQUEST)
+    }
+
+    "return code 400 when idNumber parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, Errors.invalidIdNumber)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 404 when obligations does not exist" in {
@@ -96,7 +109,40 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(404)
+        .statusIs(NOT_FOUND)
+    }
+
+    "return code 500 when regime type parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, Errors.invalidRegime)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
+    }
+
+    "return code 500 when status parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, Errors.invalidStatus)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
+    }
+
+    "return code 500 when idType parameter is invalid" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.obligationParamsFor(vrn, Errors.invalidIdType)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .thenAssertThat()
+        .statusIs(INTERNAL_SERVER_ERROR)
     }
 
     "return code 200 with a set of obligations" in {
@@ -107,7 +153,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(200)
+        .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
     }
 
@@ -119,7 +165,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(200)
+        .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
     }
 
@@ -131,7 +177,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(200)
+        .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
     }
 
@@ -142,7 +188,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(403)
+        .statusIs(FORBIDDEN)
         .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
     }
   }

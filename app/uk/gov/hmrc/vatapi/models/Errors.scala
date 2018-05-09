@@ -44,6 +44,12 @@ object Errors {
     val code = "INVALID_REQUEST"
   }
 
+  case class DesError(code:String, reason: String)
+
+  object DesError {
+    implicit val format: OFormat[DesError] = Json.format[DesError]
+  }
+
   case class BusinessError(errors: Seq[Error], message: String) {
     val code = "BUSINESS_ERROR"
   }
@@ -52,6 +58,7 @@ object Errors {
     val code = "INTERNAL_SERVER_ERROR"
   }
 
+  //TODO: remove unneeded DES Errors
   object VrnInvalid extends Error("VRN_INVALID", "The provided VRN is invalid", None)
   object InvalidDateFrom extends Error("DATE_FROM_INVALID", "The provided from date is invalid", None)
   object InvalidDateTo extends Error("DATE_TO_INVALID", "The provided to date is invalid", None)
@@ -63,6 +70,7 @@ object Errors {
   object DateRangeTooLarge extends Error("DATE_RANGE_TOO_LARGE", "The date of the requested return cannot be further than four years from the current date.", None)
   object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
   object ClientOrAgentNotAuthorized extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.", None)
+  object InvalidData extends Error("INVALID_DATA", "The provided data is failed validation, contains invalid data", None)
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")

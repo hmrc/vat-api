@@ -20,7 +20,7 @@ import cats.implicits._
 import play.api.libs.json.{JsNull, JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent, Request}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.audit.AuditEvent
+import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditService}
 import uk.gov.hmrc.vatapi.audit.AuditService.audit
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
@@ -31,12 +31,20 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object VatReturnsResource extends BaseResource {
+object VatReturnsResource extends VatReturnsResource {
 
-  private val connector = VatReturnsConnector
-  private val orchestrator = VatReturnsOrchestrator
-  override val authService = AuthorisationService
-  override val appContext = AppContext
+  override val connector: VatReturnsConnector = VatReturnsConnector
+  override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
+  override val authService: AuthorisationService = AuthorisationService
+  override val appContext: AppContext = AppContext
+  override val auditService: AuditService = AuditService
+}
+
+trait VatReturnsResource extends BaseResource {
+
+  val connector: VatReturnsConnector
+  val orchestrator: VatReturnsOrchestrator
+  val auditService: AuditService
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -44,15 +52,15 @@ object VatReturnsResource extends BaseResource {
     val receiptSignature = "Receipt-Signature"
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
-    fromDes {
+    val result = fromDes {
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
         response <- BusinessResult { orchestrator.submitVatReturn(vrn, vatReturn) }
-        _ <-  audit(SubmitVatReturnEvent(vrn, response))
+        _ <-  auditService.audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
-      response.filter { case 200 => response.jsonOrError match {
+      response.filter { case 200 => response.vatSubmissionReturnOrError match {
         case Right(vatReturnDesResponse) =>
           logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
           Created(Json.toJson(vatReturnDesResponse)).withHeaders(
@@ -63,12 +71,17 @@ object VatReturnsResource extends BaseResource {
       }
       }
     }
+    result.recover {
+      case ex =>
+        logger.warn(s"[VatReturnsResource] [submitVatReturn] Unexpected downstream error thrown ${ex.getMessage}")
+        InternalServerError(Json.toJson(Errors.InternalServerError))
+    }
   }
 
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
     APIAction(vrn).async { implicit request =>
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
-      fromDes {
+      val result = fromDes {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }
           response <- execute { _ => connector.query(vrn, periodKey) }
@@ -83,6 +96,12 @@ object VatReturnsResource extends BaseResource {
               InternalServerError
           }
         }
+      }
+
+      result.recover {
+        case ex =>
+          logger.warn(s"[VatReturnsResource][retrieveVatReturns] Unexpected downstream error thrown ${ex.getMessage}")
+          InternalServerError(Json.toJson(Errors.InternalServerError))
       }
     }
 
