@@ -50,8 +50,8 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
   lazy val desBaseUrl = "des-base-url"
 
   val vrn: Vrn = generateVrn
-  val queryParams = ObligationsQueryParams(now.minusDays(7), now, "O")
-  val queryString = s"from=${queryParams.from}&to=${queryParams.to}&status=${queryParams.status}"
+  val queryParams = ObligationsQueryParams(now.minusDays(7), now, Some("O"))
+  val queryString = queryParams.queryString
   val desUrl = s"$desBaseUrl/enterprise/obligation-data/vrn/$vrn/VATC?$queryString"
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
 

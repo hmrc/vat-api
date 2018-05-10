@@ -71,6 +71,7 @@ object Errors {
   object DuplicateVatSubmission extends Error("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.", None)
   object ClientOrAgentNotAuthorized extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.", None)
   object InvalidData extends Error("INVALID_DATA", "The provided data is failed validation, contains invalid data", None)
+  object InvalidStatus extends Error("INVALID_STATUS", "The provided data is failed validation, invalid status", None)
 
   def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
   def badRequest(error: Error) = BadRequest(Seq(error), "Invalid request")

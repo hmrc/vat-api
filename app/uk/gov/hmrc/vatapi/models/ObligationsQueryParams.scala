@@ -21,13 +21,21 @@ import org.joda.time.LocalDate
 
 import scala.util.Try
 
-case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: String) {
+case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: Option[String] = None) {
   val map = Map("from" -> from, "to" -> to, "status" -> status)
+
+  def queryString: String ={
+    status match {
+      case None | Some("") => s"from=$from&to=$to"
+      case Some(status) => s"from=$from&to=$to&status=$status"
+
+    }
+  }
 }
 
 object ObligationsQueryParams {
   val dateRegex = """^\d{4}-\d{2}-\d{2}$"""
-  val statusRegex = "^[OFA]$"
+  val statusRegex = "^[OF]$"
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String]): Either[String, ObligationsQueryParams] = {
     val from = dateQueryParam(fromOpt, "INVALID_DATE_FROM")
@@ -41,7 +49,7 @@ object ObligationsQueryParams {
     } yield param.left.get
 
     if (errors.isEmpty) {
-      Right(ObligationsQueryParams(from.map(_.right.get).get, to.map(_.right.get).get, status.map(_.right.get).get))
+      Right(ObligationsQueryParams(from.map(_.right.get).get, to.map(_.right.get).get, status.map(_.right.get)))
     } else {
       Left(errors.head)
     }
@@ -70,7 +78,7 @@ object ObligationsQueryParams {
           Right(status)
         else
           Left(errorCode)
-      case None => Left(errorCode)
+      case None => Right("")
     }
     Some(paramValue)
   }

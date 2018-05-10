@@ -25,7 +25,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
 
-    "be applied for obligations " in {
+    "be applied for obligations with status A" in {
       given()
         .stubAudit
         .userIsFullyAuthorisedForTheResource
@@ -33,16 +33,27 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(200)
+        .statusIs(400)
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
 
+    "be applied for obligations " in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.returnObligationsFor(vrn)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
+        .thenAssertThat()
+        .statusIs(200)
+        .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
+    }
 
     "be applied when vrn is invalid" in {
       given()
         .stubAudit
         .when()
-        .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
+        .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=O")
         .thenAssertThat()
         .statusIs(400)
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
@@ -55,7 +66,7 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=O")
         .thenAssertThat()
         .statusIs(404)
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)

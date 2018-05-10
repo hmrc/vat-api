@@ -47,7 +47,8 @@ class ObligationsResourceSpec extends ResourceSpec
       .returns(BusinessResult.success(Future.successful(())))
   }
 
-  val queryParams = ObligationsQueryParams(now.minusDays(7), now, "O")
+  val queryParams = ObligationsQueryParams(now.minusDays(7), now, Some("O"))
+  val queryParamsWithNoStatus = ObligationsQueryParams(now.minusDays(7), now)
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
   val desObligationsNoDetailsJson: JsValue = Jsons.Obligations.desResponseWithoutObligationDetails(vrn)
   val clientObligationsJson: JsValue = Jsons.Obligations()
@@ -61,6 +62,20 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        status(result) shouldBe 200
+        contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe clientObligationsJson
+      }
+    }
+
+    "return a 200 and the correct obligations json for no status" when {
+      "DES returns a 200 response with the correct obligations body" in new Setup {
+        val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsJson)))
+
+        MockObligationsConnector.get(vrn, queryParamsWithNoStatus)
+          .returns(Future.successful(desResponse))
+
+        val result = testObligationResource.retrieveObligations(vrn, queryParamsWithNoStatus)(FakeRequest())
         status(result) shouldBe 200
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
