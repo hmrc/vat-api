@@ -12,7 +12,17 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
       given()
         .stubAudit
       when()
-        .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31&status=A")
+        .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31")
+        .thenAssertThat()
+        .statusIs(BAD_REQUEST)
+        .isBadRequest("VRN_INVALID")
+    }
+
+    "return code 400 when status is A" in {
+      given()
+        .stubAudit
+      when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31&status=A")
         .thenAssertThat()
         .statusIs(BAD_REQUEST)
         .isBadRequest("VRN_INVALID")
@@ -50,15 +60,6 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .stubAudit
       when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=abc&status=A")
-        .thenAssertThat()
-        .statusIs(BAD_REQUEST)
-    }
-
-    "return code 400 when status is missing" in {
-      given()
-        .stubAudit
-      when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-03-31")
         .thenAssertThat()
         .statusIs(BAD_REQUEST)
     }
@@ -107,7 +108,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationNotFoundFor(vrn)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(NOT_FOUND)
     }
@@ -118,12 +119,12 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationParamsFor(vrn, Errors.invalidRegime)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(INTERNAL_SERVER_ERROR)
     }
 
-    "return code 500 when status parameter is invalid" in {
+    "return code 400 when status parameter is invalid" in {
       given()
         .stubAudit
         .userIsFullyAuthorisedForTheResource
@@ -131,7 +132,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .when()
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
         .thenAssertThat()
-        .statusIs(INTERNAL_SERVER_ERROR)
+        .statusIs(BAD_REQUEST)
     }
 
     "return code 500 when idType parameter is invalid" in {
@@ -140,7 +141,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.obligationParamsFor(vrn, Errors.invalidIdType)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(INTERNAL_SERVER_ERROR)
     }
@@ -151,7 +152,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsFor(vrn)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
@@ -163,7 +164,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsWithoutIdentificationFor(vrn)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
@@ -175,7 +176,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .userIsFullyAuthorisedForTheResource
         .des().obligations.returnObligationsWithIdentificationButNoIncomeSourceTypeFor(vrn)
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
         .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
@@ -186,7 +187,7 @@ class ObligationsResourceSpec extends BaseFunctionalSpec {
         .stubAudit
         .userIsNotAuthorisedForTheResource
         .when()
-        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(FORBIDDEN)
         .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")

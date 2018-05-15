@@ -48,12 +48,18 @@ class ObligationsQueryParamsSpec extends UnitSpec {
 
     "return error when the status query parameter is missing" in {
       val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), None)
-      response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_STATUS"
+      response.isRight shouldBe true
+      response.right.get.from shouldEqual LocalDate.parse("2017-01-01")
     }
 
     "return error when the status query parameter is not a valid status" in {
       val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), Some(Right("C")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "INVALID_STATUS"
+    }
+
+    "return error when the status query parameter is A" in {
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-03-31")), Some(Right("A")))
       response.isLeft shouldBe true
       response.left.get shouldBe "INVALID_STATUS"
     }

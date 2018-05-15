@@ -71,7 +71,8 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_DATE_TO) => BadRequest(toJson(Errors.InvalidDateTo))
     case 400 if errorCodeIsOneOf(INVALID_DATE_FROM) => BadRequest(toJson(Errors.InvalidDateFrom))
     case 400 if errorCodeIsOneOf(INVALID_DATE_RANGE) => BadRequest(toJson(Errors.DateRangeTooLarge))
-    case 400 if errorCodeIsOneOf(INVALID_IDTYPE, INVALID_STATUS, INVALID_REGIME, NOT_FOUND_BPKEY) =>
+    case 400 if errorCodeIsOneOf(INVALID_STATUS) => BadRequest(toJson(Errors.InvalidStatus))
+    case 400 if errorCodeIsOneOf(INVALID_IDTYPE, INVALID_REGIME, NOT_FOUND_BPKEY) =>
       InternalServerError(toJson(Errors.InternalServerError))
     case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
   }
