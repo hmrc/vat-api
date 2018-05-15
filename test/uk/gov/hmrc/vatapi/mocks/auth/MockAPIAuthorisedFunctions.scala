@@ -43,11 +43,12 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
   }
 
   object testAuthSuccessResponseWithNrsData {
+
+    import uk.gov.hmrc.vatapi.assets.TestConstants.Auth.vatEnrolment
     val organisationResponse =
       new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Organisation),
-        Enrolments(Set(
-          Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+        Enrolments(Set(vatEnrolment))),
         orgIdentityData.internalId),
         orgIdentityData.externalId),
         None),
@@ -69,8 +70,7 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
     val individualResponse =
       new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Individual),
-        Enrolments(Set(
-          Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+        Enrolments(Set(vatEnrolment))),
         orgIdentityData.internalId),
         orgIdentityData.externalId),
         None),
@@ -93,7 +93,9 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
       new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
         Option(AffinityGroup.Agent),
         Enrolments(Set(
-          Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+          vatEnrolment,
+          agentEnrolment)
+        )),
         agentIdentityData.internalId),
         agentIdentityData.externalId),
         None),
@@ -111,25 +113,26 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
         agentIdentityData.credentialStrength),
         agentIdentityData.loginTimes
       )
-
   }
 
   object testAuthSuccessResponse {
     val organisationResponse = new ~(new ~(
       Option(AffinityGroup.Organisation),
-      Enrolments(Set(Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+      Enrolments(Set(vatEnrolment))),
       orgIdentityData.agentInformation
     )
 
     val individualResponse = new ~(new ~(
       Option(AffinityGroup.Individual),
-      Enrolments(Set(Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+      Enrolments(Set(vatEnrolment))),
       orgIdentityData.agentInformation
     )
 
     val agentResponse = new ~(new ~(
       Option(AffinityGroup.Agent),
-      Enrolments(Set(Enrolment("HMRC-MTD-VAT", List(EnrolmentIdentifier("VRN", "666350722")), "activated")))),
+      Enrolments(Set(
+        vatEnrolment,
+        agentEnrolment))),
       agentIdentityData.agentInformation
     )
 

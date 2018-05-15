@@ -15,7 +15,8 @@
  */
 
 package uk.gov.hmrc.vatapi.auth
-import uk.gov.hmrc.auth.core.AffinityGroup
+
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import AuthConstants._
 import nrs.models.IdentityData
 import uk.gov.hmrc.auth.core.retrieve.AgentInformation
@@ -45,7 +46,8 @@ case class Individual(override val identityData: Option[IdentityData]) extends A
 
 case class Agent(override val agentCode: Option[String],
                  override val agentReference: Option[String],
-                 override val identityData: Option[IdentityData] = None
+                 override val identityData: Option[IdentityData] = None,
+                 agentEnrolments: Enrolments
                 ) extends AuthContext {
   override val affinityGroup: String = "agent"
   override val userType = "Agent"
@@ -54,13 +56,16 @@ case class Agent(override val agentCode: Option[String],
 case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
 
 object AffinityGroupToAuthContext {
-  def authContext(affinityGroup: AffinityGroup, identityData: Option[IdentityData], agentInformation: Option[AgentInformation] = None) = {
+  def authContext(enrolments: Enrolments,
+                  affinityGroup: AffinityGroup,
+                  identityData: Option[IdentityData],
+                  agentInformation: Option[AgentInformation] = None): AuthContext = {
     affinityGroup.getClass.getSimpleName.dropRight(1) match {
       case ORGANISATION => Organisation(identityData)
       case INDIVIDUAL => Individual(identityData)
       case AGENT => agentInformation match {
-        case Some(agent) => Agent(agentCode = agent.agentCode, agentReference = agent.agentId, identityData)
-        case None => Agent(None, None, identityData)
+        case Some(agent) => Agent(agentCode = agent.agentCode, agentReference = agent.agentId, identityData, enrolments)
+        case None => Agent(None, None, identityData, enrolments)
       }
     }
   }
