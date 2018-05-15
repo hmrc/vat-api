@@ -36,7 +36,7 @@ case class VatReturnDeclaration(
   finalised: Boolean
 ) {
 
-  def toDes(timestamp: DateTime = new DateTime()): des.VatReturnDeclaration =
+  def toDes(timestamp: DateTime = new DateTime(), arn: Option[String]): des.VatReturnDeclaration =
     des.VatReturnDeclaration(
       periodKey = periodKey,
       vatDueSales = vatDueSales,
@@ -48,6 +48,7 @@ case class VatReturnDeclaration(
       totalValuePurchasesExVAT = totalValuePurchasesExVAT,
       totalValueGoodsSuppliedExVAT = totalValueGoodsSuppliedExVAT,
       totalAllAcquisitionsExVAT = totalAcquisitionsExVAT,
+      agentReferenceNumber = arn,
       receivedAt = timestamp
     )
 

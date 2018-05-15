@@ -29,6 +29,9 @@ import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
 
 object TestConstants {
 
+  val testArn = "JB007"
+  val testVrn = "666350722"
+
   object Auth {
 
     val orgIdentityData  = IdentityData(
@@ -80,16 +83,29 @@ object TestConstants {
     val agentIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Agent)).copy(agentInformation = AgentInformation(
       agentCode = Some("AGENT007"),
       agentFriendlyName = Some("James"),
-      agentId = Some("JB007")
+      agentId = Some(testArn)
     ))
+
+    val vatEnrolment =
+      Enrolment(
+        key = "HMRC-MTD-VAT",
+        identifiers = Seq(EnrolmentIdentifier(key = "VRN", value = testVrn)),
+        state = "Activated"
+      )
+
+    val agentEnrolment =
+      Enrolment(
+        key = "HMRC_AS_AGENT",
+        identifiers = Seq(EnrolmentIdentifier(key = "AgentReferenceNumber", value = testArn)),
+        state = "Activated")
 
     val orgAuthContextWithNrsData: AuthContext = Organisation(Some(orgIdentityData))
     val indAuthContextWithNrsData: AuthContext = Individual(Some(indIdentityData))
-    val agentAuthContextWithNrsData: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData))
+    val agentAuthContextWithNrsData: AuthContext = Agent(Some("AGENT007"), Some("JB007"), Some(agentIdentityData), Enrolments(Set(vatEnrolment, agentEnrolment)))
 
     val orgAuthContext: AuthContext = Organisation(None)
     val indAuthContext: AuthContext = Individual(None)
-    val agentAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), None)
+    val agentAuthContext: AuthContext = Agent(Some("AGENT007"), Some("JB007"), None, Enrolments(Set(vatEnrolment, agentEnrolment)))
   }
 
   object VatReturn {
@@ -107,7 +123,7 @@ object TestConstants {
       finalised = true
     )
 
-    val desVatReturnDeclaration : DateTime =>  des.VatReturnDeclaration = time => vatReturnDeclaration.toDes().copy(receivedAt = time)
+    val desVatReturnDeclaration : DateTime =>  des.VatReturnDeclaration = time => vatReturnDeclaration.toDes(arn = Some(testArn)).copy(receivedAt = time)
 
     val desVatReturnDeclarationAsJsonString : des.VatReturnDeclaration => String = desVatReturnDeclaration =>
       desVatReturnDeclaration.toJsonString

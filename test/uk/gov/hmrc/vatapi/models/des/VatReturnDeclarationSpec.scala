@@ -26,12 +26,27 @@ class VatReturnDeclarationSpec extends UnitSpec {
 
       val receivedAt = new DateTime(2018,12,11,9,8,7).toDateTimeISO
 
-      val actualDesVatReturn = TestConstants.VatReturn.desVatReturnDeclaration(receivedAt)
+      import TestConstants.VatReturn._
+      import TestConstants.testArn
+
 
       val expectedDesVATReturnJsonString =
-        """{"periodKey":"#001","vatDueSales":-3600.15,"vatDueAcquisitions":12000.05,"vatDueTotal":8399.90,"vatReclaimedCurrPeriod":124.15,"vatDueNet":8275.75,"totalValueSalesExVAT":1000.00,"totalValuePurchasesExVAT":200.00,"totalValueGoodsSuppliedExVAT":100.00,"totalAllAcquisitionsExVAT":540.00,"receivedAt":"2018-12-11T09:08:07.000Z"}"""
+        s"""{
+           |"periodKey":"#001",
+           |"vatDueSales":-3600.15,
+           |"vatDueAcquisitions":12000.05,
+           |"vatDueTotal":8399.90,
+           |"vatReclaimedCurrPeriod":124.15,
+           |"vatDueNet":8275.75,
+           |"totalValueSalesExVAT":1000.00,
+           |"totalValuePurchasesExVAT":200.00,
+           |"totalValueGoodsSuppliedExVAT":100.00,
+           |"totalAllAcquisitionsExVAT":540.00,
+           |"agentReferenceNumber":"$testArn",
+           |"receivedAt":"2018-12-11T09:08:07.000Z"
+           |}""".stripMargin.replaceAll("\\s", "")
 
-      actualDesVatReturn.toJsonString shouldBe expectedDesVATReturnJsonString
+      desVatReturnDeclaration(receivedAt).toJsonString shouldBe expectedDesVATReturnJsonString
     }
   }
 }
