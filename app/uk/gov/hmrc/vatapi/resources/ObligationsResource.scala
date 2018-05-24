@@ -33,19 +33,16 @@ object ObligationsResource extends ObligationsResource {
   override val connector = ObligationsConnector
   override val authService = AuthorisationService
   override val appContext = AppContext
-  override val auditService = AuditService
 }
 
 trait ObligationsResource extends BaseResource {
   val connector: ObligationsConnector
-  val auditService: AuditService
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
     val result = fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }
-        _        <- auditService.audit(RetrieveVatObligationsEvent(vrn, response))
       } yield response
     } onSuccess { response =>
       response.filter {
@@ -70,12 +67,5 @@ trait ObligationsResource extends BaseResource {
   private case class RetrieveVatObligations(vrn: Vrn, httpStatus: Int, responsePayload: JsValue)
 
   private implicit val retrieveVatObligationFormat = Json.format[RetrieveVatObligations]
-
-  private def RetrieveVatObligationsEvent(vrn: Vrn, response: ObligationsResponse): AuditEvent[RetrieveVatObligations] =
-    AuditEvent(
-      auditType = "retrieveVatObligations",
-      transactionName = "vat-retrieve-obligations",
-      detail = RetrieveVatObligations(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
-    )
 
 }

@@ -31,20 +31,15 @@ import scala.concurrent.Future
 
 class ObligationsResourceSpec extends ResourceSpec
   with MockObligationsConnector
-  with MockAuthorisationService
-  with MockAuditService {
+  with MockAuthorisationService {
 
   class Setup {
     val testObligationResource = new ObligationsResource {
       override val authService = mockAuthorisationService
       override val connector = mockObligationsConnector
       override val appContext = mockAppContext
-      override val auditService = mockAuditService
     }
     mockAuthAction(vrn)
-
-    MockAuditService.audit()
-      .returns(BusinessResult.success(Future.successful(())))
   }
 
   val queryParams = ObligationsQueryParams(now.minusDays(7), now, Some("O"))
