@@ -26,6 +26,8 @@ class Assertions(request: String, response: HttpResponse) (
     }
     this
   }
+  
+  def responseContainsHeader(name: String, value: String): Assertions = responseContainsHeader(name, value.r)
 
   //Status
   def isBadRequest(code: String): Assertions = {

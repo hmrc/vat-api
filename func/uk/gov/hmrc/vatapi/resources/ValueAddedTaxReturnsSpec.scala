@@ -49,9 +49,9 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
-        .hasHeader("Receipt-Id")
-        .hasHeader("Receipt-Signature")
-        .hasHeader("Receipt-TimeStamp")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
+        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
+        .responseContainsHeader("Receipt-TimeStamp", "2018-02-14T09:32:15Z")
     }
 
     "allow users to submit VAT returns even with negative amounts" in {
@@ -68,9 +68,9 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
-        .hasHeader("Receipt-Id")
-        .hasHeader("Receipt-Signature")
-        .hasHeader("Receipt-TimeStamp")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
+        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
+        .responseContainsHeader("Receipt-TimeStamp", "2018-02-14T09:32:15Z")
     }
 
     "reject client with no authorization" in {
