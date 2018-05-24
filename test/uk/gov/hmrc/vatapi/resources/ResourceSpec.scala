@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, OptionValues, WordSpec}
 import play.api.Configuration
-import play.api.http.{HeaderNames, Status}
+import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.TestUtils
 import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 
 trait ResourceSpec extends WordSpec
   with Matchers
@@ -34,7 +34,9 @@ trait ResourceSpec extends WordSpec
   with ResultExtractors
   with HeaderNames
   with Status
-  with DefaultAwaitTimeout {
+  with DefaultAwaitTimeout
+  with MimeTypes
+  with MockAuthorisationService {
 
   val vrn: Vrn = generateVrn
 

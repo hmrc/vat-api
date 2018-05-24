@@ -66,7 +66,7 @@ trait VatReturnsResource extends BaseResource {
           Created(Json.toJson(vatReturnDesResponse)).withHeaders(
             receiptId -> response.nrsData.nrSubmissionId,
             receiptTimestamp -> response.nrsData.timestamp,
-            receiptSignature -> response.nrsData.cadesTSignature
+            receiptSignature -> "NOT CURRENTLY IMPLEMENTED"
           )
       }
       }
