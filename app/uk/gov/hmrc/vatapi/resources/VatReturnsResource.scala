@@ -85,7 +85,6 @@ trait VatReturnsResource extends BaseResource {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }
           response <- execute { _ => connector.query(vrn, periodKey) }
-          _ <-  audit(RetrieveVatReturnEvent(vrn, response))
         } yield response
       } onSuccess { response =>
         response.filter {
@@ -120,10 +119,4 @@ trait VatReturnsResource extends BaseResource {
 
   private implicit val retrieveVatReturnFormat: OFormat[RetrieveVatReturn] = Json.format[RetrieveVatReturn]
 
-  private def RetrieveVatReturnEvent(vrn: Vrn, response: VatReturnResponse): AuditEvent[RetrieveVatReturn] =
-    AuditEvent(
-      auditType = "retrieveVatReturns",
-      transactionName = "vat-retrieve-vat-returns",
-      detail = RetrieveVatReturn(vrn, response.status, response.jsonOrError.right.getOrElse(JsNull))
-    )
 }
