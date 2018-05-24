@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.vatapi.mocks.connectors
 
+import org.scalatest.Suite
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.des.VatReturnDeclaration
@@ -26,11 +26,11 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockVatReturnsConnector extends UnitSpec with Mock {
+trait MockVatReturnsConnector extends Mock { _: Suite =>
 
   val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
 
-  override def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockVatReturnsConnector)
   }

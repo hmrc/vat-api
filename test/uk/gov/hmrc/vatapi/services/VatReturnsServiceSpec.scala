@@ -61,14 +61,14 @@ class VatReturnsServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSug
     "successful responses are returned from the connector" should {
       "return the correctly formatted VatReturnsDes Data model" in {
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(successResponse)
-        extractAwait(result(desVatReturnDeclaration(timestamp))) shouldBe successResponse
+        await(result(desVatReturnDeclaration(timestamp))) shouldBe successResponse
       }
     }
 
     "error responses are returned from the connector" should {
       "return a Des Error model" in {
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(invalidPayloadResponse)
-        extractAwait(result(desVatReturnDeclaration(timestamp))) shouldBe invalidPayloadResponse
+        await(result(desVatReturnDeclaration(timestamp))) shouldBe invalidPayloadResponse
       }
     }
   }
