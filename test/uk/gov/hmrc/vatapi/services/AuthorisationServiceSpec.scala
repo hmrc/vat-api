@@ -26,11 +26,12 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.Results
 import play.api.mvc.Results.Forbidden
 import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.{InsufficientConfidenceLevel, UnsupportedAuthProvider}
+import uk.gov.hmrc.auth.core.{Enrolments, InsufficientConfidenceLevel, UnsupportedAuthProvider}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
+import uk.gov.hmrc.vatapi.assets.TestConstants.testVrn
 import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
@@ -171,6 +172,15 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
         setupMockAuthorisationException(new UnsupportedAuthProvider)
         extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
+      }
+    }
+  }
+
+  "TestAuthorisationService.getClientReference" should {
+    "return client vrn" when {
+      "passed the enrolments" in {
+        val clientRef = TestAuthorisationService.getClientReference(Enrolments(Set(vatEnrolment)))
+        assert(clientRef == Some(testVrn))
       }
     }
   }

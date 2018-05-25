@@ -79,7 +79,6 @@ trait BaseConnector {
   private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
     implicit hc: HeaderCarrier): Future[R] = {
     val newHc = header(hc)
-    logger.debug(s"URL:[$url] Headers:[${newHc.headers}]")
     f(newHc)
   }
 

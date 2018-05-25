@@ -30,7 +30,7 @@ trait MockAuditService extends Mock { _: Suite =>
     }
   }
 
-  override protected def beforeEach(): Unit = {
+  override def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockAuditService)
   }

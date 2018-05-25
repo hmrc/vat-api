@@ -42,6 +42,7 @@ trait AuditService {
   ): BusinessResult[Unit] = {
 
     logger.debug(s"[AuditService][audit] Generating ${event.auditType} audit event for vat-api.")
+
     val auditEvent =
       ExtendedDataEvent(
         auditSource = "vat-api",

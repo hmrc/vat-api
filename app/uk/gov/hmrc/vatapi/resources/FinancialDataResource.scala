@@ -29,13 +29,20 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FinancialDataResource extends BaseResource {
-
-  private val connector = FinancialDataConnector
+object FinancialDataResource extends FinancialDataResource{
+  override val connector = FinancialDataConnector
   override val authService = AuthorisationService
   override val appContext = AppContext
+}
+
+trait FinancialDataResource extends BaseResource {
+
+  val connector: FinancialDataConnector
+  val authService: AuthorisationService
+  val appContext: AppContext
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
+
     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
     val result = fromDes {
       for {
@@ -73,7 +80,9 @@ object FinancialDataResource extends BaseResource {
 
 
   def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
+
     logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
+
     val result = fromDes {
       for {
         response <- execute{_ => connector.getFinancialData(vrn, params)}

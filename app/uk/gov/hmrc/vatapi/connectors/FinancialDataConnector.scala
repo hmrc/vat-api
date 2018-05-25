@@ -26,13 +26,17 @@ import uk.gov.hmrc.vatapi.resources.wrappers.FinancialDataResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object FinancialDataConnector extends BaseConnector {
-
-  val logger: Logger = Logger(this.getClass)
+object FinancialDataConnector extends FinancialDataConnector {
   override val http: WSHttp = WSHttp
   override val appContext = AppContext
+}
 
-  private lazy val baseUrl: String = s"${AppContext.desUrl}/enterprise/financial-data"
+trait FinancialDataConnector extends BaseConnector {
+
+  val logger: Logger = Logger(this.getClass)
+  val http: WSHttp
+
+  private lazy val baseUrl: String = s"${appContext.desUrl}/enterprise/financial-data"
 
   def getFinancialData(vrn: Vrn, params: FinancialDataQueryParams)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FinancialDataResponse] = {
 

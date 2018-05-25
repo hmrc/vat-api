@@ -17,16 +17,13 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import play.api.libs.json.{JsNull, JsValue, Json, OFormat}
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditService}
-import uk.gov.hmrc.vatapi.audit.AuditService.audit
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
-import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,14 +34,12 @@ object VatReturnsResource extends VatReturnsResource {
   override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
   override val authService: AuthorisationService = AuthorisationService
   override val appContext: AppContext = AppContext
-  override val auditService: AuditService = AuditService
 }
 
 trait VatReturnsResource extends BaseResource {
 
   val connector: VatReturnsConnector
   val orchestrator: VatReturnsOrchestrator
-  val auditService: AuditService
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -57,7 +52,6 @@ trait VatReturnsResource extends BaseResource {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
         response <- BusinessResult { orchestrator.submitVatReturn(vrn, vatReturn) }
-        _ <-  auditService.audit(SubmitVatReturnEvent(vrn, response))
       } yield response
     } onSuccess { response =>
       response.filter { case 200 => response.vatSubmissionReturnOrError match {
@@ -103,17 +97,6 @@ trait VatReturnsResource extends BaseResource {
           InternalServerError(Json.toJson(Errors.InternalServerError))
       }
     }
-
-  private case class SubmitVatReturn(vrn: Vrn, httpStatus: Int, requestPayload: JsValue, responsePayload: JsValue)
-
-  private implicit val submitVatReturnFormat: OFormat[SubmitVatReturn] = Json.format[SubmitVatReturn]
-
-  private def SubmitVatReturnEvent(vrn: Vrn, response: VatReturnResponse)(implicit request: Request[JsValue]): AuditEvent[SubmitVatReturn] =
-    AuditEvent(
-      auditType = "submitVatReturn",
-      transactionName = "vat-return-create",
-      detail = SubmitVatReturn(vrn, response.status, request.body, response.jsonOrError.right.getOrElse(JsNull))
-    )
 
   private case class RetrieveVatReturn(vrn: Vrn, httpStatus: Int, responsePayload: JsValue)
 

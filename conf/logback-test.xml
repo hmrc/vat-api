@@ -4,22 +4,21 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/vat-api.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date{ISO8601} level=[%level] logger=[%logger] thread=[%thread] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
+            <pattern>[%.-4level]  %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date{ISO8601} level=[%level] logger=[%logger] rid=[%X{X-Request-ID}] user=[%X{Authorization}] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
+            <pattern>[%.-4level]  %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT_IGNORE_NETTY" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date{ISO8601} level=[%level] logger=[%logger] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
+            <pattern>[%.-4level]  %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
-
     <appender name="ACCESS_LOG_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/access.log</file>
         <encoder>
@@ -42,15 +41,13 @@
         <appender-ref ref="STDOUT"/>
     </appender>
 
-    <logger name="application" level="ERROR"/>
-    <logger name="uk.gov.hmrc.vatapi" level="OFF"/>
-    <logger name="uk.gov.hmrc.audit" level="ERROR"/>
-    <logger name="connector" level="ERROR"/>
-
+    <logger name="application" level="DEBUG"/>
+    <logger name="uk.gov" level="ERROR"/>
+    <logger name="connector" level="DEBUG"/>
     <logger name="org.eclipse.jetty" level="ERROR"/>
     <logger name="akka" level="ERROR"/>
 
-    <root level="WARN">
+    <root level="OFF">
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="ASYNC_STDOUT"/>
     </root>

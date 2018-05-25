@@ -314,6 +314,98 @@ object Jsons {
         )
       ))
     )
+
+    val singlePaymentDesResponse: JsValue = Json.parse(
+      """
+        |{
+        |	"idType": "VRN",
+        |	"idNumber": "100062914",
+        |	"regimeType": "VATC",
+        |	"processingDate": "2017-05-13T09:30:00.000Z",
+        |	"financialTransactions": [{
+        |			"chargeType": "VAT Return Debit Charge",
+        |			"mainType": "VAT Return Charge",
+        |			"periodKey": "15AD",
+        |			"periodKeyDescription": "January 2018",
+        |			"taxPeriodFrom": "2017-01-01",
+        |			"taxPeriodTo": "2017-02-01",
+        |			"businessPartner": "0100062914",
+        |			"contractAccountCategory": "33",
+        |			"contractAccount": "000917000429",
+        |			"contractObjectType": "ZVAT",
+        |			"contractObject": "00000018000000000104",
+        |			"sapDocumentNumber": "003390002284",
+        |			"sapDocumentNumberItem": "0001",
+        |			"chargeReference": "XQ002750002150",
+        |			"mainTransaction": "4700",
+        |			"subTransaction": "1174",
+        |			"originalAmount": 1534.65,
+        |			"outstandingAmount": 0,
+        |			"clearedAmount": 1534.65,
+        |			"accruedInterest": 0,
+        |			"items": [{
+        |				"subItem": "000",
+        |				"dueDate": "2017-01-12",
+        |				"amount": 1000.65,
+        |				"clearingDate": "2017-02-12",
+        |				"clearingReason": "01",
+        |				"outgoingPaymentMethod": "A",
+        |				"paymentLock": "a",
+        |				"clearingLock": "A",
+        |				"interestLock": "C",
+        |				"dunningLock": "1",
+        |				"returnFlag": true,
+        |				"paymentReference": "a",
+        |				"paymentAmount": 1534.65,
+        |				"paymentMethod": "A",
+        |				"paymentLot": "081203010024",
+        |				"paymentLotItem": "000001",
+        |				"clearingSAPDocument": "3350000253",
+        |				"statisticalDocument": "A"
+        |			}]
+        |		}
+        |	]
+        |}
+      """.stripMargin)
+
+    val singleLiabilityDesResponse: JsValue = Json.parse(
+      """
+        |{
+        |	"idType": "VRN",
+        |	"idNumber": "XQIT00000000001",
+        |	"regimeType": "VATC",
+        |	"processingDate": "2017-03-07T09:30:00.000Z",
+        |	"financialTransactions": [{
+        |			"chargeType": "VAT Return Debit Charge",
+        |			"mainType": "2100",
+        |			"periodKey": "13RL",
+        |			"periodKeyDescription": "abcde",
+        |			"taxPeriodFrom": "2017-01-01",
+        |			"taxPeriodTo": "2017-02-01",
+        |			"businessPartner": "6622334455",
+        |			"contractAccountCategory": "02",
+        |			"contractAccount": "D",
+        |			"contractObjectType": "ABCD",
+        |			"contractObject": "00000003000000002757",
+        |			"sapDocumentNumber": "1040000872",
+        |			"sapDocumentNumberItem": "XM00",
+        |			"chargeReference": "XM002610011594",
+        |			"mainTransaction": "1234",
+        |			"subTransaction": "5678",
+        |			"originalAmount": 463872,
+        |			"outstandingAmount": 463872,
+        |			"accruedInterest": 10000,
+        |			"items": [{
+        |				"subItem": "001",
+        |				"dueDate": "2017-03-08",
+        |				"amount": 463872
+        |			}]
+        |		}
+        |	]
+        |}
+        |
+    """.stripMargin)
+
   }
 
 }

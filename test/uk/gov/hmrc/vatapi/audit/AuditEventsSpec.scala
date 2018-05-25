@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.models
+package uk.gov.hmrc.vatapi.audit
 
+import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.vatapi.UnitSpec
+import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 
-trait NrsTransformError {
-  val msg : String
-}
+class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
-
-object NrsTransformError {
-  def unapply(err: NrsTransformError): Option[String] = Some(err.msg)
+  "nrsAudit event" should {
+    "return valid AuditEvent" when {
+      "proper NRS data is supplied" in {
+      val auditEvent = AuditEvents.nrsAudit(generateVrn, nrsData, "NO_TOKEN", "X-COID")
+      assert(auditEvent.transactionName == "submit-vat-return")
+      assert(auditEvent.auditType == "submitToNonRepudiationStore")
+    }
+    }
+  }
 }
