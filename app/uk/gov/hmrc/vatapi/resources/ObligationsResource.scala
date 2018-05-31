@@ -17,14 +17,12 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import play.api.libs.json.{JsNull, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditService}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
-import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,6 +38,7 @@ trait ObligationsResource extends BaseResource {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
+
     val result = fromDes {
       for {
         response <- execute { _ => connector.get(vrn, params) }

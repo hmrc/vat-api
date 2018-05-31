@@ -20,6 +20,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
@@ -33,6 +34,7 @@ import scala.concurrent.Future
 object VatReturnsOrchestrator extends VatReturnsOrchestrator {
   override val nrsService: NRSService = NRSService
   override val vatReturnsService: VatReturnsService = VatReturnsService
+  override val auditService: AuditService = AuditService
 }
 
 trait VatReturnsOrchestrator {
@@ -41,7 +43,7 @@ trait VatReturnsOrchestrator {
 
   val nrsService: NRSService
   val vatReturnsService: VatReturnsService
-
+  val auditService: AuditService
   def submitVatReturn(vrn: Vrn,
                       vatReturn: VatReturnDeclaration
                      )(implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
@@ -54,6 +56,8 @@ trait VatReturnsOrchestrator {
           case Agent(_,_,_,enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
           case c: AuthContext => c.agentReference
         }
+        auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
+          request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
         vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
@@ -62,6 +66,8 @@ trait VatReturnsOrchestrator {
   }.flatMap{s => s}
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
+
+
 }
 
 

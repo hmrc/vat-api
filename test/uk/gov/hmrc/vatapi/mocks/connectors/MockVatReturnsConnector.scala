@@ -26,7 +26,8 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockVatReturnsConnector extends Mock { _: Suite =>
+trait MockVatReturnsConnector extends Mock {
+  _: Suite =>
 
   val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
 
@@ -41,4 +42,19 @@ trait MockVatReturnsConnector extends Mock { _: Suite =>
         eqTo(vrn),
         any[VatReturnDeclaration]())(any[HeaderCarrier](), any[ExecutionContext]()))
       .thenReturn(Future.successful(response))
+
+  def retrieveVatReturn(vrn: Vrn, periodKey: String)(response: VatReturnResponse) =
+    when(mockVatReturnsConnector
+      .query(
+        eqTo(vrn),
+        any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
+      .thenReturn(Future.successful(response))
+
+  def retrieveVatReturnFailed(vrn: Vrn, periodKey: String) =
+    when(mockVatReturnsConnector
+      .query(
+        eqTo(vrn),
+        any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
+      .thenReturn(Future.failed(new Exception("DES FAILED")))
+
 }

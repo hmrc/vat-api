@@ -24,8 +24,8 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Individual, Organisation}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
-import uk.gov.hmrc.vatapi.models.des.PaymentIndicator
-import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
+import uk.gov.hmrc.vatapi.models.des.{PaymentIndicator, VatReturn}
+import uk.gov.hmrc.vatapi.models.{Amount, VatReturnDeclaration, des}
 
 object TestConstants {
 

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.orchestrators
 
+import cats.data.EitherT
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -30,7 +31,7 @@ import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.httpparsers.NrsError
-import uk.gov.hmrc.vatapi.mocks.services.{MockNRSService, MockVatReturnsService}
+import uk.gov.hmrc.vatapi.mocks.services.{MockAuditService, MockNRSService, MockVatReturnsService}
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
@@ -41,11 +42,13 @@ import scala.concurrent.Future
 
 class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with EitherValues
   with MockNRSService
-  with MockVatReturnsService {
+  with MockVatReturnsService
+  with MockAuditService {
 
   object TestVatReturnsOrchestrator extends VatReturnsOrchestrator {
     override val nrsService: NRSService = mockNrsService
     override val vatReturnsService: VatReturnsService = mockVatReturnsService
+    override val auditService = mockAuditService
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -73,6 +76,8 @@ class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with Mocki
 
     "a successful response is returned from NRS Service" should {
       "retrieve a VatReturnsResponse from VatReturnsService" in {
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
         setupNrsSubmission(testVrn, vatReturnDeclaration)(Right(nrsData))
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(vatReturnSuccessResponse)
         extractAwait(result(vatReturnDeclaration)) shouldBe Right(vatReturnSuccessResponse)

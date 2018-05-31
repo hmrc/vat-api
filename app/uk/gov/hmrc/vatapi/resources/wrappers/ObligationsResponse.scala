@@ -55,12 +55,14 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
     }
 
     jsonOrError match {
-      case Right(js) => logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES : $js")
+      case Right(js) =>
+        logger.debug(s"[ObligationsResponse][desObligations] Json response body from DES : $js")
         js.asOpt[des.Obligations] match {
           case Some(obligations) => oneFound(obligations)
           case _ => error("The response from DES does not match the expected format")
         }
-      case _ => logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.status}")
+      case _ =>
+        logger.error(s"[ObligationsResponse][desObligations] Non json response from DES : ${underlying.status}")
         error("Non json response from DES")
     }
   }
