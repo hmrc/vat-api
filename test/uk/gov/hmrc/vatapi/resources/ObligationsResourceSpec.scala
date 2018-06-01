@@ -57,7 +57,7 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
       }
@@ -71,7 +71,7 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParamsWithNoStatus)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
       }
@@ -85,7 +85,7 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 404
+        status(result) shouldBe NOT_FOUND
         contentType(result) shouldBe None
       }
     }
@@ -98,7 +98,7 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.successful(invalidDesResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
       }
@@ -111,7 +111,7 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.failed(new Exception("Connection refused error")))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
       }
@@ -124,7 +124,7 @@ class ObligationsResourceSpec extends ResourceSpec
         .returns(Future.successful(nonJsonDesResponse))
 
       val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-      status(result) shouldBe 500
+      status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
     }
@@ -136,7 +136,7 @@ class ObligationsResourceSpec extends ResourceSpec
         .returns(Future.successful(nonJsonDesResponse))
 
       val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-      status(result) shouldBe 500
+      status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
     }

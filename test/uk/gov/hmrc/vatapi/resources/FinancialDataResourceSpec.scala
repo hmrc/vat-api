@@ -51,8 +51,9 @@ class FinancialDataResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testFinalcialDataResource.retrieveLiabilities(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) \\ "outstandingAmount" shouldBe Jsons.FinancialData.oneLiability \\ "outstandingAmount"
       }
     }
   }
@@ -65,7 +66,7 @@ class FinancialDataResourceSpec extends ResourceSpec
           .returns(Future.failed(new Exception("INTERNAL_ERROR")))
 
         val result = testFinalcialDataResource.retrieveLiabilities(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
       }
     }
   }
@@ -79,8 +80,9 @@ class FinancialDataResourceSpec extends ResourceSpec
           .returns(Future.successful(desResponse))
 
         val result = testFinalcialDataResource.retrievePayments(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe Jsons.FinancialData.onePayment
       }
     }
   }
@@ -93,7 +95,7 @@ class FinancialDataResourceSpec extends ResourceSpec
           .returns(Future.failed(new Exception("INTERNAL_ERROR")))
 
         val result = testFinalcialDataResource.retrievePayments(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
       }
     }
   }
