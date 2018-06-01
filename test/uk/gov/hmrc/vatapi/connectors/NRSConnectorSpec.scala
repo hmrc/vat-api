@@ -51,7 +51,7 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
 
   "NRSConnector.submit" should {
 
-    lazy val testUrl: String = TestNRSConnector.nrsSubmissionUrl(testVrn.vrn)
+    lazy val testUrl: String = TestNRSConnector.nrsSubmissionUrl
     def result(requestBody: NRSSubmission): Future[NrsSubmissionOutcome] = TestNRSConnector.submit(testVrn, requestBody)
 
     "successful responses are returned from the connector" should {
