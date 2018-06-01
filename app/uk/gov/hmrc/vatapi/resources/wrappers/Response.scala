@@ -70,7 +70,7 @@ trait Response {
     }
 
   private def logResponse(): Unit =
-    logger.error(s"DES error occurred with status code ${underlying.status}")
+    logger.error(s"DES error occurred with status code ${underlying.status} and body: ${underlying.body}")
 
   private def addCorrelationHeader(result: Result) =
     underlying

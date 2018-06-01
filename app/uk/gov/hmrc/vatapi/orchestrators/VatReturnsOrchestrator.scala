@@ -56,6 +56,7 @@ trait VatReturnsOrchestrator {
           case Agent(_,_,_,enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
           case c: AuthContext => c.agentReference
         }
+        logger.error(s"[VatReturns][submitVatReturn] ARN from enrolment: ${arn}\tARN from auth: ${request.authContext.agentReference}")
         auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
           request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
         vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
