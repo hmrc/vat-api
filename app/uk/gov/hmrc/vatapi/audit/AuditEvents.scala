@@ -21,21 +21,17 @@ import uk.gov.hmrc.vatapi.httpparsers.NRSData
 
 object AuditEvents {
 
-   def nrsAudit(vrn: Vrn, nrsData: NRSData, authorization: String, correlationId: String): AuditEvent[String] =
+  def nrsAudit(vrn: Vrn, nrsData: NRSData, authorization: String, correlationId: String): AuditEvent[Map[String, String]] =
     AuditEvent(
       auditType = "submitToNonRepudiationStore",
       transactionName = "submit-vat-return",
-      detail = nrsAuditString(vrn, authorization, nrsData.nrSubmissionId, correlationId)
+      detail = nrsAuditDetals(vrn, authorization, nrsData.nrSubmissionId, correlationId)
     )
 
-  private def nrsAuditString(vrn: Vrn, authorization: String, nrSubmissionID: String, correlationId: String): String  ={
-    s"""
-       |{
-       |  "vrn": "$vrn",
-       |  "authorization": "$authorization",
-       |  "nrSubmissionID": "$nrSubmissionID",
-       |  "correlationId": "$correlationId"
-       |}
-       """.stripMargin
-  }
+  private def nrsAuditDetals(vrn: Vrn, authorization: String, nrSubmissionID: String, correlationId: String): Map[String, String] = Map(
+    "vrn" -> vrn.vrn,
+    "authorization" -> authorization,
+    "nrSubmissionID" -> nrSubmissionID,
+    "correlationId" -> correlationId
+  )
 }
