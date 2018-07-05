@@ -24,8 +24,8 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   val reactiveMongoVersion = "6.2.0"
-  val microserviceBootstrapVersion = "6.17.0"
-  val authClientVersion = "2.5.0"
+  val microserviceBootstrapVersion = "6.18.0"
+  val authClientVersion = "2.6.0"
   val domainVersion = "5.1.0"
   val hmrcApiVersion = "2.1.0"
   val jsonExtensionsVersion = "0.10.0"
