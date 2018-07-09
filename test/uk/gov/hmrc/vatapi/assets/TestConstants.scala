@@ -154,7 +154,7 @@ object TestConstants {
         headerData = Json.toJson(
           s"""
              |{
-             |"Gov-Client-Public-IP":"10.51.100.0",
+             |"Gov-Client-Public-IP":"X.X.X.0",
              |"Gov-Client-Public-Port":"12345",
              |"Gov-Client-Device-ID":"beec798b-b366-47fa-b1f8-92cede14a1ce",
              |"Gov-Client-User-ID":"alice_desktop",
