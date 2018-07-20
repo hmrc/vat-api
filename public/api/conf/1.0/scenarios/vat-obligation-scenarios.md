@@ -8,17 +8,49 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>N/A - Default</p></td>
-            <td><p>VAT obligation periods are calculated based on the from & to dates passed, with 1st obligation met. Three months for each obligations.</p></td>
+            <td><p>Default (No header value)</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and one is fulfilled</p></td>
         </tr>
         <tr>
-            <td><p>NONE_MET</p></td>
-            <td><p>VAT business 4 standard tax year obligations. None of the obligations are met</p></td>
+            <td><p>QUARTERLY_NONE_MET</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and none are fulfilled</p></td>
         </tr>
         <tr>
         <tr>
-            <td><p>ALL_MET</p></td>
-            <td><p>VAT business 4 standard tax year obligations. All the obligations are met</p></td>
+            <td><p>QUARTERLY_ONE_MET</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and one is fulfilled</p></td>
         </tr>
+        <tr>
+            <td><p>QUARTERLY_TWO_MET</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and two are fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>QUARTERLY_THREE_MET</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and three are fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>QUARTERLY_FOUR_MET</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations and four are fulfilled</p></td>
+        </tr>        
+        <tr>
+            <td><p>MONTHLY_NONE_MET</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations and none are fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>MONTHLY_ONE_MET</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations and one month is fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>MONTHLY_TWO_MET</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations and two months are fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>MONTHLY_THREE_MET</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations and three months are fulfilled</p></td>
+        </tr>
+        <tr>
+            <td><p>NOT_FOUND</p></td>
+            <td><p>Simulates the scenario where no data is found</p></td>
+        </tr>                  
     </tbody>
 </table>

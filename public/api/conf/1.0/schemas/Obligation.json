@@ -21,7 +21,7 @@
     },
     "status": {
       "title": "Status",
-      "description": "Status of the obligation (O = Open, F = Fulfilled)",
+      "description": "Which obligation statuses to return (O = Open, F = Fulfilled)",
       "type": "string",
       "example": "F"
     },

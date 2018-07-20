@@ -73,12 +73,12 @@ traits:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
          from:
-           description: Obligations to return from date
+           description: Date from which to return obligations
            type: string
            example: 2017-01-25
            required: true
          to:
-           description: Obligations to return up to date
+           description: Date to which to return obligations
            type: string
            example: 2017-01-25
            required: true
@@ -94,9 +94,15 @@ traits:
                 example: 5968c22d620000620096db5f
                 description: Unique id for operation tracking
             body:
-               application/json:
-                 type: !include schemas/Obligations.json
-                 example: !include examples/Obligations.json
+              application/json:
+                type: !include schemas/Obligations.json
+                examples:
+                 example-1:
+                  description: Quarterly obligations; one fulfilled
+                  value: !include examples/ObligationsQuarterly.json
+                 example-2:
+                  description: Monthly obligations; one fulfilled
+                  value: !include examples/ObligationsMonthly.json
           400:
             body:
               application/json:
@@ -122,6 +128,15 @@ traits:
                     description: Invalid status
                     value:
                       code: INVALID_STATUS
+          404:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: The remote endpoint has indicated that no associated data is found
+                    value:
+                      code: NOT_FOUND
     /returns:
       displayName: VAT Returns
       description: Submit and read VAT returns
