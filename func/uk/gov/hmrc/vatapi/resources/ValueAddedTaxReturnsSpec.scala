@@ -71,7 +71,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\formBundleNumber", "891713832155")
         .responseContainsHeader("Receipt-Id", "")
         .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
-        .responseContainsHeader("Receipt-TimeStamp", s"${DateTime.now().toString("yyyy-MM-dd'T'HH:mm:ss'Z'")}")
+        .responseContainsHeader("Receipt-TimeStamp", "")
     }
 
     "allow users to submit VAT returns even with negative amounts" in {

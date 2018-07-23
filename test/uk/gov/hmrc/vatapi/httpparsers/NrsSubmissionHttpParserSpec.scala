@@ -17,10 +17,10 @@
 package uk.gov.hmrc.vatapi.httpparsers
 
 import org.scalatest.EitherValues
+import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.UnitSpec
-import play.api.http.Status._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcomeReads.read
 
@@ -41,7 +41,7 @@ class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
       }
       "return NrsError" when {
         "the Json returned is not valid" in {
-          read("", "", successBadJsonResponse) shouldBe Right(new NRSData)
+          read("", "", successBadJsonResponse).right.value shouldBe NRSData()
         }
       }
     }

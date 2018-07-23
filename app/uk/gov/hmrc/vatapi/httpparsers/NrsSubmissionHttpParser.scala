@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.httpparsers
 
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{Json, OFormat}
@@ -48,7 +47,7 @@ object NrsSubmissionHttpParser {
           )
         case e =>
               logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
-              Right(new NRSData)
+              Right(NRSData())
       }
     }
   }
@@ -58,7 +57,7 @@ sealed trait NrsSubmissionFailure
 
 case class NRSData(nrSubmissionId: String = "",
                    cadesTSignature: String = "",
-                   timestamp: String = s"${DateTime.now().toString("yyyy-MM-dd'T'HH:mm:ss'Z'")}"
+                   timestamp: String = ""
                   )
 
 object NRSData {

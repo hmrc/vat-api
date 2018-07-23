@@ -27,6 +27,7 @@ import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
+import uk.gov.hmrc.vatapi.utils.DateUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,7 +59,8 @@ trait VatReturnsOrchestrator {
         }
         auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
           request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
-        vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
+        vatReturnsService.submit(vrn,
+          vatReturn.toDes(DateUtils.stringToDateTime(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
