@@ -22,8 +22,6 @@ import play.api.http.Status._
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-import scala.util.Random
-
 object NrsSubmissionHttpParser {
 
   val logger: Logger = Logger(this.getClass)
@@ -44,7 +42,7 @@ object NrsSubmissionHttpParser {
               Left(NrsError)
             },
             valid =>{
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS Data: $valid with status : ")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS Data: $valid")
               Right(valid)
             }
           )
