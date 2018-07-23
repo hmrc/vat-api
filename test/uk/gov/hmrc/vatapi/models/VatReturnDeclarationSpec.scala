@@ -18,8 +18,8 @@ package uk.gov.hmrc.vatapi.models
 
 import play.api.libs.json.Json.toJson
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.resources.JsonSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
+import uk.gov.hmrc.vatapi.resources.JsonSpec
 
 class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
 
@@ -149,23 +149,25 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
   }
 
   "reject VAT returns with decimal amounts where whole amounts are expected" in {
-    assertValidationErrorWithCode(
-      VatReturnDeclaration(
-        periodKey = "#001",
-        vatDueSales = 10.00,
-        vatDueAcquisitions = 100.30,
-        totalVatDue = 350.00,
-        vatReclaimedCurrPeriod = -450.00,
-        netVatDue = 2000.00,
-        totalValueSalesExVAT = 1000,
-        totalValuePurchasesExVAT = 200.35,
-        totalValueGoodsSuppliedExVAT = 100.00,
-        totalAcquisitionsExVAT = 540.00,
-        finalised = true
-      ),
-      "/totalValuePurchasesExVAT",
-      ErrorCode.INVALID_MONETARY_AMOUNT
+
+    val model = VatReturnDeclaration(
+      periodKey = "#001",
+      vatDueSales = 10.00,
+      vatDueAcquisitions = 100.30,
+      totalVatDue = 350.00,
+      vatReclaimedCurrPeriod = -450.00,
+      netVatDue = 2000.00,
+      totalValueSalesExVAT = 1000,
+      totalValuePurchasesExVAT = 200.35,
+      totalValueGoodsSuppliedExVAT = 100.00,
+      totalAcquisitionsExVAT = 540.00,
+      finalised = true
     )
+
+    assertValidationErrorWithCode(
+      model, "/totalValuePurchasesExVAT", ErrorCode.INVALID_MONETARY_AMOUNT
+    )
+    assertValidationErrorWithMessage(model, "/totalValuePurchasesExVAT", "The value must be between -9999999999999 and 9999999999999")
   }
 
   "reject VAT returns with amounts with more than 2 decimal places" in {
