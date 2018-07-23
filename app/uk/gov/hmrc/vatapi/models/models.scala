@@ -84,7 +84,7 @@ package object models {
     .of[Amount]
     .filter(
       JsonValidationError(
-        "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00",
+        "The value must be between -9999999999999 and 9999999999999",
         ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount =>
         (amount.scale <= 0 || amount
