@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.vatapi.httpparsers
 
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+
+import scala.util.Random
 
 object NrsSubmissionHttpParser {
 
@@ -31,6 +34,9 @@ object NrsSubmissionHttpParser {
     override def read(method: String, url: String, response: HttpResponse): NrsSubmissionOutcome = {
       logger.debug(s"[NrsSubmissionHttpParser][#reads] - Reading NRS Response")
       response.status match {
+        case BAD_REQUEST =>
+          logger.warn(s"[NrsSubmissionHttpParser][#reads] - BAD_REQUEST status from NRS Response")
+          Left(NrsError)
         case ACCEPTED =>
           response.json.validate[NRSData].fold(
             invalid => {
@@ -38,13 +44,13 @@ object NrsSubmissionHttpParser {
               Left(NrsError)
             },
             valid =>{
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS Data: $valid with status : ")
               Right(valid)
             }
           )
         case e =>
-          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e")
-          Left(NrsError)
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
+              Right(new NRSData)
       }
     }
   }
@@ -52,9 +58,9 @@ object NrsSubmissionHttpParser {
 
 sealed trait NrsSubmissionFailure
 
-case class NRSData(nrSubmissionId: String,
-                   cadesTSignature: String,
-                   timestamp: String
+case class NRSData(nrSubmissionId: String = "",
+                   cadesTSignature: String = "",
+                   timestamp: String = s"${DateTime.now().toString("yyyy-MM-dd'T'HH:mm:ss'Z'")}"
                   )
 
 object NRSData {

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.http.HttpResponse

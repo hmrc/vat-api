@@ -568,6 +568,17 @@ class Givens(httpVerbs: HttpVerbs) {
       )
       givens
     }
+
+    def nrsFailureforNonBadRequest(vrn: Vrn): Givens = {
+      stubFor(any(urlMatching(s".*/submission.*"))
+        .willReturn(
+          aResponse()
+            .withStatus(FORBIDDEN)
+            .withBody("{}")
+        )
+      )
+      givens
+    }
   }
 
   def des() = new Des(this)
