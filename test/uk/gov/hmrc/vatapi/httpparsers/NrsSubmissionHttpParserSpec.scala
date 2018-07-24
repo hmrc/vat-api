@@ -41,7 +41,7 @@ class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
       }
       "return NrsError" when {
         "the Json returned is not valid" in {
-          read("", "", successBadJsonResponse).right.value shouldBe NRSData()
+          read("", "", successBadJsonResponse).right.value shouldBe EmptyNrsData
         }
       }
     }

@@ -47,7 +47,7 @@ object NrsSubmissionHttpParser {
           )
         case e =>
               logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
-              Right(NRSData())
+              Right(EmptyNrsData)
       }
     }
   }
@@ -55,10 +55,11 @@ object NrsSubmissionHttpParser {
 
 sealed trait NrsSubmissionFailure
 
-case class NRSData(nrSubmissionId: String = "",
-                   cadesTSignature: String = "",
-                   timestamp: String = ""
+case class NRSData(nrSubmissionId: String,
+                   cadesTSignature: String,
+                   timestamp: String
                   )
+object EmptyNrsData extends NRSData("","","")
 
 object NRSData {
   implicit val format: OFormat[NRSData] = Json.format[NRSData]
