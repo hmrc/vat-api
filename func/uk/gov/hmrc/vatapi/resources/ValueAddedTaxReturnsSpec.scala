@@ -1,5 +1,6 @@
 package uk.gov.hmrc.vatapi.resources
 
+import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
@@ -52,6 +53,25 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
         .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
         .responseContainsHeader("Receipt-TimeStamp", "2018-02-14T09:32:15Z")
+    }
+
+    "allow users to submit VAT returns for non bad_request NRS response" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsFailureforNonBadRequest(vrn)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
+        .responseContainsHeader("Receipt-TimeStamp", "")
     }
 
     "allow users to submit VAT returns even with negative amounts" in {

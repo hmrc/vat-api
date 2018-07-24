@@ -17,10 +17,10 @@
 package uk.gov.hmrc.vatapi.httpparsers
 
 import org.scalatest.EitherValues
+import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.UnitSpec
-import play.api.http.Status._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcomeReads.read
 
@@ -28,7 +28,7 @@ import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutco
 class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
 
     val successResponse = HttpResponse(ACCEPTED, responseJson = Some(Json.toJson(nrsData)))
-    val successBadJsonResponse = HttpResponse(ACCEPTED, responseJson = Some(Json.toJson("{}")))
+    val successBadJsonResponse = HttpResponse(NOT_FOUND, responseJson = Some(Json.toJson("{}")))
     val failureResponse = HttpResponse(BAD_REQUEST, responseJson = Some(Json.toJson("{}")))
 
   "NrsSubmissionOutcome#read" when {
@@ -41,14 +41,14 @@ class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
       }
       "return NrsError" when {
         "the Json returned is not valid" in {
-          read("", "", successBadJsonResponse).left.value shouldBe NrsError
+          read("", "", successBadJsonResponse).right.value shouldBe EmptyNrsData
         }
       }
     }
 
     "the response status is not OK" should {
       "return NrsError" in {
-        read("", "", successBadJsonResponse).left.value shouldBe NrsError
+        read("", "", failureResponse).left.value shouldBe NrsError
       }
     }
   }

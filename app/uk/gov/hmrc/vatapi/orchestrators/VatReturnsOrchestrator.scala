@@ -22,7 +22,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
-import uk.gov.hmrc.vatapi.httpparsers.NRSData
+import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
@@ -56,9 +56,16 @@ trait VatReturnsOrchestrator {
           case Agent(_,_,_,enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
           case c: AuthContext => c.agentReference
         }
-        auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
-          request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
-        vatReturnsService.submit(vrn, vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
+        nrsData match {
+          case EmptyNrsData =>
+            vatReturnsService.submit(vrn,
+              vatReturn.toDes(DateTime.now(), arn)) map { response => Right(response withNrsData nrsData)}
+          case _ =>
+            auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
+              request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
+            vatReturnsService.submit(vrn,
+              vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
+        }
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
@@ -66,7 +73,6 @@ trait VatReturnsOrchestrator {
   }.flatMap{s => s}
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
-
 
 }
 

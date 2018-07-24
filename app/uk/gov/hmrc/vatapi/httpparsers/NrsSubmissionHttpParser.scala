@@ -31,6 +31,9 @@ object NrsSubmissionHttpParser {
     override def read(method: String, url: String, response: HttpResponse): NrsSubmissionOutcome = {
       logger.debug(s"[NrsSubmissionHttpParser][#reads] - Reading NRS Response")
       response.status match {
+        case BAD_REQUEST =>
+          logger.warn(s"[NrsSubmissionHttpParser][#reads] - BAD_REQUEST status from NRS Response")
+          Left(NrsError)
         case ACCEPTED =>
           response.json.validate[NRSData].fold(
             invalid => {
@@ -38,13 +41,13 @@ object NrsSubmissionHttpParser {
               Left(NrsError)
             },
             valid =>{
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Successfully retrieved NRS Data: $valid")
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS Data: $valid")
               Right(valid)
             }
           )
         case e =>
-          logger.warn(s"[NrsSubmissionHttpParser][#reads] - Non-OK NRS Response: STATUS $e")
-          Left(NrsError)
+              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
+              Right(EmptyNrsData)
       }
     }
   }
@@ -56,6 +59,7 @@ case class NRSData(nrSubmissionId: String,
                    cadesTSignature: String,
                    timestamp: String
                   )
+object EmptyNrsData extends NRSData("","","")
 
 object NRSData {
   implicit val format: OFormat[NRSData] = Json.format[NRSData]
