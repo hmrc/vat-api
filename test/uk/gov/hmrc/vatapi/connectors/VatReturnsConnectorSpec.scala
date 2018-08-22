@@ -24,23 +24,23 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
+import uk.gov.hmrc.vatapi.config.WSHttp
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
-import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
   with MockHttp
   with MockAppContext {
 
-  object TestVatReturnsConnector extends VatReturnsConnector {
-    override val http: WSHttp = mockHttp
-    override val appContext = mockAppContext
+  class Test {
+    val connector = new VatReturnsConnector {
+      override val http: WSHttp = mockHttp
+      override val appContext = mockAppContext
+    }
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -55,20 +55,48 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
       responseJson = Some(Json.toJson(DesError(DesErrorCode.INVALID_PAYLOAD, "Submission has not passed validation. Invalid parameter Payload.")))
     )
 
-
   "VatReturnsConnector.post" should {
 
-    lazy val testUrl: String = s"${AppContext.desUrl}/enterprise/return/vat/" + testVrn
-    def result(requestBody: des.VatReturnDeclaration): Future[VatReturnResponse] = TestVatReturnsConnector.post(testVrn, requestBody)
+    "return a VatReturnsResponse model with correct body in case of success" when {
 
-    "return a VatReturnsResponse model with correct body in case of success" in {
-      setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
-      await(result(desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
+      val testDesUrl = "test"
+
+      "pointing to the vat hybrid" in new Test {
+        MockAppContext.vatHybridFeature.thenReturn(true)
+        MockAppContext.desUrl.returns(testDesUrl)
+        val testUrl: String = s"$testDesUrl/vat/traders/$testVrn/returns"
+        setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
+        await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
+      }
+
+      "pointing to the vat normal" in new Test {
+        MockAppContext.vatHybridFeature.thenReturn(false)
+        MockAppContext.desUrl.returns(testDesUrl)
+        val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
+        setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
+        await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
+      }
     }
 
-    "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" in {
-      setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
-      await(result(desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(invalidPayloadResponse)
+    "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" when {
+
+      val testDesUrl = "test"
+
+      "pointing to the vat hybrid" in new Test {
+        MockAppContext.vatHybridFeature.thenReturn(true)
+        MockAppContext.desUrl.returns(testDesUrl)
+        val testUrl: String = s"$testDesUrl/vat/traders/$testVrn/returns"
+        setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
+        await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(invalidPayloadResponse)
+      }
+
+      "pointing to the vat normal" in new Test {
+        MockAppContext.vatHybridFeature.thenReturn(false)
+        MockAppContext.desUrl.returns(testDesUrl)
+        val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
+        setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
+        await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(invalidPayloadResponse)
+      }
     }
   }
 }

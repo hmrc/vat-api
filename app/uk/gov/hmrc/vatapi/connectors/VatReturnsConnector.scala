@@ -41,10 +41,8 @@ trait VatReturnsConnector extends BaseConnector {
 
     logger.debug(s"[VatReturnsConnector][post] - Submission for 9 box vat return for VRN: $vrn")
 
-    val postUrl: String = s"${AppContext.desUrl}/enterprise/return/vat"
-
     httpDesPostString[VatReturnResponse](
-      url = s"$postUrl/$vrn",
+      url = s"${retrieveDesUrl(vrn)}",
       elem = vatReturn.toJsonString,
       toResponse = VatReturnResponse
     )
@@ -57,6 +55,13 @@ trait VatReturnsConnector extends BaseConnector {
     val getUrl: String = s"${AppContext.desUrl}/vat/returns/vrn/$vrn?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
 
     httpGet[VatReturnResponse](getUrl, VatReturnResponse)
+  }
+
+  def retrieveDesUrl(vrn: Vrn): String = {
+    appContext.vatHybridFeature match {
+      case true => s"${appContext.desUrl}/vat/traders/$vrn/returns"
+      case false => s"${appContext.desUrl}/enterprise/return/vat/$vrn"
+    }
   }
 
 }

@@ -29,6 +29,7 @@ trait MockAppContext extends Mock { _: Suite =>
     def desUrl: OngoingStubbing[String] = when(mockAppContext.desUrl)
     def desToken: OngoingStubbing[String] = when(mockAppContext.desToken)
     def desEnv: OngoingStubbing[String] = when(mockAppContext.desEnv)
+    def vatHybridFeature: OngoingStubbing[Boolean] = when(mockAppContext.vatHybridFeature)
   }
 
   override protected def beforeEach(): Unit = {
