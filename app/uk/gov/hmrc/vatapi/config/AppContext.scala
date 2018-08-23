@@ -51,5 +51,5 @@ trait AppContext extends ServicesConfig {
     config.getString(s"$env.enrolments.identifier").getOrElse(throw new RuntimeException("identifier is not configured")),
     config.getString(s"$env.enrolments.auth-rule"))
 
-  lazy val vatHybridFeature = config.getBoolean(s"$env.feature-switch.des.hybrid").getOrElse(false)
+  lazy val vatHybridFeatureEnabled = config.getBoolean(s"$env.feature-switch.des.hybrid").getOrElse(false)
 }
