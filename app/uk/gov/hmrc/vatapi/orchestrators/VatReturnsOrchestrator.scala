@@ -56,15 +56,18 @@ trait VatReturnsOrchestrator {
           case Agent(_,_,_,enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
           case c: AuthContext => c.agentReference
         }
+
+        val timestamp = DateTime.now()
+
         nrsData match {
           case EmptyNrsData =>
             vatReturnsService.submit(vrn,
-              vatReturn.toDes(DateTime.now(), arn)) map { response => Right(response withNrsData nrsData)}
+              vatReturn.toDes(timestamp, arn)) map { response => Right(response withNrsData nrsData)}
           case _ =>
             auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
               request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
             vatReturnsService.submit(vrn,
-              vatReturn.toDes(DateTime.parse(nrsData.timestamp), arn)) map { response => Right(response withNrsData nrsData)}
+              vatReturn.toDes(timestamp, arn)) map { response => Right(response withNrsData nrsData)}
         }
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
