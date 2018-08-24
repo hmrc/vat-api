@@ -19,6 +19,7 @@ package uk.gov.hmrc.vatapi.mocks
 import org.mockito.{ArgumentMatchers => Matchers}
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
+import org.mockito.verification.VerificationMode
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
@@ -28,6 +29,12 @@ trait Mock extends MockitoSugar with BeforeAndAfterEach { _: Suite =>
   def eqTo[T](t: T) = Matchers.eq[T](t)
   def when[T](t: T) = Mockito.when(t)
   def reset[T](t: T) = Mockito.reset(t)
+
+  def verify[T](t: T): T = Mockito.verify(t)
+  def verify[T](t: T, mode: VerificationMode): T = Mockito.verify(t, mode)
+  def times(n: Int): VerificationMode = Mockito.times(n)
+  def never: VerificationMode = Mockito.never()
+  def once: VerificationMode = Mockito.times(1)
 
   implicit class stubbingOps[T](stubbing: OngoingStubbing[T]){
     def returns(t: T) = stubbing.thenReturn(t)
