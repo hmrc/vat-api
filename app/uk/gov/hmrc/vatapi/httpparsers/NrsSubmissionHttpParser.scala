@@ -18,8 +18,9 @@ package uk.gov.hmrc.vatapi.httpparsers
 
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, Reads, Writes, _}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+
 
 object NrsSubmissionHttpParser {
 
@@ -59,10 +60,15 @@ case class NRSData(nrSubmissionId: String,
                    cadesTSignature: String,
                    timestamp: String
                   )
-object EmptyNrsData extends NRSData("","","")
+object EmptyNrsData extends NRSData("","This has been deprecated - DO NOT USE","")
 
 object NRSData {
-  implicit val format: OFormat[NRSData] = Json.format[NRSData]
+  implicit val writes: Writes[NRSData] = Json.writes[NRSData]
+  implicit val reads: Reads[NRSData] = {
+    (__ \ "nrSubmissionId").read[String].map { id =>
+      NRSData.apply(id, "This has been deprecated - DO NOT USE", "")
+    }
+  }
 }
 
 case object NrsError extends NrsSubmissionFailure

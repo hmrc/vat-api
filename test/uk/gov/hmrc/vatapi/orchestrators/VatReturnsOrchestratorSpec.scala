@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.orchestrators
 
 import cats.data.EitherT
+import org.joda.time.DateTime
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -49,6 +50,8 @@ class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with Mocki
     override val nrsService: NRSService = mockNrsService
     override val vatReturnsService: VatReturnsService = mockVatReturnsService
     override val auditService = mockAuditService
+
+    override def submissionTimestamp: DateTime = timestamp
   }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -78,7 +81,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec with OneAppPerSuite with Mocki
       "retrieve a VatReturnsResponse from VatReturnsService" in {
         MockAuditService.audit()
           .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
-        setupNrsSubmission(testVrn, vatReturnDeclaration)(Right(nrsData))
+        setupNrsSubmission(testVrn, vatReturnDeclaration)(Right(nrsClientData))
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(vatReturnSuccessResponse)
         extractAwait(result(vatReturnDeclaration)) shouldBe Right(vatReturnSuccessResponse)
       }

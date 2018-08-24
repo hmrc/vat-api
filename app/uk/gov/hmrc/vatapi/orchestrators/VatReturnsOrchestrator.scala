@@ -27,6 +27,7 @@ import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
+import uk.gov.hmrc.vatapi.utils.ImplicitDateTimeFormatter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,21 +36,27 @@ object VatReturnsOrchestrator extends VatReturnsOrchestrator {
   override val nrsService: NRSService = NRSService
   override val vatReturnsService: VatReturnsService = VatReturnsService
   override val auditService: AuditService = AuditService
+
+  override def submissionTimestamp: DateTime = DateTime.now()
+
 }
 
-trait VatReturnsOrchestrator {
+trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
   val logger: Logger = Logger(this.getClass)
 
   val nrsService: NRSService
   val vatReturnsService: VatReturnsService
   val auditService: AuditService
+
+  def submissionTimestamp: DateTime
+
   def submitVatReturn(vrn: Vrn,
                       vatReturn: VatReturnDeclaration
                      )(implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
 
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
-    nrsService.submit(vrn, vatReturn) map {
+    nrsService.submit(vrn, vatReturn) flatMap {
       case Right(nrsData) =>
         logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS: $nrsData")
         val arn: Option[String] = request.authContext match {
@@ -57,23 +64,25 @@ trait VatReturnsOrchestrator {
           case c: AuthContext => c.agentReference
         }
 
-        val timestamp = DateTime.now()
-
         nrsData match {
           case EmptyNrsData =>
             vatReturnsService.submit(vrn,
-              vatReturn.toDes(timestamp, arn)) map { response => Right(response withNrsData nrsData)}
+              vatReturn.toDes(submissionTimestamp, arn)) map { response =>
+                Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
+            }
           case _ =>
             auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
               request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
             vatReturnsService.submit(vrn,
-              vatReturn.toDes(timestamp, arn)) map { response => Right(response withNrsData nrsData)}
+              vatReturn.toDes(submissionTimestamp, arn)) map { response =>
+                Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
+            }
         }
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
     }
-  }.flatMap{s => s}
+  }
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
 
