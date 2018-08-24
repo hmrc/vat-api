@@ -1,3 +1,6 @@
+## [1.18.0](https://github.com/hmrc/vat-api/releases/tag/v1.18.0) 24-Aug-2018
+* Updated response headers for VAT Return submission
+
 ## [1.0.1](https://github.com/hmrc/vat-api/releases/tag/v1.0.1) 26-Apr-2018
 * Updated libraries and scoverage settings
 * Updated documentation to remove test only tags for endpoints ready for production
