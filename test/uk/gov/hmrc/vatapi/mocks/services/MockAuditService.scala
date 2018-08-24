@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.vatapi.mocks.services
 
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Suite
 import uk.gov.hmrc.vatapi.audit.AuditService
 import uk.gov.hmrc.vatapi.mocks.Mock
+import uk.gov.hmrc.vatapi.resources.BusinessResult
 
 trait MockAuditService extends Mock { _: Suite =>
 
-  val mockAuditService = mock[AuditService]
+  val mockAuditService: AuditService = mock[AuditService]
 
   object MockAuditService {
-    def audit() = {
+    def audit(): OngoingStubbing[BusinessResult[Unit]] = {
       when(mockAuditService.audit(any())(any(), any(), any(), any()))
     }
   }

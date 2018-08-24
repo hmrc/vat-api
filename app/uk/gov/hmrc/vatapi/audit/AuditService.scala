@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext
 trait AuditService {
 
   val logger: Logger = Logger(this.getClass)
-  private val connector: AuditConnector = MicroserviceAuditConnector
+  private val auditConnector: AuditConnector = MicroserviceAuditConnector
 
   def audit[T](event: AuditEvent[T])(
     implicit hc: HeaderCarrier,
@@ -52,7 +52,7 @@ trait AuditService {
         generatedAt = DateTime.now(DateTimeZone.UTC)
       )
 
-    BusinessResult.success(connector.sendExtendedEvent(auditEvent))
+    BusinessResult.success(auditConnector.sendExtendedEvent(auditEvent))
 
   }
 

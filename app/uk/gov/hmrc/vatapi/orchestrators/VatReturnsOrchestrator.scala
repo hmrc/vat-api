@@ -18,9 +18,10 @@ package uk.gov.hmrc.vatapi.orchestrators
 
 import org.joda.time.DateTime
 import play.api.Logger
+import play.api.mvc.Request
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
+import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
@@ -38,7 +39,6 @@ object VatReturnsOrchestrator extends VatReturnsOrchestrator {
   override val auditService: AuditService = AuditService
 
   override def submissionTimestamp: DateTime = DateTime.now()
-
 }
 
 trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
@@ -51,14 +51,17 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
   def submissionTimestamp: DateTime
 
-  def submitVatReturn(vrn: Vrn,
-                      vatReturn: VatReturnDeclaration
-                     )(implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
+  def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration)
+                     (implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
 
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
+
     nrsService.submit(vrn, vatReturn) flatMap {
+      case Left(e) =>
+        logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
+        Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
       case Right(nrsData) =>
-        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Succesfully retrieved data from NRS: $nrsData")
+        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Successfully retrieved data from NRS: $nrsData")
         val arn: Option[String] = request.authContext match {
           case Agent(_,_,_,enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
           case c: AuthContext => c.agentReference
@@ -66,25 +69,30 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
         nrsData match {
           case EmptyNrsData =>
-            vatReturnsService.submit(vrn,
-              vatReturn.toDes(submissionTimestamp, arn)) map { response =>
+            vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
+              response =>
+                auditService.audit(buildSubmitVatReturnAudit(request, None))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
           case _ =>
-            auditService.audit(AuditEvents.nrsAudit(vrn, nrsData,
-              request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse("")))
-            vatReturnsService.submit(vrn,
-              vatReturn.toDes(submissionTimestamp, arn)) map { response =>
+            auditService.audit(buildNrsAudit(vrn, nrsData, request))
+
+            vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
+              response =>
+                auditService.audit(buildSubmitVatReturnAudit(request, Some(nrsData.nrSubmissionId)))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
         }
-      case Left(e) =>
-        logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
-        Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
     }
   }
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
+
+  private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: Request[_]): AuditEvent[Map[String, String]] =
+    AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse(""))
+
+  private def buildSubmitVatReturnAudit(request: AuthRequest[_], nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] =
+    AuditEvents.submitVatReturn(request.headers.get("x-correlationid").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId)
 
 }
 
