@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.audit
+package uk.gov.hmrc.vatapi.utils
 
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
+import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
-class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
-
-  "nrsAudit event" should {
-    "return valid AuditEvent" when {
-      "proper NRS data is supplied" in {
-      val auditEvent = AuditEvents.nrsAudit(generateVrn, nrsClientData, "NO_TOKEN", "X-COID")
-      assert(auditEvent.transactionName == "submit-vat-return")
-      assert(auditEvent.auditType == "submitToNonRepudiationStore")
-    }
-    }
+trait ImplicitDateTimeFormatter {
+  implicit class DTFormat(t: DateTime) {
+    val format: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    def toIsoInstant: String = format.print(t)
   }
 }
+
+

@@ -36,6 +36,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
   "VAT returns submission" should {
 
+    val isoInstantRegex = "^\\d\\d\\d\\d-(0?[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(\\d\\d):(\\d\\d):(\\d\\d)Z"
+
     "allow users to submit VAT returns" in {
       given()
         .stubAudit
@@ -51,8 +53,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
         .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
-        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
-        .responseContainsHeader("Receipt-TimeStamp", "2018-02-14T09:32:15Z")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
 
     "allow users to submit VAT returns for non bad_request NRS response" in {
@@ -70,8 +72,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
         .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
-        .responseContainsHeader("Receipt-TimeStamp", "")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
 
     "allow users to submit VAT returns even with negative amounts" in {
@@ -89,8 +91,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
         .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
-        .responseContainsHeader("Receipt-Signature", "NOT CURRENTLY IMPLEMENTED")
-        .responseContainsHeader("Receipt-TimeStamp", "2018-02-14T09:32:15Z")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
 
     "reject client with no authorization" in {

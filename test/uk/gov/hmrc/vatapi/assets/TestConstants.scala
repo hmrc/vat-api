@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.assets
 
 import nrs.models._
 import org.joda.time.DateTime
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.domain.Vrn
@@ -172,9 +172,16 @@ object TestConstants {
       )
     )
 
-    val nrsData: NRSData = NRSData(
+    val nrsResponseJson: JsValue = Json.parse(
+      s"""
+         |{
+         |  "nrSubmissionId": "2dd537bc-4244-4ebf-bac9-96321be13cdc"
+         |}
+       """.stripMargin)
+
+    val nrsClientData: NRSData = NRSData(
       nrSubmissionId = "2dd537bc-4244-4ebf-bac9-96321be13cdc",
-      cadesTSignature = "30820b4f06092a864886f70111111111c0445c464",
+      cadesTSignature = "This has been deprecated - DO NOT USE",
       timestamp = timestamp.toString
     )
   }

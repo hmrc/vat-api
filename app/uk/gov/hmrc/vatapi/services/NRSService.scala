@@ -48,7 +48,6 @@ trait NRSService {
 
   private def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {
 
-    // TODO - Add in validation to get rid of .get
     val encoder = Base64.getEncoder
     NRSSubmission(
       payload = encoder.encodeToString(Json.toJson(payload).toString.getBytes(StandardCharsets.UTF_8)),

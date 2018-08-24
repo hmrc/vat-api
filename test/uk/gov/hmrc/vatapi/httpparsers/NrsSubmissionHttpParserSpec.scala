@@ -27,7 +27,7 @@ import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutco
 
 class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
 
-    val successResponse = HttpResponse(ACCEPTED, responseJson = Some(Json.toJson(nrsData)))
+    val successResponse = HttpResponse(ACCEPTED, responseJson = Some(nrsResponseJson))
     val successBadJsonResponse = HttpResponse(NOT_FOUND, responseJson = Some(Json.toJson("{}")))
     val failureResponse = HttpResponse(BAD_REQUEST, responseJson = Some(Json.toJson("{}")))
 
@@ -35,7 +35,7 @@ class NrsSubmissionHttpParserSpec extends UnitSpec with EitherValues {
     "the response is OK" should {
       "return NrsData" when {
         "the Json returned is valid" in {
-          read("", "", successResponse).right.value shouldBe nrsData
+          read("", "", successResponse).right.value shouldBe nrsClientData.copy(timestamp = "")
         }
 
       }

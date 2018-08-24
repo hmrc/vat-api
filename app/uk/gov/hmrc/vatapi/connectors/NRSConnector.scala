@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object NRSConnector extends NRSConnector {
   override val http: WSHttp = WSHttp
-  override val appContext = AppContext
+  override val appContext: AppContext = AppContext
 }
 
 trait NRSConnector extends BaseConnector {

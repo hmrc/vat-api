@@ -45,7 +45,7 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
 
   val testVrn = Vrn("123456789")
 
-  val successResponse = HttpResponse(ACCEPTED, responseJson = Some(Json.toJson(nrsData)))
+  val successResponse = HttpResponse(ACCEPTED, responseJson = Some(nrsResponseJson))
   val errorResponse = HttpResponse(BAD_REQUEST, responseString = Some("Error Message"))
 
 

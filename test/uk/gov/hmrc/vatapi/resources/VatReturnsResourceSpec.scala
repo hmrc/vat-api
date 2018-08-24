@@ -64,7 +64,7 @@ class VatReturnsResourceSpec extends ResourceSpec
 
   val nrsSubmissionId = "test-sub-id"
   val nrsTimestamp = "test-timestamp"
-  val nrsData = NRSData(nrsSubmissionId, "test-cades-ts", nrsTimestamp)
+  val nrsData = NRSData(nrsSubmissionId, "This has been deprecated - DO NOT USE", nrsTimestamp)
 
   val vatReturnResponseJson = Json.obj("test" -> "json")
   val vatReturnResponse = VatReturnResponse(HttpResponse(200, Some(vatReturnResponseJson))).withNrsData(nrsData)
@@ -90,7 +90,7 @@ class VatReturnsResourceSpec extends ResourceSpec
         val headersMap = headers(result)
         headersMap("Receipt-ID") shouldBe nrsSubmissionId
         headersMap("Receipt-Timestamp") shouldBe nrsTimestamp
-        headersMap("Receipt-Signature") shouldBe "NOT CURRENTLY IMPLEMENTED"
+        headersMap("Receipt-Signature") shouldBe "This has been deprecated - DO NOT USE"
       }
     }
   }

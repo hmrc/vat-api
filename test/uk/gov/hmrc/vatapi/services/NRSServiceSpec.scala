@@ -55,8 +55,8 @@ class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with
 
     "successful responses are returned from the connector" should {
       "return the correctly formatted NRS Data model" in {
-        setupNrsSubmission(testVrn, nrsSubmission)(Right(nrsData))
-        extractAwait(result(vatReturnDeclaration)) shouldBe Right(nrsData)
+        setupNrsSubmission(testVrn, nrsSubmission)(Right(nrsClientData))
+        extractAwait(result(vatReturnDeclaration)) shouldBe Right(nrsClientData)
       }
     }
 
