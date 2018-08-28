@@ -24,11 +24,24 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
   "nrsAudit event" should {
     "return valid AuditEvent" when {
+
+      val vrn = generateVrn
+
       "proper NRS data is supplied" in {
-      val auditEvent = AuditEvents.nrsAudit(generateVrn, nrsClientData, "NO_TOKEN", "X-COID")
-      assert(auditEvent.transactionName == "submit-vat-return")
-      assert(auditEvent.auditType == "submitToNonRepudiationStore")
-    }
+        val auditEvent = AuditEvents.nrsAudit(vrn, nrsClientData, "NO_TOKEN")
+        val expected = AuditEvent(
+          "submitToNonRepudiationStore",
+          "submit-vat-return",
+          Map(
+            "vrn" -> vrn.vrn,
+            "authorization" -> "NO_TOKEN",
+            "nrSubmissionID" -> nrsClientData.nrSubmissionId,
+            "correlationId" -> ""
+          )
+        )
+
+        auditEvent shouldBe expected
+      }
     }
   }
 

@@ -71,7 +71,7 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
           case EmptyNrsData =>
             vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
               response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, None))
+                auditService.audit(buildSubmitVatReturnAudit(request, response, None))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
           case _ =>
@@ -79,7 +79,7 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
             vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
               response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, Some(nrsData.nrSubmissionId)))
+                auditService.audit(buildSubmitVatReturnAudit(request, response, Some(nrsData.nrSubmissionId)))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
         }
@@ -88,11 +88,11 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
   case class VatReturnOrchestratorResponse(nrs: NRSData, vatReturnResponse: VatReturnResponse)
 
-  private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: Request[_]): AuditEvent[Map[String, String]] =
-    AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""), request.headers.get("x-correlationid").getOrElse(""))
+  private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
+    AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""))
 
-  private def buildSubmitVatReturnAudit(request: AuthRequest[_], nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] =
-    AuditEvents.submitVatReturn(request.headers.get("x-correlationid").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId)
+  private def buildSubmitVatReturnAudit(request: AuthRequest[_], response: VatReturnResponse, nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] =
+    AuditEvents.submitVatReturn(response.underlying.header("CorrelationId").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId)
 
 }
 
