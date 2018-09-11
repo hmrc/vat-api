@@ -21,21 +21,19 @@ import uk.gov.hmrc.vatapi.httpparsers.NRSData
 
 object AuditEvents {
 
-  def nrsAudit(vrn: Vrn, nrsData: NRSData, authorization: String, correlationId: String): AuditEvent[Map[String, String]] =
+  def nrsAudit(vrn: Vrn, nrsData: NRSData, authorization: String): AuditEvent[Map[String, String]] =
     AuditEvent(
       auditType = "submitToNonRepudiationStore",
       transactionName = "submit-vat-return",
-      detail = nrsAuditDetals(vrn, authorization, nrsData.nrSubmissionId, correlationId)
+      detail = Map(
+        "vrn" -> vrn.vrn,
+        "authorization" -> authorization,
+        "nrSubmissionID" -> nrsData.nrSubmissionId,
+        "correlationId" -> "" //this is meant to be empty and with an incorrect name - see Vat Api TxM assessment confluence page
+      )
     )
 
-  private def nrsAuditDetals(vrn: Vrn, authorization: String, nrSubmissionID: String, correlationId: String): Map[String, String] = Map(
-    "vrn" -> vrn.vrn,
-    "authorization" -> authorization,
-    "nrSubmissionID" -> nrSubmissionID,
-    "correlationId" -> correlationId
-  )
-
-  def submitVatReturn(xCorrelationId: String, userType: String, nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] = {
+  def submitVatReturn(correlationId: String, userType: String, nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] = {
 
     val nrSubmissionIdMap: Map[String, String] = nrSubmissionId.fold(Map.empty[String, String])(id => Map("nrSubmissionId" -> id))
 
@@ -43,7 +41,7 @@ object AuditEvents {
       auditType = "submitVatReturn",
       transactionName = "submit-vat-return",
       detail = Map(
-        "X-CorrelationId" -> xCorrelationId,
+        "X-CorrelationId" -> correlationId,
         "userType" -> userType
       ) ++ nrSubmissionIdMap
     )

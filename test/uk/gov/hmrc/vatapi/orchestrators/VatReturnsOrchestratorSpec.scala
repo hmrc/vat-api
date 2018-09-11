@@ -62,11 +62,17 @@ class VatReturnsOrchestratorSpec extends UnitSpec
   }
 
   val authorisationToken = "Bearer test-bearer-token"
+  val correlationId = "testCorrelationId"
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContextWithNrsData, FakeRequest().withHeaders(("Authorization", authorisationToken)))
+  implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContextWithNrsData, FakeRequest().withHeaders("Authorization" -> authorisationToken))
 
-  val vatReturnSuccessResponse = VatReturnResponse(HttpResponse(OK, responseJson = Some(Json.toJson(vatReturnsDes))))
+  val vatReturnSuccessResponse = VatReturnResponse(HttpResponse(
+    responseStatus = OK,
+    responseJson = Some(Json.toJson(vatReturnsDes)),
+    responseHeaders = Map("CorrelationId" -> Seq(correlationId)))
+  )
+
   val vatReturninvalidPayloadResponse =
     VatReturnResponse(HttpResponse(
       BAD_REQUEST,
@@ -114,7 +120,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
           "submitVatReturn",
           "submit-vat-return",
           Map(
-            "X-CorrelationId" -> "",
+            "X-CorrelationId" -> correlationId,
             "userType" -> "Organisation",
             "nrSubmissionId" -> nrsClientData.nrSubmissionId
           )
@@ -141,7 +147,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
           "submitVatReturn",
           "submit-vat-return",
           Map(
-            "X-CorrelationId" -> "",
+            "X-CorrelationId" -> correlationId,
             "userType" -> "Organisation"
           )
         )
