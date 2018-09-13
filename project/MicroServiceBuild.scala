@@ -8,10 +8,6 @@ object MicroServiceBuild extends Build with MicroService {
 
   val appName = "vat-api"
 
-  override lazy val plugins: Seq[Plugins] = Seq(
-    SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin
-  )
-
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
   override lazy val playSettings: Seq[Setting[_]] = Seq(
     routesImport += "uk.gov.hmrc.vatapi.resources.Binders._"

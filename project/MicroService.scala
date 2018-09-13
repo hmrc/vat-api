@@ -3,7 +3,9 @@ import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
 import sbt.{Def, _}
 import scoverage.ScoverageKeys
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
+import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 
@@ -32,7 +34,7 @@ trait MicroService {
   }
 
   lazy val microservice = Project(appName, file("."))
-    .enablePlugins(Seq(play.sbt.PlayScala) ++ plugins: _*)
+    .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
     .settings(majorVersion := 1)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
