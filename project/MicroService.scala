@@ -4,12 +4,13 @@ import sbt.Tests.{Group, SubProcess}
 import sbt.{Def, _}
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
+import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
+
 
 trait MicroService {
 
   import uk.gov.hmrc._
   import DefaultBuildSettings._
-  import TestPhases._
   import play.sbt.routes.RoutesKeys.routesGenerator
 
   val appName: String
@@ -32,6 +33,7 @@ trait MicroService {
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(Seq(play.sbt.PlayScala) ++ plugins: _*)
+    .settings(majorVersion := 1)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
@@ -69,13 +71,13 @@ trait MicroService {
       unmanagedResourceDirectories in FuncTest += baseDirectory.value,
       unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
       addTestReportOption(FuncTest, "int-test-reports"),
-      testGrouping in FuncTest := oneForkedJvmPerTest((definedTests in FuncTest).value),
+      testGrouping in FuncTest := FuncTestPhases.oneForkedJvmPerTest((definedTests in FuncTest).value),
       parallelExecution in FuncTest := false,
       routesGenerator := StaticRoutesGenerator)
     .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"), resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
 }
 
-private object TestPhases {
+private object FuncTestPhases {
 
   def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
     tests map { test =>
