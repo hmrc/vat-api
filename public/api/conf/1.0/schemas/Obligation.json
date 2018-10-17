@@ -32,7 +32,7 @@
     },
     "periodKey": {
       "title": "Period Key",
-      "description": "The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol, which must be URL-encoded.",
+      "description": "The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol.",
       "type": "string",
       "example": "18AD, 18A1, #001"
     }
