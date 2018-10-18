@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "periodKey": {
-      "description": "The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol, which must be URL-encoded.",
+      "description": "The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol.",
       "type": "string",
       "minLength": 4,
       "maxLength": 4,
