@@ -151,8 +151,8 @@ traits:
           description: Retrieve a submitted VAT return
           (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
           is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
-          (annotations.scope): "write:vat"
-          securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
+          (annotations.scope): "read:vat"
+          securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
           responses:
             200:
               headers:
