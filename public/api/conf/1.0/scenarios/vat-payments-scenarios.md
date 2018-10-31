@@ -17,4 +17,4 @@
                 </tr>
     </tbody>
 </table>
-<p>The 'to' date of the payment must fall within the date range provided.</p>
+<p>The 'received' date of the payment will fall within the date range provided.</p>

@@ -17,4 +17,4 @@
                 </tr>
     </tbody>
 </table>
-<p>The 'to' date of the liability must fall within the date range provided.</p>
+<p>The 'to' date of the liability will fall within the date range provided.</p>
