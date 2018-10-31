@@ -16,7 +16,6 @@
             <td><p>Simulates the scenario where the client has quarterly obligations and none are fulfilled</p></td>
         </tr>
         <tr>
-        <tr>
             <td><p>QUARTERLY_ONE_MET</p></td>
             <td><p>Simulates the scenario where the client has quarterly obligations and one is fulfilled</p></td>
         </tr>
