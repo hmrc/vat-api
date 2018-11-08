@@ -50,10 +50,29 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
     val xCorrelationId = "testXCorrelationId"
     val userType = "testUserType"
     val nrSubmissionId = "testNrSubmissionId"
+    val arn = "testArn"
 
     "return a valid AuditEvent" when {
       "all values are supplied" in {
-        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, Some(nrSubmissionId))
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, Some(nrSubmissionId), Some(arn))
+        val expected = AuditEvent(
+          "submitVatReturn",
+          "submit-vat-return",
+          Map(
+            "X-CorrelationId" -> xCorrelationId,
+            "userType" -> userType,
+            "nrSubmissionId" -> nrSubmissionId,
+            "agentReferenceNumber" -> arn
+          )
+        )
+
+        auditEvent shouldBe expected
+      }
+    }
+
+    "return a valid AuditEvent without optional values" when {
+      "all values are supplied except arn" in {
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, Some(nrSubmissionId), None)
         val expected = AuditEvent(
           "submitVatReturn",
           "submit-vat-return",
@@ -66,17 +85,15 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
         auditEvent shouldBe expected
       }
-    }
-
-    "return a valid AuditEvent without nrSubmissionId" when {
       "all values are supplied except nrSubmissionId" in {
-        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None)
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None, Some(arn))
         val expected = AuditEvent(
           "submitVatReturn",
           "submit-vat-return",
           Map(
             "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType
+            "userType" -> userType,
+            "agentReferenceNumber" -> arn
           )
         )
 

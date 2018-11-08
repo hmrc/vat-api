@@ -71,7 +71,7 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
           case EmptyNrsData =>
             vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
               response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, response, None))
+                auditService.audit(buildSubmitVatReturnAudit(request, response, None, arn))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
           case _ =>
@@ -79,7 +79,7 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
             vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
               response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, response, Some(nrsData.nrSubmissionId)))
+                auditService.audit(buildSubmitVatReturnAudit(request, response, Some(nrsData.nrSubmissionId), arn))
                 Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
             }
         }
@@ -91,8 +91,8 @@ trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
   private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
     AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""))
 
-  private def buildSubmitVatReturnAudit(request: AuthRequest[_], response: VatReturnResponse, nrSubmissionId: Option[String]): AuditEvent[Map[String, String]] =
-    AuditEvents.submitVatReturn(response.underlying.header("CorrelationId").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId)
+  private def buildSubmitVatReturnAudit(request: AuthRequest[_], response: VatReturnResponse, nrSubmissionId: Option[String], arn: Option[String]): AuditEvent[Map[String, String]] =
+    AuditEvents.submitVatReturn(response.underlying.header("CorrelationId").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId, arn)
 
 }
 
