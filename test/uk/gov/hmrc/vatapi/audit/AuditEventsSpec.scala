@@ -207,4 +207,39 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
       }
     }
   }
+
+  "retrieveVatPayments" should {
+
+    "return a valid AuditEvent" when {
+      "all values are supplied" in {
+        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, Some(arn))
+        val expected = AuditEvent(
+          "retrieveVatPayments",
+          "retrieve-vat-payments",
+          Map(
+            "X-CorrelationId" -> xCorrelationId,
+            "userType" -> userType,
+            "agentReferenceNumber" -> arn
+          )
+        )
+        auditEvent shouldBe expected
+      }
+    }
+
+    "return a valid AuditEvent without optional values" when {
+      "all values are supplied except arn" in {
+        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, None)
+        val expected = AuditEvent(
+          "retrieveVatPayments",
+          "retrieve-vat-payments",
+          Map(
+            "X-CorrelationId" -> xCorrelationId,
+            "userType" -> userType
+          )
+        )
+
+        auditEvent shouldBe expected
+      }
+    }
+  }
 }

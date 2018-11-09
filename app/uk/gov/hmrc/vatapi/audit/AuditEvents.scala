@@ -84,4 +84,18 @@ object AuditEvents {
       ) ++ agentRef(arn)
     )
   }
+
+  def retrieveVatPaymentsAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+
+    AuditEvent(
+      auditType = "retrieveVatPayments",
+      transactionName = "retrieve-vat-payments",
+      detail = Map(
+        "X-CorrelationId" -> correlationId,
+        "userType" -> userType
+      ) ++ agentRef(arn)
+    )
+
+  }
+
 }
