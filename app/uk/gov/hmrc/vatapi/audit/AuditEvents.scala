@@ -21,6 +21,8 @@ import uk.gov.hmrc.vatapi.httpparsers.NRSData
 
 object AuditEvents {
 
+  val agentRef: Option[String] => Map[String, String] = arn => arn.fold(Map.empty[String, String])(arn => Map("agentReferenceNumber" -> arn))
+
   def nrsAudit(vrn: Vrn, nrsData: NRSData, authorization: String): AuditEvent[Map[String, String]] =
     AuditEvent(
       auditType = "submitToNonRepudiationStore",
@@ -36,7 +38,6 @@ object AuditEvents {
   def submitVatReturn(correlationId: String, userType: String, nrSubmissionId: Option[String], arn: Option[String]): AuditEvent[Map[String, String]] = {
 
     val nrSubmissionIdMap: Map[String, String] = nrSubmissionId.fold(Map.empty[String, String])(id => Map("nrSubmissionId" -> id))
-    val arnMap: Map[String, String] = arn.fold(Map.empty[String, String])(arn => Map("agentReferenceNumber" -> arn))
 
     AuditEvent(
       auditType = "submitVatReturn",
@@ -44,7 +45,19 @@ object AuditEvents {
       detail = Map(
         "X-CorrelationId" -> correlationId,
         "userType" -> userType
-      ) ++ nrSubmissionIdMap ++ arnMap
+      ) ++ nrSubmissionIdMap ++ agentRef(arn)
+    )
+  }
+
+  def retrieveVatObligationsAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+
+    AuditEvent(
+        auditType = "retrieveVatObligations",
+        transactionName = "retrieve-vat-obligations",
+        detail = Map(
+          "X-CorrelationId" -> correlationId,
+          "userType" -> userType
+        ) ++ agentRef(arn)
     )
   }
 }
