@@ -28,6 +28,7 @@ import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
 
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
+
   def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
 
     def noneFound: Either[DesTransformError, Option[Obligations]] = {

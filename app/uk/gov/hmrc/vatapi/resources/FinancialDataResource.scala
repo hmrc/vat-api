@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
 import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
@@ -33,6 +34,7 @@ object FinancialDataResource extends FinancialDataResource{
   override val connector = FinancialDataConnector
   override val authService = AuthorisationService
   override val appContext = AppContext
+  override val auditService = AuditService
 }
 
 trait FinancialDataResource extends BaseResource {
@@ -40,6 +42,7 @@ trait FinancialDataResource extends BaseResource {
   val connector: FinancialDataConnector
   val authService: AuthorisationService
   val appContext: AppContext
+  val auditService: AuditService
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 
@@ -62,6 +65,7 @@ trait FinancialDataResource extends BaseResource {
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
                   logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
                   Ok(Json.toJson(liabilities))
               }
             case Left(ex) =>
@@ -102,6 +106,7 @@ trait FinancialDataResource extends BaseResource {
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
                   logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+                  auditService.audit(AuditEvents.retrieveVatPaymentsAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
                   Ok(Json.toJson(payments))
               }
             case Left(ex) =>

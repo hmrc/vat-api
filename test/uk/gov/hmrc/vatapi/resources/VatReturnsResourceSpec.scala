@@ -16,25 +16,27 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import cats.data.EitherT
 import org.joda.time.DateTime
 import play.api.http.MimeTypes
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture
-import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn.vatReturnDeclaration
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
+import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.orchestrators.MockVatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode, VatReturn}
-import uk.gov.hmrc.vatapi.models.{Errors, InternalServerErrorResult}
+import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.Future
 
 class VatReturnsResourceSpec extends ResourceSpec
   with MockVatReturnsConnector
-  with MockVatReturnsOrchestrator {
+  with MockVatReturnsOrchestrator
+  with MockAuditService {
 
   class Setup {
     val resource = new VatReturnsResource{
@@ -42,6 +44,7 @@ class VatReturnsResourceSpec extends ResourceSpec
       override val orchestrator = mockVatReturnsOrchestrator
       override val authService = mockAuthorisationService
       override val appContext = mockAppContext
+      override val auditService = mockAuditService
     }
     mockAuthAction(vrn)
   }
@@ -140,6 +143,9 @@ class VatReturnsResourceSpec extends ResourceSpec
   "retrieveVatReturn" should {
     "return a 200 " when {
       "a valid vrn and period key is supplied" in new Setup {
+
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
         val successResponse = VatReturnResponse(HttpResponse(OK, responseJson =
           Some(Json.toJson(desVatReturn))))

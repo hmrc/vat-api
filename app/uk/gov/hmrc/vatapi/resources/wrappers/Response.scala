@@ -61,6 +61,10 @@ trait Response {
       .header("CorrelationId")
       .fold(result)(correlationId => result.withHeaders("X-CorrelationId" -> correlationId))
 
+  def getCorrelationId() : String = {
+    underlying.header("CorrelationId").getOrElse("No Correlation ID")
+  }
+
   def errorMappings: PartialFunction[Int, Result] = empty
 
   private def standardErrorMapping: PartialFunction[Int, Result] = {

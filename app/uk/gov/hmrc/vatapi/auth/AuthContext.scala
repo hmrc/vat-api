@@ -25,8 +25,6 @@ sealed trait AuthContext {
   val affinityGroup: String
   val agentCode: Option[String]
   val agentReference: Option[String]
-  val userType: String
-
   val identityData: Option[IdentityData]
 }
 
@@ -34,14 +32,12 @@ case class Organisation(override val identityData: Option[IdentityData] = None) 
   override val affinityGroup: String = ORGANISATION
   override val agentCode: Option[String] = None
   override val agentReference: Option[String] = None
-  override val userType = "OrgVatPayer"
 }
 
 case class Individual(override val identityData: Option[IdentityData]) extends AuthContext {
   override val affinityGroup: String = INDIVIDUAL
   override val agentCode: Option[String] = None
   override val agentReference: Option[String] = None
-  override val userType = "IndVatPayer"
 }
 
 case class Agent(override val agentCode: Option[String],
@@ -49,8 +45,7 @@ case class Agent(override val agentCode: Option[String],
                  override val identityData: Option[IdentityData] = None,
                  agentEnrolments: Enrolments
                 ) extends AuthContext {
-  override val affinityGroup: String = "agent"
-  override val userType = "Agent"
+  override val affinityGroup: String = AGENT
 }
 
 case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
