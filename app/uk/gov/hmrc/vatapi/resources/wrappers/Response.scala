@@ -19,12 +19,13 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
+import play.api.mvc.Result
 import play.api.mvc.Results._
-import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
+import uk.gov.hmrc.vatapi.resources.AuthRequest
 
 import scala.PartialFunction.{apply => _, _}
 import scala.util.{Failure, Success, Try}
@@ -45,16 +46,14 @@ trait Response {
 
   val status: Int = underlying.status
 
-  def filter[A](pf: PartialFunction[Int, Result])(implicit request: Request[A]): Result =
+  def filter[A](pf: PartialFunction[Int, Result])(implicit request: AuthRequest[A]): Result =
     status / 100 match {
       case 4 | 5 =>
-        logResponse()
+        logger.error(s"DES error occurred. User type: ${request.authContext.affinityGroup}\n" +
+          s"Status code: ${underlying.status}\nBody: ${underlying.body}")
         (pf orElse errorMappings orElse standardErrorMapping) (status)
       case _ => (pf andThen addCorrelationHeader) (status)
     }
-
-  private def logResponse(): Unit =
-    logger.error(s"DES error occurred with status code ${underlying.status} and body ${underlying.body}")
 
   private def addCorrelationHeader(result: Result) =
     underlying
