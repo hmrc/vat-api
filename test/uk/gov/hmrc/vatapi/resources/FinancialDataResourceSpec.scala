@@ -16,25 +16,29 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import cats.data.EitherT
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockFinancialDataConnector
-import uk.gov.hmrc.vatapi.models.FinancialDataQueryParams
+import uk.gov.hmrc.vatapi.models.{ErrorResult, FinancialDataQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.FinancialDataResponse
 
 import scala.concurrent.Future
 
 class FinancialDataResourceSpec extends ResourceSpec
   with MockFinancialDataConnector
-  with MockAuthorisationService {
+  with MockAuthorisationService
+  with MockAuditService {
 
   class Setup {
     val testFinalcialDataResource = new FinancialDataResource {
       override val authService = mockAuthorisationService
       override val connector = mockFinancialDataConnector
       override val appContext = mockAppContext
+      override val auditService = mockAuditService
     }
     mockAuthAction(vrn)
   }
@@ -45,6 +49,9 @@ class FinancialDataResourceSpec extends ResourceSpec
     "return a 200 and the correct financial data json" when {
       "for a given valid period" in new Setup {
         val desResponse = FinancialDataResponse(HttpResponse(200, Some(Jsons.FinancialData.singleLiabilityDesResponse)))
+
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
         MockFinancialDataConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
@@ -73,6 +80,9 @@ class FinancialDataResourceSpec extends ResourceSpec
     "return a 200 and the correct financial data json" when {
       "for a given valid period" in new Setup {
         val desResponse = FinancialDataResponse(HttpResponse(200, Some(Jsons.FinancialData.singlePaymentDesResponse)))
+
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
         MockFinancialDataConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))

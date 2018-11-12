@@ -20,6 +20,7 @@ import cats.implicits._
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
@@ -34,12 +35,14 @@ object VatReturnsResource extends VatReturnsResource {
   override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
   override val authService: AuthorisationService = AuthorisationService
   override val appContext: AppContext = AppContext
+  override val auditService = AuditService
 }
 
 trait VatReturnsResource extends BaseResource {
 
   val connector: VatReturnsConnector
   val orchestrator: VatReturnsOrchestrator
+  val auditService: AuditService
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -83,7 +86,9 @@ trait VatReturnsResource extends BaseResource {
       } onSuccess { response =>
         response.filter {
           case 200 => response.vatReturnOrError match {
-            case Right(vatReturn) => Ok(Json.toJson(vatReturn))
+            case Right(vatReturn) =>
+              auditService.audit(AuditEvents.retrieveVatReturnsAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
+              Ok(Json.toJson(vatReturn))
             case Left(error) =>
               logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
               InternalServerError

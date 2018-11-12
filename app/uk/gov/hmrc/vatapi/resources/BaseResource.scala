@@ -22,7 +22,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.vatapi.auth.{AuthContext, Organisation}
+import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
@@ -39,28 +39,30 @@ trait BaseResource extends BaseController {
 
   def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
+
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
-      if (featureSwitch.isAuthEnabled){
+      if (featureSwitch.isAuthEnabled) {
         implicit val ev: Request[A] = request
         authService.authCheck(vrn) map {
           case Right(authContext) => Right(new AuthRequest(authContext, request))
           case Left(authError) => Left(authError)
         }
       } else
-          Future.successful(Right(new AuthRequest(Organisation(), request)))
+        Future.successful(Right(new AuthRequest(Organisation(), request)))
   }
 
   def AuthActionWithNrsRequirement(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn and retrieve NRS data")
+
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
-      if (featureSwitch.isAuthEnabled){
+      if (featureSwitch.isAuthEnabled) {
         implicit val ev: Request[A] = request
         authService.authCheckWithNrsRequirement(vrn) map {
           case Right(authContext) => Right(new AuthRequest(authContext, request))
           case Left(authError) => Left(authError)
         }
       } else
-          Future.successful(Right(new AuthRequest(Organisation(), request)))
+        Future.successful(Right(new AuthRequest(Organisation(), request)))
   }
 
   def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = if (nrsRequired) {
@@ -90,6 +92,15 @@ trait BaseResource extends BaseController {
     }
     requestTimestamp
   }
+
+  def getArn(implicit request: AuthRequest[_]): Option[String] = {
+    request.authContext match {
+      case Agent(_, _, _, enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
+      case c: AuthContext => c.agentReference
+    }
+  }
+
+
 }
 
 class AuthRequest[A](val authContext: AuthContext, request: Request[A]) extends WrappedRequest[A](request)

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import cats.data.EitherT
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
@@ -23,21 +24,22 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockObligationsConnector
-import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
+import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ObligationsResourceSpec extends ResourceSpec
   with MockObligationsConnector
-  with MockAuthorisationService {
+  with MockAuthorisationService
+  with MockAuditService {
 
   class Setup {
     val testObligationResource = new ObligationsResource {
       override val authService = mockAuthorisationService
       override val connector = mockObligationsConnector
       override val appContext = mockAppContext
+      override val auditService = mockAuditService
     }
     mockAuthAction(vrn)
   }
@@ -53,6 +55,9 @@ class ObligationsResourceSpec extends ResourceSpec
       "DES returns a 200 response with the correct obligations body" in new Setup {
         val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsJson)))
 
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
+
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
@@ -66,6 +71,9 @@ class ObligationsResourceSpec extends ResourceSpec
     "return a 200 and the correct obligations json for no status" when {
       "DES returns a 200 response with the correct obligations body" in new Setup {
         val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsJson)))
+
+        MockAuditService.audit()
+          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
         MockObligationsConnector.get(vrn, queryParamsWithNoStatus)
           .returns(Future.successful(desResponse))
