@@ -21,7 +21,6 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
@@ -30,7 +29,7 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FinancialDataResource extends FinancialDataResource{
+object FinancialDataResource extends FinancialDataResource {
   override val connector = FinancialDataConnector
   override val authService = AuthorisationService
   override val appContext = AppContext
@@ -49,24 +48,26 @@ trait FinancialDataResource extends BaseResource {
     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
     val result = fromDes {
       for {
-        response <- execute{_ => connector.getFinancialData(vrn, params)}
+        response <- execute { _ => connector.getFinancialData(vrn, params) }
       } yield response
     } onSuccess { response =>
       response.filter {
         case 200 =>
           response.getLiabilities(vrn) match {
             case Right(obj) =>
-              val liabilities = Liabilities(
-                obj.liabilities.filter(_.taxPeriod.isEmpty) ++ obj.liabilities.filter(_.taxPeriod.isDefined).filterNot(_.taxPeriod.get.to isAfter params.to)
+
+              val remainingLiabilities = obj.liabilities.filter(l =>
+                l.`type` != "Payment on account" && (l.taxPeriod.isEmpty || l.taxPeriod.exists(l => !(l.to isAfter params.to)))
               )
-              liabilities.liabilities match {
+
+              remainingLiabilities match {
                 case Seq() =>
                   logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
                   logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
                   auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
-                  Ok(Json.toJson(liabilities))
+                  Ok(Json.toJson(Liabilities(remainingLiabilities)))
               }
             case Left(ex) =>
               logger.error(s"[FinancialDataResource][retrieveLiabilities] Error retrieving Liabilities from DES: ${ex.msg}")
@@ -89,7 +90,7 @@ trait FinancialDataResource extends BaseResource {
 
     val result = fromDes {
       for {
-        response <- execute{_ => connector.getFinancialData(vrn, params)}
+        response <- execute { _ => connector.getFinancialData(vrn, params) }
       } yield response
     } onSuccess { response =>
       response.filter {
