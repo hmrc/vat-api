@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.models.{Liabilities, Liability, Payment, Payments, TaxPeriod}
 
@@ -272,6 +272,29 @@ object Jsons {
           )
         )
       )
+    lazy val multipleLiabilitiesWithoutPaymentOnAccount: JsValue =
+      Json.toJson(
+        Liabilities(
+          Seq(
+            Liability(
+              Some(TaxPeriod(from = LocalDate.parse("2017-01-01"), to = LocalDate.parse("2017-04-05"))),
+              `type` = "VAT",
+              originalAmount = 463872,
+              outstandingAmount = Some(463872),
+              due = Some(LocalDate.parse("2017-03-08"))
+            ),
+            Liability(
+              Some(TaxPeriod(from = LocalDate.parse("2017-08-01"), to = LocalDate.parse("2017-08-31"))),
+              `type` = "VAT CA Charge",
+              originalAmount = 8493.38,
+              outstandingAmount = Some(7493.38),
+              due = Some(LocalDate.parse("2017-10-07"))
+            )
+          )
+        )
+      )
+
+
     lazy val onePayment: JsValue = Json.toJson(
       Payments(Seq(
         Payment(

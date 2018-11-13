@@ -462,6 +462,19 @@ class Givens(httpVerbs: HttpVerbs) {
         )
         givens
       }
+
+      def multipleLiabilitiesWithPaymentOnAccountFor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withHeader("Content-Type", "application/json")
+              .withBody(multipleLiabilitiesWithPaymentOnAccount.toString)
+          )
+        )
+        givens
+      }
+
       def emptyLiabilitiesFor(vrn: Vrn): Givens = {
         stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
           .willReturn(

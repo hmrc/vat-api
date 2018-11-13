@@ -1,6 +1,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import play.api.http.Status._
+import play.api.libs.json.Json
 import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
@@ -31,6 +32,42 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
       }
 
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is after period to date" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.singleLiabilityFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
+      }
+
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is equal to period to date " in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.singleLiabilityFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-03-31")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
+      }
+
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date before period to date " in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.singleLiabilityFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-03-30")
+          .thenAssertThat()
+          .statusIs(NOT_FOUND)
+          .bodyIsLike(Json.toJson(uk.gov.hmrc.vatapi.models.Errors.NotFound).toString())
+      }
+
       "retrieve a single liability where the minimum data exists" in {
         given()
           .stubAudit
@@ -42,6 +79,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.minLiability.toString)
       }
+
       "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
         given()
           .stubAudit
@@ -64,6 +102,18 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.multipleLiabilities.toString)
+      }
+
+      "retrieve multiple liabilities where they exist excluding Payment on Account" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.multipleLiabilitiesWithPaymentOnAccountFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutPaymentOnAccount.toString)
       }
 
       "return code 400 when idNumber parameter is invalid" in {
