@@ -1,4 +1,4 @@
-<p>Scenario simulations using <b> Gov-Test-Scenario </b> headers is only available in sandbox environment</p>
+<p>Scenario simulations using <b> Gov-Test-Scenario </b> headers are only available in sandbox environment</p>
 <table>
     <thead>
         <tr>

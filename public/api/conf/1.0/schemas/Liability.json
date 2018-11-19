@@ -11,19 +11,19 @@
     },
     "type": {
       "title": "Charge Type",
-      "description": "The charge type of this liability",
+      "description": "The charge type of this liability. Max length, 30 characters.",
       "type": "string",
       "example": "VAT ..."
     },
     "originalAmount": {
       "title": "Original Amount",
-      "description": "The original liability value",
+      "description": "The original liability value. Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
       "$ref": "#/definitions/monetaryPosNeg13",
       "example": "6000.00"
     },
     "outstandingAmount": {
       "title": "Outstanding Amount",
-      "description": "The outstanding liability value",
+      "description": "The outstanding liability value. Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
       "$ref": "#/definitions/monetaryPosNeg13",
       "example": "100.00"
     },

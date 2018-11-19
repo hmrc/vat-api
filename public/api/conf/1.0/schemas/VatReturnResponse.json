@@ -27,7 +27,7 @@
       ]
     },
     "chargeRefNumber": {
-      "description": "The charge reference number is returned, only if the netVatDue value is a debit.",
+      "description": "The charge reference number is returned, only if the netVatDue value is a debit. Between 1 and 16 characters.",
       "type": "string",
       "minLength": 1,
       "maxLength": 16
