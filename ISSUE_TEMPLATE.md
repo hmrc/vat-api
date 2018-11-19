@@ -10,6 +10,8 @@ If your issue falls into any of the below categories please contact SDST at SDST
 - Performance metrics
 - Questions relating to the process pre MTD
 
+When submitting an issue please try to provide the following information:
+
 * **I'm submitting a ...**
   - [ ] Bug - API
   - [ ] Bug - Documentation
@@ -22,3 +24,7 @@ If your issue falls into any of the below categories please contact SDST at SDST
 * **What is the expected behaviour?**
 
 * **Other information** (e.g. detailed explanation, screenshots, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. stackoverflow, gitter, etc)
+
+
+
+Find answers to common questions [here](https://github.com/hmrc/vat-api/wiki/FAQ)
