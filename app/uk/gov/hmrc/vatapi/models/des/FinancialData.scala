@@ -56,7 +56,7 @@ case class FinancialTransaction(
                                   outstandingAmount: Option[Amount] = None,
                                   clearedAmount: Option[Amount] = None,
                                   accruedInterest: Option[Amount] = None,
-                                  items: Seq[FinancialItem]
+                                  items: Option[Seq[FinancialItem]] = None
                                 )
 
 object FinancialTransaction {
