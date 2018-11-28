@@ -17,9 +17,7 @@
 package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
-import play.api.Logger
 import play.api.libs.json._
-import uk.gov.hmrc.vatapi.models.des.FinancialItem
 
 import scala.util.{Failure, Success, Try}
 
@@ -50,7 +48,7 @@ object Liabilities {
             Liability(
               taxPeriod = period,
               `type` = l.chargeType,
-              originalAmount = l.originalAmount,
+              originalAmount = l.originalAmount.get,
               outstandingAmount = l.outstandingAmount,
               due = dueDate
             )
@@ -95,45 +93,29 @@ object Payments {
   implicit val from = new DesTransformValidator[des.FinancialData, Payments] {
     def from(desFinancialData: des.FinancialData): Either[DesTransformError, Payments] = {
       Try {
-        Payments(
-          desFinancialData.financialTransactions.filter(ft =>
-            ft.items.exists(_.map(_.paymentAmount.isDefined).reduce(_ && _))
-          ).flatMap { liability =>
-            val period =
-              if (liability.taxPeriodFrom.nonEmpty && liability.taxPeriodTo.nonEmpty)
-                Some(TaxPeriod(LocalDate.parse(liability.taxPeriodFrom.get), LocalDate.parse(liability.taxPeriodTo.get)))
-              else None
-            liability.items match {
-              case Some(its) => its.map { it =>
-                val receivedDate = if (it.clearingDate.nonEmpty) Some(LocalDate.parse(it.clearingDate.get)) else None
+
+        val payments = desFinancialData.financialTransactions.collect {
+          case ft if ft.items.nonEmpty =>
+            ft.items.get.collect {
+              case paymentItem if paymentItem.paymentAmount.nonEmpty =>
+                val period =
+                  if (ft.taxPeriodFrom.nonEmpty && ft.taxPeriodTo.nonEmpty)
+                    Some(TaxPeriod(LocalDate.parse(ft.taxPeriodFrom.get), LocalDate.parse(ft.taxPeriodTo.get)))
+                  else None
 
                 val payment = Payment(
-                  amount = it.paymentAmount.get,
-                  received = receivedDate
-                )
+                amount = paymentItem.paymentAmount.get,
+                received = paymentItem.clearingDate.map(LocalDate.parse)
+              )
                 payment.taxPeriod = period
                 payment
-              }
-              case None => Seq()
             }
-
-
-
-//            .map( sq => sq.map { it =>
-//              val receivedDate = if (it.clearingDate.nonEmpty) Some(LocalDate.parse(it.clearingDate.get)) else None
-//              val payment = Payment(
-//                amount = it.paymentAmount.get,
-//                received = receivedDate
-//              )
-//              payment.taxPeriod = period
-//              payment
-//            }
-//            )
-          }
-        )
+        }
+        Payments(payments.flatten)
       }
     } match {
-      case obj : Success[Payments] =>  Right(obj.value)
+      case obj: Success[Payments] =>
+        Right(obj.value)
       case Failure(ex) =>
         Left(new DesTransformError {
           override val msg: String = s"[Payments] Unable to parse the Json from DES model"
