@@ -40,10 +40,8 @@ object Liabilities {
 
             val dueDate = l.items.map(_.exists(_.dueDate.nonEmpty)) match {
               case Some(result) if result => Some(LocalDate.parse(l.items.get.head.dueDate.get))
-              case None => None
+              case _ => None
             }
-
-            // val dueDate = if (l.items.map(_.exists(_.dueDate.nonEmpty))) Some(LocalDate.parse(l.items.head.dueDate.get)) else None
 
             Liability(
               taxPeriod = period,
@@ -59,7 +57,7 @@ object Liabilities {
           Right(obj)
         case Failure(ex) =>
           Left(new DesTransformError {
-            override val msg: String = s"[Liabilities] Unable to parse the Json from DES model"
+            override val msg: String = s"[Liabilities] Unable to parse the Json from DES model: $ex"
           })
       }
     }

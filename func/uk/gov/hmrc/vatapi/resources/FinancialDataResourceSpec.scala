@@ -32,6 +32,18 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
       }
 
+      "retrieve a single liability when VAT Hybrid data is returned" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.vatHybridLiabilityFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.vatHybrid.toString)
+      }
+
       "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is after period to date" in {
         given()
           .stubAudit
@@ -229,6 +241,20 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .statusIs(OK)
           .bodyIsLike(Jsons.FinancialData.onePayment.toString)
       }
+
+      "retrieve a single payment when VAT Hybrid data is returned" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.vatHybridLiabilityFor(vrn)
+          .when()
+          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.vatHybridPayment.toString)
+      }
+
+
       "retrieve a single payment where the minimum data exists" in {
         given()
           .stubAudit

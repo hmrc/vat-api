@@ -111,7 +111,7 @@ class FinancialDataSpec extends UnitSpec with JsonSpec {
       val result = Liabilities.from.from(TestFinancialData.badLiabilityModel)
 
       result.isLeft shouldBe true
-      result.left.get.msg shouldBe "[Liabilities] Unable to parse the Json from DES model"
+      result.left.get.msg should startWith ("[Liabilities] Unable to parse the Json from DES model")
     }
 
     "retrieve a payments model where both payments exist" when {
