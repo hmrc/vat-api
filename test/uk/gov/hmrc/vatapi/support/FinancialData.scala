@@ -43,7 +43,7 @@ object FinancialData {
   val badLiabilityModel: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction.copy(taxPeriodFrom = Some(""))))
   val badPaymentModel: des.FinancialData = testFinancialData.copy(
     financialTransactions = Seq(testPaymentFinancialTransaction.copy(
-      items = Seq(testPaymentItem.copy(clearingDate = Some(""))))
+      items = Some(Seq(testPaymentItem.copy(clearingDate = Some("")))))
     )
   )
 
@@ -66,28 +66,28 @@ object FinancialData {
       chargeReference = Some(""),
       mainTransaction = Some(""),
       subTransaction = Some(""),
-      originalAmount = 10000,
+      originalAmount = Some(10000),
       outstandingAmount = Some(10000),
       clearedAmount = Some(1.0),
       accruedInterest = Some(1.0),
-      items = Seq(testPaymentItem)
+      items = Some(Seq(testPaymentItem))
     )
 
     val testMinPaymentFinancialTransaction = des.FinancialTransaction(
       chargeType = "VAT",
-      originalAmount = 10000,
-      items = Seq(testMinPaymentItem)
+      originalAmount = Some(10000),
+      items = Some(Seq(testMinPaymentItem))
     )
 
     val testLiabilityFinancialTransaction: FinancialTransaction = testPaymentFinancialTransaction.copy(
       taxPeriodFrom = Some("1977-08-13"),
       taxPeriodTo = Some("1977-08-14"),
-      items = Seq(testLiabilityItem))
+      items = Some(Seq(testLiabilityItem)))
 
     val testMinLiabilityFinancialTransaction: FinancialTransaction = des.FinancialTransaction(
       chargeType = "VAT",
-      originalAmount = 10000,
-      items = Seq(testMinLiabilityItem)
+      originalAmount = Some(10000),
+      items = Some(Seq(testMinLiabilityItem))
     )
   }
 

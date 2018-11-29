@@ -52,11 +52,11 @@ case class FinancialTransaction(
                                   chargeReference: Option[String] = None,
                                   mainTransaction: Option[String] = None,
                                   subTransaction: Option[String] = None,
-                                  originalAmount: Amount,
+                                  originalAmount: Option[Amount] = Some(BigDecimal(0)),
                                   outstandingAmount: Option[Amount] = None,
                                   clearedAmount: Option[Amount] = None,
                                   accruedInterest: Option[Amount] = None,
-                                  items: Seq[FinancialItem]
+                                  items: Option[Seq[FinancialItem]] = None
                                 )
 
 object FinancialTransaction {

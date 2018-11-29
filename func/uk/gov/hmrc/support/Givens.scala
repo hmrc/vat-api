@@ -420,6 +420,18 @@ class Givens(httpVerbs: HttpVerbs) {
     }
 
     object FinancialData {
+
+      def vatHybridLiabilityFor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withHeader("Content-Type", "application/json")
+              .withBody(vatHybrid.toString)
+          ))
+        givens
+      }
+
       def singleLiabilityFor(vrn: Vrn): Givens = {
         stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
           .willReturn(

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
-import play.api.Logger
 import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
@@ -33,16 +32,21 @@ object Liabilities {
     def from(desFinancialData: des.FinancialData) = {
       Try {
         Liabilities(
-          desFinancialData.financialTransactions.map { l =>
+          desFinancialData.financialTransactions.filter(_.chargeType != "Payment on account").map { l =>
             val period =
               if (l.taxPeriodFrom.nonEmpty && l.taxPeriodTo.nonEmpty)
                 Some(TaxPeriod(LocalDate.parse(l.taxPeriodFrom.get), LocalDate.parse(l.taxPeriodTo.get)))
               else None
-            val dueDate = if (l.items.exists(_.dueDate.nonEmpty)) Some(LocalDate.parse(l.items.head.dueDate.get)) else None
+
+            val dueDate = l.items.map(_.exists(_.dueDate.nonEmpty)) match {
+              case Some(result) if result => Some(LocalDate.parse(l.items.get.head.dueDate.get))
+              case _ => None
+            }
+
             Liability(
               taxPeriod = period,
               `type` = l.chargeType,
-              originalAmount = l.originalAmount,
+              originalAmount = l.originalAmount.get,
               outstandingAmount = l.outstandingAmount,
               due = dueDate
             )
@@ -53,7 +57,7 @@ object Liabilities {
           Right(obj)
         case Failure(ex) =>
           Left(new DesTransformError {
-            override val msg: String = s"[Liabilities] Unable to parse the Json from DES model"
+            override val msg: String = s"[Liabilities] Unable to parse the Json from DES model: $ex"
           })
       }
     }
@@ -85,28 +89,31 @@ object Payments {
   implicit val format: OFormat[Payments] = Json.format[Payments]
 
   implicit val from = new DesTransformValidator[des.FinancialData, Payments] {
-    def from(desFinancialData: des.FinancialData) = {
-      Try { Payments(
-        desFinancialData.financialTransactions.filter(ft =>
-          ft.items.map(_.paymentAmount.isDefined).reduce(_&&_)
-        ).flatMap { liability =>
-          val period =
-            if (liability.taxPeriodFrom.nonEmpty && liability.taxPeriodTo.nonEmpty)
-              Some(TaxPeriod(LocalDate.parse(liability.taxPeriodFrom.get), LocalDate.parse(liability.taxPeriodTo.get)))
-            else None
-          liability.items.map { it =>
-            val receivedDate = if (it.clearingDate.nonEmpty) Some(LocalDate.parse(it.clearingDate.get)) else None
-            val payment = Payment(
-              amount = it.paymentAmount.get,
-              received = receivedDate
-            )
-            payment.taxPeriod = period
-            payment
-          }
+    def from(desFinancialData: des.FinancialData): Either[DesTransformError, Payments] = {
+      Try {
+
+        val payments = desFinancialData.financialTransactions.collect {
+          case ft if ft.items.nonEmpty =>
+            ft.items.get.collect {
+              case paymentItem if paymentItem.paymentAmount.nonEmpty =>
+                val period =
+                  if (ft.taxPeriodFrom.nonEmpty && ft.taxPeriodTo.nonEmpty)
+                    Some(TaxPeriod(LocalDate.parse(ft.taxPeriodFrom.get), LocalDate.parse(ft.taxPeriodTo.get)))
+                  else None
+
+                val payment = Payment(
+                amount = paymentItem.paymentAmount.get,
+                received = paymentItem.clearingDate.map(LocalDate.parse)
+              )
+                payment.taxPeriod = period
+                payment
+            }
         }
-      )} } match {
-      case Success(obj) =>
-        Right(obj)
+        Payments(payments.flatten)
+      }
+    } match {
+      case obj: Success[Payments] =>
+        Right(obj.value)
       case Failure(ex) =>
         Left(new DesTransformError {
           override val msg: String = s"[Payments] Unable to parse the Json from DES model"
