@@ -24,5 +24,14 @@ class DocumentationSpec extends BaseFunctionalSpec {
     }
   }
 
+  "Request to /api/conf/2.0/application.raml" should {
+    "return 200 with raml response" in {
+      given()
+        .when()
+        .get("/api/conf/2.0/application.raml")
+        .thenAssertThat()
+        .statusIs(200)
+    }
+  }
 
 }

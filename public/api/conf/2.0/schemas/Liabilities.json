@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Liabilities",
+  "type": "object",
+  "properties": {
+    "liabilities": {
+      "title": "Liabilities",
+      "description": "A list of all liabilities",
+      "type": "array",
+      "items": {
+        "$ref": "Liability.json"
+      }
+    }
+  },
+  "required": [
+    "liabilities"
+  ],
+  "additionalProperties": false
+}

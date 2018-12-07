@@ -35,7 +35,7 @@ trait AppContext extends ServicesConfig {
   lazy val apiGatewayContext: Option[String] = config.getString("api.gateway.context")
   lazy val apiGatewayRegistrationContext: String = apiGatewayContext.getOrElse(throw new RuntimeException("api.gateway.context is not configured"))
   lazy val apiGatewayLinkContext: String = apiGatewayContext.map(x => if(x.isEmpty) x else s"/$x").getOrElse("")
-  lazy val apiStatus: String = config.getString("api.status").getOrElse(throw new RuntimeException("api.status is not configured"))
+  def apiStatus(version: String): String = config.getString(s"api.$version.status").getOrElse(throw new RuntimeException("api.status is not configured"))
 
   lazy val serviceLocatorUrl: String = baseUrl("service-locator")
   lazy val desUrl: String = baseUrl("des")
