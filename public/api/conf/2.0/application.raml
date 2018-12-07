@@ -1,0 +1,376 @@
+#%RAML 2.0
+---
+
+title: VAT (MTD)
+version: 2.0
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+mediaType: application/json
+
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+
+documentation:
+  - title: Overview
+    content: !include docs/overview.md
+  - title: Technical support
+    content: !include docs/technicalSupport.md
+  - title: Testing
+    content: !include docs/testing.md
+  - title: Versioning
+    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
+  - title: Errors
+    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+
+
+traits:
+  contentType:
+    headers:
+      Content-Type:
+        description: Specifies the format of the request body, which must be JSON.
+        type: string
+        required: true
+        example: application/json
+  testScenarioHeader:
+    headers:
+      Gov-Test-Scenario:
+        description: Only in sandbox environment. See Test Data table for all header values.
+        type: string
+        required: false
+        example: '-'
+  clientOrAgentNotAuthorised:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              clientNotSubscribedToMTD:
+                description: The client and/or agent is not authorised.
+                value:
+                  code: CLIENT_OR_AGENT_NOT_AUTHORISED
+
+/organisations/vat:
+  /{vrn}:
+    uriParameters:
+      vrn:
+        description: VAT registration number. <br> A nine-digit number.
+        type: string
+        example: "123456789"
+    /obligations:
+      displayName: Retrieve VAT obligations
+      description: Retrieve VAT obligations
+      get:
+        displayName: Retrieve VAT obligations
+        description: Retrieve VAT obligations
+        (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        queryParameters:
+         from:
+           description: Date from which to return obligations
+           type: string
+           example: 2017-01-25
+           required: true
+         to:
+           description: Date to which to return obligations
+           type: string
+           example: 2017-01-25
+           required: true
+         status:
+           description: Which obligation statuses to return (O=Open, F=Fulfilled)
+           type: string
+           example: F
+           required: false
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: c75f40a6-a3df-4429-a697-471eeec46435
+                description: Unique id for operation tracking <br> String, 36 characters.
+            body:
+              application/json:
+                type: !include schemas/Obligations.json
+                examples:
+                 example-1:
+                  description: Quarterly obligations; one fulfilled
+                  value: !include examples/ObligationsQuarterly.json
+                 example-2:
+                  description: Monthly obligations; one fulfilled
+                  value: !include examples/ObligationsMonthly.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: INVALID_DATE_FROM
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: INVALID_DATE_TO
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: INVALID_DATE_RANGE
+                  invalidStatus:
+                    description: Invalid status
+                    value:
+                      code: INVALID_STATUS
+          404:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: The remote endpoint has indicated that no associated data is found
+                    value:
+                      code: NOT_FOUND
+    /returns:
+      displayName: VAT Returns
+      description: Submit and read VAT returns
+      /{periodKey}:
+        uriParameters:
+          periodKey:
+            description: The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the "#" symbol, which must be URL-encoded.
+            type: string
+            example: "18AD, 18A1, #001"
+        get:
+          displayName: View VAT Return
+          description: Retrieve a submitted VAT return
+          (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
+          is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+          (annotations.scope): "read:vat"
+          securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+          responses:
+            200:
+              headers:
+                X-CorrelationId:
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+                  description: Unique id for operation tracking <br> String, 36 characters.
+              body:
+                 application/json:
+                   type: !include schemas/GetVatReturn.json
+                   example: !include examples/GetVatReturn.json
+            400:
+              body:
+                application/json:
+                  type: types.errorResponse
+                  examples:
+                    invalidNino:
+                      description: The provided VRN is invalid
+                      value:
+                        code: VRN_INVALID
+                    periodKeyInvalid:
+                      description: Invalid period key
+                      value:
+                        code: PERIOD_KEY_INVALID
+            403:
+              body:
+                application/json:
+                  type: types.errorResponse
+                  examples:
+                    dateRangeTooLarge:
+                      description: The date of the requested return cannot be more than four years from the current date
+                      value:
+                        code: DATE_RANGE_TOO_LARGE
+            404:
+      post:
+        displayName: Submit VAT return for period
+        description: Submit VAT return for period
+        (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        (annotations.scope): "write:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
+        body:
+          application/json:
+            type: !include schemas/VatReturnDeclaration.json
+            example: !include examples/VatReturnDeclaration.json
+        responses:
+          201:
+            headers:
+              X-CorrelationId:
+                example: c75f40a6-a3df-4429-a697-471eeec46435
+                description: Unique id for operation tracking <br> String, 36 characters.
+              Receipt-ID:
+                example: 2dd537bc-4244-4ebf-bac9-96321be13cdc
+                description: Unique reference number returned for a submission <br> String, 36 characters.
+              Receipt-Timestamp:
+                example: 2018-02-14T09:32:15Z
+                description: The timestamp from the signature, in ISO8601 format
+              Receipt-Signature:
+                example: DO NOT USE
+                description: This header is not currently used
+            body:
+              application/json:
+                type: !include schemas/VatReturnResponse.json
+                example: !include examples/VatReturnResponse.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidVrn:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidPeriodKey:
+                    description: Invalid period key
+                    value:
+                      code: PERIOD_KEY_INVALID
+                  invalidRequest:
+                    description: Invalid request
+                    value:
+                      code: INVALID_REQUEST
+                  invalidTotalValue:
+                    description: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
+                    value:
+                      code: VAT_TOTAL_VALUE
+                  invalidNetValue:
+                    description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                    value:
+                      code: VAT_NET_VALUE
+                  invalidNumericValue:
+                    description: please provide a numeric field
+                    value:
+                      code: INVALID_NUMERIC_VALUE
+                  nonNegInvalidMonetaryAmount:
+                    description: amounts should be a non-negative number less than 9999999999999.99 with up to 2 decimal places
+                    value:
+                      code: INVALID_MONETARY_AMOUNT
+                  wholeInvalidMonetaryAmount:
+                    description: The value must be between -9999999999999 and 9999999999999
+                    value:
+                      code: INVALID_MONETARY_AMOUNT
+                  netVatInvalidMonetaryAmount:
+                    description: amount should be a monetary value (to 2 decimal places), between 0 and 99999999999.99
+                    value:
+                      code: INVALID_MONETARY_AMOUNT
+          403:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  notDeclared:
+                    description: User has not declared VAT return as final
+                    value:
+                      code: NOT_FINALISED
+                  duplicateSubmission:
+                    description: User has has already submitted a VAT return for the given period
+                    value:
+                      code: DUPLICATE_SUBMISSION
+    /liabilities:
+      displayName: Retrieve VAT liabilities
+      description: Retrieve VAT liabilities
+      get:
+        displayName: Retrieve VAT liabilities
+        description: Retrieve VAT liabilities
+        (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        queryParameters:
+         from:
+           description: Liabilities to return from date
+           type: string
+           example: 2017-01-25
+           required: true
+         to:
+           description: Liabilities to return up to date
+           type: string
+           example: 2017-01-25
+           required: true
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: c75f40a6-a3df-4429-a697-471eeec46435
+                description: Unique id for operation tracking <br> String, 36 characters.
+            body:
+               application/json:
+                 type: !include schemas/Liabilities.json
+                 example: !include examples/Liabilities.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: DATE_FROM_INVALID
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: DATE_TO_INVALID
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: DATE_RANGE_INVALID
+    /payments:
+      displayName: Retrieve VAT payments
+      description: Retrieve VAT payments
+      get:
+        displayName: Retrieve VAT payments
+        description: Retrieve VAT payments
+        (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        queryParameters:
+         from:
+           description: Payments to return from date
+           type: string
+           example: 2017-01-25
+           required: true
+         to:
+           description: Payments to return up to date
+           type: string
+           example: 2017-01-25
+           required: true
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: c75f40a6-a3df-4429-a697-471eeec46435
+                description: Unique id for operation tracking <br> String, 36 characters.
+            body:
+               application/json:
+                 type: !include schemas/Payments.json
+                 example: !include examples/Payments.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                  invalidDateFrom:
+                    description: Invalid date from
+                    value:
+                      code: DATE_FROM_INVALID
+                  invalidDateTo:
+                    description: Invalid date to
+                    value:
+                      code: DATE_TO_INVALID
+                  invalidDateRange:
+                    description: Invalid date range
+                    value:
+                      code: DATE_RANGE_INVALID

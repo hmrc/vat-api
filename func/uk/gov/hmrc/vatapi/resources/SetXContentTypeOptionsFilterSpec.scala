@@ -25,6 +25,16 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
 
+    "be applied for application.raml 2.0" in {
+      given()
+        .stubAudit
+        .when()
+        .get("/api/conf/2.0/application.raml")
+        .thenAssertThat()
+        .statusIs(200)
+        .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
+    }
+
     "be applied for obligations with status A" in {
       given()
         .stubAudit
