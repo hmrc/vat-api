@@ -22,6 +22,7 @@ import uk.gov.hmrc.vatapi.controllers.definition.GroupName.GroupName
 import uk.gov.hmrc.vatapi.controllers.definition.HttpMethod.HttpMethod
 import uk.gov.hmrc.vatapi.controllers.definition.ResourceThrottlingTier.ResourceThrottlingTier
 
+
 case class Definition(scopes: Seq[Scope],
                       api: APIDefinition)
 

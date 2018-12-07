@@ -106,7 +106,14 @@ class VatApiDefinition {
           APIVersion(
             version = "1.0",
             access = buildWhiteListingAccess(),
-            status = buildAPIStatus(),
+            status = buildAPIStatus("1.0"),
+            endpoints = allEndpoints,
+            endpointsEnabled = true
+          ),
+          APIVersion(
+            version = "2.0",
+            access = buildWhiteListingAccess(),
+            status = buildAPIStatus("2.0"),
             endpoints = allEndpoints,
             endpointsEnabled = true
           )
@@ -115,8 +122,8 @@ class VatApiDefinition {
       )
     )
 
-  private def buildAPIStatus(): APIStatus = {
-    AppContext.apiStatus match {
+  private def buildAPIStatus(version: String): APIStatus = {
+    AppContext.apiStatus(version) match {
       case "ALPHA" => APIStatus.ALPHA
       case "BETA" => APIStatus.BETA
       case "STABLE" => APIStatus.STABLE
