@@ -19,11 +19,14 @@ vat-api has five endpoints:
 
 Run from the console using: `$ sbt "run 9675"`
 
-### Testing
-
-Run unit tests: `$ sbt test`
-
-Run integration tests: `$ sbt func:test`
+## Highlighted SBT Tasks
+Task | Description | Command
+:-------|:------------|:-----
+test | Runs the standard unit tests | ```$ sbt test```
+func:test  | Runs the functional tests | ```$ sbt func:test ```
+dependencyCheck | Runs dependency-check against the current project. It aggregates dependencies and generates a report | ```$ sbt dependencyCheck```
+dependencyUpdates |  Shows a list of project dependencies that can be updated | ```$ sbt dependencyUpdates```
+dependencyUpdatesReport | Writes a list of project dependencies to a file | ```$ sbt dependencyUpdatesReport```
 
 ### Reporting Issues
 
