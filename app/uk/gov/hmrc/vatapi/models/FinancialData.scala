@@ -92,7 +92,7 @@ object Payments {
     def from(desFinancialData: des.FinancialData): Either[DesTransformError, Payments] = {
       Try {
 
-        val payments = desFinancialData.financialTransactions.collect {
+        val payments = desFinancialData.financialTransactions.filter(_.chargeType != "Payment on account").collect {
           case ft if ft.items.nonEmpty =>
             ft.items.get.collect {
               case paymentItem if paymentItem.paymentAmount.nonEmpty =>
