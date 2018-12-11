@@ -250,8 +250,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .when()
           .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
           .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.vatHybridPayment.toString)
+          .statusIs(NOT_FOUND)
       }
 
 
