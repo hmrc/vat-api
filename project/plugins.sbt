@@ -15,3 +15,7 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "0.14.0")
 addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "1.2.0")
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.12")
+
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
+
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "0.2.8")
