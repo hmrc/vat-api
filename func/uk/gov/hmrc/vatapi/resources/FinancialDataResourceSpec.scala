@@ -252,6 +252,17 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(NOT_FOUND)
       }
+7
+      "retrieve no VAT Hybrid payments when no relevant data is returned" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.vatHybridPaymentForNoPOA(vrn)
+          .when()
+          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
+          .thenAssertThat()
+          .statusIs(NOT_FOUND)
+      }
 
 
       "retrieve a single payment where the minimum data exists" in {

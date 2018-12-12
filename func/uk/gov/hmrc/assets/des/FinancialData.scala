@@ -48,6 +48,30 @@ object FinancialData {
       |}
     """.stripMargin)
 
+  val vatHybridNoPOA: JsValue = Json.parse(
+    """
+      |{
+      |   "idType":"VRN",
+      |   "idNumber":"888871052",
+      |   "regimeType":"VATC",
+      |   "processingDate":"2018-11-26T00:00:00.000Z",
+      |   "financialTransactions":[
+      |      {
+      |         "chargeType":"Balance brought forward",
+      |         "periodKey":"BFWD",
+      |         "originalAmount":0
+      |      },
+      |      {
+      |         "chargeType":"VAT RETURN DEBIT CHARGE",
+      |         "originalAmount":1000,
+      |         "periodKey":"0318",
+      |         "taxPeriodFrom":"2017-01-01",
+      |         "taxPeriodTo":"2017-03-31"
+      |      }
+      |   ]
+      |}
+    """.stripMargin)
+
   val oneLiability: JsValue = Json.parse("""{
       "idType": "MTDBSA",
       "idNumber": "XQIT00000000001",
@@ -732,6 +756,26 @@ object FinancialData {
       |               "statisticalDocument": "A"
       |            }
       |         ]
+      |      },
+      |       {
+      |         "chargeType":"Payment on account",
+      |         "items":[
+      |            {
+      |               "subItem":"000",
+      |               "amount":-10
+      |            },
+      |            {
+      |               "subItem":"001",
+      |               "dueDate":"2017-04-01",
+      |               "amount":-10,
+      |               "clearingDate":"2017-11-27",
+      |               "paymentAmount":-10,
+      |               "paymentMethod":"DIRECT DEBIT"
+      |            }
+      |         ],
+      |         "periodKey":"0318",
+      |         "taxPeriodFrom":"2017-01-01",
+      |         "taxPeriodTo":"2017-03-31"
       |      }
       |   ]
       |}
