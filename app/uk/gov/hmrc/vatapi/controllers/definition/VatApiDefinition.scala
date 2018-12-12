@@ -109,13 +109,6 @@ class VatApiDefinition {
             status = buildAPIStatus("1.0"),
             endpoints = allEndpoints,
             endpointsEnabled = true
-          ),
-          APIVersion(
-            version = "2.0",
-            access = buildWhiteListingAccess(),
-            status = buildAPIStatus("2.0"),
-            endpoints = allEndpoints,
-            endpointsEnabled = true
           )
         ),
         requiresTrust = None
