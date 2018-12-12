@@ -252,7 +252,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(NOT_FOUND)
       }
-7
+
       "retrieve no VAT Hybrid payments when no relevant data is returned" in {
         given()
           .stubAudit
