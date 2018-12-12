@@ -128,8 +128,14 @@ class FinancialDataSpec extends UnitSpec with JsonSpec {
         result.isRight shouldBe true
         result shouldBe testPayment
       }
-      "transactions exist with just liabilities" in {
+      "transactions exist with just payments" in {
         val result = Payments.from.from(TestFinancialData.justPayments)
+
+        result.isRight shouldBe true
+        result shouldBe testPayment
+      }
+      "transactions exist with liabilities, payments and hybrid payments" in {
+        val result = Payments.from.from(TestFinancialData.allPaymentsAndLiabilities)
 
         result.isRight shouldBe true
         result shouldBe testPayment
@@ -151,6 +157,13 @@ class FinancialDataSpec extends UnitSpec with JsonSpec {
 
     "return nothing when no payments exist from the des.FinancialData model" in {
       val result = Payments.from.from(TestFinancialData.justLiabilities)
+
+      result.isRight shouldBe true
+      result shouldBe Right(Payments(Seq()))
+    }
+
+    "return nothing when only POA payments exist from the des.FinancialData model" in {
+      val result = Payments.from.from(TestFinancialData.testFinancialDataPOAOnly)
 
       result.isRight shouldBe true
       result shouldBe Right(Payments(Seq()))

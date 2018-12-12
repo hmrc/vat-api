@@ -432,6 +432,17 @@ class Givens(httpVerbs: HttpVerbs) {
         givens
       }
 
+      def vatHybridPaymentForNoPOA(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withHeader("Content-Type", "application/json")
+              .withBody(vatHybridNoPOA.toString)
+          ))
+        givens
+      }
+
       def singleLiabilityFor(vrn: Vrn): Givens = {
         stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
           .willReturn(

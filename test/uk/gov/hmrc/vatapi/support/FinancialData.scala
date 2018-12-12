@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.support
 
 import uk.gov.hmrc.vatapi.models.des
-import uk.gov.hmrc.vatapi.models.des.{FinancialItem, FinancialTransaction}
+import uk.gov.hmrc.vatapi.models.des.{FinancialData, FinancialItem, FinancialTransaction}
 
 
 object FinancialData {
@@ -33,12 +33,17 @@ object FinancialData {
     financialTransactions = Seq(testLiabilityFinancialTransaction, testPaymentFinancialTransaction)
   )
 
+
+
   val noLiabilities: des.FinancialData = testFinancialData.copy(financialTransactions = Seq())
   val justPayments: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testPaymentFinancialTransaction))
   val minimumPaymentData: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testMinPaymentFinancialTransaction))
   val justLiabilities: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction))
   val minimumLiabilityData: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testMinLiabilityFinancialTransaction))
 
+  private val testPOAPaymentsOnly = testPaymentFinancialTransaction.copy(chargeType = "Payment on account")
+  val testFinancialDataPOAOnly: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testPOAPaymentsOnly))
+  val allPaymentsAndLiabilities: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction, testPaymentFinancialTransaction, testPOAPaymentsOnly))
 
   val badLiabilityModel: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction.copy(taxPeriodFrom = Some(""))))
   val badPaymentModel: des.FinancialData = testFinancialData.copy(
