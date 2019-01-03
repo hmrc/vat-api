@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,13 @@ class FinancialDataSpec extends UnitSpec with JsonSpec {
 
       result.isLeft shouldBe true
       result.left.get.msg should startWith ("[Liabilities] Unable to parse the Json from DES model")
+    }
+
+    "return no liabilities when only Hybrid payments exist in the des.FinancialData model" in {
+      val result = Liabilities.from.from(TestFinancialData.testFinancialDataHybridPaymentsOnly)
+
+      result.isRight shouldBe true
+      result shouldBe Right(Liabilities(Seq()))
     }
 
     "retrieve a payments model where both payments exist" when {

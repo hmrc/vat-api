@@ -498,6 +498,18 @@ class Givens(httpVerbs: HttpVerbs) {
         givens
       }
 
+      def multipleLiabilitiesWithHybridPaymentsFor(vrn: Vrn): Givens = {
+        stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withHeader("Content-Type", "application/json")
+              .withBody(multipleLiabilitiesWithHybridPayments.toString)
+          )
+        )
+        givens
+      }
+
       def emptyLiabilitiesFor(vrn: Vrn): Givens = {
         stubFor(any(urlMatching(s".*/VRN/$vrn.*"))
           .willReturn(
