@@ -125,7 +125,19 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
           .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
           .thenAssertThat()
           .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutPaymentOnAccount.toString)
+          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutNoHybrids.toString)
+      }
+
+      "retrieve multiple liabilities where they exist excluding Hybrid Payments" in {
+        given()
+          .stubAudit
+          .userIsFullyAuthorisedForTheResource
+          .des().FinancialData.multipleLiabilitiesWithHybridPaymentsFor(vrn)
+          .when()
+          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
+          .thenAssertThat()
+          .statusIs(OK)
+          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutNoHybrids.toString)
       }
 
       "return code 400 when idNumber parameter is invalid" in {

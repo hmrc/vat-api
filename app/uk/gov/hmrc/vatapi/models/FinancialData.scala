@@ -32,7 +32,8 @@ object Liabilities {
     def from(desFinancialData: des.FinancialData) = {
       Try {
         Liabilities(
-          desFinancialData.financialTransactions.filter(_.chargeType != "Payment on account").map { l =>
+          desFinancialData.financialTransactions.filter(_.chargeType != "Payment on account").filter(_.chargeType != "Hybrid Payments")
+            .map { l =>
             val period =
               if (l.taxPeriodFrom.nonEmpty && l.taxPeriodTo.nonEmpty)
                 Some(TaxPeriod(LocalDate.parse(l.taxPeriodFrom.get), LocalDate.parse(l.taxPeriodTo.get)))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,10 @@ object FinancialData {
 
   private val testPOAPaymentsOnly = testPaymentFinancialTransaction.copy(chargeType = "Payment on account")
   val testFinancialDataPOAOnly: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testPOAPaymentsOnly))
+
+  private val testHybridPaymentsOnly = testPaymentFinancialTransaction.copy(chargeType = "Hybrid Payments")
+  val testFinancialDataHybridPaymentsOnly: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testHybridPaymentsOnly))
+
   val allPaymentsAndLiabilities: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction, testPaymentFinancialTransaction, testPOAPaymentsOnly))
 
   val badLiabilityModel: des.FinancialData = testFinancialData.copy(financialTransactions = Seq(testLiabilityFinancialTransaction.copy(taxPeriodFrom = Some(""))))
