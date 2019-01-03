@@ -322,6 +322,15 @@ traits:
                     description: Invalid date range
                     value:
                       code: DATE_RANGE_INVALID
+          404:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidNino:
+                    description: The remote endpoint has indicated that no associated data is found
+                    value:
+                      code: NOT_FOUND
     /payments:
       displayName: Retrieve VAT payments
       description: Retrieve VAT payments
@@ -374,3 +383,12 @@ traits:
                     description: Invalid date range
                     value:
                       code: DATE_RANGE_INVALID
+          404:
+              body:
+                application/json:
+                  type: types.errorResponse
+                  examples:
+                    invalidNino:
+                      description: The remote endpoint has indicated that no associated data is found
+                      value:
+                        code: NOT_FOUND
