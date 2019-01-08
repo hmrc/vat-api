@@ -9,6 +9,7 @@ dist
 .DS_Store
 **/*.DS_Store
 eclipse
+ensime*
 *.eml
 .history
 .idea
