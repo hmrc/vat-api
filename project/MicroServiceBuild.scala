@@ -22,7 +22,7 @@ private object AppDependencies {
   val reactiveMongoVersion = "6.2.0"
   val microserviceBootstrapVersion = "8.7.0"
   val authClientVersion = "2.17.0-play-25"
-  val domainVersion = "5.2.0"
+  val domainVersion = "5.3.0"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
   val jsonExtensionsVersion = "0.20.0"
   val jsonJodaVersion = "2.6.13"
@@ -31,7 +31,7 @@ private object AppDependencies {
   val json4SextVersion = "3.6.3"
 
   val hmrcTestVersion = "3.3.0"
-  val scalaTestVersion = "3.0.1"
+  val scalaTestVersion = "3.0.5"
   val pegdownVersion = "1.6.0"
   val scalaTestPlusVerson = "2.0.1"
   val wiremockversion = "2.20.0"
