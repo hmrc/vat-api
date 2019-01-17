@@ -1,9 +1,9 @@
 {
   "periodKey": "#001",
-  "vatDueSales": 100.00,
-  "vatDueAcquisitions": 100.00,
+  "vatDueSales": 100,
+  "vatDueAcquisitions": 100,
   "totalVatDue": 200,
-  "vatReclaimedCurrPeriod": 100.00,
+  "vatReclaimedCurrPeriod": 100,
   "netVatDue": 100,
   "totalValueSalesExVAT": 500,
   "totalValuePurchasesExVAT": 500,

@@ -162,7 +162,13 @@ traits:
               body:
                  application/json:
                    type: !include schemas/GetVatReturn.json
-                   example: !include examples/GetVatReturn.json
+                   examples:
+                    example-1:
+                     description: VAT Return with decimals
+                     value: !include examples/GetVatReturnDecimals.json
+                    example-2:
+                     description: VAT Return with a hash in the periodKey
+                     value: !include examples/GetVatReturnHash.json
             400:
               body:
                 application/json:
@@ -196,7 +202,7 @@ traits:
         body:
           application/json:
             type: !include schemas/VatReturnDeclaration.json
-            example: !include examples/VatReturnDeclaration.json
+            example: !include examples/SubmitVatReturn.json
         responses:
           201:
             headers:
@@ -215,7 +221,7 @@ traits:
             body:
               application/json:
                 type: !include schemas/VatReturnResponse.json
-                example: !include examples/VatReturnResponse.json
+                example: !include examples/SubmitVatReturnResponse.json
           400:
             body:
               application/json:
