@@ -1,12 +1,12 @@
 {
   "liabilities": [{
     "taxPeriod": {
-      "from": "2017-04-06",
-      "to": "2017-07-06"
+      "from": "2018-04-06",
+      "to": "2018-07-06"
     },
     "type": "VAT ...",
-    "originalAmount": 6000.00,
-    "outstandingAmount": 100.00,
-    "due": "2017-07-06"
+    "originalAmount": 6000.3,
+    "outstandingAmount": 100.51,
+    "due": "2018-07-06"
   }]
 }
