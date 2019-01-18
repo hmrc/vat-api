@@ -24,7 +24,6 @@ private object AppDependencies {
   val authClientVersion = "2.17.0-play-25"
   val domainVersion = "5.3.0"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
-  val jsonExtensionsVersion = "0.20.0"
   val jsonJodaVersion = "2.6.13"
   val catsCoreVersion = "1.5.0"
   val json4SnativeVersion = "3.6.3"
@@ -35,7 +34,6 @@ private object AppDependencies {
   val pegdownVersion = "1.6.0"
   val scalaTestPlusVerson = "2.0.1"
   val wiremockversion = "2.20.0"
-  val reactiveMongoTestVersion = "3.1.0"
   val scalacheckVersion = "1.14.0"
   val jsonAssertVersion = "1.5.0"
   val restAssuredVersion = "2.9.0"
@@ -43,13 +41,11 @@ private object AppDependencies {
   val scoverageVersion = "1.3.1"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-reactivemongo" % reactiveMongoVersion,
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
     "uk.gov.hmrc" %% "auth-client" % authClientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "uk.gov.hmrc" %% "play-hmrc-api" % hmrcApiVersion,
-    "ai.x" %% "play-json-extensions" % jsonExtensionsVersion,
     "com.typesafe.play" %% "play-json-joda" % jsonJodaVersion,
     "org.typelevel" %% "cats-core" % catsCoreVersion,
     "org.json4s" %% "json4s-native" % json4SnativeVersion,
