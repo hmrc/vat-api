@@ -61,7 +61,9 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
-    case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) => InternalServerError(toJson(Errors.InternalServerError))
+    case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) =>
+      logger.info(s"[VatReturnResponse][errorMappings] Des returned error with status 400 and errorCode INVALID_SUBMISSION")
+      InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
     case 403 if errorCodeIsOneOf(VRN_NOT_FOUND, NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => NotFound(toJson(Errors.InvalidPeriodKey))
