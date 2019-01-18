@@ -60,7 +60,7 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
   }
 
   override def errorMappings: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_VRN, INVALID_IDNUMBER) => BadRequest(toJson(Errors.VrnInvalid))
+    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => BadRequest(toJson(Errors.VrnInvalid))
     case 400 if errorCodeIsOneOf(INVALID_DATEFROM) => BadRequest(toJson(Errors.InvalidDateFrom))
     case 400 if errorCodeIsOneOf(INVALID_DATETO) => BadRequest(toJson(Errors.InvalidDateTo))
     case 400 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
