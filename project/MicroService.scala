@@ -43,7 +43,7 @@ trait MicroService {
     .settings(defaultSettings(): _*)
     .settings(
       targetJvm := "jvm-1.8",
-      scalaVersion := "2.11.11",
+      scalaVersion := "2.11.12",
       scalacOptions ++= Seq(
         // FIXME: Uncomment fatal-warnings will make compilation fail because of usage of Play.current instead of DI
         // Choose a DI strategy and uncomment
@@ -56,7 +56,10 @@ trait MicroService {
         "-language:implicitConversions",
         "-Ywarn-numeric-widen",
         "-Yno-adapted-args",
-        "-Ypartial-unification"),
+        "-Ypartial-unification",
+        "-Ywarn-dead-code",
+        "-Ywarn-value-discard",
+        "-Ywarn-unused"),
       libraryDependencies ++= appDependencies,
       parallelExecution in Test := false,
       fork in Test := true,
