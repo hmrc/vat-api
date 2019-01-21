@@ -185,7 +185,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
       }
 
       "an invalid VRN is supplied" should {
-        "return an INVALID_VRN error" in {
+        "return an VRN_INVALID error" in {
           given()
             .stubAudit
           when()
@@ -359,7 +359,7 @@ class FinancialDataResourceSpec extends BaseFunctionalSpec {
     }
 
     "an invalid VRN is supplied" should {
-      "return an INVALID_VRN error" in {
+      "return an VRN_INVALID error" in {
         given()
           .stubAudit
         when()
