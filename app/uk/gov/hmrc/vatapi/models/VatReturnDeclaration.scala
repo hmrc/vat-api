@@ -61,7 +61,7 @@ object VatReturnDeclaration {
   private val periodKeyValidator: Reads[String] = Reads
     .of[String]
     .filter(JsonValidationError("period key should be a 4 character string",
-                                ErrorCode.INVALID_PERIOD_KEY))(_.length == 4)
+                                ErrorCode.PERIOD_KEY_INVALID))(_.length == 4)
 
   implicit val reads: Reads[VatReturnDeclaration] = (
     (__ \ "periodKey").read[String](periodKeyValidator) and
