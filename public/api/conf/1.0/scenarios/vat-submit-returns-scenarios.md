@@ -23,5 +23,9 @@
             <td><p>DUPLICATE_SUBMISSION</p></td>
             <td><p>The remote endpoint has indicated that VAT has already been submitted for that period.</p></td>
         </tr>
+        <tr>
+            <td><p>TAX_PERIOD_NOT_ENDED</p></td>
+            <td><p>The remote endpoint has indicated that the submission is for a tax period that has not ended.</p></td>
+        </tr>
     </tbody>
 </table>

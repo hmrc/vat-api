@@ -273,9 +273,14 @@ traits:
                     value:
                       code: NOT_FINALISED
                   duplicateSubmission:
-                    description: User has has already submitted a VAT return for the given period
+                    description: User has already submitted a VAT return for the given period
                     value:
                       code: DUPLICATE_SUBMISSION
+                  submittedToEarly:
+                    description: Return submitted too early
+                    value:
+                      code: TAX_PERIOD_NOT_ENDED
+
     /liabilities:
       displayName: Retrieve VAT liabilities
       description: Retrieve VAT liabilities

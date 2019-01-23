@@ -57,15 +57,16 @@ trait VatReturnsResource extends BaseResource {
         response <- BusinessResult { orchestrator.submitVatReturn(vrn, vatReturn) }
       } yield response
     } onSuccess { response =>
-      response.filter { case 200 => response.vatSubmissionReturnOrError match {
-        case Right(vatReturnDesResponse) =>
-          logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
-          Created(Json.toJson(vatReturnDesResponse)).withHeaders(
-            receiptId -> response.nrsData.nrSubmissionId,
-            receiptTimestamp -> response.nrsData.timestamp,
-            receiptSignature -> response.nrsData.cadesTSignature
-          )
-      }
+      response.filter {
+        case 200 => response.vatSubmissionReturnOrError match {
+          case Right(vatReturnDesResponse) =>
+            logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
+            Created(Json.toJson(vatReturnDesResponse)).withHeaders(
+              receiptId -> response.nrsData.nrSubmissionId,
+              receiptTimestamp -> response.nrsData.timestamp,
+              receiptSignature -> response.nrsData.cadesTSignature
+            )
+        }
       }
     }
     result.recover {

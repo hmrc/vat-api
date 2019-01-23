@@ -27,8 +27,10 @@ import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.orchestrators.MockVatReturnsOrchestrator
+import uk.gov.hmrc.vatapi.models.Errors.TaxPeriodNotEnded
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode, VatReturn}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult}
+import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.Future
@@ -71,10 +73,15 @@ class VatReturnsResourceSpec extends ResourceSpec
 
   val vatReturnResponseJson = Json.obj("test" -> "json")
   val vatReturnResponse = VatReturnResponse(HttpResponse(200, Some(vatReturnResponseJson))).withNrsData(nrsData)
-  val invalidPayloadResponse =
+  val duplicateSubmissionResponse =
+    VatReturnResponse(HttpResponse(
+      CONFLICT,
+      responseJson = Some(Json.toJson(DesError(DesErrorCode.DUPLICATE_SUBMISSION, "The VAT return was already submitted for the given period.")))
+    ))
+  val taxPeriodNotEndedResponse =
     VatReturnResponse(HttpResponse(
       FORBIDDEN,
-      responseJson = Some(Json.toJson(DesError(DesErrorCode.DUPLICATE_SUBMISSION, "The VAT return was already submitted for the given period.")))
+      responseJson = Some(Json.toJson(DesError(DesErrorCode.TAX_PERIOD_NOT_ENDED, "The remote endpoint has indicated that the submission is for an tax period that has not ended.")))
     ))
 
   "submitVatReturn" should {
@@ -96,9 +103,7 @@ class VatReturnsResourceSpec extends ResourceSpec
         headersMap("Receipt-Signature") shouldBe "This has been deprecated - DO NOT USE"
       }
     }
-  }
 
-  "submitVatReturn" should {
     "return a 500 with the message" when {
       "the orchestrator returns error from NRS submission" in new Setup {
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
@@ -116,18 +121,28 @@ class VatReturnsResourceSpec extends ResourceSpec
     "return a 403 duplication submission" when {
       "re-submit the same vat return" in new Setup {
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
-          .returns(Future.successful(Right(invalidPayloadResponse)))
+          .returns(Future.successful(Right(duplicateSubmissionResponse)))
 
         val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
         val result = resource.submitVatReturn(vrn)(request)
 
-        status(result) shouldBe INTERNAL_SERVER_ERROR
+        status(result) shouldBe FORBIDDEN
       }
     }
-  }
+    "return a 403 tax period not ended error" when {
+      "des indicates that the return has been sent too early" in new Setup {
+        MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
+          .returns(Future.successful(Right(taxPeriodNotEndedResponse)))
 
-  "submitVatReturn" should {
-    "return the INTERNAL_SERVER_ERROR" when {
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val result = resource.submitVatReturn(vrn)(request)
+
+        status(result) shouldBe FORBIDDEN
+        contentAsJson(result) shouldBe Json.toJson(TaxPeriodNotEnded)
+
+      }
+    }
+    "return an INTERNAL_SERVER_ERROR" when {
       "backend failed to respond" in new Setup {
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.failed(new Exception("DES FAILED")))
@@ -156,9 +171,7 @@ class VatReturnsResourceSpec extends ResourceSpec
         contentType(result) shouldBe Some(MimeTypes.JSON)
       }
     }
-  }
 
-  "retrieveVatReturn" should {
     "return a 500" when {
       "des backend return 200 with empty data" in new Setup {
 

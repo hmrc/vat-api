@@ -68,6 +68,7 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     case 403 if errorCodeIsOneOf(VRN_NOT_FOUND, NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
     case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => NotFound(toJson(Errors.InvalidPeriodKey))
     case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => Forbidden(toJson(Errors.InvalidRequest))
+    case 403 if errorCodeIsOneOf(TAX_PERIOD_NOT_ENDED) => Forbidden(toJson(Errors.TaxPeriodNotEnded))
     case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
 
   }
