@@ -202,7 +202,13 @@ traits:
         body:
           application/json:
             type: !include schemas/VatReturnDeclaration.json
-            example: !include examples/SubmitVatReturn.json
+            examples:
+              example-1:
+               description: VAT Return with decimals
+               value: !include examples/SubmitVatReturn.json
+              example-2:
+               description: VAT Return with a hash in the periodKey
+               value: !include examples/SubmitVatReturnHash.json
         responses:
           201:
             headers:
