@@ -20,6 +20,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   val microserviceBootstrapVersion = "8.7.0"
+  val bootstrapPlayVersion = "4.8.0"
   val authClientVersion = "2.17.0-play-25"
   val domainVersion = "5.3.0"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
@@ -41,7 +42,10 @@ private object AppDependencies {
 
   val compile = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
+    // TODO DELETE
+//    "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
+    
+    "uk.gov.hmrc" %% "bootstrap-play-25" % bootstrapPlayVersion,
     "uk.gov.hmrc" %% "auth-client" % authClientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "uk.gov.hmrc" %% "play-hmrc-api" % hmrcApiVersion,
