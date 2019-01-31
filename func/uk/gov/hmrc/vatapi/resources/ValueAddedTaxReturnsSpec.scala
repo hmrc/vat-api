@@ -190,6 +190,20 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\errors(0)\\code", "DUPLICATE_SUBMISSION")
     }
 
+    "reject submissions that are made too early" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsVatReturnSuccessFor(vrn)
+        .des().vatReturns.expectVatReturnToFail(vrn, "TAX_PERIOD_NOT_ENDED", 403)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(403)
+        .bodyHasPath("\\code", "TAX_PERIOD_NOT_ENDED")
+    }
+
     "fail if submission to  Non-Repudiation service failed" in {
       given()
         .stubAudit

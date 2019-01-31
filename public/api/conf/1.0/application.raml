@@ -202,7 +202,13 @@ traits:
         body:
           application/json:
             type: !include schemas/VatReturnDeclaration.json
-            example: !include examples/SubmitVatReturn.json
+            examples:
+              example-1:
+               description: VAT Return with decimals
+               value: !include examples/SubmitVatReturn.json
+              example-2:
+               description: VAT Return with a hash in the periodKey
+               value: !include examples/SubmitVatReturnHash.json
         responses:
           201:
             headers:
@@ -273,9 +279,14 @@ traits:
                     value:
                       code: NOT_FINALISED
                   duplicateSubmission:
-                    description: User has has already submitted a VAT return for the given period
+                    description: User has already submitted a VAT return for the given period
                     value:
                       code: DUPLICATE_SUBMISSION
+                  submittedToEarly:
+                    description: Return submitted too early
+                    value:
+                      code: TAX_PERIOD_NOT_ENDED
+
     /liabilities:
       displayName: Retrieve VAT liabilities
       description: Retrieve VAT liabilities
