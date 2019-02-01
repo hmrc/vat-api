@@ -67,8 +67,9 @@ trait AuthorisationService {
 
     logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(
-      RawJsonPredicate(JsArray(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))))))
+      Enrolment(vatAuthEnrolments.enrolmentToken)
+        .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
       .retrieve(
         affinityGroup and authorisedEnrolments and agentInformation
       ) {
@@ -89,8 +90,9 @@ trait AuthorisationService {
 
     logger.debug(s"[AuthorisationService] [authoriseAsClientWithNrsRequirement] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(
-      RawJsonPredicate(JsArray(Seq(Json.toJson(Enrolment(vatAuthEnrolments.enrolmentToken).withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))))))
+      Enrolment(vatAuthEnrolments.enrolmentToken)
+        .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
       .retrieve(
         affinityGroup and allEnrolments
           and internalId and externalId and agentCode and credentials
