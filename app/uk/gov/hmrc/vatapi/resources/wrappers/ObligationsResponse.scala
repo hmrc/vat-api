@@ -18,13 +18,13 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError}
+import play.api.mvc.Results._
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.des.ObligationDetail
 import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
-import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
+//import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
 
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 

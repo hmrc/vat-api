@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
+import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -24,18 +25,22 @@ import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object ObligationsConnector extends ObligationsConnector {
-  override val http: WSHttp = WSHttp
-  override val appContext = AppContext
-}
+//object ObligationsConnector extends ObligationsConnector {
+//  override val http: WSHttp = WSHttp
+//  override val appContext = AppContext
+//}
 
-trait ObligationsConnector extends BaseConnector {
-  val http: WSHttp
 
-  private lazy val baseUrl = appContext.desUrl
+
+class ObligationsConnector @Inject()(
+                                      override val http: WSHttp,
+                                      appContext: AppContext
+                                    ) extends BaseConnector {
+//trait ObligationsConnector extends BaseConnector {
+//  val http: WSHttp
+
   private val logger: Logger = Logger(this.getClass)
 
   def get(vrn: Vrn, queryParams: ObligationsQueryParams)(implicit hc: HeaderCarrier): Future[ObligationsResponse] = {

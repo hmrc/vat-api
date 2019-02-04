@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
+import javax.inject.Inject
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -28,17 +29,23 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object ObligationsResource extends ObligationsResource {
-  override val connector = ObligationsConnector
-  override val authService = AuthorisationService
-  override val appContext = AppContext
-  override val auditService = AuditService
-}
+//object ObligationsResource extends ObligationsResource {
+//  override val connector = ObligationsConnector
+//  override val authService = AuthorisationService
+//  override val appContext = AppContext
+//  override val auditService = AuditService
+//}
 
-trait ObligationsResource extends BaseResource {
+class ObligationsResource @Inject()(
+                                     connector: ObligationsConnector,
+                                     override val authService: AuthorisationService,
+                                     override val appContext: AppContext,
+                                     auditService : AuditService
+                                   )extends BaseResource {
+//trait ObligationsResource extends BaseResource {
 
-  val connector: ObligationsConnector
-  val auditService: AuditService
+//  val connector: ObligationsConnector
+//  val auditService: AuditService
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")

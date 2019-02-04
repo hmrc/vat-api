@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.services
 
+import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,16 +26,18 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object VatReturnsService extends VatReturnsService {
+//object VatReturnsService extends VatReturnsService {
+//
+//  override val vatReturnsConnector: VatReturnsConnector = VatReturnsConnector
+//
+//}
 
-  override val vatReturnsConnector: VatReturnsConnector = VatReturnsConnector
+class VatReturnsService @Inject()(vatReturnsConnector: VatReturnsConnector ) {
 
-}
-
-trait VatReturnsService {
+//trait VatReturnsService {
 
   val logger: Logger = Logger(this.getClass)
-  val vatReturnsConnector: VatReturnsConnector
+//  val vatReturnsConnector: VatReturnsConnector
 
   def submit(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {
     logger.debug(s"[VatReturnsService][submit] - Submitting Vat Return")

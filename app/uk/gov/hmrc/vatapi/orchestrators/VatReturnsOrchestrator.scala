@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.orchestrators
 
+import javax.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc.Request
@@ -33,23 +34,30 @@ import uk.gov.hmrc.vatapi.utils.ImplicitDateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object VatReturnsOrchestrator extends VatReturnsOrchestrator {
-  override val nrsService: NRSService = NRSService
-  override val vatReturnsService: VatReturnsService = VatReturnsService
-  override val auditService: AuditService = AuditService
+//object VatReturnsOrchestrator extends VatReturnsOrchestrator {
+//  override val nrsService: NRSService = NRSService
+//  override val vatReturnsService: VatReturnsService = VatReturnsService
+//  override val auditService: AuditService = AuditService
+//
+//  override def submissionTimestamp: DateTime = DateTime.now()
+//}
 
-  override def submissionTimestamp: DateTime = DateTime.now()
-}
 
-trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
+class VatReturnsOrchestrator @Inject()(
+                                        nrsService: NRSService,
+                                        vatReturnsService: VatReturnsService,
+                                        auditService: AuditService
+                                      ) extends ImplicitDateTimeFormatter {
+
+//trait VatReturnsOrchestrator extends ImplicitDateTimeFormatter {
 
   val logger: Logger = Logger(this.getClass)
 
-  val nrsService: NRSService
-  val vatReturnsService: VatReturnsService
-  val auditService: AuditService
+//  val nrsService: NRSService
+//  val vatReturnsService: VatReturnsService
+//  val auditService: AuditService
 
-  def submissionTimestamp: DateTime
+  def submissionTimestamp: DateTime = DateTime.now()
 
   def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration)
                      (implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {

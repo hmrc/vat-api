@@ -16,42 +16,78 @@
 
 package uk.gov.hmrc.vatapi.config
 
-import uk.gov.hmrc.auth.core.PlayAuthConnector
+import akka.actor.ActorSystem
+import javax.inject.{Inject, Singleton}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.auth.core.{AuthConnector, PlayAuthConnector}
 import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
+import uk.gov.hmrc.play.bootstrap.config.LoadAuditingConfig
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.play.http.ws._
-import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
+//import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
 
-object MicroserviceAuditConnector extends AuditConnector {
-  lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"auditing")
+
+@Singleton
+class MicroserviceAuditConnector @Inject()(configuration: Configuration, env: Environment) extends AuditConnector {
+  val mode = env.mode
+  lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(configuration, mode, s"auditing")
 }
 
-trait Hooks extends HttpHooks with HttpAuditing {
+@Singleton
+class Hooks @Inject()(override val auditConnector: AuditConnector, appConfig: AppConfig) extends HttpHooks with HttpAuditing {
   override val hooks = Seq(AuditingHook)
-  override lazy val auditConnector: AuditConnector = MicroserviceAuditConnector
+  override val appName = "vat-api"
+  //  override val auditConnector: AuditConnector // = MicroserviceAuditConnector
 }
 
-trait WSHttp
-    extends HttpGet
-    with WSGet
-    with HttpPut
-    with WSPut
-    with HttpPost
-    with WSPost
-    with HttpDelete
-    with WSDelete
-    with Hooks
-    with AppName
+//trait WSHttp
+//  extends HttpGet
+//    with WSGet
+//    with HttpPut
+//    with WSPut
+//    with HttpPost
+//    with WSPost
+//    with HttpDelete
+//    with WSDelete
+//    //    with Hooks
+//    with AppName
 
-object WSHttp extends WSHttp
+class WSHttp @Inject()(hooksI: Hooks, config: Configuration, override val actorSystem: ActorSystem)  extends HttpGet
+  with WSGet
+  with HttpPut
+  with WSPut
+  with HttpPost
+  with WSPost
+  with HttpDelete
+  with WSDelete
+  //    with Hooks
+  with AppName{
+  override val configuration = Some(config.underlying)
+  // TODO Check below
+  override val appNameConfiguration = config
+  // TODO What should this actually be?
+  override val hooks = Seq()
 
-object MicroserviceAuthConnector extends AuthConnector with PlayAuthConnector with ServicesConfig with WSHttp {
-  override val authBaseUrl: String = baseUrl("auth")
+}
+
+class MicroserviceAuthConnector @Inject()(
+                                           env: Environment,
+                                           config: Configuration,
+                                           override val http: WSHttp,
+                                           override val runModeConfiguration: Configuration,
+                                           override val actorSystem: ActorSystem
+                                         ) extends AuthConnector with PlayAuthConnector with ServicesConfig with WSHttp {
+  val authBaseUrl: String = baseUrl("auth")
   override val serviceUrl: String = baseUrl("auth")
-  override lazy val http = WSHttp
+  override val mode = env.mode
+  override val configuration = Some(config.underlying)
+  // TODO Check below
+  override val appNameConfiguration = config
+  // TODO What should this actually be?
+  override val hooks = Seq()
+
 }

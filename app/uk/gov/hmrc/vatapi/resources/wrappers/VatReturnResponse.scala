@@ -19,12 +19,12 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
+import play.api.mvc.Results._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, VatReturn, des}
-import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
+//import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
 
 case class VatReturnResponse(underlying: HttpResponse) extends Response {
 

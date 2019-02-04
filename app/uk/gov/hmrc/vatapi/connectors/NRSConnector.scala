@@ -32,6 +32,7 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
+import javax.inject.Inject
 import nrs.models.NRSSubmission
 import play.api.Logger
 import play.api.libs.json.Writes
@@ -43,12 +44,18 @@ import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.{NrsSubmissionOutc
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object NRSConnector extends NRSConnector {
-  override val http: WSHttp = WSHttp
-  override val appContext: AppContext = AppContext
-}
+//object NRSConnector extends NRSConnector {
+//  override val http: WSHttp = WSHttp
+//  override val appContext: AppContext = AppContext
+//}
 
-trait NRSConnector extends BaseConnector {
+
+
+class NRSConnector @Inject()(
+                              override val http: WSHttp,
+                              override val appContext: AppContext
+                            ) extends BaseConnector {
+//trait NRSConnector extends BaseConnector {
 
   val logger: Logger = Logger(this.getClass)
 

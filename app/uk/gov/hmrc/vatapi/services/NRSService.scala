@@ -19,6 +19,7 @@ package uk.gov.hmrc.vatapi.services
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
+import javax.inject.Inject
 import nrs.models._
 import org.joda.time.DateTime
 import play.api.Logger
@@ -32,14 +33,18 @@ import uk.gov.hmrc.vatapi.resources.AuthRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object NRSService extends NRSService {
-  override val nrsConnector: NRSConnector = NRSConnector
-}
+//object NRSService extends NRSService {
+//  override val nrsConnector: NRSConnector = NRSConnector
+//}
 
-trait NRSService {
+class NRSService @Inject()(
+                            nrsConnector: NRSConnector
+                          ) {
+
+//trait NRSService {
   val logger: Logger = Logger(this.getClass)
 
-  val nrsConnector: NRSConnector
+//  val nrsConnector: NRSConnector
 
   def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
+import javax.inject.Inject
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -29,20 +30,28 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object VatReturnsResource extends VatReturnsResource {
+//object VatReturnsResource extends VatReturnsResource {
+//
+//  override val connector: VatReturnsConnector = VatReturnsConnector
+//  override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
+//  override val authService: AuthorisationService = AuthorisationService
+//  override val appContext: AppContext = AppContext
+//  override val auditService : AuditService = AuditService
+//}
 
-  override val connector: VatReturnsConnector = VatReturnsConnector
-  override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
-  override val authService: AuthorisationService = AuthorisationService
-  override val appContext: AppContext = AppContext
-  override val auditService = AuditService
-}
+class VatReturnsResource @Inject()(
+                                    connector: VatReturnsConnector,
+                                    orchestrator: VatReturnsOrchestrator,
+                                    authService: AuthorisationService,
+                                    appContext: AppContext,
+                                    auditService : AuditService
+                                  ) extends BaseResource {
 
-trait VatReturnsResource extends BaseResource {
+//trait VatReturnsResource extends BaseResource {
 
-  val connector: VatReturnsConnector
-  val orchestrator: VatReturnsOrchestrator
-  val auditService: AuditService
+//  val connector: VatReturnsConnector
+//  val orchestrator: VatReturnsOrchestrator
+//  val auditService: AuditService
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
