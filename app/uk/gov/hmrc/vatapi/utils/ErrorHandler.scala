@@ -16,22 +16,62 @@
 
 package uk.gov.hmrc.vatapi.utils
 
-import javax.inject.Inject
-import play.api.Configuration
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.http.JsonErrorHandler
 
-class ErrorHandler {
+import javax.inject._
+import play.api._
+import play.api.http.DefaultHttpErrorHandler
+import play.api.libs.json.Json
+import play.api.mvc.Results._
+import play.api.mvc._
+import play.api.routing.Router
+import uk.gov.hmrc.http.NotImplementedException
+import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
 
-  // TODO implement error handling:
-  /*
-  override def onStart(app: Application): Unit = {
-    super.onStart(app)
-    application = app
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
+
+@Singleton
+class ErrorHandler @Inject()(
+                              env: Environment,
+                              config: Configuration,
+                              sourceMapper: OptionalSourceMapper,
+                              router: Provider[Router]
+                            ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+//
+//  override def onProdServerError(request: RequestHeader, exception: UsefulException) = {
+//    Future.successful(
+//      InternalServerError("A server error occurred: " + exception.getMessage)
+//    )
+//  }
+//
+//  override def onForbidden(request: RequestHeader, message: String) = {
+//    Future.successful(
+//      Forbidden("You're not allowed to access this resource.")
+//    )
+//  }
+
+
+  override protected def onNotFound(request: RequestHeader, message: String): Future[Result] = {
+    super.onNotFound(request, message).map { result =>
+      BadRequest(Json.toJson(Json.obj("Hello" -> "You")))
+    }
   }
 
-  override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
-    super.onError(request, ex).map { result =>
+  override protected def onBadRequest(request: RequestHeader, error: String): Future[Result] = {
+    super.onBadRequest(request, error).map { result =>
+      error match {
+        case "ERROR_VRN_INVALID"       => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid")))
+        case "ERROR_INVALID_DATE"      => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_DATE, "The provided date is invalid")))
+        case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid")))
+        case "ERROR_INVALID_TO_DATE"   => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
+        case "INVALID_STATUS" | "INVALID_DATE_RANGE"         => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
+        case _                         => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> "BAD_REQUEST")))
+      }
+    }
+  }
+
+  override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
+    super.onServerError(request, ex).map { result =>
       ex match {
         case _ =>
           ex.getCause match {
@@ -43,22 +83,20 @@ class ErrorHandler {
     }
   }
 
-
-  override def onBadRequest(request: RequestHeader, error: String) = {
-    super.onBadRequest(request, error).map { result =>
-      error match {
-        case "ERROR_VRN_INVALID"       => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid")))
-        case "ERROR_INVALID_DATE"      => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_DATE, "The provided date is invalid")))
-        case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid")))
-        case "ERROR_INVALID_TO_DATE"   => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
-        case _                         => result
+  override protected def onDevServerError(request: RequestHeader, ex: UsefulException): Future[Result] = {
+    super.onServerError(request, ex).map { result =>
+      ex match {
+        case _ =>
+          ex.getCause match {
+            case ex: NotImplementedException =>
+              NotImplemented(Json.toJson(ErrorNotImplemented))
+            case _ => result
+          }
       }
     }
   }
-  */
-
-
 }
+
 
 
 // play.http.errorHandler = "uk.gov.hmrc.play.bootstrap.http.JsonErrorHandler
