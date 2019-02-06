@@ -22,8 +22,8 @@ import play.api.mvc._
 import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AgentSimulationFilter @Inject()(implicit val mat: Materializer) extends Filter {
 
@@ -32,7 +32,7 @@ class AgentSimulationFilter @Inject()(implicit val mat: Materializer) extends Fi
 
     rh.headers.get(GovTestScenarioHeader) match {
       case Some("CLIENT_OR_AGENT_NOT_AUTHORISED") => ClientSubscriptionSimulation(f, rh, method)
-      case _                             => f(rh)
+      case _ => f(rh)
     }
   }
 
