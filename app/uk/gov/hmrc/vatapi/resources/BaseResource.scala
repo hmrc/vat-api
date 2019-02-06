@@ -30,12 +30,13 @@ import scala.concurrent.Future
 import scala.util.Right
 
 trait BaseResource extends BaseController {
+
   val authService: AuthorisationService
   val appContext: AppContext
 
   val logger: Logger = Logger(this.getClass)
 
-  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch)
+  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
 
   def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")

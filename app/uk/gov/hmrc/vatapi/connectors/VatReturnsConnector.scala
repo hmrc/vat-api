@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.vatapi.BaseConnector
 import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.models.des
@@ -30,7 +31,7 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatReturnsConnector @Inject()(override val appContext: AppContext, override val http: WSHttp) extends BaseConnector {
+class VatReturnsConnector @Inject()(override val appContext: AppContext, override val http: DefaultHttpClient) extends BaseConnector {
 
 //trait VatReturnsConnector extends BaseConnector {
 

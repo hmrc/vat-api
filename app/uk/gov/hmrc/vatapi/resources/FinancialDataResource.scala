@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
@@ -38,7 +38,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //}
 
 
-
+@Singleton
 class FinancialDataResource @Inject()(
                                        connector: FinancialDataConnector,
                                        override val authService: AuthorisationService,

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -39,15 +39,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //  override val auditService : AuditService = AuditService
 //}
 
+// TODO SHOULD THIS BE A SINGLETON???
+@Singleton
 class VatReturnsResource @Inject()(
                                     connector: VatReturnsConnector,
                                     orchestrator: VatReturnsOrchestrator,
-                                    authService: AuthorisationService,
-                                    appContext: AppContext,
+                                    override val authService: AuthorisationService,
+                                    override val appContext: AppContext,
                                     auditService : AuditService
                                   ) extends BaseResource {
 
-//trait VatReturnsResource extends BaseResource {
+//  val appContext: uk.gov.hmrc.vatapi.config.AppContext = appContext
+
+
+  //trait VatReturnsResource extends BaseResource {
 
 //  val connector: VatReturnsConnector
 //  val orchestrator: VatReturnsOrchestrator

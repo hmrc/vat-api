@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.vatapi.services
 
+import javax.inject.Inject
 import nrs.models.IdentityData
 import org.joda.time.LocalDate
 import play.api.Logger
+//import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsArray, JsResultException, Json}
 import play.api.mvc.Results._
@@ -36,17 +38,20 @@ import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object AuthorisationService extends AuthorisationService {
-  override val apiAuthorisedFunctions: APIAuthorisedFunctions.type = APIAuthorisedFunctions
-}
+//object AuthorisationService extends AuthorisationService {
+//  override val apiAuthorisedFunctions: APIAuthorisedFunctions.type = APIAuthorisedFunctions
+//}
 
-trait AuthorisationService {
+class AuthorisationService @Inject()(
+                                      apiAuthorisedFunctions: APIAuthorisedFunctions,
+                                      appContext: AppContext
+                                    ) {
   type AuthResult = Either[Result, AuthContext]
 
-  val apiAuthorisedFunctions: APIAuthorisedFunctions
-  private lazy val vatAuthEnrolments = AppContext.vatAuthEnrolments
+//  val apiAuthorisedFunctions: APIAuthorisedFunctions
+  private lazy val vatAuthEnrolments = appContext.vatAuthEnrolments
 
-  private val logger = Logger(AuthorisationService.getClass)
+  val logger = Logger(this.getClass)
 
   def authCheck(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
     authoriseAsClient(vrn)

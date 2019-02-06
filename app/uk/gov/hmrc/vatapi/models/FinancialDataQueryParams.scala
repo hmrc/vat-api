@@ -29,7 +29,9 @@ case class FinancialDataQueryParams(from: LocalDate, to: LocalDate) {
 
 object FinancialDataQueryParams {
   val dateRegex: SourceId = """^\d{4}-\d{2}-\d{2}$"""
-  val minDate: LocalDate = LocalDate.parse(AppContext.mtdDate, ISODateTimeFormat.date())
+  // TODO Resolve import
+  //  val minDate: LocalDate = LocalDate.parse(AppContext.mtdDate, ISODateTimeFormat.date())
+  val minDate: LocalDate = LocalDate.parse("2016-04-06", ISODateTimeFormat.date())
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
 

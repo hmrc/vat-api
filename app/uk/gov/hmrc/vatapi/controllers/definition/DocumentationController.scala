@@ -16,16 +16,17 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
+import javax.inject.{Inject, Singleton}
 import play.api.http.LazyHttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import uk.gov.hmrc.vatapi.controllers.definition.JsonFormatters._
 
-
-abstract class DocumentationController extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
+@Singleton // TODO Isn't using Singleton bad here and other controllers
+class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition)extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
 
   override def definition() = Action {
-    Ok(Json.toJson(VatApiDefinition.definition))
+    Ok(Json.toJson(vatApiDefinition.definition))
   }
 
   override def conf(version: String, file: String) = {
@@ -33,4 +34,4 @@ abstract class DocumentationController extends uk.gov.hmrc.api.controllers.Docum
   }
 }
 
-object DocumentationController extends DocumentationController
+//object DocumentationController extends DocumentationController

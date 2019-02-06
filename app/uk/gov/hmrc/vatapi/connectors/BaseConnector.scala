@@ -20,6 +20,7 @@ import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, PostHttpTransport}
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.play.http.ws.WSPost
 import uk.gov.hmrc.vatapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
@@ -30,7 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseConnector {
 
-  val http: WSHttp
+//  val http: WSHttp
+  val http: DefaultHttpClient
   val appContext: AppContext
 
   private val logger = Logger("connectors")

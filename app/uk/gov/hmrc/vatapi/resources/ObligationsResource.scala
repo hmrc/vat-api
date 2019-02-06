@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -36,6 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //  override val auditService = AuditService
 //}
 
+@Singleton
 class ObligationsResource @Inject()(
                                      connector: ObligationsConnector,
                                      override val authService: AuthorisationService,

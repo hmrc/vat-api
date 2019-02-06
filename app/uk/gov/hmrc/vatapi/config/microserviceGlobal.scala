@@ -29,11 +29,11 @@ import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
 import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
 import uk.gov.hmrc.http.{HeaderCarrier, NotImplementedException}
-import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
-import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
+//import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
+//import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
-import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
-import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
+//import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+//import uk.gov.hmrc.play.bootstrap.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
 import uk.gov.hmrc.vatapi.models._
 
@@ -71,95 +71,105 @@ object ControllerConfiguration extends ControllerConfig {
   }
 }
 
-object MicroserviceAuditFilter
-  extends AuditFilter
-    with AppName
-    with MicroserviceFilterSupport {
-  override val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
+// TODO WHERE IS THIS USED AND WHAT FOR? IS IT SUPERSEDED BY BOOTSTRAP?
+//object MicroserviceAuditFilter
+//  extends AuditFilter
+//    with AppName
+//    with MicroserviceFilterSupport {
+//  override val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
+//
+//  override def controllerNeedsAuditing(controllerName: String) =
+//    AppContext.auditEnabled && ControllerConfiguration
+//      .controllerParamsConfig(controllerName)
+//      .needsAuditing
+//
+//}
 
-  override def controllerNeedsAuditing(controllerName: String) =
-    AppContext.auditEnabled && ControllerConfiguration
-      .controllerParamsConfig(controllerName)
-      .needsAuditing
 
-}
+// TODO WHERE IS THIS USED AND WHAT FOR? IS IT SUPERSEDED BY BOOTSTRAP?
+//object MicroserviceLoggingFilter
+//  extends LoggingFilter
+//    with MicroserviceFilterSupport {
+//  override def controllerNeedsLogging(controllerName: String) =
+//    ControllerConfiguration.controllerParamsConfig(controllerName).needsLogging
+//}
 
-object MicroserviceLoggingFilter
-  extends LoggingFilter
-    with MicroserviceFilterSupport {
-  override def controllerNeedsLogging(controllerName: String) =
-    ControllerConfiguration.controllerParamsConfig(controllerName).needsLogging
-}
+// MOVED TO OWN FILE
+//object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
+//  val emptyHeader = "Gov-Empty-Response"
+//
+//  override def apply(f: (RequestHeader) => Future[Result])(
+//    rh: RequestHeader): Future[Result] =
+//    f(rh) map { res =>
+//      if ((res.header.status == 201 || res.header.status == 409) && res.body.isKnownEmpty) {
+//        val headers = res.header.headers
+//          .updated("Content-Type", "application/json")
+//          .updated(emptyHeader, "true")
+//        res.copy(res.header.copy(headers = headers), HttpEntity.NoEntity)
+//      } else res
+//    }
+//}
 
-object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
-  val emptyHeader = "Gov-Empty-Response"
-
-  override def apply(f: (RequestHeader) => Future[Result])(
-    rh: RequestHeader): Future[Result] =
-    f(rh) map { res =>
-      if ((res.header.status == 201 || res.header.status == 409) && res.body.isKnownEmpty) {
-        val headers = res.header.headers
-          .updated("Content-Type", "application/json")
-          .updated(emptyHeader, "true")
-        res.copy(res.header.copy(headers = headers), HttpEntity.NoEntity)
-      } else res
-    }
-}
-
+// MOVED TO OWN FILE
 // this filter is a workaround for the issue reported in ticket APSR-87
-object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
-  override def apply(f: (RequestHeader) => Future[Result])(
-    rh: RequestHeader): Future[Result] =
-    f(rh).map(_.as("application/json"))
-}
+//object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
+//  override def apply(f: (RequestHeader) => Future[Result])(
+//    rh: RequestHeader): Future[Result] =
+//    f(rh).map(_.as("application/json"))
+//}
+
+// MOVED TO OWN FILE
+//object SetXContentTypeOptionsFilter extends Filter with MicroserviceFilterSupport {
+//  val xContentTypeOptionsHeader = "X-Content-Type-Options"
+//  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
+//    f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
+//  }
+//}
 
 
-object SetXContentTypeOptionsFilter extends Filter with MicroserviceFilterSupport {
-  val xContentTypeOptionsHeader = "X-Content-Type-Options"
-  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
-  }
-}
+// TODO WHAT NEEDS TO HAPPEN WITH THIS
+//object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
+//  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
+//}
 
-object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
-  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
-}
+// TODO WHERE IS THIS USED AND WHAT FOR? IS IT SUPERSEDED BY BOOTSTRAP?
+//object MicroserviceAuthFilter
+//  extends AuthorisationFilter
+//    with MicroserviceFilterSupport {
+//
+//  override def authConnector = MicroserviceAuthConnector
+//
+//
+//  override def authParamsConfig = AuthParamsControllerConfiguration
+//
+//  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
+//}
 
-object MicroserviceAuthFilter
-  extends AuthorisationFilter
-    with MicroserviceFilterSupport {
+// MOVED TO OWN FILE
+//object HeaderValidatorFilter
+//  extends Filter
+//    with HeaderValidator
+//    with MicroserviceFilterSupport {
+//  def apply(next: (RequestHeader) => Future[Result])(
+//    rh: RequestHeader): Future[Result] = {
+//    val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)
+//    val needsHeaderValidation =
+//      controller.forall(
+//        name =>
+//          ControllerConfiguration
+//            .controllerParamsConfig(name)
+//            .needsHeaderValidation)
+//
+//    if (!needsHeaderValidation || acceptHeaderValidationRules(
+//      rh.headers.get("Accept"))) next(rh)
+//    else
+//      Future.successful(
+//        Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
+//          Json.toJson(ErrorAcceptHeaderInvalid)))
+//  }
+//}
 
-  override def authConnector = MicroserviceAuthConnector
-
-
-  override def authParamsConfig = AuthParamsControllerConfiguration
-
-  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
-}
-
-object HeaderValidatorFilter
-  extends Filter
-    with HeaderValidator
-    with MicroserviceFilterSupport {
-  def apply(next: (RequestHeader) => Future[Result])(
-    rh: RequestHeader): Future[Result] = {
-    val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)
-    val needsHeaderValidation =
-      controller.forall(
-        name =>
-          ControllerConfiguration
-            .controllerParamsConfig(name)
-            .needsHeaderValidation)
-
-    if (!needsHeaderValidation || acceptHeaderValidationRules(
-      rh.headers.get("Accept"))) next(rh)
-    else
-      Future.successful(
-        Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
-          Json.toJson(ErrorAcceptHeaderInvalid)))
-  }
-}
-
+/* TODO What needs to happen with MicroserviceRegistration?
 trait MicroserviceRegistration
   extends ServiceLocatorRegistration
     with ServiceLocatorConfig {
@@ -169,7 +179,9 @@ trait MicroserviceRegistration
     WSHttp)
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 }
+*/
 
+/* TODO IS THIS TO BE DELETED?
 object MicroserviceGlobal
   extends DefaultMicroserviceGlobal
     with MicroserviceRegistration {
@@ -198,45 +210,6 @@ object MicroserviceGlobal
     Seq(SetXContentTypeOptionsFilter, HeaderValidatorFilter, EmptyResponseFilter, SetContentTypeFilter) ++ enabledFilters ++
       defaultMicroserviceFilters
 
-  override def onStart(app: Application): Unit = {
-    super.onStart(app)
-    application = app
-  }
-
-  override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
-    super.onError(request, ex).map { result =>
-      ex match {
-        case _ =>
-          ex.getCause match {
-            case ex: NotImplementedException =>
-              NotImplemented(Json.toJson(ErrorNotImplemented))
-            case _ => result
-          }
-      }
-    }
-  }
-
-
-  override def onBadRequest(request: RequestHeader, error: String) = {
-    super.onBadRequest(request, error).map { result =>
-      error match {
-        case "ERROR_VRN_INVALID"       => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid")))
-        case "ERROR_INVALID_DATE"      => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_DATE, "The provided date is invalid")))
-        case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid")))
-        case "ERROR_INVALID_TO_DATE"   => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
-        case _                         => result
-      }
-    }
-  }
 }
+*/
 
-object AgentSimulationFilter extends Filter with MicroserviceFilterSupport {
-  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    val method = rh.method
-
-    rh.headers.get(GovTestScenarioHeader) match {
-      case Some("CLIENT_OR_AGENT_NOT_AUTHORISED") => ClientSubscriptionSimulation(f, rh, method)
-      case _                             => f(rh)
-    }
-  }
-}

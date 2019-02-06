@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.config.LoadAuditingConfig
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.play.http.ws._
 //import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
@@ -79,15 +80,15 @@ class MicroserviceAuthConnector @Inject()(
                                            config: Configuration,
                                            override val http: WSHttp,
                                            override val runModeConfiguration: Configuration,
-                                           override val actorSystem: ActorSystem
-                                         ) extends AuthConnector with PlayAuthConnector with ServicesConfig with WSHttp {
+                                           actorSystem: ActorSystem
+                                         ) extends AuthConnector with PlayAuthConnector with ServicesConfig {// with DefaultHttpClient {
   val authBaseUrl: String = baseUrl("auth")
   override val serviceUrl: String = baseUrl("auth")
   override val mode = env.mode
-  override val configuration = Some(config.underlying)
+//  override val configuration = Some(config.underlying)
   // TODO Check below
-  override val appNameConfiguration = config
+//  override val appNameConfiguration = config
   // TODO What should this actually be?
-  override val hooks = Seq()
+//  override val hooks = Seq()
 
 }
