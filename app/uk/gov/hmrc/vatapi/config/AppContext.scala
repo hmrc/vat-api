@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.config
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Environment}
 import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -26,6 +26,8 @@ import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 //  lazy val config: Configuration = current.configuration
 //}
 
+
+@Singleton
 class AppContext @Inject()(
                             config: Configuration,
                             environment: Environment

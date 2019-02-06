@@ -20,28 +20,28 @@ import javax.inject.{Inject, Singleton}
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.config.ServicesConfig
-
-trait AppConfig {
-  def desBaseUrl: String
-
-  def mtdIdBaseUrl: String
-
-  def desEnv: String
-
-  def desToken: String
-}
-
-@Singleton
-class AppConfigImpl @Inject()(environment: Environment,
-                              config: Configuration) extends AppConfig with ServicesConfig {
-
-  override protected def mode: Mode = environment.mode
-
-  override protected def runModeConfiguration: Configuration = config
-
-  val mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
-  val desBaseUrl: String = baseUrl("des")
-  val desEnv: String = getString("microservice.services.des.env")
-  val desToken: String = getString("microservice.services.des.token")
-
-}
+//
+//trait AppConfig {
+//  def desBaseUrl: String
+//
+//  def mtdIdBaseUrl: String
+//
+//  def desEnv: String
+//
+//  def desToken: String
+//}
+//
+//@Singleton
+//class AppConfigImpl @Inject()(environment: Environment,
+//                              config: Configuration) extends AppConfig with ServicesConfig {
+//
+//  override protected def mode: Mode = environment.mode
+//
+//  override protected def runModeConfiguration: Configuration = config
+//
+//  val mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
+//  val desBaseUrl: String = baseUrl("des")
+//  val desEnv: String = getString("microservice.services.des.env")
+//  val desToken: String = getString("microservice.services.des.token")
+//
+//}

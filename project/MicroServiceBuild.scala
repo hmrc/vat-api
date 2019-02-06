@@ -21,7 +21,7 @@ private object AppDependencies {
 
   val microserviceBootstrapVersion = "8.7.0"
   val bootstrapPlayVersion = "4.8.0"
-  val authClientVersion = "2.17.0-play-25"
+  val authClientVersion = "2.19.0-play-25"
   val domainVersion = "5.3.0"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
   val jsonJodaVersion = "2.6.13"
