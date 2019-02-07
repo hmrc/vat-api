@@ -26,14 +26,14 @@ import uk.gov.hmrc.vatapi.config.ControllerConfiguration
 
 import scala.concurrent.Future
 
-class HeaderValidatorFilter @Inject()(implicit val mat: Materializer) extends Filter with HeaderValidator {
+class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controllerConfiguration: ControllerConfiguration) extends Filter with HeaderValidator {
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)
     val needsHeaderValidation =
       controller.forall(
         name =>
-          ControllerConfiguration
+          controllerConfiguration
             .controllerParamsConfig(name)
             .needsHeaderValidation)
 

@@ -18,14 +18,10 @@ package uk.gov.hmrc.vatapi.filters
 
 import akka.stream.Materializer
 import javax.inject.Inject
-import play.api.libs.json.Json
 import play.api.mvc._
-import play.routing.Router.Tags
-import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
-import uk.gov.hmrc.vatapi.config.ControllerConfiguration
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class SetContentTypeFilter @Inject()(implicit val mat: Materializer) extends Filter {
 

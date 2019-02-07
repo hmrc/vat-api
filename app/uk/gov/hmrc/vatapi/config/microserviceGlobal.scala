@@ -42,34 +42,37 @@ import scala.concurrent.Future
 import scala.util.matching.Regex
 import uk.gov.hmrc.vatapi.resources._
 
-case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
-                                  needsLogging: Boolean = true,
-                                  needsAuditing: Boolean = true,
-                                  needsTaxYear: Boolean = true)
 
-object ControllerConfiguration extends ControllerConfig {
-  private implicit val regexValueReader: ValueReader[Regex] =
-    StringReader.stringValueReader.map(_.r)
-  private implicit val controllerParamsReader: ValueReader[ControllerConfigParams] =
-    ValueReader.relative[ControllerConfigParams] { config =>
-      ControllerConfigParams(
-        needsHeaderValidation =
-          config.getAs[Boolean]("needsHeaderValidation").getOrElse(true),
-        needsLogging = config.getAs[Boolean]("needsLogging").getOrElse(true),
-        needsAuditing = config.getAs[Boolean]("needsAuditing").getOrElse(true),
-        needsTaxYear = config.getAs[Boolean]("needsTaxYear").getOrElse(true)
-      )
-    }
-
-  lazy val controllerConfigs: Config =
-    Play.current.configuration.underlying.as[Config]("controllers")
-
-  def controllerParamsConfig(controllerName: String): ControllerConfigParams = {
-    controllerConfigs
-      .as[Option[ControllerConfigParams]](controllerName)
-      .getOrElse(ControllerConfigParams())
-  }
-}
+// MOVED TO ANOTHER CLASS - DELETE
+//case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
+//                                  needsLogging: Boolean = true,
+//                                  needsAuditing: Boolean = true,
+//                                  needsTaxYear: Boolean = true)
+//
+// MOVED TO ANOTHER CLASS - DELETE
+//object ControllerConfiguration extends ControllerConfig {
+//  private implicit val regexValueReader: ValueReader[Regex] =
+//    StringReader.stringValueReader.map(_.r)
+//  private implicit val controllerParamsReader: ValueReader[ControllerConfigParams] =
+//    ValueReader.relative[ControllerConfigParams] { config =>
+//      ControllerConfigParams(
+//        needsHeaderValidation =
+//          config.getAs[Boolean]("needsHeaderValidation").getOrElse(true),
+//        needsLogging = config.getAs[Boolean]("needsLogging").getOrElse(true),
+//        needsAuditing = config.getAs[Boolean]("needsAuditing").getOrElse(true),
+//        needsTaxYear = config.getAs[Boolean]("needsTaxYear").getOrElse(true)
+//      )
+//    }
+//
+//  lazy val controllerConfigs: Config =
+//    Play.current.configuration.underlying.as[Config]("controllers")
+//
+//  def controllerParamsConfig(controllerName: String): ControllerConfigParams = {
+//    controllerConfigs
+//      .as[Option[ControllerConfigParams]](controllerName)
+//      .getOrElse(ControllerConfigParams())
+//  }
+//}
 
 // TODO WHERE IS THIS USED AND WHAT FOR? IS IT SUPERSEDED BY BOOTSTRAP?
 //object MicroserviceAuditFilter
