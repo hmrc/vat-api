@@ -33,18 +33,12 @@ import uk.gov.hmrc.vatapi.resources.AuthRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-//object NRSService extends NRSService {
-//  override val nrsConnector: NRSConnector = NRSConnector
-//}
 
 class NRSService @Inject()(
                             nrsConnector: NRSConnector
                           ) {
 
-//trait NRSService {
   val logger: Logger = Logger(this.getClass)
-
-//  val nrsConnector: NRSConnector
 
   def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
@@ -64,7 +58,7 @@ class NRSService @Inject()(
         userSubmissionTimestamp = DateTime.now(),
         identityData = request.authContext.identityData,
         userAuthToken = request.headers.get("Authorization").get,
-        headerData = Json.toJson(request.headers.toMap.map { h => h._1 -> h._2.head}),
+        headerData = Json.toJson(request.headers.toMap.map { h => h._1 -> h._2.head }),
         searchKeys = SearchKeys(
           vrn = Some(vrn),
           periodKey = Some(payload.periodKey)

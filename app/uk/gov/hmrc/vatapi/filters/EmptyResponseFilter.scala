@@ -24,7 +24,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EmptyResponseFilter @Inject()(implicit val mat: Materializer) extends Filter{
+class EmptyResponseFilter @Inject()(implicit val mat: Materializer) extends Filter {
 
   val emptyHeader = "Gov-Empty-Response"
 

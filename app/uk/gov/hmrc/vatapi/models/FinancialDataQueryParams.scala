@@ -18,8 +18,6 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
-import play.api.Logger
-import uk.gov.hmrc.vatapi.config.AppContext
 
 import scala.util.Try
 

@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.vatapi
 
+import cats.data.EitherT
+import cats.implicits._
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.Result
 import play.api.mvc.Results.{BadRequest, Forbidden, InternalServerError}
 import uk.gov.hmrc.vatapi.models.{AuthorisationErrorResult, ErrorResult, Errors, GenericErrorResult, InternalServerErrorResult, JsonValidationErrorResult, ValidationErrorResult}
-import cats.data.EitherT
+import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.vatapi.resources.wrappers.Response
-import cats.implicits._
 
 package object resources {
 
+  type BusinessResult[T] = EitherT[Future, ErrorResult, T]
   val GovTestScenarioHeader = "Gov-Test-Scenario"
 
   def unhandledResponse(status: Int, logger: Logger): Result = {
@@ -38,15 +39,37 @@ package object resources {
 
   def handleErrors(errorResult: ErrorResult): Result = {
     errorResult match {
-      case GenericErrorResult(message)       => BadRequest(Json.toJson(Errors.badRequest(message)))
+      case GenericErrorResult(message) => BadRequest(Json.toJson(Errors.badRequest(message)))
       case JsonValidationErrorResult(errors) => BadRequest(Json.toJson(Errors.badRequest(errors)))
-      case ValidationErrorResult(error)      => BadRequest(Json.toJson(Errors.badRequest(error)))
-      case AuthorisationErrorResult(error)   => Forbidden(Json.toJson(error))
-      case InternalServerErrorResult(error)  => InternalServerError(Json.toJson(Errors.InternalServerError(error)))
+      case ValidationErrorResult(error) => BadRequest(Json.toJson(Errors.badRequest(error)))
+      case AuthorisationErrorResult(error) => Forbidden(Json.toJson(error))
+      case InternalServerErrorResult(error) => InternalServerError(Json.toJson(Errors.InternalServerError(error)))
     }
   }
 
-  type BusinessResult[T] = EitherT[Future, ErrorResult, T]
+  def validateJson[T](json: JsValue)(implicit reads: Reads[T], ec: ExecutionContext): BusinessResult[T] =
+    BusinessResult {
+      for {
+        errors <- json.validate[T].asEither.left
+      } yield JsonValidationErrorResult(errors)
+    }
+
+  def validate[T](value: T)(validate: PartialFunction[T, Errors.Error])(implicit ec: ExecutionContext): BusinessResult[T] =
+    if (validate.isDefinedAt(value)) BusinessResult.failure(ValidationErrorResult(validate(value)))
+    else BusinessResult.success(value)
+
+  def authorise[T](value: T)(auth: PartialFunction[T, Errors.Error])(implicit ec: ExecutionContext): BusinessResult[T] =
+    if (auth.isDefinedAt(value)) BusinessResult.failure(AuthorisationErrorResult(Errors.businessError(auth(value))))
+    else BusinessResult.success(value)
+
+  def execute[T](torun: Unit => Future[T])(implicit ec: ExecutionContext): BusinessResult[T] =
+    BusinessResult {
+      for {
+        result <- torun(())
+      } yield Right(result)
+    }
+
+  def fromDes[R <: Response](result: BusinessResult[R]): DesBusinessResult[R] = DesBusinessResult(result)
 
   object BusinessResult {
 
@@ -61,29 +84,5 @@ package object resources {
     def failure[T](error: ErrorResult)(implicit ec: ExecutionContext): BusinessResult[T] = EitherT.fromEither(Left(error))
 
   }
-
-  def validateJson[T](json: JsValue)(implicit reads: Reads[T], ec: ExecutionContext): BusinessResult[T] =
-    BusinessResult {
-      for {
-        errors <- json.validate[T].asEither.left
-      } yield JsonValidationErrorResult(errors)
-    }
-
-  def validate[T](value: T)(validate: PartialFunction[T, Errors.Error])(implicit ec: ExecutionContext): BusinessResult[T] =
-    if(validate.isDefinedAt(value)) BusinessResult.failure(ValidationErrorResult(validate(value)))
-    else                            BusinessResult.success(value)
-
-  def authorise[T](value: T)(auth: PartialFunction[T, Errors.Error])(implicit ec: ExecutionContext): BusinessResult[T] =
-    if(auth.isDefinedAt(value)) BusinessResult.failure(AuthorisationErrorResult(Errors.businessError(auth(value))))
-    else                        BusinessResult.success(value)
-
-  def execute[T](torun: Unit => Future[T])(implicit ec: ExecutionContext): BusinessResult[T] =
-    BusinessResult {
-      for {
-        result <- torun(())
-      } yield Right(result)
-    }
-
-  def fromDes[R <: Response](result: BusinessResult[R]): DesBusinessResult[R] = DesBusinessResult(result)
 
 }

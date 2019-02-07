@@ -30,14 +30,6 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//object FinancialDataResource extends FinancialDataResource {
-//  override val connector = FinancialDataConnector
-//  override val authService = AuthorisationService
-//  override val appContext = AppContext
-//  override val auditService = AuditService
-//}
-
-
 @Singleton
 class FinancialDataResource @Inject()(
                                        connector: FinancialDataConnector,
@@ -45,12 +37,6 @@ class FinancialDataResource @Inject()(
                                        override val appContext: AppContext,
                                        auditService: AuditService
                                      ) extends BaseResource {
-//trait FinancialDataResource extends BaseResource {
-
-//  val connector: FinancialDataConnector
-//  val authService: AuthorisationService
-//  val appContext: AppContext
-//  val auditService: AuditService
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 

@@ -23,6 +23,7 @@ case class Validation[T](path: JsPath,
                          validationError: JsonValidationError)
 
 object Validation {
+
   implicit class ErrorAccumulatingValidator[T](reads: Reads[T]) {
     def validate(validations: Seq[Validation[T]]): Reads[T] =
       reads.flatMap { t =>
@@ -36,4 +37,5 @@ object Validation {
         }
       }
   }
+
 }

@@ -31,12 +31,26 @@ import scala.util.Right
 
 trait BaseResource extends BaseController {
 
+  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
   val authService: AuthorisationService
   val appContext: AppContext
-
   val logger: Logger = Logger(this.getClass)
 
-  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
+  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = if (nrsRequired) {
+    new ActionBuilder[Request] with ActionFilter[Request] {
+      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
+        Future {
+          None
+        }
+    } andThen AuthActionWithNrsRequirement(vrn)
+  } else {
+    new ActionBuilder[Request] with ActionFilter[Request] {
+      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
+        Future {
+          None
+        }
+    } andThen AuthAction(vrn)
+  }
 
   def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
@@ -65,23 +79,6 @@ trait BaseResource extends BaseController {
       } else
         Future.successful(Right(new AuthRequest(Organisation(), request)))
   }
-
-  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = if (nrsRequired) {
-    new ActionBuilder[Request] with ActionFilter[Request] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        Future {
-          None
-        }
-    } andThen AuthActionWithNrsRequirement(vrn)
-  } else {
-    new ActionBuilder[Request] with ActionFilter[Request] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        Future {
-          None
-        }
-    } andThen AuthAction(vrn)
-  }
-
 
   def getRequestDateTimestamp(implicit request: AuthRequest[_]): String = {
     val requestTimestampHeader = "X-Request-Timestamp"

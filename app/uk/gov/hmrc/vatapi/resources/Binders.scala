@@ -59,7 +59,7 @@ object Binders {
   }
 
   implicit def financialDataQueryParamsBinder(implicit stringBinder: QueryStringBindable[String]) = new QueryStringBindable[FinancialDataQueryParams] {
-    override def bind(key:String, params: Map[String, Seq[String]]): OptEither[FinancialDataQueryParams] = {
+    override def bind(key: String, params: Map[String, Seq[String]]): OptEither[FinancialDataQueryParams] = {
       val from = stringBinder.bind("from", params)
       val to = stringBinder.bind("to", params)
 
@@ -83,7 +83,9 @@ object Binders {
       for {
         dates <- params.get(key)
       } yield
-        Try{ DateTimeFormat.forPattern(format).parseLocalDate(dates(0)) } match {
+        Try {
+          DateTimeFormat.forPattern(format).parseLocalDate(dates(0))
+        } match {
           case Success(v) => Right(v)
           case Failure(_) => Left("ERROR_INVALID_DATE")
         }

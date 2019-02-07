@@ -40,29 +40,20 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.vatapi.BaseConnector
-import uk.gov.hmrc.vatapi.config.{AppContext}
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.{NrsSubmissionOutcome, NrsSubmissionOutcomeReads}
 
 import scala.concurrent.{ExecutionContext, Future}
-
-//object NRSConnector extends NRSConnector {
-//  override val http: WSHttp = WSHttp
-//  override val appContext: AppContext = AppContext
-//}
-
 
 
 class NRSConnector @Inject()(
                               override val http: DefaultHttpClient,
                               override val appContext: AppContext
                             ) extends BaseConnector {
-//trait NRSConnector extends BaseConnector {
 
   val logger: Logger = Logger(this.getClass)
-
-  private val xApiKeyHeader = "X-API-Key"
-
   val nrsSubmissionUrl: String => String = vrn => s"${appContext.nrsServiceUrl}/submission"
+  private val xApiKeyHeader = "X-API-Key"
 
   def submit(vrn: Vrn, nrsSubmission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
 
@@ -73,7 +64,7 @@ class NRSConnector @Inject()(
     http.POST[NRSSubmission, NrsSubmissionOutcome](submitUrl, nrsSubmission)(
       implicitly[Writes[NRSSubmission]],
       NrsSubmissionOutcomeReads,
-      withTestHeader(hc.withExtraHeaders(xApiKeyHeader-> s"${appContext.xApiKey}")),
+      withTestHeader(hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}")),
       implicitly)
   }
 }

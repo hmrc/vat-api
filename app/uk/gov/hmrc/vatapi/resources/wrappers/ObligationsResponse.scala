@@ -24,12 +24,11 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.des.ObligationDetail
 import uk.gov.hmrc.vatapi.models.{DesTransformError, Obligations, _}
-//import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
 
 case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
 
-  def obligations(vrn : Vrn) : Either[DesTransformError, Option[Obligations]] = {
+  def obligations(vrn: Vrn): Either[DesTransformError, Option[Obligations]] = {
 
     def noneFound: Either[DesTransformError, Option[Obligations]] = {
       logger.error(s"[ObligationsResponse][noneFound] No obligation details found. JSON: ${underlying.status}")
@@ -38,7 +37,9 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
     def error(message: String): Either[DesTransformError, Option[Obligations]] = {
       logger.error(s"[ObligationsResponse][error] $message. status: ${underlying.status}")
-      Left(new DesTransformError{ val msg = message })
+      Left(new DesTransformError {
+        val msg = message
+      })
     }
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {

@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.vatapi.resources.wrappers
+
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
@@ -23,7 +24,6 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, Liabilities, Payments, des}
-//import uk.gov.hmrc.vatapi.resources.VatReturnsResource.NotFound
 
 case class FinancialDataResponse(underlying: HttpResponse) extends Response {
 
@@ -34,6 +34,7 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
       case JsSuccess(financialData, _) =>
         DesTransformValidator[des.FinancialData, Liabilities].from(financialData)
     }
+
     jsonOrError match {
       case Right(js) =>
         logger.debug(s"[FinancialDataResponse][getLiabilities - jsonOrError] Json response body from DES : ${js}")
@@ -49,6 +50,7 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
       case JsError(errors) => Left(ParseError(s"[FinancialDataResponse][getPayments - deserialise] Json format from DES doesn't match the FinancialData model: $errors"))
       case JsSuccess(financialData, _) => DesTransformValidator[des.FinancialData, Payments].from(financialData)
     }
+
     jsonOrError match {
       case Right(js) =>
         logger.debug(s"[FinancialDataResponse][getPayments - jsonOrError] Json response body from DES : ${js}")

@@ -30,33 +30,14 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//object VatReturnsResource extends VatReturnsResource {
-//
-//  override val connector: VatReturnsConnector = VatReturnsConnector
-//  override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
-//  override val authService: AuthorisationService = AuthorisationService
-//  override val appContext: AppContext = AppContext
-//  override val auditService : AuditService = AuditService
-//}
-
-// TODO SHOULD THIS BE A SINGLETON???
 @Singleton
 class VatReturnsResource @Inject()(
                                     connector: VatReturnsConnector,
                                     orchestrator: VatReturnsOrchestrator,
                                     override val authService: AuthorisationService,
                                     override val appContext: AppContext,
-                                    auditService : AuditService
+                                    auditService: AuditService
                                   ) extends BaseResource {
-
-//  val appContext: uk.gov.hmrc.vatapi.config.AppContext = appContext
-
-
-  //trait VatReturnsResource extends BaseResource {
-
-//  val connector: VatReturnsConnector
-//  val orchestrator: VatReturnsOrchestrator
-//  val auditService: AuditService
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -68,7 +49,9 @@ class VatReturnsResource @Inject()(
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
-        response <- BusinessResult { orchestrator.submitVatReturn(vrn, vatReturn) }
+        response <- BusinessResult {
+          orchestrator.submitVatReturn(vrn, vatReturn)
+        }
       } yield response
     } onSuccess { response =>
       response.filter {

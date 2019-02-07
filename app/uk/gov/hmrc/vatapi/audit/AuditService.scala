@@ -23,7 +23,6 @@ import play.api.libs.json.{Format, Json}
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.vatapi.config.MicroserviceAuditConnector
 import uk.gov.hmrc.vatapi.resources.BusinessResult
@@ -31,10 +30,8 @@ import uk.gov.hmrc.vatapi.resources.BusinessResult
 import scala.concurrent.ExecutionContext
 
 class AuditService @Inject()(auditConnector: MicroserviceAuditConnector) {
-//trait AuditService {
 
   val logger: Logger = Logger(this.getClass)
-//  private val auditConnector: AuditConnector = MicroserviceAuditConnector
 
   def audit[T](event: AuditEvent[T])(
     implicit hc: HeaderCarrier,
@@ -59,5 +56,3 @@ class AuditService @Inject()(auditConnector: MicroserviceAuditConnector) {
   }
 
 }
-
-//object AuditService extends AuditService

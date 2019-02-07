@@ -20,21 +20,20 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.Validation._
-import uk.gov.hmrc.vatapi.utils.ImplicitCurrencyFormatter._
 
 case class VatReturnDeclaration(
-  periodKey: String,
-  vatDueSales: Amount,
-  vatDueAcquisitions: Amount,
-  totalVatDue: Amount,
-  vatReclaimedCurrPeriod: Amount,
-  netVatDue: Amount,
-  totalValueSalesExVAT: Amount,
-  totalValuePurchasesExVAT: Amount,
-  totalValueGoodsSuppliedExVAT: Amount,
-  totalAcquisitionsExVAT: Amount,
-  finalised: Boolean
-) {
+                                 periodKey: String,
+                                 vatDueSales: Amount,
+                                 vatDueAcquisitions: Amount,
+                                 totalVatDue: Amount,
+                                 vatReclaimedCurrPeriod: Amount,
+                                 netVatDue: Amount,
+                                 totalValueSalesExVAT: Amount,
+                                 totalValuePurchasesExVAT: Amount,
+                                 totalValueGoodsSuppliedExVAT: Amount,
+                                 totalAcquisitionsExVAT: Amount,
+                                 finalised: Boolean
+                               ) {
 
   def toDes(timestamp: DateTime = new DateTime(), arn: Option[String]): des.VatReturnDeclaration =
     des.VatReturnDeclaration(
@@ -61,7 +60,7 @@ object VatReturnDeclaration {
   private val periodKeyValidator: Reads[String] = Reads
     .of[String]
     .filter(JsonValidationError("period key should be a 4 character string",
-                                ErrorCode.PERIOD_KEY_INVALID))(_.length == 4)
+      ErrorCode.PERIOD_KEY_INVALID))(_.length == 4)
 
   implicit val reads: Reads[VatReturnDeclaration] = (
     (__ \ "periodKey").read[String](periodKeyValidator) and
@@ -77,7 +76,7 @@ object VatReturnDeclaration {
         .read[Amount](vatAmountValidatorWithZeroDecimals) and
       (__ \ "totalAcquisitionsExVAT").read[Amount](vatAmountValidatorWithZeroDecimals) and
       (__ \ "finalised").read[Boolean]
-  )(VatReturnDeclaration.apply _)
+    ) (VatReturnDeclaration.apply _)
     .validate(
       Seq(
         Validation[VatReturnDeclaration](

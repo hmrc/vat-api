@@ -15,64 +15,11 @@
  */
 
 package uk.gov.hmrc.vatapi.config
-
-import com.typesafe.config.Config
-import net.ceedubs.ficus.Ficus._
-import net.ceedubs.ficus.readers.{StringReader, ValueReader}
-import play.api.http.HttpEntity
-import play.api.libs.json.Json
-import play.api.mvc.Results._
-import play.api.mvc._
-import play.api.{Application, Configuration, Logger, Play}
-import play.routing.Router.Tags
-import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
-import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
-import uk.gov.hmrc.http.{HeaderCarrier, NotImplementedException}
 //import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 //import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
-import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
 //import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 //import uk.gov.hmrc.play.bootstrap.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
-import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
-import uk.gov.hmrc.vatapi.models._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.matching.Regex
-import uk.gov.hmrc.vatapi.resources._
-
-
-// MOVED TO ANOTHER CLASS - DELETE
-//case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
-//                                  needsLogging: Boolean = true,
-//                                  needsAuditing: Boolean = true,
-//                                  needsTaxYear: Boolean = true)
-//
-// MOVED TO ANOTHER CLASS - DELETE
-//object ControllerConfiguration extends ControllerConfig {
-//  private implicit val regexValueReader: ValueReader[Regex] =
-//    StringReader.stringValueReader.map(_.r)
-//  private implicit val controllerParamsReader: ValueReader[ControllerConfigParams] =
-//    ValueReader.relative[ControllerConfigParams] { config =>
-//      ControllerConfigParams(
-//        needsHeaderValidation =
-//          config.getAs[Boolean]("needsHeaderValidation").getOrElse(true),
-//        needsLogging = config.getAs[Boolean]("needsLogging").getOrElse(true),
-//        needsAuditing = config.getAs[Boolean]("needsAuditing").getOrElse(true),
-//        needsTaxYear = config.getAs[Boolean]("needsTaxYear").getOrElse(true)
-//      )
-//    }
-//
-//  lazy val controllerConfigs: Config =
-//    Play.current.configuration.underlying.as[Config]("controllers")
-//
-//  def controllerParamsConfig(controllerName: String): ControllerConfigParams = {
-//    controllerConfigs
-//      .as[Option[ControllerConfigParams]](controllerName)
-//      .getOrElse(ControllerConfigParams())
-//  }
-//}
 
 // TODO WHERE IS THIS USED AND WHAT FOR? IS IT SUPERSEDED BY BOOTSTRAP?
 //object MicroserviceAuditFilter
@@ -97,39 +44,6 @@ import uk.gov.hmrc.vatapi.resources._
 //    ControllerConfiguration.controllerParamsConfig(controllerName).needsLogging
 //}
 
-// MOVED TO OWN FILE
-//object EmptyResponseFilter extends Filter with MicroserviceFilterSupport {
-//  val emptyHeader = "Gov-Empty-Response"
-//
-//  override def apply(f: (RequestHeader) => Future[Result])(
-//    rh: RequestHeader): Future[Result] =
-//    f(rh) map { res =>
-//      if ((res.header.status == 201 || res.header.status == 409) && res.body.isKnownEmpty) {
-//        val headers = res.header.headers
-//          .updated("Content-Type", "application/json")
-//          .updated(emptyHeader, "true")
-//        res.copy(res.header.copy(headers = headers), HttpEntity.NoEntity)
-//      } else res
-//    }
-//}
-
-// MOVED TO OWN FILE
-// this filter is a workaround for the issue reported in ticket APSR-87
-//object SetContentTypeFilter extends Filter with MicroserviceFilterSupport {
-//  override def apply(f: (RequestHeader) => Future[Result])(
-//    rh: RequestHeader): Future[Result] =
-//    f(rh).map(_.as("application/json"))
-//}
-
-// MOVED TO OWN FILE
-//object SetXContentTypeOptionsFilter extends Filter with MicroserviceFilterSupport {
-//  val xContentTypeOptionsHeader = "X-Content-Type-Options"
-//  override def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-//    f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
-//  }
-//}
-
-
 // TODO WHAT NEEDS TO HAPPEN WITH THIS
 //object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
 //  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
@@ -148,29 +62,6 @@ import uk.gov.hmrc.vatapi.resources._
 //  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 //}
 
-// MOVED TO OWN FILE
-//object HeaderValidatorFilter
-//  extends Filter
-//    with HeaderValidator
-//    with MicroserviceFilterSupport {
-//  def apply(next: (RequestHeader) => Future[Result])(
-//    rh: RequestHeader): Future[Result] = {
-//    val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)
-//    val needsHeaderValidation =
-//      controller.forall(
-//        name =>
-//          ControllerConfiguration
-//            .controllerParamsConfig(name)
-//            .needsHeaderValidation)
-//
-//    if (!needsHeaderValidation || acceptHeaderValidationRules(
-//      rh.headers.get("Accept"))) next(rh)
-//    else
-//      Future.successful(
-//        Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
-//          Json.toJson(ErrorAcceptHeaderInvalid)))
-//  }
-//}
 
 /* TODO What needs to happen with MicroserviceRegistration?
 trait MicroserviceRegistration

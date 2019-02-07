@@ -19,9 +19,11 @@ package uk.gov.hmrc.vatapi.utils
 import uk.gov.hmrc.vatapi.models.Amount
 
 trait ImplicitCurrencyFormatter {
+
   implicit class CurrencyFormatter(x: Amount) {
     def toDesCurrency: String = x.setScale(2).toString()
   }
+
 }
 
 object ImplicitCurrencyFormatter extends ImplicitCurrencyFormatter

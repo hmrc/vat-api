@@ -33,18 +33,9 @@ import scala.util.{Failure, Success, Try}
 trait Response {
 
   val logger: Logger = Logger(this.getClass)
+  val status: Int = underlying.status
 
   def underlying: HttpResponse
-
-  def jsonOrError: Either[Throwable, JsValue] = {
-    Try(underlying.json) match {
-      case Success(null) => Left(new RuntimeException)
-      case Success(json) => Right(json)
-      case Failure(e) => Left(e)
-    }
-  }
-
-  val status: Int = underlying.status
 
   def filter[A](pf: PartialFunction[Int, Result])(implicit request: AuthRequest[A]): Result =
     status / 100 match {
@@ -60,10 +51,6 @@ trait Response {
       .header("CorrelationId")
       .fold(result)(correlationId => result.withHeaders("X-CorrelationId" -> correlationId))
 
-  def getCorrelationId() : String = {
-    underlying.header("CorrelationId").getOrElse("No Correlation ID")
-  }
-
   def errorMappings: PartialFunction[Int, Result] = empty
 
   private def standardErrorMapping: PartialFunction[Int, Result] = {
@@ -75,7 +62,19 @@ trait Response {
 
   def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean = jsonOrError match {
     case Right(json) => json.asOpt[DesError].exists(errorCode => errorCodes.contains(errorCode.code))
-    case Left(_)     => false
+    case Left(_) => false
+  }
+
+  def jsonOrError: Either[Throwable, JsValue] = {
+    Try(underlying.json) match {
+      case Success(null) => Left(new RuntimeException)
+      case Success(json) => Right(json)
+      case Failure(e) => Left(e)
+    }
+  }
+
+  def getCorrelationId(): String = {
+    underlying.header("CorrelationId").getOrElse("No Correlation ID")
   }
 
 }

@@ -29,8 +29,8 @@ import uk.gov.hmrc.play.config.ServicesConfig
 
 @Singleton
 class MicroserviceAuditConnector @Inject()(configuration: Configuration, env: Environment) extends AuditConnector {
-  val mode = env.mode
   lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(configuration, mode, s"auditing")
+  val mode = env.mode
 }
 
 //
@@ -79,10 +79,10 @@ class MicroserviceAuthConnector @Inject()(
                                          ) extends AuthConnector with PlayAuthConnector with ServicesConfig {
   override val mode = env.mode
   override val runModeConfiguration: Configuration = configuration
-  val authBaseUrl: String = baseUrl("auth")
   override val serviceUrl: String = baseUrl("auth")
+  val authBaseUrl: String = baseUrl("auth")
   //  override lazy val http = WSHttp
-//  override val http: DefaultHttpClient
+  //  override val http: DefaultHttpClient
 }
 
 

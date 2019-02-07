@@ -34,24 +34,24 @@ object Liabilities {
         Liabilities(
           desFinancialData.financialTransactions.filter(_.chargeType != "Payment on account").filter(_.chargeType != "Hybrid Payments")
             .map { l =>
-            val period =
-              if (l.taxPeriodFrom.nonEmpty && l.taxPeriodTo.nonEmpty)
-                Some(TaxPeriod(LocalDate.parse(l.taxPeriodFrom.get), LocalDate.parse(l.taxPeriodTo.get)))
-              else None
+              val period =
+                if (l.taxPeriodFrom.nonEmpty && l.taxPeriodTo.nonEmpty)
+                  Some(TaxPeriod(LocalDate.parse(l.taxPeriodFrom.get), LocalDate.parse(l.taxPeriodTo.get)))
+                else None
 
-            val dueDate = l.items.map(_.exists(_.dueDate.nonEmpty)) match {
-              case Some(result) if result => Some(LocalDate.parse(l.items.get.head.dueDate.get))
-              case _ => None
+              val dueDate = l.items.map(_.exists(_.dueDate.nonEmpty)) match {
+                case Some(result) if result => Some(LocalDate.parse(l.items.get.head.dueDate.get))
+                case _ => None
+              }
+
+              Liability(
+                taxPeriod = period,
+                `type` = l.chargeType,
+                originalAmount = l.originalAmount.get,
+                outstandingAmount = l.outstandingAmount,
+                due = dueDate
+              )
             }
-
-            Liability(
-              taxPeriod = period,
-              `type` = l.chargeType,
-              originalAmount = l.originalAmount.get,
-              outstandingAmount = l.outstandingAmount,
-              due = dueDate
-            )
-          }
         )
       } match {
         case Success(obj) =>
@@ -103,9 +103,9 @@ object Payments {
                   else None
 
                 val payment = Payment(
-                amount = paymentItem.paymentAmount.get,
-                received = paymentItem.clearingDate.map(LocalDate.parse)
-              )
+                  amount = paymentItem.paymentAmount.get,
+                  received = paymentItem.clearingDate.map(LocalDate.parse)
+                )
                 payment.taxPeriod = period
                 payment
             }

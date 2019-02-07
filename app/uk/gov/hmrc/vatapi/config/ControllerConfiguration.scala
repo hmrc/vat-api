@@ -20,7 +20,7 @@ import com.typesafe.config.Config
 import javax.inject.Inject
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.{StringReader, ValueReader}
-import play.api.{Configuration, Play}
+import play.api.Configuration
 import uk.gov.hmrc.play.config.ControllerConfig
 
 import scala.util.matching.Regex

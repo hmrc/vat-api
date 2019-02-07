@@ -20,10 +20,13 @@ import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 trait ImplicitDateTimeFormatter {
+
   implicit class DTFormat(t: DateTime) {
     val format: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
     def toIsoInstant: String = format.print(t)
   }
+
 }
 
 

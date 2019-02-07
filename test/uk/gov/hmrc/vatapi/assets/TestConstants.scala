@@ -24,8 +24,8 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Individual, Organisation}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
-import uk.gov.hmrc.vatapi.models.des.{PaymentIndicator, VatReturn}
-import uk.gov.hmrc.vatapi.models.{Amount, VatReturnDeclaration, des}
+import uk.gov.hmrc.vatapi.models.des.PaymentIndicator
+import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
 
 object TestConstants {
 
@@ -34,7 +34,7 @@ object TestConstants {
 
   object Auth {
 
-    val orgIdentityData  = IdentityData(
+    val orgIdentityData = IdentityData(
       internalId = Some("Int-a7688cda-d983-472d-9971-ddca5f124641"),
       externalId = Some("Ext-c4ebc935-ac7a-4cc2-950a-19e6fac91f2a"),
       agentCode = None,
@@ -123,9 +123,9 @@ object TestConstants {
       finalised = true
     )
 
-    val desVatReturnDeclaration : DateTime =>  des.VatReturnDeclaration = time => vatReturnDeclaration.toDes(arn = Some(testArn)).copy(receivedAt = time)
+    val desVatReturnDeclaration: DateTime => des.VatReturnDeclaration = time => vatReturnDeclaration.toDes(arn = Some(testArn)).copy(receivedAt = time)
 
-    val desVatReturnDeclarationAsJsonString : des.VatReturnDeclaration => String = desVatReturnDeclaration =>
+    val desVatReturnDeclarationAsJsonString: des.VatReturnDeclaration => String = desVatReturnDeclaration =>
       desVatReturnDeclaration.toJsonString
 
     val vatReturnsDes = des.VatReturnsDES(
@@ -185,4 +185,5 @@ object TestConstants {
       timestamp = timestamp.toString
     )
   }
+
 }

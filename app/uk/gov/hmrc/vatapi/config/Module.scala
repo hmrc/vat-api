@@ -17,14 +17,9 @@
 package uk.gov.hmrc.vatapi.config
 
 import com.google.inject.AbstractModule
-import com.google.inject.name.Names
 
 class Module extends AbstractModule {
   def configure() = {
-
-//    bind(classOf[AppConfig]).to(classOf[AppConfig]).asEagerSingleton
-//    bind(classOf[AppConfig]).to(classOf[AppConfigImpl]).asEagerSingleton
-
-//    bind(classOf[AppContext]).toInstance(new AppContext(configuration, environment))
+    //    bind(classOf[AppConfig]).to(classOf[AppConfigImpl]).asEagerSingleton
   }
 }

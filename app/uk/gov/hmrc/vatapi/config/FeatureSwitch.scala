@@ -18,9 +18,6 @@ package uk.gov.hmrc.vatapi.config
 
 import javax.inject.Inject
 import play.api.Configuration
-// TODO FIX THIS
-//import uk.gov.hmrc.vatapi.config.AppContext._
-
 
 case class FeatureSwitch @Inject()(value: Option[Configuration], env: String) {
 

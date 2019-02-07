@@ -22,26 +22,19 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.vatapi.BaseConnector
-import uk.gov.hmrc.vatapi.config.{AppContext}
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.FinancialDataQueryParams
 import uk.gov.hmrc.vatapi.resources.wrappers.FinancialDataResponse
 
 import scala.concurrent.{ExecutionContext, Future}
-
-//object FinancialDataConnector extends FinancialDataConnector {
-//  override val http: WSHttp = WSHttp
-//  override val appContext = AppContext
-//}
 
 class FinancialDataConnector @Inject()(
                                         override val http: DefaultHttpClient,
                                         override val appContext: AppContext
                                       ) extends BaseConnector {
 
-  val logger: Logger = Logger(this.getClass)
-//  val http: WSHttp
-
   private lazy val baseUrl: String = s"${appContext.desUrl}/enterprise/financial-data"
+  val logger: Logger = Logger(this.getClass)
 
   def getFinancialData(vrn: Vrn, params: FinancialDataQueryParams)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FinancialDataResponse] = {
 

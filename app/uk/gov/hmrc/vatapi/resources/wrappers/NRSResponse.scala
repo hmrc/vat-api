@@ -18,6 +18,4 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 
 import uk.gov.hmrc.http.HttpResponse
 
-case class NRSResponse(underlying: HttpResponse) extends Response {
-
-}
+case class NRSResponse(underlying: HttpResponse) extends Response

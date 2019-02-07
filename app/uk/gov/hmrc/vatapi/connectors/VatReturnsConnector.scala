@@ -33,8 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VatReturnsConnector @Inject()(override val appContext: AppContext, override val http: DefaultHttpClient) extends BaseConnector {
 
-//trait VatReturnsConnector extends BaseConnector {
-
   val logger: Logger = Logger(this.getClass)
 
   def post(vrn: Vrn, vatReturn: des.VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[VatReturnResponse] = {

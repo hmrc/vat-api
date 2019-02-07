@@ -38,32 +38,18 @@ import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
 import scala.concurrent.{ExecutionContext, Future}
 
-//object AuthorisationService extends AuthorisationService {
-//  override val apiAuthorisedFunctions: APIAuthorisedFunctions.type = APIAuthorisedFunctions
-//}
-
 class AuthorisationService @Inject()(
                                       apiAuthorisedFunctions: APIAuthorisedFunctions,
                                       appContext: AppContext
                                     ) {
   type AuthResult = Either[Result, AuthContext]
 
-//  val apiAuthorisedFunctions: APIAuthorisedFunctions
   private lazy val vatAuthEnrolments = appContext.vatAuthEnrolments
 
   val logger = Logger(this.getClass)
 
   def authCheck(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
     authoriseAsClient(vrn)
-
-  def authCheckWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
-    authoriseAsClientWithNrsRequirement(vrn)
-
-  def getClientReference(enrolments: Enrolments): Option[String] =
-    enrolments.enrolments
-      .flatMap(_.identifiers)
-      .find(_.key == vatAuthEnrolments.identifier)
-      .map(_.value)
 
   private def authoriseAsClient(vrn: Vrn)(implicit hc: HeaderCarrier,
                                           requestHeader: RequestHeader,
@@ -86,6 +72,31 @@ class AuthorisationService @Inject()(
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
   }
+
+  def getClientReference(enrolments: Enrolments): Option[String] =
+    enrolments.enrolments
+      .flatMap(_.identifiers)
+      .find(_.key == vatAuthEnrolments.identifier)
+      .map(_.value)
+
+  private def unauthorisedError: PartialFunction[Throwable, Future[AuthResult]] = {
+    case _: InsufficientEnrolments =>
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
+      Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
+    case _: InsufficientConfidenceLevel =>
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
+      Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
+    case _: JsResultException =>
+      logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
+      Future.successful(Left(Forbidden(toJson(Errors.InternalServerError))))
+    case exception@_ =>
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
+      Future.successful(Left(InternalServerError(toJson(
+        Errors.InternalServerError("An internal server error occurred")))))
+  }
+
+  def authCheckWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
+    authoriseAsClientWithNrsRequirement(vrn)
 
   private def authoriseAsClientWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier,
                                                             requestHeader: RequestHeader,
@@ -128,21 +139,5 @@ class AuthorisationService @Inject()(
         case _ => logger.error(s"[AuthorisationService] [authoriseAsClientWithNrsRequirement] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(Forbidden(toJson(ClientOrAgentNotAuthorized))))
       } recoverWith unauthorisedError
-  }
-
-  private def unauthorisedError: PartialFunction[Throwable, Future[AuthResult]] = {
-    case _: InsufficientEnrolments =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
-      Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
-    case _: InsufficientConfidenceLevel =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
-      Future.successful(Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized))))
-    case _: JsResultException =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
-      Future.successful(Left(Forbidden(toJson(Errors.InternalServerError))))
-    case exception@_ =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
-      Future.successful(Left(InternalServerError(toJson(
-        Errors.InternalServerError("An internal server error occurred")))))
   }
 }

@@ -17,17 +17,11 @@
 package uk.gov.hmrc.vatapi.auth
 
 import javax.inject.Inject
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.vatapi.config.MicroserviceAuthConnector
-
-
-//object APIAuthorisedFunctions extends APIAuthorisedFunctions
 
 class APIAuthorisedFunctions @Inject()(
                                         override val authConnector: MicroserviceAuthConnector
-                                      ) extends AuthorisedFunctions {
-//trait APIAuthorisedFunctions extends AuthorisedFunctions {
-//  override def authConnector: AuthConnector = MicroserviceAuthConnector
-}
+                                      ) extends AuthorisedFunctions
 
 

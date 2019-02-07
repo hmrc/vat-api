@@ -22,8 +22,8 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import uk.gov.hmrc.vatapi.controllers.definition.JsonFormatters._
 
-@Singleton // TODO Isn't using Singleton bad here and other controllers
-class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition)extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
+@Singleton
+class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition) extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
 
   override def definition() = Action {
     Ok(Json.toJson(vatApiDefinition.definition))
@@ -33,5 +33,3 @@ class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition)exten
     super.at(s"/public/api/conf/$version", file)
   }
 }
-
-//object DocumentationController extends DocumentationController

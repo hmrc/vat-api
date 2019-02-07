@@ -29,24 +29,13 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//object ObligationsResource extends ObligationsResource {
-//  override val connector = ObligationsConnector
-//  override val authService = AuthorisationService
-//  override val appContext = AppContext
-//  override val auditService = AuditService
-//}
-
 @Singleton
 class ObligationsResource @Inject()(
                                      connector: ObligationsConnector,
                                      override val authService: AuthorisationService,
                                      override val appContext: AppContext,
-                                     auditService : AuditService
-                                   )extends BaseResource {
-//trait ObligationsResource extends BaseResource {
-
-//  val connector: ObligationsConnector
-//  val auditService: AuditService
+                                     auditService: AuditService
+                                   ) extends BaseResource {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")

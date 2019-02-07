@@ -39,7 +39,7 @@ case class APIDefinition(
   require(uniqueVersions, s"version numbers must be unique")
   versions.foreach(version => {
     require(version.version.nonEmpty, s"version is required")
-//    require(version.endpoints.nonEmpty, s"at least one endpoint is required")
+    //    require(version.endpoints.nonEmpty, s"at least one endpoint is required")
     version.endpoints.foreach(endpoint => {
       require(endpoint.endpointName.nonEmpty, s"endpointName is required")
       endpoint.queryParameters.getOrElse(Nil).foreach(parameter => {
@@ -73,13 +73,13 @@ case class APIVersion(
 case class Access(`type`: String, whitelistedApplicationIds: Seq[String])
 
 case class Endpoint(uriPattern: String,
-                     endpointName: String,
-                     method: HttpMethod,
-                     authType: AuthType,
-                     throttlingTier: ResourceThrottlingTier,
-                     scope: Option[String] = None,
-                     groupName : GroupName,
-                     queryParameters: Option[Seq[Parameter]] = None)
+                    endpointName: String,
+                    method: HttpMethod,
+                    authType: AuthType,
+                    throttlingTier: ResourceThrottlingTier,
+                    scope: Option[String] = None,
+                    groupName: GroupName,
+                    queryParameters: Option[Seq[Parameter]] = None)
 
 case class Parameter(name: String, required: Boolean = false)
 
