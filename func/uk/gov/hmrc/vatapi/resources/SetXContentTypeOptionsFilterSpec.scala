@@ -1,7 +1,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import uk.gov.hmrc.support.BaseFunctionalSpec
-import uk.gov.hmrc.vatapi.config.SetXContentTypeOptionsFilter
+import uk.gov.hmrc.vatapi.filters.SetXContentTypeOptionsFilter
 
 class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 

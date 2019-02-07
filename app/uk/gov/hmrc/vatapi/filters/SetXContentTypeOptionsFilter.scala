@@ -25,10 +25,14 @@ import scala.concurrent.Future
 
 class SetXContentTypeOptionsFilter @Inject()(implicit val mat: Materializer) extends Filter {
 
-  val xContentTypeOptionsHeader = "X-Content-Type-Options"
+  import SetXContentTypeOptionsFilter._
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
   }
 
+}
+
+object SetXContentTypeOptionsFilter {
+  val xContentTypeOptionsHeader = "X-Content-Type-Options"
 }
