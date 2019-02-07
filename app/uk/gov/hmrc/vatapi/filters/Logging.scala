@@ -16,17 +16,13 @@
 
 package uk.gov.hmrc.vatapi.filters
 
-import akka.stream.Materializer
 import javax.inject.Inject
-import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import akka.stream.Materializer
+import play.api.mvc.Filter
+import uk.gov.hmrc.vatapi.config.ControllerConfiguration
+import uk.gov.hmrc.play.bootstrap.filters.LoggingFilter
 
-class MicroserviceAuthFilter @Inject()(implicit val mat: Materializer) extends Filter {
-
-  def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    f(rh).map(_.as("application/json"))
-  }
-
+class Logging @Inject()(config: ControllerConfiguration)(implicit val mat: Materializer) extends Filter with LoggingFilter {
+  override def controllerNeedsLogging(controllerName: String) = config.paramsForController(controllerName).needsLogging
 }

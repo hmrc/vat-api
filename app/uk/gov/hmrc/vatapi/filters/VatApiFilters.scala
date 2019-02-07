@@ -24,17 +24,17 @@ case class VatApiFilters @Inject()(
                                     agentSimulationFilter: AgentSimulationFilter,
                                     emptyResponseFilter: EmptyResponseFilter,
                                     headerValidatorFilter: HeaderValidatorFilter,
-                                    microserviceAuthFilter: MicroserviceAuthFilter,
                                     setContentTypeFilter: SetContentTypeFilter,
                                     setXContentTypeOptionsFilter: SetXContentTypeOptionsFilter,
+                                    logging: Logging,
                                     defaultFilters: MicroserviceFilters
                                   ) extends DefaultHttpFilters(
   defaultFilters.filters :+
     agentSimulationFilter :+
     emptyResponseFilter :+
     headerValidatorFilter :+
-    microserviceAuthFilter :+
     setContentTypeFilter :+
+    logging :+
     setXContentTypeOptionsFilter: _*)
 
 

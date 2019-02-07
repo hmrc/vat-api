@@ -42,9 +42,6 @@ private object AppDependencies {
 
   val compile = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    // TODO DELETE
-//    "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
-    
     "uk.gov.hmrc" %% "bootstrap-play-25" % bootstrapPlayVersion,
     "uk.gov.hmrc" %% "auth-client" % authClientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,

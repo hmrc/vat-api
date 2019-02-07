@@ -16,15 +16,18 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.{FinancialDataQueryParams, ObligationsQueryParams, OptEither}
 
 import scala.util.{Failure, Success, Try}
 
-object Binders {
+@Singleton
+class Binders @Inject()(implicit val appContext: AppContext){
 
   implicit def vrnBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[Vrn] {
     val vrnRegex = """^\d{9}$"""

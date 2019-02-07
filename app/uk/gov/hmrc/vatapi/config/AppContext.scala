@@ -48,7 +48,6 @@ class AppContext @Inject()(
     config.getString(s"$env.enrolments.auth-rule"))
   lazy val vatHybridFeatureEnabled = config.getBoolean(s"$env.feature-switch.des.hybrid").getOrElse(false)
   override val mode = environment.mode
-  // TODO Check this
   override val runModeConfiguration: Configuration = config
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status").getOrElse(throw new RuntimeException("api.status is not configured"))

@@ -37,7 +37,7 @@ object ObligationsQueryParams {
   val dateRegex = """^\d{4}-\d{2}-\d{2}$"""
   val statusRegex = "^[OF]$"
 
-  def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String]): Either[String, ObligationsQueryParams] = {
+  def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String])(): Either[String, ObligationsQueryParams] = {
     val from = dateQueryParam(fromOpt, "INVALID_DATE_FROM")
     val to = dateQueryParam(toOpt, "INVALID_DATE_TO")
     val status = statusQueryParam(statusOpt, "INVALID_STATUS")

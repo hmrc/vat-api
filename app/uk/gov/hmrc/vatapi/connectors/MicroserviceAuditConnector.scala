@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.auth
+package uk.gov.hmrc.vatapi.connectors
 
-import javax.inject.Inject
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
-import uk.gov.hmrc.vatapi.connectors.MicroserviceAuthConnector
+import javax.inject.{Inject, Singleton}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.audit.http.config.AuditingConfig
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.config.LoadAuditingConfig
 
-class APIAuthorisedFunctions @Inject()(
-                                        override val authConnector: MicroserviceAuthConnector
-                                      ) extends AuthorisedFunctions
-
-
+@Singleton
+class MicroserviceAuditConnector @Inject()(configuration: Configuration, env: Environment) extends AuditConnector {
+  lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(configuration, mode, s"auditing")
+  val mode = env.mode
+}
