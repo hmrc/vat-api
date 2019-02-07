@@ -34,51 +34,32 @@ trait BaseResource extends BaseController {
   lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
   val authService: AuthorisationService
   val appContext: AppContext
+
   val logger: Logger = Logger(this.getClass)
 
-  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = if (nrsRequired) {
-    new ActionBuilder[Request] with ActionFilter[Request] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        Future {
-          None
-        }
-    } andThen AuthActionWithNrsRequirement(vrn)
-  } else {
-    new ActionBuilder[Request] with ActionFilter[Request] {
-      override protected def filter[A](request: Request[A]): Future[Option[Result]] =
-        Future {
-          None
-        }
-    } andThen AuthAction(vrn)
-  }
-
-  def AuthAction(vrn: Vrn) = new ActionRefiner[Request, AuthRequest] {
+  def AuthAction(vrn: Vrn, nrsRequired: Boolean = false) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
 
-    override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
-      if (featureSwitch.isAuthEnabled) {
-        implicit val ev: Request[A] = request
-        authService.authCheck(vrn) map {
-          case Right(authContext) => Right(new AuthRequest(authContext, request))
-          case Left(authError) => Left(authError)
-        }
-      } else
-        Future.successful(Right(new AuthRequest(Organisation(), request)))
+    override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] = {
+      implicit val ev: Request[A] = request
+      (featureSwitch.isAuthEnabled, nrsRequired) match {
+        case (true, false) =>
+          authService.authCheck(vrn) map {
+            case Right(authContext) => Right(new AuthRequest(authContext, request))
+            case Left(authError) => Left(authError)
+          }
+        case (true, true) =>
+          authService.authCheckWithNrsRequirement(vrn) map {
+            case Right(authContext) => Right(new AuthRequest(authContext, request))
+            case Left(authError) => Left(authError)
+          }
+        case (false, _) =>
+          Future.successful (Right (new AuthRequest (Organisation (), request) ) )
+      }
+    }
   }
 
-  def AuthActionWithNrsRequirement(vrn: Vrn): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
-    logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn and retrieve NRS data")
-
-    override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] =
-      if (featureSwitch.isAuthEnabled) {
-        implicit val ev: Request[A] = request
-        authService.authCheckWithNrsRequirement(vrn) map {
-          case Right(authContext) => Right(new AuthRequest(authContext, request))
-          case Left(authError) => Left(authError)
-        }
-      } else
-        Future.successful(Right(new AuthRequest(Organisation(), request)))
-  }
+  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = Action andThen AuthAction(vrn, nrsRequired)
 
   def getRequestDateTimestamp(implicit request: AuthRequest[_]): String = {
     val requestTimestampHeader = "X-Request-Timestamp"
