@@ -18,11 +18,10 @@ package uk.gov.hmrc.vatapi.connectors
 
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
-import play.mvc.Http.{HeaderNames, MimeTypes}
+import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.config.WSHttp
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
 import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
@@ -36,10 +35,10 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
   with MockAppContext {
 
   class Setup {
-    val testObligationsConnector = new ObligationsConnector {
-      override val http: WSHttp = mockHttp
-      override val appContext = mockAppContext
-    }
+    val testObligationsConnector = new ObligationsConnector(mockHttp, mockAppContext)
+//      override val http: WSHttp = mockHttp
+//      override val appContext = mockAppContext
+//    }
     MockAppContext.desUrl returns desBaseUrl
     MockAppContext.desToken returns desToken
     MockAppContext.desEnv returns desEnvironment

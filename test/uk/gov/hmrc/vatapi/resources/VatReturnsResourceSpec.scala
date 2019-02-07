@@ -30,7 +30,6 @@ import uk.gov.hmrc.vatapi.mocks.orchestrators.MockVatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.models.Errors.TaxPeriodNotEnded
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode, VatReturn}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult}
-import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.Future
@@ -41,31 +40,37 @@ class VatReturnsResourceSpec extends ResourceSpec
   with MockAuditService {
 
   class Setup {
-    val resource = new VatReturnsResource{
-      override val connector = mockVatReturnsConnector
-      override val orchestrator = mockVatReturnsOrchestrator
-      override val authService = mockAuthorisationService
-      override val appContext = mockAppContext
-      override val auditService = mockAuditService
-    }
+    val resource = new VatReturnsResource(
+      mockVatReturnsConnector,
+      mockVatReturnsOrchestrator,
+      mockAuthorisationService,
+      mockAppContext,
+      mockAuditService
+    )
+    //      override val connector = mockVatReturnsConnector
+    //      override val orchestrator = mockVatReturnsOrchestrator
+    //      override val authService = mockAuthorisationService
+    //      override val appContext = mockAppContext
+    //      override val auditService = mockAuditService
+    //    }
     mockAuthAction(vrn)
   }
 
   val vatReturnsDeclaration = VatReturnDeclarationFixture.vatReturnDeclaration
   val vatReturnDeclarationJson = VatReturnDeclarationFixture.vatReturnDeclarationJson
 
-  val desVatReturn = VatReturn(periodKey= "#001",
+  val desVatReturn = VatReturn(periodKey = "#001",
     vatDueSales = -3600.15,
     vatDueAcquisitions = 12000.05,
     vatDueTotal = 8399.90,
     vatReclaimedCurrPeriod = 124.15,
-    vatDueNet= 8275.75,
+    vatDueNet = 8275.75,
     totalValueSalesExVAT = 1000,
     totalValuePurchasesExVAT = 200,
     totalValueGoodsSuppliedExVAT = 100,
     totalAllAcquisitionsExVAT = 100,
     agentReferenceNumber = Some("MK001"),
-  receivedAt = Some(DateTime.parse("2018-02-14T09:32:15Z")))
+    receivedAt = Some(DateTime.parse("2018-02-14T09:32:15Z")))
 
   val nrsSubmissionId = "test-sub-id"
   val nrsTimestamp = "test-timestamp"

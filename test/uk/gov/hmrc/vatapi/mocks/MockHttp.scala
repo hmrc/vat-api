@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.vatapi.mocks
 
+import org.mockito.ArgumentCaptor
 import org.mockito.stubbing.OngoingStubbing
-import org.mockito.{ArgumentCaptor, ArgumentMatchers => Matchers}
 import org.scalatest.Suite
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.vatapi.config.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
 trait MockHttp extends Mock { _: Suite =>
 
-  val mockHttp: WSHttp = mock[WSHttp]
+  val mockHttp: DefaultHttpClient = mock[DefaultHttpClient]
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()

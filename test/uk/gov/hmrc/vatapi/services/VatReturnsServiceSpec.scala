@@ -38,9 +38,11 @@ import scala.concurrent.Future
 
 class VatReturnsServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockVatReturnsConnector {
 
-  object TestVatReturnsService extends VatReturnsService {
-    override val vatReturnsConnector: VatReturnsConnector = mockVatReturnsConnector
-  }
+//  object testVatReturnsService extends VatReturnsService {
+//    override val vatReturnsConnector: VatReturnsConnector = mockVatReturnsConnector
+//  }
+
+  val testVatReturnsService = new VatReturnsService(mockVatReturnsConnector)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val testDateTime: DateTime = DateTime.now()
@@ -56,7 +58,7 @@ class VatReturnsServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSug
   "VatReturnsService.submit" when {
 
     lazy val testVrn: Vrn = Vrn("123456789")
-    def result(submission: des.VatReturnDeclaration): Future[VatReturnResponse] = TestVatReturnsService.submit(testVrn, submission)
+    def result(submission: des.VatReturnDeclaration): Future[VatReturnResponse] = testVatReturnsService.submit(testVrn, submission)
 
     "successful responses are returned from the connector" should {
       "return the correctly formatted VatReturnsDes Data model" in {

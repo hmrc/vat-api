@@ -19,12 +19,10 @@ package uk.gov.hmrc.vatapi.connectors
 import nrs.models.NRSSubmission
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status._
-import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
-import uk.gov.hmrc.vatapi.config.WSHttp
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
@@ -36,10 +34,12 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
   with MockHttp
   with MockAppContext {
 
-  object TestNRSConnector extends NRSConnector {
-    override val http: WSHttp = mockHttp
-    override val appContext = mockAppContext
-  }
+//  object testNrsConnector extends NRSConnector {
+//    override val http: DefaultHttpClient = mockHttp
+//    override val appContext = mockAppContext
+//  }
+
+  val testNrsConnector = new NRSConnector(mockHttp, mockAppContext)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -51,8 +51,8 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
 
   "NRSConnector.submit" should {
 
-    lazy val testUrl: String = TestNRSConnector.nrsSubmissionUrl(testVrn.vrn)
-    def result(requestBody: NRSSubmission): Future[NrsSubmissionOutcome] = TestNRSConnector.submit(testVrn, requestBody)
+    lazy val testUrl: String = testNrsConnector.nrsSubmissionUrl(testVrn.vrn)
+    def result(requestBody: NRSSubmission): Future[NrsSubmissionOutcome] = testNrsConnector.submit(testVrn, requestBody)
 
     "successful responses are returned from the connector" should {
       "return the correctly formatted NRS Data model" in {

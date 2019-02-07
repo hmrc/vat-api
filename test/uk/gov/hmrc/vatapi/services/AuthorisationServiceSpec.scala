@@ -20,6 +20,7 @@ import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.Configuration
 import play.api.http.HeaderNames
 import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
@@ -32,7 +33,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.testVrn
-import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
+import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, VATAuthEnrolments}
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
@@ -42,9 +44,21 @@ import scala.util.Right
 
 class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockAPIAuthorisedFunctions {
 
-  object TestAuthorisationService extends AuthorisationService {
-    override val apiAuthorisedFunctions: APIAuthorisedFunctions = mockAPIAuthorisedFunctions
-  }
+//  object testAuthorisationService extends AuthorisationService {
+//    override val apiAuthorisedFunctions: APIAuthorisedFunctions = mockAPIAuthorisedFunctions
+//  }
+
+  val mockAppContext = mock[AppContext]
+
+//  def mockAuthAction(vrn: Vrn, authEnabled: Boolean = false) = {
+//    val config = Configuration("auth.enabled" -> authEnabled)
+//    when(mockAppContext.featureSwitch)
+//      .thenReturn(Some(config))
+//  }
+
+  when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN"))
+
+  val testAuthorisationService = new AuthorisationService(mockAPIAuthorisedFunctions, mockAppContext)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val testDateTime: DateTime = DateTime.now()
@@ -67,35 +81,35 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContextWithNrsData)
       }
     }
 
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
       }
     }
 
     "verify the auth with invalid client confidenceLevel details" should {
       "should reject the client " in {
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
       }
     }
@@ -103,7 +117,7 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
       "reject the client" in {
         setupMockAuthorisationException(new JsResultException(errors = Seq()))
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
         Left(Forbidden(toJson(Errors.InternalServerError)))
       }
     }
@@ -111,7 +125,7 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with unexpected auth error" should {
       "should reject the client " in {
         setupMockAuthorisationException(new UnsupportedAuthProvider)
-        extractAwait(TestAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
       }
     }
@@ -126,35 +140,35 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
       }
     }
 
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()
-        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
       }
     }
 
     "verify the auth with invalid client confidenceLevel details" should {
       "should reject the client " in {
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
-        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
       }
     }
@@ -162,7 +176,7 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
       "reject the client" in {
         setupMockAuthorisationException(new JsResultException(errors = Seq()))
-        extractAwait(TestAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
         Left(Forbidden(toJson(Errors.InternalServerError)))
       }
     }
@@ -170,7 +184,7 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     "verify the auth with unexpected auth error" should {
       "should reject the client " in {
         setupMockAuthorisationException(new UnsupportedAuthProvider)
-        extractAwait(TestAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
           Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
       }
     }
@@ -179,9 +193,33 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
   "TestAuthorisationService.getClientReference" should {
     "return client vrn" when {
       "passed the enrolments" in {
-        val clientRef = TestAuthorisationService.getClientReference(Enrolments(Set(vatEnrolment)))
+        val clientRef = testAuthorisationService.getClientReference(Enrolments(Set(vatEnrolment)))
         assert(clientRef == Some(testVrn))
       }
     }
   }
 }
+
+/*
+def getClientReference(enrolments: Enrolments): Option[String] =
+    enrolments.enrolments
+      .flatMap(_.identifiers)
+      .find(_.key == vatAuthEnrolments.identifier)
+      .map(_.value)
+
+
+  case class Enrolments(enrolments: Set[Enrolment]) {
+
+    def getEnrolment(key: String): Option[Enrolment] = enrolments.find(_.key.equalsIgnoreCase(key))
+
+  }
+
+
+      val vatEnrolment =
+      Enrolment(
+        key = "HMRC-MTD-VAT",
+        identifiers = Seq(EnrolmentIdentifier(key = "VRN", value = testVrn)),
+        state = "Activated"
+      )
+
+ */
