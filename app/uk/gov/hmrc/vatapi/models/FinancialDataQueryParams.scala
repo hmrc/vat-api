@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
-import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.config.{AppContext, FixedConfig}
 
 import scala.util.Try
 
@@ -26,10 +26,10 @@ case class FinancialDataQueryParams(from: LocalDate, to: LocalDate) {
   val map: Map[SourceId, LocalDate] = Map("from" -> from, "to" -> to)
 }
 
-object FinancialDataQueryParams {
+object FinancialDataQueryParams extends FixedConfig {
   val dateRegex: SourceId = """^\d{4}-\d{2}-\d{2}$"""
 
-  def from(fromOpt: OptEither[String], toOpt: OptEither[String])(implicit appContext: AppContext): Either[String, FinancialDataQueryParams] = {
+  def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
 
     val from = checkMinFromDate(dateQueryParam(fromOpt, "DATE_FROM_INVALID"))
     val to = checkFutureToDate(dateQueryParam(toOpt, "DATE_TO_INVALID"))
@@ -75,8 +75,8 @@ object FinancialDataQueryParams {
       }
   }
 
-  def checkMinFromDate(date: OptEither[LocalDate])(implicit appContext: AppContext): OptEither[LocalDate] = {
-    val minDate: LocalDate = LocalDate.parse(appContext.mtdDate, ISODateTimeFormat.date())
+  def checkMinFromDate(date: OptEither[LocalDate]): OptEither[LocalDate] = {
+    val minDate: LocalDate = LocalDate.parse(mtdDate, ISODateTimeFormat.date())
     val out = date match {
       case Some(value) =>
         value match {

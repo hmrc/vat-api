@@ -26,7 +26,7 @@ import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 class AppContext @Inject()(
                             config: Configuration,
                             environment: Environment
-                          ) extends ServicesConfig {
+                          ) extends ServicesConfig with FixedConfig {
   lazy val desEnv: String = config.getString(s"$env.microservice.services.des.env").getOrElse(throw new RuntimeException("desEnv is not configured"))
   lazy val desToken: String = config.getString(s"$env.microservice.services.des.token").getOrElse(throw new RuntimeException("desEnv is not configured"))
   lazy val appName: String = config.getString("appName").getOrElse(throw new RuntimeException("appName is not configured"))
@@ -41,7 +41,6 @@ class AppContext @Inject()(
   lazy val featureSwitch: Option[Configuration] = config.getConfig(s"$env.feature-switch")
   lazy val auditEnabled: Boolean = config.getBoolean(s"auditing.enabled").getOrElse(true)
   lazy val authEnabled: Boolean = config.getBoolean(s"$env.microservice.services.auth.enabled").getOrElse(true)
-  lazy val mtdDate: String = config.getString(s"$env.mtd-date").getOrElse(throw new RuntimeException("mtd-date is not configured"))
   lazy val xApiKey: String = config.getString(s"$env.access-keys.xApiKey").getOrElse(throw new RuntimeException("X-API-Key is not configured"))
   lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString(s"$env.enrolments.key").getOrElse(throw new RuntimeException("enrolments.key is not configured")),
     config.getString(s"$env.enrolments.identifier").getOrElse(throw new RuntimeException("identifier is not configured")),
@@ -51,4 +50,8 @@ class AppContext @Inject()(
   override val runModeConfiguration: Configuration = config
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status").getOrElse(throw new RuntimeException("api.status is not configured"))
+}
+
+trait FixedConfig {
+  val mtdDate = "2016-04-06"
 }
