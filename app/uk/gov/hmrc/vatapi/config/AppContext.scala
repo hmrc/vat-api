@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.config
 
+import com.typesafe.config.ConfigFactory
 import javax.inject.{Inject, Singleton}
 import play.api.Play._
 import play.api.{Configuration, Environment}
@@ -53,5 +54,5 @@ class AppContext @Inject()(
 }
 
 trait FixedConfig {
-  val mtdDate = "2018-04-06"
+  val mtdDate = ConfigFactory.load().getString("mtd-date")
 }
