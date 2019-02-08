@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -29,20 +30,14 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object VatReturnsResource extends VatReturnsResource {
-
-  override val connector: VatReturnsConnector = VatReturnsConnector
-  override val orchestrator: VatReturnsOrchestrator = VatReturnsOrchestrator
-  override val authService: AuthorisationService = AuthorisationService
-  override val appContext: AppContext = AppContext
-  override val auditService = AuditService
-}
-
-trait VatReturnsResource extends BaseResource {
-
-  val connector: VatReturnsConnector
-  val orchestrator: VatReturnsOrchestrator
-  val auditService: AuditService
+@Singleton
+class VatReturnsResource @Inject()(
+                                    connector: VatReturnsConnector,
+                                    orchestrator: VatReturnsOrchestrator,
+                                    override val authService: AuthorisationService,
+                                    override val appContext: AppContext,
+                                    auditService: AuditService
+                                  ) extends BaseResource {
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"
@@ -54,7 +49,9 @@ trait VatReturnsResource extends BaseResource {
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
-        response <- BusinessResult { orchestrator.submitVatReturn(vrn, vatReturn) }
+        response <- BusinessResult {
+          orchestrator.submitVatReturn(vrn, vatReturn)
+        }
       } yield response
     } onSuccess { response =>
       response.filter {

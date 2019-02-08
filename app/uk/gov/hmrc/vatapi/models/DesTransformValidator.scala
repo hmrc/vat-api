@@ -21,11 +21,11 @@ trait DesTransformValidator[S, D] {
 }
 
 object DesTransformValidator {
-  def apply[S, D](implicit v: DesTransformValidator[S, D]) : DesTransformValidator[S, D] = implicitly
+  def apply[S, D](implicit v: DesTransformValidator[S, D]): DesTransformValidator[S, D] = implicitly
 }
 
 trait DesTransformError {
-  val msg : String
+  val msg: String
 }
 
 

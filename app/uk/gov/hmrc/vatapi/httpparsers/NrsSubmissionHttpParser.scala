@@ -41,17 +41,18 @@ object NrsSubmissionHttpParser {
               logger.warn(s"[NrsSubmissionHttpParser][#reads] - Error reading NRS Response: $invalid")
               Left(NrsError)
             },
-            valid =>{
+            valid => {
               logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS Data: $valid")
               Right(valid)
             }
           )
         case e =>
-              logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
-              Right(EmptyNrsData)
+          logger.debug(s"[NrsSubmissionHttpParser][#reads] - Retrieved NRS status : $e")
+          Right(EmptyNrsData)
       }
     }
   }
+
 }
 
 sealed trait NrsSubmissionFailure
@@ -60,7 +61,8 @@ case class NRSData(nrSubmissionId: String,
                    cadesTSignature: String,
                    timestamp: String
                   )
-object EmptyNrsData extends NRSData("","This has been deprecated - DO NOT USE","")
+
+object EmptyNrsData extends NRSData("", "This has been deprecated - DO NOT USE", "")
 
 object NRSData {
   implicit val writes: Writes[NRSData] = Json.writes[NRSData]

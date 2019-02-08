@@ -23,7 +23,7 @@ object EnumJson {
 
   def enumReads[E <: Enumeration](enum: E, valueMissingMessage: Option[String] = None): Reads[E#Value] = new Reads[E#Value] {
 
-    def defaultValueMissingMessage(s: String)= s"Enumeration expected of type: '${enum.getClass}', but it does not contain '$s'"
+    def defaultValueMissingMessage(s: String) = s"Enumeration expected of type: '${enum.getClass}', but it does not contain '$s'"
 
     def reads(json: JsValue): JsResult[E#Value] = json match {
       case JsString(s) =>

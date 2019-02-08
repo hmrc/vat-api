@@ -21,7 +21,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
@@ -30,12 +30,12 @@ import scala.concurrent.Future
 import scala.util.Right
 
 trait BaseResource extends BaseController {
+
+  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
   val authService: AuthorisationService
   val appContext: AppContext
 
   val logger: Logger = Logger(this.getClass)
-
-  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch)
 
   def AuthAction(vrn: Vrn, nrsRequired: Boolean = false) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")

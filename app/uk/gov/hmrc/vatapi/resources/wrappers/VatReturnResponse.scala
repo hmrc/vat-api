@@ -19,14 +19,15 @@ package uk.gov.hmrc.vatapi.resources.wrappers
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
+import play.api.mvc.Results._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, VatReturn, des}
-import uk.gov.hmrc.vatapi.resources.VatReturnsResource.Forbidden
 
 case class VatReturnResponse(underlying: HttpResponse) extends Response {
+
+  var nrsData: NRSData = _
 
   def vatReturnOrError: Either[DesTransformError, VatReturn] = {
 
@@ -53,8 +54,10 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     }
   }
 
-  var nrsData: NRSData = _
-  def withNrsData(data: NRSData): VatReturnResponse = {nrsData = data; this}
+  def withNrsData(data: NRSData): VatReturnResponse = {
+    nrsData = data;
+    this
+  }
 
   override def errorMappings: PartialFunction[Int, Result] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))

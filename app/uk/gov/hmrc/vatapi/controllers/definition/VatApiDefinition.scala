@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
@@ -24,13 +25,41 @@ import uk.gov.hmrc.vatapi.controllers.definition.GroupName._
 import uk.gov.hmrc.vatapi.controllers.definition.HttpMethod._
 import uk.gov.hmrc.vatapi.controllers.definition.ResourceThrottlingTier._
 
-class VatApiDefinition {
+@Singleton
+class VatApiDefinition @Inject()(appContext: AppContext) {
 
+  lazy val definition: Definition =
+    Definition(
+      scopes = Seq(
+        Scope(
+          key = readScope,
+          name = "View your VAT information",
+          description = "Allow read access to VAT data"
+        ),
+        Scope(
+          key = writeScope,
+          name = "Change your VAT information",
+          description = "Allow write access to VAT data"
+        )
+      ),
+      api = APIDefinition(
+        name = "VAT (MTD)",
+        description =
+          "An API for providing VAT data",
+        context = appContext.apiGatewayRegistrationContext,
+        versions = Seq(
+          APIVersion(
+            version = "1.0",
+            access = buildWhiteListingAccess(),
+            status = buildAPIStatus("1.0"),
+            endpoints = allEndpoints,
+            endpointsEnabled = true
+          )
+        ),
+        requiresTrust = None
+      )
+    )
   val logger: Logger = Logger(this.getClass)
-
-  private val readScope = "read:vat"
-  private val writeScope = "write:vat"
-
   val vatEndpoints: Seq[Endpoint] = {
     Seq(
       Endpoint(
@@ -55,8 +84,8 @@ class VatApiDefinition {
           Parameter("to", true),
           Parameter("status", true)
         )))
-        ,
-        Endpoint(
+      ,
+      Endpoint(
         uriPattern = "/{vrn}/returns",
         endpointName = "Retrieve submitted VAT returns",
         method = GET,
@@ -79,44 +108,12 @@ class VatApiDefinition {
       )
     )
   }
-
-
+  private val readScope = "read:vat"
+  private val writeScope = "write:vat"
   private val allEndpoints = vatEndpoints
 
-  lazy val definition: Definition =
-    Definition(
-      scopes = Seq(
-        Scope(
-          key = readScope,
-          name = "View your VAT information",
-          description = "Allow read access to VAT data"
-        ),
-        Scope(
-          key = writeScope,
-          name = "Change your VAT information",
-          description = "Allow write access to VAT data"
-        )
-      ),
-      api = APIDefinition(
-        name = "VAT (MTD)",
-        description =
-          "An API for providing VAT data",
-        context = AppContext.apiGatewayRegistrationContext,
-        versions = Seq(
-          APIVersion(
-            version = "1.0",
-            access = buildWhiteListingAccess(),
-            status = buildAPIStatus("1.0"),
-            endpoints = allEndpoints,
-            endpointsEnabled = true
-          )
-        ),
-        requiresTrust = None
-      )
-    )
-
   private def buildAPIStatus(version: String): APIStatus = {
-    AppContext.apiStatus(version) match {
+    appContext.apiStatus(version) match {
       case "ALPHA" => APIStatus.ALPHA
       case "BETA" => APIStatus.BETA
       case "STABLE" => APIStatus.STABLE
@@ -128,7 +125,7 @@ class VatApiDefinition {
   }
 
   private def buildWhiteListingAccess(): Option[Access] = {
-    val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
+    val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
     featureSwitch.isWhiteListingEnabled match {
       case true =>
         Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds))
@@ -136,5 +133,3 @@ class VatApiDefinition {
     }
   }
 }
-
-object VatApiDefinition extends VatApiDefinition

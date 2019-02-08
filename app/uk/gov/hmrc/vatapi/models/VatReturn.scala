@@ -19,17 +19,17 @@ package uk.gov.hmrc.vatapi.models
 import play.api.libs.json._
 
 case class VatReturn(
-  periodKey: String,
-  vatDueSales: Amount,
-  vatDueAcquisitions: Amount,
-  totalVatDue: Amount,
-  vatReclaimedCurrPeriod: Amount,
-  netVatDue: Amount,
-  totalValueSalesExVAT: Amount,
-  totalValuePurchasesExVAT: Amount,
-  totalValueGoodsSuppliedExVAT: Amount,
-  totalAcquisitionsExVAT: Amount
-)
+                      periodKey: String,
+                      vatDueSales: Amount,
+                      vatDueAcquisitions: Amount,
+                      totalVatDue: Amount,
+                      vatReclaimedCurrPeriod: Amount,
+                      netVatDue: Amount,
+                      totalValueSalesExVAT: Amount,
+                      totalValuePurchasesExVAT: Amount,
+                      totalValueGoodsSuppliedExVAT: Amount,
+                      totalAcquisitionsExVAT: Amount
+                    )
 
 object VatReturn {
 

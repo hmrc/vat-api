@@ -49,19 +49,19 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatObligationsAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatObligationsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
 
     AuditEvent(
-        auditType = "retrieveVatObligations",
-        transactionName = "retrieve-vat-obligations",
-        detail = Map(
-          "X-CorrelationId" -> correlationId,
-          "userType" -> userType
-        ) ++ agentRef(arn)
+      auditType = "retrieveVatObligations",
+      transactionName = "retrieve-vat-obligations",
+      detail = Map(
+        "X-CorrelationId" -> correlationId,
+        "userType" -> userType
+      ) ++ agentRef(arn)
     )
   }
 
-  def retrieveVatReturnsAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatReturnsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
 
     AuditEvent(
       auditType = "retrieveVatReturns",
@@ -73,7 +73,7 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatLiabilitiesAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatLiabilitiesAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
 
     AuditEvent(
       auditType = "retrieveVatLiabilities",
@@ -85,7 +85,7 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatPaymentsAudit(correlationId: String, userType:String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatPaymentsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
 
     AuditEvent(
       auditType = "retrieveVatPayments",

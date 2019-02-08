@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.vatapi.models.des
 
-import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.json.{Json, Format}
-import uk.gov.hmrc.vatapi.models
+import org.joda.time.DateTime
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.vatapi.models.Amount
 import uk.gov.hmrc.vatapi.models.dateTimeFormat
 

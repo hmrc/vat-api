@@ -24,10 +24,10 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.controllers.RestFormats
 import uk.gov.hmrc.vatapi.models.isoInstantDateFormat
 
-case class NRSSubmission( payload: String,
-                          metadata: Metadata )
+case class NRSSubmission(payload: String,
+                         metadata: Metadata)
 
-object NRSSubmission{
+object NRSSubmission {
   implicit val mdFormat: OFormat[Metadata] = Metadata.format
   implicit val format: OFormat[NRSSubmission] = Json.format[NRSSubmission]
 }
@@ -43,7 +43,7 @@ case class Metadata(businessId: String,
                     headerData: JsValue,
                     searchKeys: SearchKeys)
 
-object Metadata{
+object Metadata {
   implicit val idformat: OFormat[IdentityData] = IdentityData.format
   implicit val format: OFormat[Metadata] = Json.format[Metadata]
 }
@@ -88,7 +88,7 @@ case class SearchKeys(vrn: Option[Vrn] = None,
                       periodKey: Option[String] = None
                      )
 
-object SearchKeys{
+object SearchKeys {
   implicit val localDateFormat: Format[LocalDate] = RestFormats.localDateFormats
   implicit val format: OFormat[SearchKeys] = Json.format[SearchKeys]
 }

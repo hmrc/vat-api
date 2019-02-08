@@ -47,22 +47,19 @@ case class VatReturnDeclaration(
 }
 
 
-
-private object BigDecimalSerializer extends CustomSerializer[Amount](format => ({
-    case jde: JDecimal => jde.num
-  },
-  {
-    case bd : Amount => JDecimal(bd.setScale(2))
-  }
+private object BigDecimalSerializer extends CustomSerializer[Amount](format => ( {
+  case jde: JDecimal => jde.num
+}, {
+  case bd: Amount => JDecimal(bd.setScale(2))
+}
 ))
 
-private object JodaSerializer extends CustomSerializer[DateTime](format => ({
-    case js: JString => DateTime.parse(js.s)
-  },
-  {
-    case dt: DateTime => {
-      val fmt = ISODateTimeFormat.dateTime()
-      JString(dt.toString(fmt))
-    }
+private object JodaSerializer extends CustomSerializer[DateTime](format => ( {
+  case js: JString => DateTime.parse(js.s)
+}, {
+  case dt: DateTime => {
+    val fmt = ISODateTimeFormat.dateTime()
+    JString(dt.toString(fmt))
   }
+}
 ))

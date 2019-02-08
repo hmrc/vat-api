@@ -24,7 +24,7 @@ import scala.util.Try
 case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: Option[String] = None) {
   val map = Map("from" -> from, "to" -> to, "status" -> status)
 
-  def queryString: String ={
+  def queryString: String = {
     status match {
       case None | Some("") => s"from=$from&to=$to"
       case Some(status) => s"from=$from&to=$to&status=$status"
@@ -37,10 +37,10 @@ object ObligationsQueryParams {
   val dateRegex = """^\d{4}-\d{2}-\d{2}$"""
   val statusRegex = "^[OF]$"
 
-  def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String]): Either[String, ObligationsQueryParams] = {
+  def from(fromOpt: OptEither[String], toOpt: OptEither[String], statusOpt: OptEither[String])(): Either[String, ObligationsQueryParams] = {
     val from = dateQueryParam(fromOpt, "INVALID_DATE_FROM")
     val to = dateQueryParam(toOpt, "INVALID_DATE_TO")
-    val status = statusQueryParam(statusOpt,  "INVALID_STATUS")
+    val status = statusQueryParam(statusOpt, "INVALID_STATUS")
 
     val errors = for {
       paramOpt <- Seq(from, to, status, validDateRange(from, to))

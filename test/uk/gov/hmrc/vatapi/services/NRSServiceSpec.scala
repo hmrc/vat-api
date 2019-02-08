@@ -39,9 +39,7 @@ import scala.concurrent.Future
 
 class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockNRSConnector {
 
-  object TestNRSService extends NRSService {
-    override val nrsConnector: NRSConnector = mockNRSConnector
-  }
+  val testNRSService = new NRSService(mockNRSConnector)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val req: AuthRequest[_] = new AuthRequest(orgAuthContextWithNrsData, FakeRequest().withHeaders(("Authorization", "Bearer test-bearer-token")))
@@ -51,7 +49,7 @@ class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with
   "NRSService.submit" when {
 
     lazy val testVrn: Vrn = Vrn("123456789")
-    def result(submission: VatReturnDeclaration): Future[NrsSubmissionOutcome] = TestNRSService.submit(testVrn, submission)
+    def result(submission: VatReturnDeclaration): Future[NrsSubmissionOutcome] = testNRSService.submit(testVrn, submission)
 
     "successful responses are returned from the connector" should {
       "return the correctly formatted NRS Data model" in {

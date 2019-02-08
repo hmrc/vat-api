@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
@@ -29,19 +30,13 @@ import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FinancialDataResource extends FinancialDataResource {
-  override val connector = FinancialDataConnector
-  override val authService = AuthorisationService
-  override val appContext = AppContext
-  override val auditService = AuditService
-}
-
-trait FinancialDataResource extends BaseResource {
-
-  val connector: FinancialDataConnector
-  val authService: AuthorisationService
-  val appContext: AppContext
-  val auditService: AuditService
+@Singleton
+class FinancialDataResource @Inject()(
+                                       connector: FinancialDataConnector,
+                                       override val authService: AuthorisationService,
+                                       override val appContext: AppContext,
+                                       auditService: AuditService
+                                     ) extends BaseResource {
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 

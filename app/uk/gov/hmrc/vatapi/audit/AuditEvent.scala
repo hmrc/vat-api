@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.vatapi.audit
 
-case class AuditEvent[T] (
-  auditType: String,
-  transactionName: String,
-  detail: T
-)
+case class AuditEvent[T](
+                          auditType: String,
+                          transactionName: String,
+                          detail: T
+                        )

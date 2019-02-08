@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import play.api.mvc.Result
+import uk.gov.hmrc.vatapi.resources.wrappers.Response
+
 import scala.concurrent.{ExecutionContext, Future}
 
 case class DesBusinessResult[R <: Response](businessResult: BusinessResult[R]) {
@@ -26,7 +27,7 @@ case class DesBusinessResult[R <: Response](businessResult: BusinessResult[R]) {
     for {
       desResponseOrError <- businessResult.value
     } yield desResponseOrError match {
-      case Left(errors)       => handleErrors(errors)
+      case Left(errors) => handleErrors(errors)
       case Right(desResponse) => handleSuccess(desResponse)
     }
 

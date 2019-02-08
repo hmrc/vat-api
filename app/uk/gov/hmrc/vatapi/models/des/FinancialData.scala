@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.models.des
 
-import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.vatapi.models.Amount
 
@@ -36,28 +35,28 @@ object FinancialData {
 }
 
 case class FinancialTransaction(
-                                  chargeType: String,
-                                  mainType: Option[String] = None,
-                                  periodKey: Option[String] = None,
-                                  periodKeyDescription: Option[String] = None,
-                                  taxPeriodFrom: Option[String] = None,
-                                  taxPeriodTo: Option[String] = None,
-                                  businessPartner: Option[String] = None,
-                                  contractAccountCategory: Option[String] = None,
-                                  contractAccount: Option[String] = None,
-                                  contractObjectType: Option[String] = None,
-                                  contractObject: Option[String] = None,
-                                  sapDocumentNumber: Option[String] = None,
-                                  sapDocumentNumberItem: Option[String] = None,
-                                  chargeReference: Option[String] = None,
-                                  mainTransaction: Option[String] = None,
-                                  subTransaction: Option[String] = None,
-                                  originalAmount: Option[Amount] = Some(BigDecimal(0)),
-                                  outstandingAmount: Option[Amount] = None,
-                                  clearedAmount: Option[Amount] = None,
-                                  accruedInterest: Option[Amount] = None,
-                                  items: Option[Seq[FinancialItem]] = None
-                                )
+                                 chargeType: String,
+                                 mainType: Option[String] = None,
+                                 periodKey: Option[String] = None,
+                                 periodKeyDescription: Option[String] = None,
+                                 taxPeriodFrom: Option[String] = None,
+                                 taxPeriodTo: Option[String] = None,
+                                 businessPartner: Option[String] = None,
+                                 contractAccountCategory: Option[String] = None,
+                                 contractAccount: Option[String] = None,
+                                 contractObjectType: Option[String] = None,
+                                 contractObject: Option[String] = None,
+                                 sapDocumentNumber: Option[String] = None,
+                                 sapDocumentNumberItem: Option[String] = None,
+                                 chargeReference: Option[String] = None,
+                                 mainTransaction: Option[String] = None,
+                                 subTransaction: Option[String] = None,
+                                 originalAmount: Option[Amount] = Some(BigDecimal(0)),
+                                 outstandingAmount: Option[Amount] = None,
+                                 clearedAmount: Option[Amount] = None,
+                                 accruedInterest: Option[Amount] = None,
+                                 items: Option[Seq[FinancialItem]] = None
+                               )
 
 object FinancialTransaction {
   implicit val itemFormat: OFormat[FinancialItem] = FinancialItem.format

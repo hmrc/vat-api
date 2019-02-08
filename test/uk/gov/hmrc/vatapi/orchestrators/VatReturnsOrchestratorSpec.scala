@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi.orchestrators
 
 import cats.data.EitherT
-import org.joda.time.DateTime
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -31,14 +30,13 @@ import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditService}
+import uk.gov.hmrc.vatapi.audit.AuditEvent
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NrsError}
 import uk.gov.hmrc.vatapi.mocks.services.{MockAuditService, MockNRSService, MockVatReturnsService}
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
-import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
 
 import scala.concurrent.Future
 
@@ -52,13 +50,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
   with MockAuditService {
 
   class Test {
-    val orchestrator: VatReturnsOrchestrator = new VatReturnsOrchestrator {
-      override val nrsService: NRSService = mockNrsService
-      override val vatReturnsService: VatReturnsService = mockVatReturnsService
-      override val auditService: AuditService = mockAuditService
-
-      override def submissionTimestamp: DateTime = timestamp
-    }
+    val orchestrator: VatReturnsOrchestrator = new VatReturnsOrchestrator (mockNrsService, mockVatReturnsService, mockAuditService)
   }
 
   val authorisationToken = "Bearer test-bearer-token"

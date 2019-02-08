@@ -28,14 +28,14 @@ object Obligations {
   implicit val writes: Writes[Obligations] = Json.writes[Obligations]
 }
 
-case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, status: String, periodKey : String, received : Option[LocalDate] = None)
+case class Obligation(start: LocalDate, end: LocalDate, due: LocalDate, status: String, periodKey: String, received: Option[LocalDate] = None)
 
 object Obligation {
   implicit val jodaDateWrites: Writes[LocalDate] = new Writes[LocalDate] {
     def writes(d: LocalDate): JsValue = JsString(d.toString())
   }
 
-  implicit val from =  new DesTransformValidator[des.ObligationDetail, Obligation] {
+  implicit val from = new DesTransformValidator[des.ObligationDetail, Obligation] {
     def from(desObligation: des.ObligationDetail) = {
       Try(Obligation(
         start = LocalDate.parse(desObligation.inboundCorrespondenceFromDate),

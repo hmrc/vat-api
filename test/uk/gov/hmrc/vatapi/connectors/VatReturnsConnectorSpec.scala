@@ -26,7 +26,6 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.config.WSHttp
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
@@ -39,10 +38,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
   with MockAppContext {
 
   class Test {
-    val connector = new VatReturnsConnector {
-      override val http: WSHttp = mockHttp
-      override val appContext = mockAppContext
-    }
+    val connector = new VatReturnsConnector (mockAppContext, mockHttp)
     val testDesUrl = "test"
     MockAppContext.desUrl.returns(testDesUrl)
   }
