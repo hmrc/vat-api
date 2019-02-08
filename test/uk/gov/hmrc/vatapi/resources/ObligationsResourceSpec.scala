@@ -36,11 +36,6 @@ class ObligationsResourceSpec extends ResourceSpec
 
   class Setup {
     val testObligationResource = new ObligationsResource (mockObligationsConnector, mockAuthorisationService, mockAppContext, mockAuditService)
-//      override val authService = mockAuthorisationService
-//      override val connector = mockObligationsConnector
-//      override val appContext = mockAppContext
-//      override val auditService = mockAuditService
-//    }
     mockAuthAction(vrn)
   }
 

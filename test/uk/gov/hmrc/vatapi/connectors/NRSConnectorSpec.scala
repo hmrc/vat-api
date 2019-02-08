@@ -34,11 +34,6 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
   with MockHttp
   with MockAppContext {
 
-//  object testNrsConnector extends NRSConnector {
-//    override val http: DefaultHttpClient = mockHttp
-//    override val appContext = mockAppContext
-//  }
-
   val testNrsConnector = new NRSConnector(mockHttp, mockAppContext)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()

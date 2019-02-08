@@ -44,17 +44,7 @@ import scala.util.Right
 
 class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockAPIAuthorisedFunctions {
 
-//  object testAuthorisationService extends AuthorisationService {
-//    override val apiAuthorisedFunctions: APIAuthorisedFunctions = mockAPIAuthorisedFunctions
-//  }
-
   val mockAppContext = mock[AppContext]
-
-//  def mockAuthAction(vrn: Vrn, authEnabled: Boolean = false) = {
-//    val config = Configuration("auth.enabled" -> authEnabled)
-//    when(mockAppContext.featureSwitch)
-//      .thenReturn(Some(config))
-//  }
 
   when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN"))
 
@@ -199,27 +189,3 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
     }
   }
 }
-
-/*
-def getClientReference(enrolments: Enrolments): Option[String] =
-    enrolments.enrolments
-      .flatMap(_.identifiers)
-      .find(_.key == vatAuthEnrolments.identifier)
-      .map(_.value)
-
-
-  case class Enrolments(enrolments: Set[Enrolment]) {
-
-    def getEnrolment(key: String): Option[Enrolment] = enrolments.find(_.key.equalsIgnoreCase(key))
-
-  }
-
-
-      val vatEnrolment =
-      Enrolment(
-        key = "HMRC-MTD-VAT",
-        identifiers = Seq(EnrolmentIdentifier(key = "VRN", value = testVrn)),
-        state = "Activated"
-      )
-
- */

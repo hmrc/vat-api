@@ -35,11 +35,6 @@ class FinancialDataResourceSpec extends ResourceSpec
 
   class Setup {
     val testFinalcialDataResource = new FinancialDataResource (      mockFinancialDataConnector, mockAuthorisationService, mockAppContext , mockAuditService)
-//      override val authService = mockAuthorisationService
-//      override val connector = mockFinancialDataConnector
-//      override val appContext = mockAppContext
-//      override val auditService = mockAuditService
-//    }
     mockAuthAction(vrn)
   }
 

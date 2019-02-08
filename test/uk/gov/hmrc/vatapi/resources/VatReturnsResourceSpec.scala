@@ -47,12 +47,6 @@ class VatReturnsResourceSpec extends ResourceSpec
       mockAppContext,
       mockAuditService
     )
-    //      override val connector = mockVatReturnsConnector
-    //      override val orchestrator = mockVatReturnsOrchestrator
-    //      override val authService = mockAuthorisationService
-    //      override val appContext = mockAppContext
-    //      override val auditService = mockAuditService
-    //    }
     mockAuthAction(vrn)
   }
 

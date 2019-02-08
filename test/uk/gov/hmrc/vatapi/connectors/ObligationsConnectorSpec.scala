@@ -36,9 +36,6 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
 
   class Setup {
     val testObligationsConnector = new ObligationsConnector(mockHttp, mockAppContext)
-//      override val http: WSHttp = mockHttp
-//      override val appContext = mockAppContext
-//    }
     MockAppContext.desUrl returns desBaseUrl
     MockAppContext.desToken returns desToken
     MockAppContext.desEnv returns desEnvironment

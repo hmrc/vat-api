@@ -38,10 +38,6 @@ import scala.concurrent.Future
 
 class VatReturnsServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockVatReturnsConnector {
 
-//  object testVatReturnsService extends VatReturnsService {
-//    override val vatReturnsConnector: VatReturnsConnector = mockVatReturnsConnector
-//  }
-
   val testVatReturnsService = new VatReturnsService(mockVatReturnsConnector)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()

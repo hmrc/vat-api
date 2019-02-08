@@ -51,12 +51,6 @@ class VatReturnsOrchestratorSpec extends UnitSpec
 
   class Test {
     val orchestrator: VatReturnsOrchestrator = new VatReturnsOrchestrator (mockNrsService, mockVatReturnsService, mockAuditService)
-//      override val nrsService: NRSService = mockNrsService
-//      override val vatReturnsService: VatReturnsService = mockVatReturnsService
-//      override val auditService: AuditService = mockAuditService
-//
-//      override def submissionTimestamp: DateTime = timestamp
-//    }
   }
 
   val authorisationToken = "Bearer test-bearer-token"

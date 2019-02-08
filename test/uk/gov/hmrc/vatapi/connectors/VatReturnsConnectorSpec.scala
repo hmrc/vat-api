@@ -39,10 +39,6 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
 
   class Test {
     val connector = new VatReturnsConnector (mockAppContext, mockHttp)
-//      override val http: WSHttp = mockHttp
-//      override val appContext = mockAppContext
-//    }
-
     val testDesUrl = "test"
     MockAppContext.desUrl.returns(testDesUrl)
   }

@@ -39,10 +39,6 @@ import scala.concurrent.Future
 
 class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockNRSConnector {
 
-//  object testNRSService extends NRSService {
-//    override val nrsConnector: NRSConnector = mockNRSConnector
-//  }
-
   val testNRSService = new NRSService(mockNRSConnector)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
