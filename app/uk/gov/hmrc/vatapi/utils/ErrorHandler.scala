@@ -51,12 +51,6 @@ class ErrorHandler @Inject()(
     }
   }
 
-  override protected def onNotFound(request: RequestHeader, message: String): Future[Result] = {
-    super.onNotFound(request, message).map { result =>
-      BadRequest(Json.toJson(Json.obj("Hello" -> "You")))
-    }
-  }
-
   override protected def onBadRequest(request: RequestHeader, error: String): Future[Result] = {
     super.onBadRequest(request, error).map { result =>
       error match {
