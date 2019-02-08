@@ -4,6 +4,7 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
+import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode}
 
 class FinancialDataResourceSpec extends BaseFunctionalSpec {
 

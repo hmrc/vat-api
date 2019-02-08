@@ -59,7 +59,7 @@ class ErrorHandler @Inject()(
         case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid")))
         case "ERROR_INVALID_TO_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
         case "INVALID_STATUS" | "INVALID_DATE_RANGE" => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
-        case _ => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> "BAD_REQUEST")))
+        case error => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
       }
     }
   }
