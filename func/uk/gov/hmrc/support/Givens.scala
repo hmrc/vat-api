@@ -281,22 +281,42 @@ class Givens(httpVerbs: HttpVerbs) {
     }
 
     object vatReturns {
+
       def expectVatReturnSubmissionFor(vrn: Vrn): Givens = {
+          val successBody = s"""
+                               |{
+                               |    "processingDate": "2018-03-01T11:43:43.195Z",
+                               |    "paymentIndicator": "BANK",
+                               |    "formBundleNumber": "891713832155"
+                               |}
+                            """.stripMargin
+
+        vatReturnSubmission(vrn, successBody)
+        givens
+      }
+
+      def expectVatReturnSubmissionWithIncorrectProcessingDateFor(vrn: Vrn): Givens = {
+        val successBody = s"""
+                             |{
+                             |    "processingDate": "2018-03-01T11:43:43Z",
+                             |    "paymentIndicator": "BANK",
+                             |    "formBundleNumber": "891713832155"
+                             |}
+                            """.stripMargin
+
+        vatReturnSubmission(vrn, successBody)
+        givens
+      }
+
+      private def vatReturnSubmission(vrn: Vrn, body: String): Unit = {
         stubFor(
           any(urlMatching(s"/enterprise/return/vat/$vrn"))
             .willReturn(
               aResponse()
                 .withStatus(200)
-                .withBody(s"""
-                             |{
-                             |    "processingDate": "2018-03-01T11:43:43.195Z",
-                             |    "paymentIndicator": "BANK",
-                             |    "formBundleNumber": "891713832155"
-                             |}
-                            """.stripMargin)
+                .withBody(body)
             )
         )
-        givens
       }
 
       def expectVatReturnToFail(vrn: Vrn, code: String, status: Int, reason: String = "Irrelevant"): Givens = {

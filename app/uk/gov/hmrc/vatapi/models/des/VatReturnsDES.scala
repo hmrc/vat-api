@@ -17,9 +17,8 @@
 package uk.gov.hmrc.vatapi.models.des
 
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator.PaymentIndicator
-import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturnsDES(processingDate: DateTime,
                          paymentIndicator: PaymentIndicator,
@@ -27,5 +26,18 @@ case class VatReturnsDES(processingDate: DateTime,
                          chargeRefNumber: Option[String])
 
 object VatReturnsDES {
-  implicit val format: OFormat[VatReturnsDES] = Json.format[VatReturnsDES]
+  implicit val reads: Reads[VatReturnsDES] = {
+    import uk.gov.hmrc.vatapi.models.dateTimeFormat
+    Json.reads[VatReturnsDES]
+  }
+
+  val withIsoDateReads: Reads[VatReturnsDES] = {
+    import uk.gov.hmrc.vatapi.models.defaultDateTimeFormat
+    Json.reads[VatReturnsDES]
+  }
+
+  implicit val writes: Writes[VatReturnsDES] = {
+    import uk.gov.hmrc.vatapi.models.dateTimeFormat
+    Json.writes[VatReturnsDES]
+  }
 }

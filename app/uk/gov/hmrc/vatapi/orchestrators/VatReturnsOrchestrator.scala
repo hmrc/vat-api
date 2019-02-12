@@ -60,20 +60,22 @@ class VatReturnsOrchestrator @Inject()(
           case c: AuthContext => c.agentReference
         }
 
+        val thisSubmissionTimestamp = submissionTimestamp
+
         nrsData match {
           case EmptyNrsData =>
-            vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
+            vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
               response =>
                 auditService.audit(buildSubmitVatReturnAudit(request, response, None, arn))
-                Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
+                Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
           case _ =>
             auditService.audit(buildNrsAudit(vrn, nrsData, request))
 
-            vatReturnsService.submit(vrn, vatReturn.toDes(submissionTimestamp, arn)) map {
+            vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
               response =>
                 auditService.audit(buildSubmitVatReturnAudit(request, response, Some(nrsData.nrSubmissionId), arn))
-                Right(response withNrsData nrsData.copy(timestamp = submissionTimestamp.toIsoInstant))
+                Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
         }
     }

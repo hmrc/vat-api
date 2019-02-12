@@ -57,6 +57,25 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
 
+    "return processing date with milliseconds if DES returns them without" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsVatReturnSuccessFor(vrn)
+        .des().vatReturns.expectVatReturnSubmissionWithIncorrectProcessingDateFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.000Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    }
+
     "allow users to submit VAT returns for non bad_request NRS response" in {
       given()
         .stubAudit
