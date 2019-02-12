@@ -81,7 +81,7 @@ package object models {
           .toBigInt() >= -VAT_MAX_AMOUNT_13_DIGITS.toBigInt && amount
           .toBigInt() <= VAT_MAX_AMOUNT_13_DIGITS.toBigInt)
   val isoInstantDatePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-  val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+  val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   val datePattern = "yyyy-MM-dd"
 
 
@@ -102,6 +102,10 @@ package object models {
 
   implicit val dateTimeFormat: Format[DateTime] = Format[DateTime](
     JodaReads.jodaDateReads(dateTimePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
+  )
+  implicit val defaultDateTimeFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.DefaultJodaDateTimeReads,
     JodaWrites.jodaDateWrites(dateTimePattern)
   )
   private val VAT_MAX_AMOUNT_11_DIGITS = BigDecimal("99999999999.99")

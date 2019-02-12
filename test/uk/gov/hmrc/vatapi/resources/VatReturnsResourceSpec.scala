@@ -23,6 +23,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture
+import uk.gov.hmrc.vatapi.assets.TestConstants
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
@@ -70,7 +71,7 @@ class VatReturnsResourceSpec extends ResourceSpec
   val nrsTimestamp = "test-timestamp"
   val nrsData = NRSData(nrsSubmissionId, "This has been deprecated - DO NOT USE", nrsTimestamp)
 
-  val vatReturnResponseJson = Json.obj("test" -> "json")
+  val vatReturnResponseJson = Json.toJson(TestConstants.VatReturn.vatReturnsDes)
   val vatReturnResponse = VatReturnResponse(HttpResponse(200, Some(vatReturnResponseJson))).withNrsData(nrsData)
   val duplicateSubmissionResponse =
     VatReturnResponse(HttpResponse(

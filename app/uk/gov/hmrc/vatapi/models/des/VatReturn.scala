@@ -19,7 +19,6 @@ package uk.gov.hmrc.vatapi.models.des
 import org.joda.time.DateTime
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.vatapi.models.Amount
-import uk.gov.hmrc.vatapi.models.dateTimeFormat
 
 case class VatReturn(periodKey: String,
                      vatDueSales: Amount,
@@ -35,5 +34,6 @@ case class VatReturn(periodKey: String,
                      receivedAt: Option[DateTime] = None)
 
 object VatReturn {
+  import uk.gov.hmrc.vatapi.models.dateTimeFormat
   implicit val reads: Format[VatReturn] = Json.format[VatReturn]
 }

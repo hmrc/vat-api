@@ -18,12 +18,13 @@ package uk.gov.hmrc.vatapi.resources
 
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsValue, Json, OFormat}
+import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
+import uk.gov.hmrc.vatapi.models.des.VatReturnsDES
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.services.AuthorisationService
@@ -57,12 +58,19 @@ class VatReturnsResource @Inject()(
       response.filter {
         case 200 => response.vatSubmissionReturnOrError match {
           case Right(vatReturnDesResponse) =>
-            logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
-            Created(Json.toJson(vatReturnDesResponse)).withHeaders(
-              receiptId -> response.nrsData.nrSubmissionId,
-              receiptTimestamp -> response.nrsData.timestamp,
-              receiptSignature -> response.nrsData.cadesTSignature
-            )
+            def successResponse(vatReturn: VatReturnsDES) = {
+              logger.debug(s"[VatReturnsResource][submitVatReturn] - Successfully created ")
+              Created(Json.toJson(vatReturn)).withHeaders(
+                receiptId -> response.nrsData.nrSubmissionId,
+                receiptTimestamp -> response.nrsData.timestamp,
+                receiptSignature -> response.nrsData.cadesTSignature)
+            }
+            vatReturnDesResponse.validate[VatReturnsDES] match {
+              case JsSuccess(vatReturn, _) => successResponse(vatReturn)
+              case JsError(errs) =>
+                logger.warn(s"[VatReturnsResource] [submitVatReturn] Could not read response from DES as a Vat Return $errs")
+                InternalServerError(Json.toJson(Errors.InternalServerError))
+            }
         }
       }
     }
