@@ -21,15 +21,17 @@ import org.joda.time.LocalDate
 
 import scala.util.Try
 
-case class ObligationsQueryParams(from: LocalDate, to: LocalDate, status: Option[String] = None) {
+case class ObligationsQueryParams(from: Option[LocalDate], to: Option[LocalDate], status: Option[String] = None) {
   val map = Map("from" -> from, "to" -> to, "status" -> status)
 
   def queryString: String = {
-    status match {
-      case None | Some("") => s"from=$from&to=$to"
-      case Some(status) => s"from=$from&to=$to&status=$status"
 
+    (from, to, status) match {
+      case (Some(fromDate), Some(toDate), Some(statusValue)) => s"from=$fromDate&to=$toDate&status=$statusValue"
+      case (Some(fromDate), Some(toDate), None) => s"from=$fromDate&to=$toDate"
+      case (None, None, Some("O")) => "status=O"
     }
+
   }
 }
 
@@ -42,54 +44,69 @@ object ObligationsQueryParams {
     val to = dateQueryParam(toOpt, "INVALID_DATE_TO")
     val status = statusQueryParam(statusOpt, "INVALID_STATUS")
 
-    val errors = for {
-      paramOpt <- Seq(from, to, status, validDateRange(from, to))
-      param <- paramOpt
-      if param.isLeft
-    } yield param.left.get
-
-    if (errors.isEmpty) {
-      Right(ObligationsQueryParams(from.map(_.right.get).get, to.map(_.right.get).get, status.map(_.right.get)))
-    } else {
-      Left(errors.head)
+    (from, to, status) match {
+      case (None, None, Some(statusE)) => {
+        statusE match {
+          case Right(actualStatus) => {
+            if (actualStatus == "O") {
+              Right(ObligationsQueryParams(from.map(_.right.get), to.map(_.right.get), status.map(_.right.get)))
+            } else {
+              Left("MISSING_DATE_RANGE")
+            }
+          }
+          case _ => Left("INVALID_STATUS")
+        }
+      }
+      case (Some(_), Some(_), _) => {
+        val errors = for {
+          paramOpt <- Seq(from, to, status, validDateRange(from, to))
+          param <- paramOpt
+          if param.isLeft
+        } yield param.left.get
+        if (errors.isEmpty) {
+          Right(ObligationsQueryParams(from.map(_.right.get), to.map(_.right.get), status.map(_.right.get)))
+        } else {
+          Left(errors.head)
+        }
+      }
+      case (None, Some(_), _) => Left("INVALID_DATE_FROM")
+      case (Some(_), None, _) => Left("INVALID_DATE_TO")
+      case _ => Left("INVALID_DATE_FROM")
     }
+
   }
 
 
   private def dateQueryParam(dateOpt: OptEither[String], errorCode: String): OptEither[LocalDate] = {
-    val paramValue = dateOpt match {
+    dateOpt match {
       case Some(value) =>
         val dateString = value.right.get
         if (dateString.matches(dateRegex))
-          Try(Right(LocalDate.parse(dateString))).getOrElse(Left(errorCode))
+          Some(Try(Right(LocalDate.parse(dateString))).getOrElse(Left(errorCode)))
         else
-          Left(errorCode)
-      case None => Left(errorCode)
+          Some(Left(errorCode))
+      case None => None
     }
-    Some(paramValue)
   }
 
 
   private def statusQueryParam(statusOpt: OptEither[String], errorCode: String): OptEither[String] = {
-    val paramValue = statusOpt match {
+    statusOpt match {
       case Some(value) =>
         val status = value.right.get
         if (status.matches(statusRegex))
-          Right(status)
+          Some(Right(status))
         else
-          Left(errorCode)
-      case None => Right("")
+          Some(Left(errorCode))
+      case None => None
     }
-    Some(paramValue)
   }
 
 
   def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]) = {
     for {
-      fromVal <- fromOpt
-      if fromVal.isRight
-      toVal <- toOpt
-      if toVal.isRight
+      fromVal <- fromOpt if fromVal.isRight
+      toVal <- toOpt if toVal.isRight
     } yield
       (fromVal.right.get, toVal.right.get) match {
         case (from, to) if !from.isBefore(to) || from.plusDays(365).isBefore(to) =>

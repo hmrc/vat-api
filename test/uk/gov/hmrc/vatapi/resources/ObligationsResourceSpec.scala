@@ -39,8 +39,8 @@ class ObligationsResourceSpec extends ResourceSpec
     mockAuthAction(vrn)
   }
 
-  val queryParams = ObligationsQueryParams(now.minusDays(7), now, Some("O"))
-  val queryParamsWithNoStatus = ObligationsQueryParams(now.minusDays(7), now)
+  val queryParams = ObligationsQueryParams(Some(now.minusDays(7)), Some(now), Some("O"))
+  val queryParamsWithNoStatus = ObligationsQueryParams(Some(now.minusDays(7)), Some(now))
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
   val desObligationsNoDetailsJson: JsValue = Jsons.Obligations.desResponseWithoutObligationDetails(vrn)
   val clientObligationsJson: JsValue = Jsons.Obligations()
