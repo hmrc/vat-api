@@ -67,13 +67,9 @@ class VatReturnsResource @Inject()(
             }
             vatReturnDesResponse.validate[VatReturnsDES] match {
               case JsSuccess(vatReturn, _) => successResponse(vatReturn)
-              case JsError(_) =>
-                vatReturnDesResponse.validate[VatReturnsDES](VatReturnsDES.withIsoDateReads) match {
-                  case JsSuccess(vatReturn, _) => successResponse(vatReturn)
-                  case JsError(errs) =>
-                    logger.warn(s"[VatReturnsResource] [submitVatReturn] Could not read response from DES as a Vat Return $errs")
-                    InternalServerError(Json.toJson(Errors.InternalServerError))
-                }
+              case JsError(errs) =>
+                logger.warn(s"[VatReturnsResource] [submitVatReturn] Could not read response from DES as a Vat Return $errs")
+                InternalServerError(Json.toJson(Errors.InternalServerError))
             }
         }
       }
