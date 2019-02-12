@@ -1,3 +1,9 @@
+## 12-Feb-2019
+| Change    | Version  | Status                               | Endpoint                            | Details                               
+| :------:  | :------: | :-----------------------------------:| :---------------------------------: | :-----:
+| Improvement  | v1.0     | Testable in Sandbox               | Retrieve obligations                | See note A
+**Note A:** You are now able to retrieve open obligations without supplying a `from` and `to` date range. You can simply supply `status=O` and you will receive all open obligations.    
+
 ## [1.76.0](https://github.com/hmrc/vat-api/releases/tag/v1.76.0) 24-Jan-2018
 * Added additional error for VAT Return submission when made too early
 
