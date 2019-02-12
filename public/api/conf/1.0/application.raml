@@ -73,15 +73,15 @@ traits:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
          from:
-           description: Date from which to return obligations
+           description: Date from which to return obligations. Mandatory unless the status is O.
            type: string
            example: 2017-01-25
-           required: true
+           required: false
          to:
-           description: Date to which to return obligations
+           description: Date to which to return obligations. Mandatory unless the status is O.
            type: string
            example: 2017-01-25
-           required: true
+           required: false
          status:
            description: Which obligation statuses to return (O=Open, F=Fulfilled)
            type: string
