@@ -57,7 +57,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
 
-    "return processing date with milliseconds if DES returns them without" in {
+    "return processing date with milliseconds and no paymentIndicator if DES returns them without" in {
       given()
         .stubAudit
         .userIsFullyAuthorisedForTheNrsDependantResource
@@ -68,7 +68,6 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .withHeaders("Authorization", "Bearer testtoken")
         .thenAssertThat()
         .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.000Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
         .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")

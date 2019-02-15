@@ -130,7 +130,7 @@ object TestConstants {
 
     val vatReturnsDes = des.VatReturnsDES(
       processingDate = DateTime.parse("2018-06-30T01:20"),
-      paymentIndicator = PaymentIndicator.DirectDebit,
+      paymentIndicator = Some(PaymentIndicator.DirectDebit),
       formBundleNumber = "123456789012",
       chargeRefNumber = Some("SKDJGFH9URGT")
     )
