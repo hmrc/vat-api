@@ -22,7 +22,7 @@ import play.api.libs.functional.syntax._
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator.PaymentIndicator
 
 case class VatReturnsDES(processingDate: DateTime,
-                         paymentIndicator: PaymentIndicator,
+                         paymentIndicator: Option[PaymentIndicator],
                          formBundleNumber: String,
                          chargeRefNumber: Option[String])
 
@@ -31,7 +31,7 @@ object VatReturnsDES {
     (
       ((__ \ "processingDate").read[DateTime](uk.gov.hmrc.vatapi.models.dateTimeFormat) or
         (__ \ "processingDate").read[DateTime](uk.gov.hmrc.vatapi.models.defaultDateTimeFormat)) and
-        (__ \ "paymentIndicator").read[PaymentIndicator] and
+        (__ \ "paymentIndicator").readNullable[PaymentIndicator] and
         (__ \ "formBundleNumber").read[String] and
         (__ \ "chargeRefNumber").readNullable[String]
 

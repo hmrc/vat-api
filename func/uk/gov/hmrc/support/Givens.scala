@@ -299,7 +299,6 @@ class Givens(httpVerbs: HttpVerbs) {
         val successBody = s"""
                              |{
                              |    "processingDate": "2018-03-01T11:43:43Z",
-                             |    "paymentIndicator": "BANK",
                              |    "formBundleNumber": "891713832155"
                              |}
                             """.stripMargin
