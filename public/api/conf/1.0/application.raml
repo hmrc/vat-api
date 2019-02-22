@@ -192,6 +192,14 @@ traits:
                       value:
                         code: DATE_RANGE_TOO_LARGE
             404:
+              body:
+                application/json:
+                  type: types.errorResponse
+                  examples:
+                    notFound:
+                      description: The remote endpoint has indicated that no associated data is found
+                      value:
+                        code: NOT_FOUND
       post:
         displayName: Submit VAT return for period
         description: Submit VAT return for period
