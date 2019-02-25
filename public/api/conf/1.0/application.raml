@@ -307,14 +307,14 @@ traits:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
          from:
-           description: Liabilities to return from date
+           description: Liabilities to return from date, the minimum 'from' date is 2017-12-01
            type: string
-           example: 2017-01-25
+           example: 2018-01-25
            required: true
          to:
-           description: Liabilities to return up to date
+           description: Liabilities to return up to date, the maximum 'to' date is the current date
            type: string
-           example: 2017-01-25
+           example: 2018-12-31
            required: true
         responses:
           200:
@@ -344,7 +344,7 @@ traits:
                     value:
                       code: DATE_TO_INVALID
                   invalidDateRange:
-                    description: Invalid date range
+                    description: Invalid date range, must be 1 year or less
                     value:
                       code: DATE_RANGE_INVALID
           404:
@@ -368,14 +368,14 @@ traits:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
          from:
-           description: Payments to return from date
+           description: Payments to return from date, the minimum 'from' date is 2017-12-01
            type: string
-           example: 2017-01-25
+           example: 2018-01-25
            required: true
          to:
-           description: Payments to return up to date
+           description: Payments to return up to date, the maximum 'to' date is the current date
            type: string
-           example: 2017-01-25
+           example: 2018-12-31
            required: true
         responses:
           200:
@@ -405,7 +405,7 @@ traits:
                     value:
                       code: DATE_TO_INVALID
                   invalidDateRange:
-                    description: Invalid date range
+                    description: Invalid date range, must be 1 year or less
                     value:
                       code: DATE_RANGE_INVALID
           404:
