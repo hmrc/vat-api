@@ -4,3 +4,4 @@ It may not be possible to test all scenarios in the sandbox. You can test some s
 
 If you have a specific testing need that is not supported in the sandbox, contact <a href="/developer/support">our support team</a>.
 
+Some APIs may be marked \[test only\]. This means that they are not available for use in production and may change.
