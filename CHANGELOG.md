@@ -1,6 +1,6 @@
 <hr>
 
-## All changes after 12<sup>nd</sup> Feb 2019 can be found within the Wiki page located [here](https://github.com/hmrc/vat-api/wiki/Changelog).
+## All changes after 1<sup>st</sup> Jan 2019 can be found within the Wiki page located [here](https://github.com/hmrc/vat-api/wiki/Changelog).
 
 <hr>
 
