@@ -4,9 +4,6 @@
 
 <hr>
 
-## [1.76.0](https://github.com/hmrc/vat-api/releases/tag/v1.76.0) 24-Jan-2018
-* Added additional error for VAT Return submission when made too early
-
 ## [1.18.0](https://github.com/hmrc/vat-api/releases/tag/v1.18.0) 24-Aug-2018
 * Updated response headers for VAT Return submission
 
