@@ -2,7 +2,9 @@
 
 The MTD VAT API allows software to supply business financial data to HMRC, so that clients can fulfil their obligations.
 
-For more background on the VAT API, see the <a href="/api-documentation/docs/mtd">MTDfB VAT Guide for Vendors</a>.
+For more background on the VAT API, see the <a href="https://developer.service.hmrc.gov.uk/guides/vat-mtd-end-to-end-service-guide/">MTDfB VAT Guide for Vendors</a>.
+
+
 
 ### How it works 
 
