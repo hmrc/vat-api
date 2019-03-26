@@ -70,7 +70,7 @@ traits:
         displayName: Retrieve VAT obligations
         description: Retrieve VAT obligations
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -152,7 +152,7 @@ traits:
           displayName: View VAT Return
           description: Retrieve a submitted VAT return
           (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
-          is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+          is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
           (annotations.scope): "read:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
           responses:
@@ -304,7 +304,7 @@ traits:
         displayName: Retrieve VAT liabilities
         description: Retrieve VAT liabilities
         (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -365,7 +365,7 @@ traits:
         displayName: Retrieve VAT payments
         description: Retrieve VAT payments
         (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
