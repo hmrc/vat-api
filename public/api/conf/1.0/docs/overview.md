@@ -16,4 +16,4 @@ For more background on the VAT API, see the <a href="https://developer.service.h
 
 ### Fraud prevention
 
-We expect it will become compulsory to supply header information for this API from April 2019 to <a href="/api-documentation/docs/reference-guide#fraud-prevention">prevent fraud</a>. We recommend that you include this now.
+It will become compulsory to supply header information for this API from April 2019 to <a href="/api-documentation/docs/fraud-prevention#fraud-prevention">prevent fraud</a>. We recommend that you include this now.
