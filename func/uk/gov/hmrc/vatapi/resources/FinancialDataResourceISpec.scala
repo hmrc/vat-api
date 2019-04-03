@@ -6,7 +6,7 @@ import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
 import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode}
 
-class FinancialDataResourceSpec extends BaseFunctionalSpec {
+class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
   "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
