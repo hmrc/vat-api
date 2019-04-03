@@ -52,10 +52,22 @@ class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
     }
 
     "return error when the from date query parameter is before mtd-date in Config" in {
+      val from = FinancialDataQueryParams.minDate.minusDays(1)
+      val to = FinancialDataQueryParams.minDate
 
-      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(11).toString)), Some(Right(testTime.minusYears(10).toString)))
+      val response = FinancialDataQueryParams.from(Some(Right(from.toString)), Some(Right(to.toString)))
       response.isLeft shouldBe true
       response.left.get shouldBe "DATE_FROM_INVALID"
+    }
+
+    "return success when the from date query parameter is the mtd-date in Config" in {
+      val from = FinancialDataQueryParams.minDate
+      val to = FinancialDataQueryParams.minDate.plusDays(1)
+
+      val response = FinancialDataQueryParams.from(Some(Right(from.toString)), Some(Right(to.toString)))
+      response.isRight shouldBe true
+      response.right.get.from shouldBe from
+      response.right.get.to shouldBe to
     }
 
     "return error when the to date query parameter is missing" in {
@@ -70,10 +82,21 @@ class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
       response.left.get shouldBe "DATE_TO_INVALID"
     }
 
-    "return error when the to date query parameter is a future date" in {
-      val futureDate = LocalDate.now().plusDays(1)
+    "return success when the to date query parameter is the current date" in {
+      val from = LocalDate.now().minusDays(1)
+      val to = LocalDate.now()
 
-      val response = FinancialDataQueryParams.from(Some(Right("2019-03-31")), Some(Right(futureDate.toString("yyyy-MM-dd"))))
+      val response = FinancialDataQueryParams.from(Some(Right(from.toString)), Some(Right(to.toString)))
+      response.isRight shouldBe true
+      response.right.get.from shouldBe from
+      response.right.get.to shouldBe to
+    }
+
+    "return error when the to date query parameter is a future date" in {
+      val from = LocalDate.now()
+      val to  = LocalDate.now().plusDays(1)
+
+      val response = FinancialDataQueryParams.from(Some(Right(from.toString)), Some(Right(to.toString)))
       response.isLeft shouldBe true
       response.left.get shouldBe "DATE_TO_INVALID"
     }

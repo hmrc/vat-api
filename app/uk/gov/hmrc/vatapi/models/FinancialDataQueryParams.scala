@@ -29,7 +29,7 @@ case class FinancialDataQueryParams(from: LocalDate, to: LocalDate) {
 object FinancialDataQueryParams extends FixedConfig {
   val dateRegex: SourceId = """^\d{4}-\d{2}-\d{2}$"""
 
-  private val minDate: LocalDate = LocalDate.parse(mtdDate, ISODateTimeFormat.date())
+  private[models] val minDate: LocalDate = LocalDate.parse(mtdDate, ISODateTimeFormat.date())
 
   def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] =
     from(LocalDate.now, fromOpt, toOpt)
@@ -69,13 +69,11 @@ object FinancialDataQueryParams extends FixedConfig {
   private def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]): Option[Either[SourceId, Unit] with Product with Serializable] = {
 
     for {
-      fromVal <- fromOpt
-      if fromVal.isRight
-      toVal <- toOpt
-      if toVal.isRight
+      fromVal <- fromOpt if fromVal.isRight
+      toVal <- toOpt if toVal.isRight
     } yield
       (fromVal.right.get, toVal.right.get) match {
-        case (from, to) if from.isAfter(to)  || from.plusYears(1).minusDays(1).isBefore(to) =>
+        case (from, to) if from.isAfter(to) || from.plusYears(1).minusDays(1).isBefore(to) =>
           Left("DATE_RANGE_INVALID")
         case _ => Right(()) // object wrapped in Right irrelevant
       }
