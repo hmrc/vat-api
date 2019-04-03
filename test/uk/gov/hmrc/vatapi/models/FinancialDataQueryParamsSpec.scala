@@ -39,12 +39,6 @@ class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
       response.right.get.to shouldEqual LocalDate.parse(testTime.minusDays(1).toString)
     }
 
-    "return an error when the date range is greater than one year" in {
-      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(1).toString)), Some(Right(testTime.toString)))
-      response.isLeft shouldBe true
-      response.left.get shouldBe "DATE_RANGE_INVALID"
-    }
-
     "return error when the from date query parameter is missing" in {
       val response = FinancialDataQueryParams.from(None, Some(Right("2019-03-31")))
       response.isLeft shouldBe true
@@ -84,10 +78,49 @@ class FinancialDataQueryParamsSpec extends UnitSpec with GuiceOneAppPerTest {
       response.left.get shouldBe "DATE_TO_INVALID"
     }
 
-    s"return error when from date is after to date" in {
-      val response = FinancialDataQueryParams.from(Some(Right(testTime.minusYears(1).toString)), Some(Right(testTime.minusYears(1).minusDays(1).toString)))
+    "return error when from date is after to date" in {
+      val now = LocalDate.parse("2018-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2017-01-02")), Some(Right("2017-01-01")))
       response.isLeft shouldBe true
       response.left.get shouldBe "DATE_RANGE_INVALID"
+    }
+
+    "return success when the date range is single day" in {
+      val now = LocalDate.parse("2018-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2017-01-01")), Some(Right("2017-01-01")))
+      response.isRight shouldBe true
+      response.right.get.from shouldBe LocalDate.parse("2017-01-01")
+      response.right.get.to shouldBe LocalDate.parse("2017-01-01")
+    }
+
+    "return error when the date range is more than 365 days" in {
+      val now = LocalDate.parse("2018-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2017-01-01")), Some(Right("2018-01-01")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "DATE_RANGE_INVALID"
+    }
+
+    "return success when the date range is equal to 365 days" in {
+      val now = LocalDate.parse("2018-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2017-01-01")), Some(Right("2017-12-31")))
+      response.isRight shouldBe true
+      response.right.get.from shouldBe LocalDate.parse("2017-01-01")
+      response.right.get.to shouldBe LocalDate.parse("2017-12-31")
+    }
+
+    "return error when the date range is more than 366 days and it is a leap year" in {
+      val now = LocalDate.parse("2021-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2020-01-01")), Some(Right("2021-01-01")))
+      response.isLeft shouldBe true
+      response.left.get shouldBe "DATE_RANGE_INVALID"
+    }
+
+    "return success when the date range is equal to 366 days and it is a leap year" in {
+      val now = LocalDate.parse("2021-01-01")
+      val response = FinancialDataQueryParams.from(now, Some(Right("2020-01-01")), Some(Right("2020-12-31")))
+      response.isRight shouldBe true
+      response.right.get.from shouldBe LocalDate.parse("2020-01-01")
+      response.right.get.to shouldBe LocalDate.parse("2020-12-31")
     }
   }
 

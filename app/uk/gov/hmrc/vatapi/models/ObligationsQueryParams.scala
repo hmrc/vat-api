@@ -103,13 +103,13 @@ object ObligationsQueryParams {
   }
 
 
-  def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]) = {
+  private def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]) = {
     for {
       fromVal <- fromOpt if fromVal.isRight
       toVal <- toOpt if toVal.isRight
     } yield
       (fromVal.right.get, toVal.right.get) match {
-        case (from, to) if !from.isBefore(to) || from.plusDays(365).isBefore(to) =>
+        case (from, to) if from.isAfter(to) || from.plusYears(1).minusDays(1).isBefore(to) =>
           Left("INVALID_DATE_RANGE")
         case _ => Right(()) // object wrapped in Right irrelevant
       }
