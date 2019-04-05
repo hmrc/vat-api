@@ -4,7 +4,7 @@ import play.api.http.Status._
 import uk.gov.hmrc.assets.des.Errors
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
-class ObligationsResourceISpec extends BaseFunctionalSpec {
+class ObligationsResourceSpec extends BaseFunctionalSpec {
 
   "retrieveObligations" should {
 

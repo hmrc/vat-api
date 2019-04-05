@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
-import uk.gov.hmrc.vatapi.config.FixedConfig
+import uk.gov.hmrc.vatapi.config.{AppContext, FixedConfig}
 
 import scala.util.Try
 
@@ -29,16 +29,10 @@ case class FinancialDataQueryParams(from: LocalDate, to: LocalDate) {
 object FinancialDataQueryParams extends FixedConfig {
   val dateRegex: SourceId = """^\d{4}-\d{2}-\d{2}$"""
 
-  private[models] val minDate: LocalDate = LocalDate.parse(mtdDate, ISODateTimeFormat.date())
-
-  def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] =
-    from(LocalDate.now, fromOpt, toOpt)
-
-  // Method to allow simple testing with a specific 'now' date
-  private[models] def from(now: LocalDate, fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
+  def from(fromOpt: OptEither[String], toOpt: OptEither[String]): Either[String, FinancialDataQueryParams] = {
 
     val from = checkMinFromDate(dateQueryParam(fromOpt, "DATE_FROM_INVALID"))
-    val to = checkFutureToDate(now, dateQueryParam(toOpt, "DATE_TO_INVALID"))
+    val to = checkFutureToDate(dateQueryParam(toOpt, "DATE_TO_INVALID"))
 
     val errors = for {
       paramOpt <- Seq(from, to, validDateRange(from, to))
@@ -66,20 +60,23 @@ object FinancialDataQueryParams extends FixedConfig {
     Some(paramValue)
   }
 
-  private def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]): Option[Either[SourceId, Unit] with Product with Serializable] = {
+  def validDateRange(fromOpt: OptEither[LocalDate], toOpt: OptEither[LocalDate]): Option[Either[SourceId, Unit] with Product with Serializable] = {
 
     for {
-      fromVal <- fromOpt if fromVal.isRight
-      toVal <- toOpt if toVal.isRight
+      fromVal <- fromOpt
+      if fromVal.isRight
+      toVal <- toOpt
+      if toVal.isRight
     } yield
       (fromVal.right.get, toVal.right.get) match {
-        case (from, to) if from.isAfter(to) || from.plusYears(1).minusDays(1).isBefore(to) =>
+        case (from, to) if !from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to) =>
           Left("DATE_RANGE_INVALID")
         case _ => Right(()) // object wrapped in Right irrelevant
       }
   }
 
-  private def checkMinFromDate(date: OptEither[LocalDate]): OptEither[LocalDate] = {
+  def checkMinFromDate(date: OptEither[LocalDate]): OptEither[LocalDate] = {
+    val minDate: LocalDate = LocalDate.parse(mtdDate, ISODateTimeFormat.date())
     val out = date match {
       case Some(value) =>
         value match {
@@ -91,11 +88,11 @@ object FinancialDataQueryParams extends FixedConfig {
     Some(out)
   }
 
-  private def checkFutureToDate(now: LocalDate, date: OptEither[LocalDate]): OptEither[LocalDate] = {
+  def checkFutureToDate(date: OptEither[LocalDate]): OptEither[LocalDate] = {
     val out = date match {
       case Some(value) =>
         value match {
-          case Right(d) if d.isAfter(now) => Left("DATE_TO_INVALID")
+          case Right(d) if d.isAfter(LocalDate.now()) => Left("DATE_TO_INVALID")
           case _ => value
         }
       case None => Left("DATE_TO_INVALID")

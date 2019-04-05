@@ -70,34 +70,11 @@ class ObligationsQueryParamsSpec extends UnitSpec {
       response.left.get shouldBe "INVALID_DATE_RANGE"
     }
 
-    "return success when the date range is single day" in {
-      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-01-01")), Some(Right("F")))
-      response.isRight shouldBe true
-      response.right.get shouldBe ObligationsQueryParams(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2017-01-01")), Some("F"))
-    }
 
     "return error when the date range is more than 365 days" in {
-      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2018-01-01")), Some(Right("F")))
+      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2018-01-02")), Some(Right("F")))
       response.isLeft shouldBe true
       response.left.get shouldBe "INVALID_DATE_RANGE"
-    }
-
-    "return success when the date range is equal to 365 days" in {
-      val response = ObligationsQueryParams.from(Some(Right("2017-01-01")), Some(Right("2017-12-31")), Some(Right("F")))
-      response.isRight shouldBe true
-      response.right.get shouldBe ObligationsQueryParams(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2017-12-31")), Some("F"))
-    }
-
-    "return error when the date range is more than 366 days and it is a leap year" in {
-      val response = ObligationsQueryParams.from(Some(Right("2020-01-01")), Some(Right("2021-01-01")), Some(Right("F")))
-      response.isLeft shouldBe true
-      response.left.get shouldBe "INVALID_DATE_RANGE"
-    }
-
-    "return success when the date range is equal to 366 days and it is a leap year" in {
-      val response = ObligationsQueryParams.from(Some(Right("2020-01-01")), Some(Right("2020-12-31")), Some(Right("F")))
-      response.isRight shouldBe true
-      response.right.get shouldBe ObligationsQueryParams(Some(LocalDate.parse("2020-01-01")), Some(LocalDate.parse("2020-12-31")), Some("F"))
     }
 
     "return an object when all the query params are valid" in {
