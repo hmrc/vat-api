@@ -53,11 +53,10 @@ class AuditDetailSpec extends UnitSpec {
       "produce valid json" in {
 
         val jsonResponse = Json.stringify(vatReturnDeclarationJson)
-        
+
         val json = Json.parse(
           s"""
              |{
-             |        "vrn": "$vrn",
              |        "arn": "012345678",
              |        "userType": "Agent",
              |        "X-CorrelationId": "X-123",
@@ -68,7 +67,7 @@ class AuditDetailSpec extends UnitSpec {
              |}
            """.stripMargin)
 
-        val model = AuditDetail("Agent", agentReferenceNumber, vrn.toString(), `X-CorrelationId`, response = responseSuccess)
+        val model = AuditDetail("Agent", agentReferenceNumber, `X-CorrelationId`, response = responseSuccess)
 
         Json.toJson(model) shouldBe json
       }
@@ -79,7 +78,6 @@ class AuditDetailSpec extends UnitSpec {
         val json = Json.parse(
           s"""
              |{
-             |    "vrn": "$vrn",
              |    "userType": "Organisation",
              |    "X-CorrelationId": "X-123",
              |    "response": {
@@ -93,7 +91,7 @@ class AuditDetailSpec extends UnitSpec {
              |}
            """.stripMargin)
 
-        val model = AuditDetail(userType, None, vrn.toString(), `X-CorrelationId`, responseFail)
+        val model = AuditDetail(userType, None, `X-CorrelationId`, responseFail)
 
         Json.toJson(model) shouldBe json
       }

@@ -21,7 +21,6 @@ import play.api.libs.json.{Json, OWrites}
 case class AuditDetail(
                         userType: String,
                         arn: Option[String],
-                        vrn: String,
                         `X-CorrelationId`: String,
                         response: AuditResponse
                       )
