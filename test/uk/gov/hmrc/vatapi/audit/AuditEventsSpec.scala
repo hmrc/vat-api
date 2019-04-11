@@ -19,6 +19,7 @@ package uk.gov.hmrc.vatapi.audit
 import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
+import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 
 class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 

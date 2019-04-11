@@ -21,13 +21,14 @@ import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditEvents, AuditService}
+import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
+import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
-import uk.gov.hmrc.vatapi.services.{NRSService, VatReturnsService}
+import uk.gov.hmrc.vatapi.services.{AuditService, NRSService, VatReturnsService}
 import uk.gov.hmrc.vatapi.utils.ImplicitDateTimeFormatter
 
 import scala.concurrent.ExecutionContext.Implicits.global

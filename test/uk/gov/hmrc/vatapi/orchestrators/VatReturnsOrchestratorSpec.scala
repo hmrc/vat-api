@@ -30,9 +30,9 @@ import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.audit.AuditEvent
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NrsError}
 import uk.gov.hmrc.vatapi.mocks.services.{MockAuditService, MockNRSService, MockVatReturnsService}
+import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
