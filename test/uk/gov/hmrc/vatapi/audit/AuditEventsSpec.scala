@@ -17,15 +17,19 @@
 package uk.gov.hmrc.vatapi.audit
 
 import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
-import uk.gov.hmrc.vatapi.models.audit.AuditEvent
+import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
 
 class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
   val xCorrelationId = "testXCorrelationId"
   val userType = "testUserType"
   val arn = "testArn"
+
+  val vrn = Vrn("someVrn")
+  val auditResponse = AuditResponse(200, None, None)
 
   "nrsAudit event" should {
     "return valid AuditEvent" when {
@@ -108,15 +112,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent" when {
       "all values are supplied" in {
-        val auditEvent = AuditEvents.retrieveVatObligationsAudit(xCorrelationId, userType, Some(arn))
+        val auditEvent = AuditEvents.retrieveVatObligationsAudit(xCorrelationId, userType, Some(arn), auditResponse)
         val expected = AuditEvent(
           "retrieveVatObligations",
           "retrieve-vat-obligations",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType,
-            "agentReferenceNumber" -> arn
-          )
+          AuditDetail(userType, Some(arn), xCorrelationId, auditResponse)
         )
         auditEvent shouldBe expected
       }
@@ -124,14 +124,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent without optional values" when {
       "all values are supplied except arn" in {
-        val auditEvent = AuditEvents.retrieveVatObligationsAudit(xCorrelationId, userType, None)
+        val auditEvent = AuditEvents.retrieveVatObligationsAudit(xCorrelationId, userType, None, auditResponse)
         val expected = AuditEvent(
           "retrieveVatObligations",
           "retrieve-vat-obligations",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType
-          )
+          AuditDetail(userType, None, xCorrelationId, auditResponse)
         )
 
         auditEvent shouldBe expected
@@ -178,15 +175,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent" when {
       "all values are supplied" in {
-        val auditEvent = AuditEvents.retrieveVatLiabilitiesAudit(xCorrelationId, userType, Some(arn))
+        val auditEvent = AuditEvents.retrieveVatLiabilitiesAudit(xCorrelationId, userType, Some(arn), auditResponse)
         val expected = AuditEvent(
           "retrieveVatLiabilities",
           "retrieve-vat-liabilities",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType,
-            "agentReferenceNumber" -> arn
-          )
+          AuditDetail(userType, Some(arn), xCorrelationId, auditResponse)
         )
         auditEvent shouldBe expected
       }
@@ -194,14 +187,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent without optional values" when {
       "all values are supplied except arn" in {
-        val auditEvent = AuditEvents.retrieveVatLiabilitiesAudit(xCorrelationId, userType, None)
+        val auditEvent = AuditEvents.retrieveVatLiabilitiesAudit(xCorrelationId, userType, None, auditResponse)
         val expected = AuditEvent(
           "retrieveVatLiabilities",
           "retrieve-vat-liabilities",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType
-          )
+          AuditDetail(userType, None, xCorrelationId, auditResponse)
         )
 
         auditEvent shouldBe expected
@@ -213,15 +203,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent" when {
       "all values are supplied" in {
-        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, Some(arn))
+        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, Some(arn), auditResponse)
         val expected = AuditEvent(
           "retrieveVatPayments",
           "retrieve-vat-payments",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType,
-            "agentReferenceNumber" -> arn
-          )
+          AuditDetail(userType, Some(arn), xCorrelationId, auditResponse)
         )
         auditEvent shouldBe expected
       }
@@ -229,14 +215,11 @@ class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
 
     "return a valid AuditEvent without optional values" when {
       "all values are supplied except arn" in {
-        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, None)
+        val auditEvent = AuditEvents.retrieveVatPaymentsAudit(xCorrelationId, userType, None, auditResponse)
         val expected = AuditEvent(
           "retrieveVatPayments",
           "retrieve-vat-payments",
-          Map(
-            "X-CorrelationId" -> xCorrelationId,
-            "userType" -> userType
-          )
+          AuditDetail(userType, None, xCorrelationId, auditResponse)
         )
 
         auditEvent shouldBe expected

@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.data.EitherT
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.vatapi.audit.AuditEvents
+import uk.gov.hmrc.vatapi.auth.Organisation
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockObligationsConnector
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, ObligationsQueryParams}
-import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
+import uk.gov.hmrc.vatapi.models.audit.AuditResponse
+import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
+import uk.gov.hmrc.vatapi.resources.wrappers.{ObligationsResponse, Response}
+import v2.models.audit.AuditError
 
 import scala.concurrent.Future
 
@@ -34,76 +38,92 @@ class ObligationsResourceSpec extends ResourceSpec
   with MockAuthorisationService
   with MockAuditService {
 
-  class Setup {
-    val testObligationResource = new ObligationsResource (mockObligationsConnector, mockAuthorisationService, mockAppContext, mockAuditService)
-    mockAuthAction(vrn)
-  }
-
   val queryParams = ObligationsQueryParams(Some(now.minusDays(7)), Some(now), Some("O"))
   val queryParamsWithNoStatus = ObligationsQueryParams(Some(now.minusDays(7)), Some(now))
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
   val desObligationsNoDetailsJson: JsValue = Jsons.Obligations.desResponseWithoutObligationDetails(vrn)
+
+  val enrolments = Enrolments(Set.empty)
+  val arn = "someAgentRefNo"
   val clientObligationsJson: JsValue = Jsons.Obligations()
+
+  val authContext = Organisation(None)
+
+  class Setup {
+    val testObligationResource = new ObligationsResource(mockObligationsConnector, mockAuthorisationService, mockAppContext, mockAuditService)
+    mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
+  }
 
   "retrieveObligations" should {
     "return a 200 and the correct obligations json" when {
       "DES returns a 200 response with the correct obligations body" in new Setup {
-        val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsJson)))
 
-        MockAuditService.audit()
-          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
+        val desResponse = ObligationsResponse(HttpResponse(OK, Some(desObligationsJson)))
 
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
+
+        val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
     "return a 200 and the correct obligations json for no status" when {
       "DES returns a 200 response with the correct obligations body" in new Setup {
-        val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsJson)))
-
-        MockAuditService.audit()
-          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
+        val desResponse = ObligationsResponse(HttpResponse(OK, Some(desObligationsJson)))
 
         MockObligationsConnector.get(vrn, queryParamsWithNoStatus)
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParamsWithNoStatus)(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
+
+        val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
     "return a 404 with no body" when {
       "DES returns a 200 response with the correct obligations body but the obligationDetails are empty" in new Setup {
-        val desResponse = ObligationsResponse(HttpResponse(200, Some(desObligationsNoDetailsJson)))
+        val desResponse = ObligationsResponse(HttpResponse(OK, Some(desObligationsNoDetailsJson)))
 
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 404
+        status(result) shouldBe NOT_FOUND
         contentType(result) shouldBe None
+
+        val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
     "return a 500 with a json body" when {
       "DES returns a 200 response but the body does not match the expected obligations format" in new Setup {
-        val invalidDesResponse = ObligationsResponse(HttpResponse(200, Some(Json.obj("invalid" -> "des json"))))
+        val invalidDesResponse = ObligationsResponse(HttpResponse(OK, Some(Json.obj("invalid" -> "des json"))))
 
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(invalidDesResponse))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+
+        val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(Response.defaultCorrelationId,
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
@@ -114,32 +134,40 @@ class ObligationsResourceSpec extends ResourceSpec
           .returns(Future.failed(new Exception("Connection refused error")))
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-        status(result) shouldBe 500
+        status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+
+        val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(Response.defaultCorrelationId,
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
     "DES returns a 200 response with a non-json body" in new Setup {
-      val nonJsonDesResponse = ObligationsResponse(HttpResponse(200, responseString = Some("non-json")))
+      val nonJsonDesResponse = ObligationsResponse(HttpResponse(OK, responseString = Some("non-json")))
 
       MockObligationsConnector.get(vrn, queryParams)
         .returns(Future.successful(nonJsonDesResponse))
 
       val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-      status(result) shouldBe 500
+      status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+
+      val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+      MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(nonJsonDesResponse.getCorrelationId(),
+        authContext.affinityGroup, None, auditResponse))
     }
 
     "DES returns a 200 response with an empty body" in new Setup {
-      val nonJsonDesResponse = ObligationsResponse(HttpResponse(200))
+      val nonJsonDesResponse = ObligationsResponse(HttpResponse(OK))
 
       MockObligationsConnector.get(vrn, queryParams)
         .returns(Future.successful(nonJsonDesResponse))
 
       val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
-      status(result) shouldBe 500
+      status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
     }

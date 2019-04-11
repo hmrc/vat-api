@@ -17,15 +17,18 @@
 package uk.gov.hmrc.vatapi.mocks.auth
 
 import org.scalatest.Suite
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
-trait MockAuthorisationService extends Mock{ _: Suite =>
+trait MockAuthorisationService extends Mock {
+  _: Suite =>
 
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object MockAuthorisationService {
-
+    def authCheck(vrn: Vrn) =
+      when(mockAuthorisationService.authCheck(eqTo(vrn))(any(),any(),any()))
   }
 
   override protected def beforeEach(): Unit = {

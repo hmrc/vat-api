@@ -46,5 +46,7 @@ trait ResourceSpec extends WordSpec
     val config = Configuration("auth.enabled" -> authEnabled)
     when(mockAppContext.featureSwitch)
       .thenReturn(Some(config))
+
+    MockAuthorisationService.authCheck(vrn)
   }
 }

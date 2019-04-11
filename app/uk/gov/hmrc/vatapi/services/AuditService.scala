@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.services
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
@@ -36,7 +36,7 @@ class AuditService @Inject()(auditConnector: MicroserviceAuditConnector) {
 
   def audit[T](event: AuditEvent[T])(
     implicit hc: HeaderCarrier,
-    fmt: Format[T],
+    fmt: Writes[T],
     request: Request[_],
     ec: ExecutionContext
   ): BusinessResult[Unit] = {

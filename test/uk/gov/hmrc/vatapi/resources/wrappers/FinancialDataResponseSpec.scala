@@ -47,7 +47,7 @@ class FinancialDataResponseSpec extends UnitSpec {
       val response = FinancialDataResponse(HttpResponse(200, Some(Jsons.FinancialData.singleLiabilityDesResponse)))
 
       val liabilities = response.getLiabilities(vrn)
-      liabilities.right.get.liabilities.head.`type` shouldBe "VAT Return Debit Charge"
+      liabilities.right.get.liabilities.head.`type` shouldBe "VAT"
     }
   }
 

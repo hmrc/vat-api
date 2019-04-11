@@ -33,6 +33,10 @@ trait MockAuditService extends Mock { _: Suite =>
     def audit[T](event: AuditEvent[T]): OngoingStubbing[BusinessResult[Unit]] = {
       when(mockAuditService.audit[T](eqTo(event))(any(), any(), any(), any()))
     }
+
+    def verifyAudit[T](event: AuditEvent[T]) = {
+      verify(mockAuditService).audit(eqTo(event))(any(), any(), any(), any())
+    }
   }
 
   override protected def beforeEach(): Unit = {

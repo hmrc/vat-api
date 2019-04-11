@@ -24,6 +24,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture
 import uk.gov.hmrc.vatapi.assets.TestConstants
+import uk.gov.hmrc.vatapi.auth.Organisation
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
@@ -48,7 +49,7 @@ class VatReturnsResourceSpec extends ResourceSpec
       mockAppContext,
       mockAuditService
     )
-    mockAuthAction(vrn)
+    mockAuthAction(vrn).thenReturn(Future.successful(Right(Organisation(None))))
   }
 
   val vatReturnsDeclaration = VatReturnDeclarationFixture.vatReturnDeclaration
