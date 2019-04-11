@@ -18,8 +18,9 @@ package uk.gov.hmrc.vatapi.mocks
 
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Suite
-import uk.gov.hmrc.vatapi.audit.{AuditEvent, AuditService}
+import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 import uk.gov.hmrc.vatapi.resources.BusinessResult
+import uk.gov.hmrc.vatapi.services.AuditService
 
 trait MockAuditService extends Mock { _: Suite =>
 

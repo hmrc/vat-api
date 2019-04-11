@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.mocks.services
+package uk.gov.hmrc.vatapi.models.audit
 
-import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.Suite
-import uk.gov.hmrc.vatapi.mocks.Mock
-import uk.gov.hmrc.vatapi.resources.BusinessResult
-import uk.gov.hmrc.vatapi.services.AuditService
+import play.api.libs.json.Json
+import uk.gov.hmrc.vatapi.UnitSpec
+import v2.models.audit.AuditError
 
-trait MockAuditService extends Mock { _: Suite =>
+class AuditErrorSpec extends UnitSpec {
 
-  val mockAuditService: AuditService = mock[AuditService]
+  private val auditError = AuditError("VRN_INVALID")
 
-  object MockAuditService {
-    def audit(): OngoingStubbing[BusinessResult[Unit]] = {
-      when(mockAuditService.audit(any())(any(), any(), any(), any()))
+  "writes" when {
+    "passed an audit error model" should {
+      "produce valid json" in {
+
+         val json = Json.parse(
+          s"""
+             |{
+             |  "errorCode": "VRN_INVALID"
+             |}
+           """.stripMargin)
+
+        Json.toJson(auditError) shouldBe json
+      }
     }
-  }
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockAuditService)
   }
 }

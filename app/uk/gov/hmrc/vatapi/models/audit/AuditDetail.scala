@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.audit
+package uk.gov.hmrc.vatapi.models.audit
 
-case class AuditEvent[T](
-                          auditType: String,
-                          transactionName: String,
-                          detail: T
-                        )
+import play.api.libs.json.{Json, OWrites}
+
+case class AuditDetail(
+                        userType: String,
+                        arn: Option[String],
+                        `X-CorrelationId`: String,
+                        response: AuditResponse
+                      )
+
+object AuditDetail {
+  implicit val writes: OWrites[AuditDetail] = Json.writes[AuditDetail]
+}
+

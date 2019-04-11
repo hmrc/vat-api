@@ -21,13 +21,13 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
+import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.models.des.VatReturnsDES
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
-import uk.gov.hmrc.vatapi.services.AuthorisationService
+import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

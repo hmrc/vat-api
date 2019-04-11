@@ -22,11 +22,11 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.vatapi.audit.{AuditEvents, AuditService}
+import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
 import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
-import uk.gov.hmrc.vatapi.services.AuthorisationService
+import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
