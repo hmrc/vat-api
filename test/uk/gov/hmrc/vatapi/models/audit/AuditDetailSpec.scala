@@ -52,16 +52,18 @@ class AuditDetailSpec extends UnitSpec {
     "passed an audit detail model with success response" should {
       "produce valid json" in {
 
+        val jsonResponse = Json.stringify(vatReturnDeclarationJson)
+        
         val json = Json.parse(
           s"""
              |{
-             |        "vrn": $vrn,
+             |        "vrn": "$vrn",
              |        "arn": "012345678",
              |        "userType": "Agent",
              |        "X-CorrelationId": "X-123",
              |        "response": {
              |            "httpStatus": 200,
-             |            "payload": $responseSuccess
+             |            "payload": $jsonResponse
              |        }
              |}
            """.stripMargin)
@@ -77,7 +79,7 @@ class AuditDetailSpec extends UnitSpec {
         val json = Json.parse(
           s"""
              |{
-             |    "vrn": $vrn,
+             |    "vrn": "$vrn",
              |    "userType": "Organisation",
              |    "X-CorrelationId": "X-123",
              |    "response": {
