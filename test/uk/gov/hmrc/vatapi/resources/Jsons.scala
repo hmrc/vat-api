@@ -423,6 +423,17 @@ object Jsons {
         |}
       """.stripMargin)
 
+    val missingPaymentDesResponse: JsValue = Json.parse(
+      """
+        |{
+        |	"idType": "VRN",
+        |	"idNumber": "100062914",
+        |	"regimeType": "VATC",
+        |	"processingDate": "2017-05-13T09:30:00.000Z",
+        |	"financialTransactions": []
+        |}
+      """.stripMargin)
+
     val singleLiabilityDesResponse: JsValue = Json.parse(
       """
         |{
@@ -431,12 +442,12 @@ object Jsons {
         |	"regimeType": "VATC",
         |	"processingDate": "2017-03-07T09:30:00.000Z",
         |	"financialTransactions": [{
-        |			"chargeType": "VAT Return Debit Charge",
+        |			"chargeType": "VAT",
         |			"mainType": "2100",
         |			"periodKey": "13RL",
         |			"periodKeyDescription": "abcde",
         |			"taxPeriodFrom": "2017-01-01",
-        |			"taxPeriodTo": "2017-02-01",
+        |			"taxPeriodTo": "2017-03-31",
         |			"businessPartner": "6622334455",
         |			"contractAccountCategory": "02",
         |			"contractAccount": "D",
@@ -452,11 +463,23 @@ object Jsons {
         |			"accruedInterest": 10000,
         |			"items": [{
         |				"subItem": "001",
-        |				"dueDate": "2017-03-08",
+        |				"dueDate": "2018-04-02",
         |				"amount": 463872
         |			}]
         |		}
         |	]
+        |}
+        |
+    """.stripMargin)
+
+    val missingLiabilityDesResponse: JsValue = Json.parse(
+      """
+        |{
+        |	"idType": "VRN",
+        |	"idNumber": "XQIT00000000001",
+        |	"regimeType": "VATC",
+        |	"processingDate": "2017-03-07T09:30:00.000Z",
+        |	"financialTransactions": []
         |}
         |
     """.stripMargin)

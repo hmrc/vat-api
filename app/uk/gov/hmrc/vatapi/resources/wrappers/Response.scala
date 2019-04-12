@@ -30,6 +30,14 @@ import uk.gov.hmrc.vatapi.resources.AuthRequest
 import scala.PartialFunction.{apply => _, _}
 import scala.util.{Failure, Success, Try}
 
+object Response{
+  val defaultCorrelationId = "No Correlation ID"
+
+
+  def getCorrelationId(desResponse: Option[Response]): String =
+    desResponse.map(_.getCorrelationId()).getOrElse(Response.defaultCorrelationId)
+}
+
 trait Response {
 
   val logger: Logger = Logger(this.getClass)
@@ -74,7 +82,7 @@ trait Response {
   }
 
   def getCorrelationId(): String = {
-    underlying.header("CorrelationId").getOrElse("No Correlation ID")
+    underlying.header("CorrelationId").getOrElse(Response.defaultCorrelationId)
   }
 
 }

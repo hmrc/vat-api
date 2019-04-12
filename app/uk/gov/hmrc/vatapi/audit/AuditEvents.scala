@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.audit
 
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
-import uk.gov.hmrc.vatapi.models.audit.AuditEvent
+import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
 
 object AuditEvents {
 
@@ -50,15 +50,11 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatObligationsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
-
+  def retrieveVatObligationsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
     AuditEvent(
       auditType = "retrieveVatObligations",
       transactionName = "retrieve-vat-obligations",
-      detail = Map(
-        "X-CorrelationId" -> correlationId,
-        "userType" -> userType
-      ) ++ agentRef(arn)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
     )
   }
 
@@ -74,27 +70,21 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatLiabilitiesAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatLiabilitiesAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatLiabilities",
       transactionName = "retrieve-vat-liabilities",
-      detail = Map(
-        "X-CorrelationId" -> correlationId,
-        "userType" -> userType
-      ) ++ agentRef(arn)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
     )
   }
 
-  def retrieveVatPaymentsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatPaymentsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatPayments",
       transactionName = "retrieve-vat-payments",
-      detail = Map(
-        "X-CorrelationId" -> correlationId,
-        "userType" -> userType
-      ) ++ agentRef(arn)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
     )
 
   }
