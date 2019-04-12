@@ -19,7 +19,6 @@ package uk.gov.hmrc.vatapi.resources
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
-import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.auth.Organisation
@@ -43,8 +42,6 @@ class ObligationsResourceSpec extends ResourceSpec
   val desObligationsJson: JsValue = Jsons.Obligations.desResponse(vrn)
   val desObligationsNoDetailsJson: JsValue = Jsons.Obligations.desResponseWithoutObligationDetails(vrn)
 
-  val enrolments = Enrolments(Set.empty)
-  val arn = "someAgentRefNo"
   val clientObligationsJson: JsValue = Jsons.Obligations()
 
   val authContext = Organisation(None)

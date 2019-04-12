@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.data.EitherT
 import org.joda.time.DateTime
 import play.api.http.MimeTypes
 import play.api.libs.json.{JsValue, Json}
@@ -24,15 +23,18 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture
 import uk.gov.hmrc.vatapi.assets.TestConstants
+import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.auth.Organisation
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.orchestrators.MockVatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.models.Errors.TaxPeriodNotEnded
+import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode, VatReturn}
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult}
+import uk.gov.hmrc.vatapi.models.{Errors, InternalServerErrorResult}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
+import v2.models.audit.AuditError
 
 import scala.concurrent.Future
 
@@ -40,6 +42,8 @@ class VatReturnsResourceSpec extends ResourceSpec
   with MockVatReturnsConnector
   with MockVatReturnsOrchestrator
   with MockAuditService {
+
+  val authContext = Organisation(None)
 
   class Setup {
     val resource = new VatReturnsResource(
@@ -49,7 +53,7 @@ class VatReturnsResourceSpec extends ResourceSpec
       mockAppContext,
       mockAuditService
     )
-    mockAuthAction(vrn).thenReturn(Future.successful(Right(Organisation(None))))
+    mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
   }
 
   val vatReturnsDeclaration = VatReturnDeclarationFixture.vatReturnDeclaration
@@ -67,6 +71,20 @@ class VatReturnsResourceSpec extends ResourceSpec
     totalAllAcquisitionsExVAT = 100,
     agentReferenceNumber = Some("MK001"),
     receivedAt = Some(DateTime.parse("2018-02-14T09:32:15Z")))
+
+  val clientVatReturnJson = Json.parse(
+    """{
+      |  "periodKey": "#001",
+      |  "vatDueSales": -3600.15,
+      |  "vatDueAcquisitions": 12000.05,
+      |  "totalVatDue": 8399.9,
+      |  "vatReclaimedCurrPeriod": 124.15,
+      |  "netVatDue": 8275.75,
+      |  "totalValueSalesExVAT": 1000,
+      |  "totalValuePurchasesExVAT": 200,
+      |  "totalValueGoodsSuppliedExVAT": 100,
+      |  "totalAcquisitionsExVAT": 100
+      |}""".stripMargin)
 
   val nrsSubmissionId = "test-sub-id"
   val nrsTimestamp = "test-timestamp"
@@ -160,16 +178,18 @@ class VatReturnsResourceSpec extends ResourceSpec
     "return a 200 " when {
       "a valid vrn and period key is supplied" in new Setup {
 
-        MockAuditService.audit()
-          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
-
         val successResponse = VatReturnResponse(HttpResponse(OK, responseJson =
           Some(Json.toJson(desVatReturn))))
         retrieveVatReturn(vrn, "#001")(successResponse)
 
         val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest())
-        status(result) shouldBe 200
+        status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe clientVatReturnJson
+
+        val auditResponse = AuditResponse(OK, None, Some(clientVatReturnJson))
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(successResponse.getCorrelationId(),
+          authContext.affinityGroup, None, auditResponse))
       }
     }
 
@@ -182,6 +202,10 @@ class VatReturnsResourceSpec extends ResourceSpec
 
         val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest())
         status(result) shouldBe INTERNAL_SERVER_ERROR
+
+        val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(successResponse.getCorrelationId(),
+          authContext.affinityGroup, None, auditResponse))
       }
     }
   }

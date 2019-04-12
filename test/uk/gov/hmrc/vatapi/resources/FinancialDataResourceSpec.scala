@@ -20,7 +20,6 @@ import cats.data.EitherT
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
-import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.auth.Organisation
@@ -38,9 +37,6 @@ class FinancialDataResourceSpec extends ResourceSpec
   with MockFinancialDataConnector
   with MockAuthorisationService
   with MockAuditService {
-
-  val enrolments = Enrolments(Set.empty)
-  val arn = "someAgentRefNo"
 
   val authContext = Organisation(None)
 
