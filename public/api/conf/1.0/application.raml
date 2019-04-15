@@ -68,7 +68,7 @@ traits:
       description: Retrieve VAT obligations
       get:
         displayName: Retrieve VAT obligations
-        description: Retrieve VAT obligations
+        description: Retrieve VAT obligations. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Submit VAT return for period](#_submit-vat-return-for-period_post_accordion).
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
         is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
@@ -204,7 +204,7 @@ traits:
                         code: NOT_FOUND
       post:
         displayName: Submit VAT return for period
-        description: Submit VAT return for period
+        description: Submit VAT return for period. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Retrieve VAT obligations](#_retrieve-vat-obligations_get_accordion).
         (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
         is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "write:vat"
