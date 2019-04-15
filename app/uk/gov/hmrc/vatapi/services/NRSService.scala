@@ -27,7 +27,6 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
-import uk.gov.hmrc.vatapi.httpparsers.EmptyNrsData
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
 import uk.gov.hmrc.vatapi.resources.AuthRequest
@@ -43,8 +42,7 @@ class NRSService @Inject()(
 
   def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
-//    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload))
-    Future(Right(EmptyNrsData))
+    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload))
   }
 
   private def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {

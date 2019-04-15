@@ -52,7 +52,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
         .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
@@ -70,7 +70,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .statusIs(201)
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.000Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
         .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
@@ -108,7 +108,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\paymentIndicator", "BANK")
         .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
         .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
         .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
@@ -222,6 +222,18 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\code", "TAX_PERIOD_NOT_ENDED")
     }
 
+    "fail if submission to  Non-Repudiation service failed" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsFailurefor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    }
   }
 
   "VAT returns retrieval" should {
