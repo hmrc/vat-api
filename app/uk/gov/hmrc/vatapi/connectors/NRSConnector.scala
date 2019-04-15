@@ -60,39 +60,36 @@ class NRSConnector @Inject()(
 
   val logger: Logger = Logger(this.getClass)
   val nrsSubmissionUrl: String => String = vrn => s"${appContext.nrsServiceUrl}/submission"
+  val nrsMaxTimeout: Duration = appContext.nrsMaxTimeoutMillis.milliseconds
+
   private val xApiKeyHeader = "X-API-Key"
 
   def submit(vrn: Vrn, nrsSubmission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
 
     logger.debug(s"[NRSConnector][submit] - Submission to NRS for 9 box vat return for VRN: $vrn")
 
-    val submitUrl = nrsSubmissionUrl(vrn.toString)
+    val nrsResponse = {
+      val submitUrl = nrsSubmissionUrl(vrn.toString)
+      val headers = hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}").headers
 
-    val request: WSRequest = ws.url(submitUrl)
-    val headers = hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}").headers
-    implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
+      implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
 
+      ws.url(submitUrl)
+        .withHeaders(headers: _*)
+        .withRequestTimeout(nrsMaxTimeout)
+        .post(Json.toJson(nrsSubmission))
+    }
 
-    logger.debug(">>>>>> SENDING CUSTOM REQUEST ")
+    nrsResponse.map { res =>
 
-
-    println(s"\n\n <A><><><><> ${Json.toJson(nrsSubmission)} \n\n")
-
-    val response = request
-      .withHeaders(headers: _*)
-      .withRequestTimeout(5.seconds)
-      .post(Json.toJson(nrsSubmission))
-
-    response.map { res =>
-
-      val theJson = Try(res.json) match {
+      val resJson = Try(res.json) match {
         case Success(json: JsValue) => Some(json)
         case _ => None
       }
 
       val httpResponse = HttpResponse(
         res.status,
-        theJson,
+        resJson,
         res.allHeaders,
         None
       )
@@ -105,6 +102,5 @@ class NRSConnector @Inject()(
         Right(EmptyNrsData)
       }
     }
-
   }
 }
