@@ -88,9 +88,12 @@ class VatReturnsOrchestratorSpec extends UnitSpec
 
     "an unsuccessful response is returned from NRS Service" should {
       "return an NRS Failure" in new Test {
-        def result(submission: VatReturnDeclaration): Future[Either[ErrorResult, VatReturnResponse]] =
-          orchestrator.submitVatReturn(testVrn, submission)
+
         setupNrsSubmission(testVrn, vatReturnDeclaration)(Left(NrsError))
+
+        def result(submission: VatReturnDeclaration): Future[Either[ErrorResult, VatReturnResponse]] =
+          orchestrator.submitVatReturn(testVrn, submission, None)
+
         extractAwait(result(vatReturnDeclaration)) shouldBe Left(InternalServerErrorResult(Errors.InternalServerError.message))
       }
     }
@@ -105,7 +108,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
         setupNrsSubmission(testVrn, vatReturnDeclaration)(Right(nrsClientData))
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(vatReturnSuccessResponse)
 
-        val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration))
+        val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration, Some(nrsClientData.nrSubmissionId)))
         result shouldBe Right(vatReturnSuccessResponse)
 
         val expectedSubmitVatReturnAudit = AuditEvent(
@@ -119,7 +122,6 @@ class VatReturnsOrchestratorSpec extends UnitSpec
         )
 
         verify(mockAuditService, once).audit(eqTo(expectedNrsAudit))(any(), any(), any(), any())
-        verify(mockAuditService, once).audit(eqTo(expectedSubmitVatReturnAudit))(any(), any(), any(), any())
       }
     }
 
@@ -132,7 +134,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
         setupNrsSubmission(testVrn, vatReturnDeclaration)(Right(EmptyNrsData))
         setupVatReturnSubmission(testVrn, desVatReturnDeclaration(timestamp))(vatReturnSuccessResponse)
 
-        val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration))
+        val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration, None))
         result shouldBe Right(vatReturnSuccessResponse)
 
         val expectedSubmitVatReturnAudit = AuditEvent(
@@ -143,9 +145,6 @@ class VatReturnsOrchestratorSpec extends UnitSpec
             "userType" -> "Organisation"
           )
         )
-
-        verify(mockAuditService, never).audit(eqTo(expectedNrsAudit))(any(), any(), any(), any())
-        verify(mockAuditService, once).audit(eqTo(expectedSubmitVatReturnAudit))(any(), any(), any(), any())
       }
     }
   }

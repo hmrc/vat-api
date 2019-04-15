@@ -28,7 +28,7 @@ import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.des.VatReturnsDES
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
-import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
+import uk.gov.hmrc.vatapi.resources.wrappers.{Response, VatReturnResponse}
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 import v2.models.audit.AuditError
 
@@ -50,9 +50,16 @@ class VatReturnsResource @Inject()(
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
 
-    def audit(response: VatReturnResponse, auditResponse: AuditResponse) = {
-      auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
-        request.authContext.affinityGroup, Some(response.nrsData.nrSubmissionId), getArn, auditResponse))
+    def audit(response: VatReturnResponse, result: Result) = {
+      result.header.status match {
+        case CREATED =>
+          auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+          request.authContext.affinityGroup, Some(response.nrsData.nrSubmissionId),
+          getArn, AuditResponse(200, None, retrieveBody(result))))
+        case status => auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+          request.authContext.affinityGroup, None,
+          getArn, AuditResponse(status, Some(Seq(AuditError(retrieveErrorCode(result)))), None)))
+      }
     }
 
     val result = fromDes {
@@ -82,7 +89,7 @@ class VatReturnsResource @Inject()(
             }
         }
       }
-      audit(response, generateAuditResponse(result))
+      audit(response.asInstanceOf[VatReturnResponse], result)
       result
     }
     result.recover {
@@ -92,20 +99,19 @@ class VatReturnsResource @Inject()(
     }
   }
 
-  def generateAuditResponse(result: Result) = {
-    result.header.status match {
-      case 200 => AuditResponse(result.header.status, None, retrieveBody(result))
-      case _ => AuditResponse(result.header.status, Some(Seq(AuditError(retrieveErrorCode(result)))), None)
-    }
-  }
-
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
     APIAction(vrn).async { implicit request =>
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
 
-      def audit(response: VatReturnResponse, auditResponse: AuditResponse) = {
-        auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
-          request.authContext.affinityGroup, Some(response.nrsData.nrSubmissionId), getArn, auditResponse))
+      def audit(response: VatReturnResponse, result: Result) = {
+        result.header.status match {
+          case 200 => auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+            request.authContext.affinityGroup, None,
+            getArn, AuditResponse(200, None, retrieveBody(result))))
+          case status => auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+            request.authContext.affinityGroup, None,
+            getArn, AuditResponse(status, Some(Seq(AuditError(retrieveErrorCode(result)))), None)))
+        }
       }
 
       val result = fromDes {
@@ -119,14 +125,13 @@ class VatReturnsResource @Inject()(
           val result = response.filter {
             case 200 => response.vatReturnOrError match {
               case Right(vatReturn) =>
-                auditService.audit(AuditEvents.retrieveVatReturnsAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
                 Ok(Json.toJson(vatReturn))
               case Left(error) =>
                 logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
                 InternalServerError
             }
           }
-          audit(response, generateAuditResponse(result))
+          audit(response.asInstanceOf[VatReturnResponse], result)
           result
         }
       }

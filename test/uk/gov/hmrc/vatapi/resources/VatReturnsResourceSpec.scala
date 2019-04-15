@@ -24,12 +24,14 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture
 import uk.gov.hmrc.vatapi.assets.TestConstants
+import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.auth.Organisation
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.orchestrators.MockVatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.models.Errors.TaxPeriodNotEnded
+import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode, VatReturn}
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult}
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
@@ -84,6 +86,8 @@ class VatReturnsResourceSpec extends ResourceSpec
       FORBIDDEN,
       responseJson = Some(Json.toJson(DesError(DesErrorCode.TAX_PERIOD_NOT_ENDED, "The remote endpoint has indicated that the submission is for an tax period that has not ended.")))
     ))
+
+  val authContext = Organisation(None)
 
   "submitVatReturn" should {
     "return a 201 with the correct response and headers" when {

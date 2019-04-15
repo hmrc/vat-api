@@ -97,7 +97,7 @@ trait BaseResource extends BaseController {
 
   def retrieveErrorCode(result: Result): String = {
     retrieveBody(result) match {
-      case Some(x) => (x \ "code").toString
+      case Some(x) => (x \\ "code").last.toString()
       case None => "NOT_FOUND"
     }
 

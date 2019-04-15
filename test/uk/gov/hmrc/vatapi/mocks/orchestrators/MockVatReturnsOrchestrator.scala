@@ -28,7 +28,7 @@ trait MockVatReturnsOrchestrator extends Mock { _: Suite =>
 
   object MockVatReturnsOrchestrator {
     def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration) = {
-      when(mockVatReturnsOrchestrator.submitVatReturn(eqTo(vrn), eqTo(vatReturn))(any(), any()))
+      when(mockVatReturnsOrchestrator.submitVatReturn(eqTo(vrn), eqTo(vatReturn), any())(any(), any()))
     }
   }
 
