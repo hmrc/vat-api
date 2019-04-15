@@ -234,6 +234,25 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .statusIs(500)
         .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
     }
+
+    "pass if submission to Non-Repudiation service call times out" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsTimeoutFor(vrn)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    }
   }
 
   "VAT returns retrieval" should {
