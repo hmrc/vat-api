@@ -32,23 +32,30 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
+import java.util.concurrent.TimeoutException
+
 import javax.inject.Inject
 import nrs.models.NRSSubmission
 import play.api.Logger
-import play.api.libs.json.Writes
+import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.ws.{WSClient, WSRequest}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.vatapi.BaseConnector
 import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.httpparsers.EmptyNrsData
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.{NrsSubmissionOutcome, NrsSubmissionOutcomeReads}
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Success, Try}
 
 
 class NRSConnector @Inject()(
                               override val http: DefaultHttpClient,
-                              override val appContext: AppContext
+                              override val appContext: AppContext,
+                              ws: WSClient
                             ) extends BaseConnector {
 
   val logger: Logger = Logger(this.getClass)
@@ -61,10 +68,43 @@ class NRSConnector @Inject()(
 
     val submitUrl = nrsSubmissionUrl(vrn.toString)
 
-    http.POST[NRSSubmission, NrsSubmissionOutcome](submitUrl, nrsSubmission)(
-      implicitly[Writes[NRSSubmission]],
-      NrsSubmissionOutcomeReads,
-      withTestHeader(hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}")),
-      implicitly)
+    val request: WSRequest = ws.url(submitUrl)
+    val headers = hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}").headers
+    implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
+
+
+    logger.debug(">>>>>> SENDING CUSTOM REQUEST ")
+
+
+    println(s"\n\n <A><><><><> ${Json.toJson(nrsSubmission)} \n\n")
+
+    val response = request
+      .withHeaders(headers: _*)
+      .withRequestTimeout(5.seconds)
+      .post(Json.toJson(nrsSubmission))
+
+    response.map { res =>
+
+      val theJson = Try(res.json) match {
+        case Success(json: JsValue) => Some(json)
+        case _ => None
+      }
+
+      val httpResponse = HttpResponse(
+        res.status,
+        theJson,
+        res.allHeaders,
+        None
+      )
+
+      NrsSubmissionOutcomeReads.read("", "", httpResponse)
+
+    }.recover {
+      case e: TimeoutException => {
+        logger.warn(s"[NRSConnector][submit] - NRS Call timed out for VRN: $vrn - $e")
+        Right(EmptyNrsData)
+      }
+    }
+
   }
 }

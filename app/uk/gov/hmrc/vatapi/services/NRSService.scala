@@ -45,6 +45,7 @@ class NRSService @Inject()(
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
     nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload)).recover{
       case e: GatewayTimeoutException => {
+        logger.debug("[NRSService][submit] - GatewayTimeoutException exception occurred")
         Right(EmptyNrsData)
       }
     }
