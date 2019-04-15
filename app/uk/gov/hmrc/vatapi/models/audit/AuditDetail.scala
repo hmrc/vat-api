@@ -22,7 +22,8 @@ case class AuditDetail(
                         userType: String,
                         arn: Option[String],
                         `X-CorrelationId`: String,
-                        response: AuditResponse
+                        response: AuditResponse,
+                        nrSubmissionID: Option[String] = None
                       )
 
 object AuditDetail {

@@ -36,17 +36,12 @@ object AuditEvents {
       )
     )
 
-  def submitVatReturn(correlationId: String, userType: String, nrSubmissionId: Option[String], arn: Option[String]): AuditEvent[Map[String, String]] = {
-
-    val nrSubmissionIdMap: Map[String, String] = nrSubmissionId.fold(Map.empty[String, String])(id => Map("nrSubmissionId" -> id))
-
+  def submitVatReturn(correlationId: String, userType: String, nrSubmissionId: Option[String], arn: Option[String],
+                      response: AuditResponse): AuditEvent[AuditDetail] = {
     AuditEvent(
       auditType = "submitVatReturn",
       transactionName = "submit-vat-return",
-      detail = Map(
-        "X-CorrelationId" -> correlationId,
-        "userType" -> userType
-      ) ++ nrSubmissionIdMap ++ agentRef(arn)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, nrSubmissionId)
     )
   }
 
@@ -88,5 +83,4 @@ object AuditEvents {
     )
 
   }
-
 }

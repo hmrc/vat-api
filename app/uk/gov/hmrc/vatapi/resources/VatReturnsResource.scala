@@ -19,15 +19,18 @@ package uk.gov.hmrc.vatapi.resources
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
+import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.des.VatReturnsDES
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
+import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
+import v2.models.audit.AuditError
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -46,16 +49,22 @@ class VatReturnsResource @Inject()(
     val receiptSignature = "Receipt-Signature"
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
+
+    def audit(response: Response, auditResponse: AuditResponse) = {
+      auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+        request.authContext.affinityGroup, response.nrsData.nrSubmissionId, getArn, auditResponse))
+    }
+
     val result = fromDes {
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }
         response <- BusinessResult {
-          orchestrator.submitVatReturn(vrn, vatReturn)
+          orchestrator.submitVatReturn(vrn, vatReturn, getArn)
         }
       } yield response
     } onSuccess { response =>
-      response.filter {
+      val result = response.filter {
         case 200 => response.vatSubmissionReturnOrError match {
           case Right(vatReturnDesResponse) =>
             def successResponse(vatReturn: VatReturnsDES) = {
@@ -73,6 +82,8 @@ class VatReturnsResource @Inject()(
             }
         }
       }
+      audit(response, generateAuditResponse(result))
+      result
     }
     result.recover {
       case ex =>
@@ -81,24 +92,42 @@ class VatReturnsResource @Inject()(
     }
   }
 
+  def generateAuditResponse(result: Result) = {
+    result.header.status match {
+      case 200 => AuditResponse(result.header.status, None, retrieveBody(result))
+      case _ => AuditResponse(result.header.status, Some(Seq(AuditError(retrieveErrorCode(result)))), None)
+    }
+  }
+
   def retrieveVatReturns(vrn: Vrn, periodKey: String): Action[AnyContent] =
     APIAction(vrn).async { implicit request =>
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
+
+      def audit(response: Response, auditResponse: AuditResponse) = {
+        auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+          request.authContext.affinityGroup, response.nrsData.nrSubmissionId, getArn, auditResponse))
+      }
+
       val result = fromDes {
         for {
           _ <- validate[String](periodKey) { case _ if periodKey.length != 4 => Errors.InvalidPeriodKey }
           response <- execute { _ => connector.query(vrn, periodKey) }
         } yield response
-      } onSuccess { response =>
-        response.filter {
-          case 200 => response.vatReturnOrError match {
-            case Right(vatReturn) =>
-              auditService.audit(AuditEvents.retrieveVatReturnsAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
-              Ok(Json.toJson(vatReturn))
-            case Left(error) =>
-              logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
-              InternalServerError
+      } onSuccess {
+        response => {
+
+          val result = response.filter {
+            case 200 => response.vatReturnOrError match {
+              case Right(vatReturn) =>
+                auditService.audit(AuditEvents.retrieveVatReturnsAudit(response.getCorrelationId(), request.authContext.affinityGroup, getArn))
+                Ok(Json.toJson(vatReturn))
+              case Left(error) =>
+                logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
+                InternalServerError
+            }
           }
+          audit(response, generateAuditResponse(result))
+          result
         }
       }
 
