@@ -28,7 +28,7 @@ import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.des.VatReturnsDES
 import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
-import uk.gov.hmrc.vatapi.resources.wrappers.Response
+import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 import v2.models.audit.AuditError
 
@@ -50,9 +50,9 @@ class VatReturnsResource @Inject()(
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
 
-    def audit(response: Response, auditResponse: AuditResponse) = {
+    def audit(response: VatReturnResponse, auditResponse: AuditResponse) = {
       auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
-        request.authContext.affinityGroup, response.nrsData.nrSubmissionId, getArn, auditResponse))
+        request.authContext.affinityGroup, Some(response.nrsData.nrSubmissionId), getArn, auditResponse))
     }
 
     val result = fromDes {
@@ -103,9 +103,9 @@ class VatReturnsResource @Inject()(
     APIAction(vrn).async { implicit request =>
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
 
-      def audit(response: Response, auditResponse: AuditResponse) = {
+      def audit(response: VatReturnResponse, auditResponse: AuditResponse) = {
         auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
-          request.authContext.affinityGroup, response.nrsData.nrSubmissionId, getArn, auditResponse))
+          request.authContext.affinityGroup, Some(response.nrsData.nrSubmissionId), getArn, auditResponse))
       }
 
       val result = fromDes {
