@@ -38,7 +38,7 @@ import javax.inject.Inject
 import nrs.models.NRSSubmission
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Writes}
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.WSClient
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
@@ -70,7 +70,7 @@ class NRSConnector @Inject()(
 
     val nrsResponse = {
       val submitUrl = nrsSubmissionUrl(vrn.toString)
-      val headers = hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}").headers
+      val headers = hc.withExtraHeaders(xApiKeyHeader -> s"${appContext.xApiKey}", "User-Agent" -> appContext.appName).headers
 
       implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
 
