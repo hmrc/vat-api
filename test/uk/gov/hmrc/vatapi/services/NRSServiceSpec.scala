@@ -28,7 +28,7 @@ import uk.gov.hmrc.vatapi.assets.TestConstants.Auth.orgAuthContextWithNrsData
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
-import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NrsError}
+import uk.gov.hmrc.vatapi.httpparsers.NrsError
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.mocks.connectors.MockNRSConnector
 import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
@@ -54,14 +54,14 @@ class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with
     "successful responses are returned from the connector" should {
       "return the correctly formatted NRS Data model" in {
         setupNrsSubmission(testVrn, nrsSubmission)(Right(nrsClientData))
-        extractAwait(result(vatReturnDeclaration)) shouldBe Right(EmptyNrsData)//Right(nrsClientData)
+        extractAwait(result(vatReturnDeclaration)) shouldBe Right(nrsClientData)
       }
     }
 
     "error responses are returned from the connector" should {
       "return an NRS Error model" in {
         setupNrsSubmission(testVrn, nrsSubmission)(Left(NrsError))
-        extractAwait(result(vatReturnDeclaration)) shouldBe Right(EmptyNrsData)//Left(NrsError)
+        extractAwait(result(vatReturnDeclaration)) shouldBe Left(NrsError)
       }
     }
   }

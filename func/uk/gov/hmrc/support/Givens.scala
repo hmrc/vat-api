@@ -636,6 +636,18 @@ class Givens(httpVerbs: HttpVerbs) {
       givens
     }
 
+    def nrsTimeoutFor(vrn: Vrn): Givens = {
+      stubFor(any(urlMatching(s".*/submission.*"))
+        .willReturn(
+          aResponse()
+            .withStatus(499)
+            .withBody("{}")
+            .withFixedDelay(30000)
+        )
+      )
+      givens
+    }
+
     def nrsFailureforNonBadRequest(vrn: Vrn): Givens = {
       stubFor(any(urlMatching(s".*/submission.*"))
         .willReturn(
