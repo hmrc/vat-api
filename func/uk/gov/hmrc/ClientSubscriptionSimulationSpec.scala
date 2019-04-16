@@ -24,7 +24,7 @@ class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheResource
         .when()
-        .post(s"/$vrn/returns")
+        .post(s"/$vrn/returns", None)
         .withHeaders(GovTestScenarioHeader, "CLIENT_OR_AGENT_NOT_AUTHORISED")
         .thenAssertThat()
         .statusIs(403)
@@ -37,7 +37,7 @@ class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheResource
         .when()
-        .post(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A")
+        .post(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31&status=A", None)
         .withHeaders(GovTestScenarioHeader, "CLIENT_OR_AGENT_NOT_AUTHORISED")
         .thenAssertThat()
         .statusIs(403)
@@ -50,7 +50,7 @@ class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
       given()
         .userIsFullyAuthorisedForTheResource
         .when()
-        .post(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
+        .post(s"/$vrn/payments?from=2017-01-01&to=2017-06-02", None)
         .withHeaders(GovTestScenarioHeader, "CLIENT_OR_AGENT_NOT_AUTHORISED")
         .thenAssertThat()
         .statusIs(403)

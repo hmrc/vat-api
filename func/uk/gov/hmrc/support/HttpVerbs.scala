@@ -1,7 +1,7 @@
 package uk.gov.hmrc.support
 
 import org.scalatest.Assertions._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,16 +28,20 @@ class HttpVerbs() (
     }
 
     def post(path: String, body: Option[JsValue] = None): HttpRequest = {
-      new HttpRequest("POST", path, body)
+      new HttpRequest("POST", path, body.map(Json.prettyPrint))
+    }
+
+    def post(path: String, body: String): HttpRequest = {
+      new HttpRequest("POST", path, Option(body))
     }
 
     def put(path: String, body: Option[JsValue]): HttpRequest = {
-      new HttpRequest("PUT", path, body)
+      new HttpRequest("PUT", path, body.map(Json.prettyPrint))
     }
 
     class HttpRequest(method: String,
                       path: String,
-                      body: Option[JsValue],
+                      body: Option[String],
                       hc: HeaderCarrier = HeaderCarrier())(
                        implicit urlPathVariables: mutable.Map[String, String], timeout: FiniteDuration)
       extends UrlInterpolation {
@@ -64,14 +68,12 @@ class HttpVerbs() (
             case "DELETE" => new Assertions(s"DELETE@$url", Http.delete(url))
             case "POST" =>
               body match {
-                case Some(jsonBody) =>
-                  new Assertions(s"POST@$url", Http.postJson(url, jsonBody))
+                case Some(jsonBody) => new Assertions(s"POST@$url", Http.postString(url, jsonBody))
                 case None => new Assertions(s"POST@$url", Http.postEmpty(url))
               }
             case "PUT" =>
-              val jsonBody = body.getOrElse(
-                throw new RuntimeException("Body for PUT must be provided"))
-              new Assertions(s"PUT@$url", Http.putJson(url, jsonBody))
+              val stringBody = body.getOrElse(throw new RuntimeException("Body for PUT must be provided"))
+              new Assertions(s"PUT@$url", Http.putJson(url, Json.parse(stringBody)))
           }
         }
       }
@@ -93,11 +95,11 @@ class HttpVerbs() (
 
     class HttpPostBodyWrapper(method: String, body: Option[JsValue])(
       implicit urlPathVariables: mutable.Map[String, String]) {
-      def to(url: String) = new HttpRequest(method, url, body)
+      def to(url: String) = new HttpRequest(method, url, body.map(Json.prettyPrint))
     }
 
     class HttpPutBodyWrapper(method: String, body: Option[JsValue])(
       implicit urlPathVariables: mutable.Map[String, String]) {
-      def at(url: String) = new HttpRequest(method, url, body)
+      def at(url: String) = new HttpRequest(method, url, body.map(Json.prettyPrint))
     }
   }
