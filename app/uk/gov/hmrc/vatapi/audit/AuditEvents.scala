@@ -53,15 +53,12 @@ object AuditEvents {
     )
   }
 
-  def retrieveVatReturnsAudit(correlationId: String, userType: String, arn: Option[String]): AuditEvent[Map[String, String]] = {
+  def retrieveVatReturnsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatReturns",
       transactionName = "retrieve-vat-returns",
-      detail = Map(
-        "X-CorrelationId" -> correlationId,
-        "userType" -> userType
-      ) ++ agentRef(arn)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
     )
   }
 

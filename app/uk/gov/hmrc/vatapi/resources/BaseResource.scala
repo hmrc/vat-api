@@ -16,21 +16,17 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.json._
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Organisation}
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.util.Right
 
 trait BaseResource extends BaseController {
@@ -40,8 +36,6 @@ trait BaseResource extends BaseController {
   val appContext: AppContext
 
   val logger: Logger = Logger(this.getClass)
-
-  val defaultCorrelationId = "No Correlation ID"
 
   def AuthAction(vrn: Vrn, nrsRequired: Boolean = false) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
@@ -60,7 +54,7 @@ trait BaseResource extends BaseController {
             case Left(authError) => Left(authError)
           }
         case (false, _) =>
-          Future.successful (Right (new AuthRequest (Organisation (), request) ) )
+          Future.successful(Right(new AuthRequest(Organisation(), request)))
       }
     }
   }
@@ -83,26 +77,6 @@ trait BaseResource extends BaseController {
       case Agent(_, _, _, enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
       case c: AuthContext => c.agentReference
     }
-  }
-
-  def getCorrelationId(response: HttpResponse) = response.header("CorrelationId").getOrElse(defaultCorrelationId)
-
-  def retrieveBody(result: Result): Option[JsValue] = {
-    implicit val actorSystem = ActorSystem()
-    implicit val materializer = ActorMaterializer()
-    import scala.concurrent.duration._
-
-    val body = Await.result(result.body.consumeData, 500.seconds).utf8String
-    if(body.isEmpty) None
-    else Some(Json.parse(body))
-  }
-
-  def retrieveErrorCode(result: Result): String = {
-    retrieveBody(result) match {
-      case Some(x) => (x \\ "code").last.toString()
-      case None => "NOT_FOUND"
-    }
-
   }
 }
 

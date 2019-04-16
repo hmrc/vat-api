@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.vatapi.resources.wrappers
 
-import play.api.libs.json.Json.toJson
+import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
-import play.api.mvc.Result
-import play.api.mvc.Results._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, VatReturn, des}
+import uk.gov.hmrc.vatapi.resources.VatResult
 
 case class VatReturnResponse(underlying: HttpResponse) extends Response {
 
@@ -59,20 +58,20 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
     this
   }
 
-  override def errorMappings: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_VRN) => BadRequest(toJson(Errors.VrnInvalid))
-    case 400 if errorCodeIsOneOf(INVALID_ARN) => InternalServerError(toJson(Errors.InternalServerError))
-    case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => BadRequest(toJson(Errors.InvalidRequest))
-    case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => BadRequest(toJson(Errors.InvalidPeriodKey))
+  override def errorMappings: PartialFunction[Int, VatResult] = {
+    case 400 if errorCodeIsOneOf(INVALID_VRN) => VatResult.Failure(Status.BAD_REQUEST, Errors.VrnInvalid)
+    case 400 if errorCodeIsOneOf(INVALID_ARN) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => VatResult.Failure(Status.BAD_REQUEST, Errors.InvalidRequest)
+    case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => VatResult.Failure(Status.BAD_REQUEST, Errors.InvalidPeriodKey)
     case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) =>
       logger.info(s"[VatReturnResponse][errorMappings] Des returned error with status 400 and errorCode INVALID_SUBMISSION")
-      InternalServerError(toJson(Errors.InternalServerError))
-    case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => Forbidden(toJson(Errors.businessError(Errors.DateRangeTooLarge)))
-    case 403 if errorCodeIsOneOf(VRN_NOT_FOUND, NOT_FOUND_VRN) => InternalServerError(toJson(Errors.InternalServerError))
-    case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => NotFound(toJson(Errors.InvalidPeriodKey))
-    case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => Forbidden(toJson(Errors.InvalidRequest))
-    case 403 if errorCodeIsOneOf(TAX_PERIOD_NOT_ENDED) => Forbidden(toJson(Errors.TaxPeriodNotEnded))
-    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => Forbidden(toJson(Errors.businessError(Errors.DuplicateVatSubmission)))
+      VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 403 if errorCodeIsOneOf(DATE_RANGE_TOO_LARGE) => VatResult.Failure(Status.FORBIDDEN, Errors.businessError(Errors.DateRangeTooLarge))
+    case 403 if errorCodeIsOneOf(VRN_NOT_FOUND, NOT_FOUND_VRN) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 403 if errorCodeIsOneOf(INVALID_IDENTIFIER) => VatResult.Failure(Status.NOT_FOUND, Errors.InvalidPeriodKey)
+    case 403 if errorCodeIsOneOf(INVALID_INPUTDATA) => VatResult.Failure(Status.FORBIDDEN, Errors.InvalidRequest)
+    case 403 if errorCodeIsOneOf(TAX_PERIOD_NOT_ENDED) => VatResult.Failure(Status.FORBIDDEN, Errors.TaxPeriodNotEnded)
+    case 409 if errorCodeIsOneOf(DUPLICATE_SUBMISSION) => VatResult.Failure(Status.FORBIDDEN, Errors.businessError(Errors.DuplicateVatSubmission))
 
   }
 }

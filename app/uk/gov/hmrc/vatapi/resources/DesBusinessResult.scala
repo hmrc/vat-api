@@ -16,19 +16,13 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.mvc.Result
+import uk.gov.hmrc.vatapi.models.ErrorResult
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class DesBusinessResult[R <: Response](businessResult: BusinessResult[R]) {
 
-  def onSuccess(handleSuccess: R => Result)(implicit ec: ExecutionContext): Future[Result] =
-    for {
-      desResponseOrError <- businessResult.value
-    } yield desResponseOrError match {
-      case Left(errors) => handleErrors(errors)
-      case Right(desResponse) => handleSuccess(desResponse)
-    }
-
+  def map(f: Either[ErrorResult, R] => VatResult)(implicit ec: ExecutionContext): Future[VatResult] =
+    businessResult.value.map(f)
 }
