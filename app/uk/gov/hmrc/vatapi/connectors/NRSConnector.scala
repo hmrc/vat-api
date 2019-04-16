@@ -94,6 +94,8 @@ class NRSConnector @Inject()(
         None
       )
 
+      Logger.debug(s"[NRSConnector][submit] - NRS Call succeeded")
+
       NrsSubmissionOutcomeReads.read("", "", httpResponse)
 
     }.recover {

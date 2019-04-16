@@ -43,13 +43,7 @@ class NRSService @Inject()(
 
   def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
-    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload)).recover{
-      case e: GatewayTimeoutException => {
-        logger.debug("[NRSService][submit] - GatewayTimeoutException exception occurred")
-        Right(EmptyNrsData)
-      }
-    }
-
+    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload))
   }
 
   private def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {
