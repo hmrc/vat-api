@@ -41,6 +41,8 @@ trait BaseResource extends BaseController {
 
   val logger: Logger = Logger(this.getClass)
 
+  val defaultCorrelationId = "No Correlation ID"
+
   def AuthAction(vrn: Vrn, nrsRequired: Boolean = false) = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
 
@@ -83,7 +85,7 @@ trait BaseResource extends BaseController {
     }
   }
 
-  def getCorrelationId(response: HttpResponse) = response.header("CorrelationId").getOrElse("")
+  def getCorrelationId(response: HttpResponse) = response.header("CorrelationId").getOrElse(defaultCorrelationId)
 
   def retrieveBody(result: Result): Option[JsValue] = {
     implicit val actorSystem = ActorSystem()

@@ -69,7 +69,7 @@ class ObligationsResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe clientObligationsJson
 
         val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -87,7 +87,7 @@ class ObligationsResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe clientObligationsJson
 
         val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -104,7 +104,7 @@ class ObligationsResourceSpec extends ResourceSpec
         contentType(result) shouldBe None
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -122,7 +122,7 @@ class ObligationsResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(Response.defaultCorrelationId,
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.getCorrelationId(invalidDesResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -139,7 +139,7 @@ class ObligationsResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(Response.defaultCorrelationId,
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.defaultCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -156,7 +156,7 @@ class ObligationsResourceSpec extends ResourceSpec
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
       val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
-      MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(nonJsonDesResponse.getCorrelationId(),
+      MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(testObligationResource.getCorrelationId(nonJsonDesResponse.underlying),
         authContext.affinityGroup, None, auditResponse))
     }
 

@@ -20,14 +20,15 @@ import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
 import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
-import uk.gov.hmrc.vatapi.resources.wrappers.Response
+import uk.gov.hmrc.vatapi.resources.wrappers.FinancialDataResponse
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 import v2.models.audit.AuditError
 
@@ -43,18 +44,16 @@ class FinancialDataResource @Inject()(
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 
-    def audit(desResponse: Option[Response], auditResponse: AuditResponse) = {
-      auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(Response.getCorrelationId(desResponse),
-        request.authContext.affinityGroup, getArn, auditResponse))
-    }
-
     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
+
+    val arn = getArn
+
     val result = fromDes {
       for {
         response <- execute { _ => connector.getFinancialData(vrn, params) }
       } yield response
     } onSuccess { desResponse =>
-      desResponse.filter {
+      val result = desResponse.filter {
         case OK =>
           desResponse.getLiabilities(vrn) match {
             case Right(obj) =>
@@ -66,47 +65,56 @@ class FinancialDataResource @Inject()(
               remainingLiabilities match {
                 case Nil =>
                   logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
-                  audit(Some(desResponse), AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None))
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
                   logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
                   val responseBody = Json.toJson(Liabilities(remainingLiabilities))
-                  audit(Some(desResponse), AuditResponse(OK, None, Some(responseBody)))
                   Ok(responseBody)
               }
 
             case Left(ex) =>
               logger.error(s"[FinancialDataResource][retrieveLiabilities] Error retrieving Liabilities from DES: ${ex.msg}")
-              audit(Some(desResponse), AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None))
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
+      audit(desResponse, result, request.authContext.affinityGroup, arn)
+      result
     }
     //Interim Error Handling
     result.recover {
       case ex =>
         Logger.warn(s"[FinancialDataResource][retrieveLiabilities] Unexpected downstream error caught ${ex.getMessage}")
-        audit(None, AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None))
+        auditService.audit(AuditEvents.submitVatReturn(defaultCorrelationId,
+          request.authContext.affinityGroup, None,
+          arn, AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)))
         InternalServerError(Json.toJson(Errors.InternalServerError))
     }
   }
 
+  def audit(response: FinancialDataResponse, result: Result, userType: String, arn: Option[String])
+           (implicit hc: HeaderCarrier, request: AuthRequest[_]) = {
+    result.header.status match {
+      case OK =>
+        auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+          userType, None,
+          arn, AuditResponse(200, None, retrieveBody(result))))
+      case status => auditService.audit(AuditEvents.submitVatReturn(getCorrelationId(response.underlying),
+        userType, None, arn, AuditResponse(status, Some(Seq(AuditError(retrieveErrorCode(result)))), None)))
+    }
+  }
 
   def retrievePayments(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 
-    def audit(desResponse: Option[Response], auditResponse: AuditResponse) = {
-      auditService.audit(AuditEvents.retrieveVatPaymentsAudit(Response.getCorrelationId(desResponse),
-        request.authContext.affinityGroup, getArn, auditResponse))
-    }
-
     logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
+
+    val arn = getArn
 
     val result = fromDes {
       for {
         response <- execute { _ => connector.getFinancialData(vrn, params) }
       } yield response
     } onSuccess { desResponse =>
-      desResponse.filter {
+      val result = desResponse.filter {
         case OK =>
           desResponse.getPayments(vrn) match {
             case Right(obj) =>
@@ -117,26 +125,27 @@ class FinancialDataResource @Inject()(
               payments.payments match {
                 case Seq() =>
                   logger.error(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
-                  audit(Some(desResponse), AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None))
                   NotFound(Json.toJson(Errors.NotFound))
                 case _ =>
                   logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
                   val responseBody = Json.toJson(payments)
-                  audit(Some(desResponse), AuditResponse(OK, None, Some(responseBody)))
                   Ok(responseBody)
               }
             case Left(ex) =>
               logger.error(s"[FinancialDataResource][retrievePayments] Error retrieving Payments from DES: ${ex.msg}")
-              audit(Some(desResponse), AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None))
               InternalServerError(Json.toJson(Errors.InternalServerError))
           }
       }
+      audit(desResponse, result, request.authContext.affinityGroup, arn)
+      result
     }
 
     result.recover {
       case ex =>
         Logger.warn(s"[FinancialDataResource][retrievePayments] Unexpected dowstream error caught ${ex.getMessage}")
-        audit(None, AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None))
+        auditService.audit(AuditEvents.submitVatReturn(defaultCorrelationId,
+          request.authContext.affinityGroup, None,
+          arn, AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)))
         InternalServerError(Json.toJson(Errors.InternalServerError))
     }
   }

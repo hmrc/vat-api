@@ -66,7 +66,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe expectedResponseBody
 
         val auditResponse = AuditResponse(OK, None, Some(expectedResponseBody))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(testFinancialDataResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -84,7 +84,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(testFinancialDataResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -99,7 +99,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(Response.defaultCorrelationId,
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(testFinancialDataResource.defaultCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -123,7 +123,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe expectedResponseBody
 
         val auditResponse = AuditResponse(OK, None, Some(expectedResponseBody))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(testFinancialDataResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -144,7 +144,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(testFinancialDataResource.getCorrelationId(desResponse.underlying),
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -159,7 +159,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(Response.defaultCorrelationId,
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(testFinancialDataResource.defaultCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
