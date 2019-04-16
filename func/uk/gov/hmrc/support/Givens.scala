@@ -658,6 +658,17 @@ class Givens(httpVerbs: HttpVerbs) {
       )
       givens
     }
+
+    def nrs5xx(vrn: Vrn, status: Int): Givens = {
+      stubFor(any(urlMatching(s".*/submission.*"))
+        .willReturn(
+          aResponse()
+            .withStatus(status)
+            .withBody("{}")
+        )
+      )
+      givens
+    }
   }
 
   def des() = new Des(this)
