@@ -253,6 +253,63 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
         .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
     }
+
+    "pass if Non-Repudiation service returns a 500 Internal Server Error" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrs5xx(vrn, 500)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    }
+
+    "pass if Non-Repudiation service returns a 502 Bad Gateway" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrs5xx(vrn, 502)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    }
+
+    "pass if Non-Repudiation service returns a 503 Service Unavailable" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrs5xx(vrn, 503)
+        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(201)
+        .bodyHasPath("\\paymentIndicator", "BANK")
+        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
+        .bodyHasPath("\\formBundleNumber", "891713832155")
+        .responseContainsHeader("Receipt-Id", "")
+        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
+        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    }
   }
 
   "VAT returns retrieval" should {
