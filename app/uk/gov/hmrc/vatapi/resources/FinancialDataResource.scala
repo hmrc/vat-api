@@ -48,12 +48,10 @@ class FinancialDataResource @Inject()(
       auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(correlationId,
         request.authContext.affinityGroup, arn, vatResult.auditResponse))
 
-    val result = fromDes {
+    val result =
       for {
-        response <- execute { _ => connector.getFinancialData(vrn, params) }
-      } yield response
-    }.map {
-      case Right(desResponse) =>
+        desResponse <- connector.getFinancialData(vrn, params)
+      } yield {
         val result = desResponse.filter {
           case OK =>
             desResponse.getLiabilities(vrn) match {
@@ -79,12 +77,7 @@ class FinancialDataResource @Inject()(
         }
         audit(result, desResponse.getCorrelationId)
         result
-
-      case Left(errorResult) =>
-        val result = handleErrors(errorResult)
-        audit(result, Response.defaultCorrelationId)
-        result
-    }
+      }
 
     //Interim Error Handling
     result.recover {
@@ -106,12 +99,10 @@ class FinancialDataResource @Inject()(
       auditService.audit(AuditEvents.retrieveVatPaymentsAudit(correlationId,
         request.authContext.affinityGroup, arn, vatResult.auditResponse))
 
-    val result = fromDes {
+    val result =
       for {
-        response <- execute { _ => connector.getFinancialData(vrn, params) }
-      } yield response
-    }.map {
-      case Right(desResponse) =>
+        desResponse <- connector.getFinancialData(vrn, params)
+      } yield {
         val result = desResponse.filter {
           case OK =>
             desResponse.getPayments(vrn) match {
@@ -135,12 +126,7 @@ class FinancialDataResource @Inject()(
         }
         audit(result, desResponse.getCorrelationId)
         result
-
-      case Left(errorResult) =>
-        val result = handleErrors(errorResult)
-        audit(result, Response.defaultCorrelationId)
-        result
-    }
+      }
 
     result.recover {
       case ex =>

@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.models
 
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode.ErrorCode
-import uk.gov.hmrc.vatapi.resources.ErrorCodeExtractor
+import uk.gov.hmrc.vatapi.resources.AuditErrorExtractor
 import v2.models.audit.AuditError
 
 object Errors {
@@ -80,8 +80,8 @@ object Errors {
   case class Error(code: String, message: String, path: Option[String])
 
   object Error {
-    implicit val auditErrorExtractor: ErrorCodeExtractor[Error] = new ErrorCodeExtractor[Error] {
-      override def errors(e: Error): Seq[AuditError] = Seq(AuditError(e.code))
+    implicit val auditErrorExtractor: AuditErrorExtractor[Error] = new AuditErrorExtractor[Error] {
+      override def auditErrors(e: Error): Seq[AuditError] = Seq(AuditError(e.code))
     }
   }
 
@@ -90,8 +90,8 @@ object Errors {
   }
 
   object BadRequest {
-    implicit val auditErrorExtractor: ErrorCodeExtractor[BadRequest] = new ErrorCodeExtractor[BadRequest] {
-      override def errors(e: BadRequest): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
+    implicit val auditErrorExtractor: AuditErrorExtractor[BadRequest] = new AuditErrorExtractor[BadRequest] {
+      override def auditErrors(e: BadRequest): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
     }
   }
 
@@ -102,8 +102,8 @@ object Errors {
   }
 
   object BusinessError {
-    implicit val auditErrorExtractor: ErrorCodeExtractor[BusinessError] = new ErrorCodeExtractor[BusinessError] {
-      override def errors(e: BusinessError): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
+    implicit val auditErrorExtractor: AuditErrorExtractor[BusinessError] = new AuditErrorExtractor[BusinessError] {
+      override def auditErrors(e: BusinessError): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
     }
   }
 
@@ -127,8 +127,8 @@ object Errors {
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
 
   object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None) {
-    implicit val auditErrorExtractor: ErrorCodeExtractor[InternalServerError] = new ErrorCodeExtractor[InternalServerError] {
-      override def errors(e: InternalServerError): Seq[AuditError] = Seq(AuditError(e.code))
+    implicit val auditErrorExtractor: AuditErrorExtractor[InternalServerError] = new AuditErrorExtractor[InternalServerError] {
+      override def auditErrors(e: InternalServerError): Seq[AuditError] = Seq(AuditError(e.code))
     }
   }
 

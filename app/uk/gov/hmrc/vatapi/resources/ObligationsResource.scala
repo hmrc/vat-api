@@ -42,17 +42,14 @@ class ObligationsResource @Inject()(
 
     val arn = getArn
 
-
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatObligationsAudit(correlationId,
         request.authContext.affinityGroup, arn, vatResult.auditResponse))
 
-    val result = fromDes {
+    val result =
       for {
-        response <- execute { _ => connector.get(vrn, params) }
-      } yield response
-    }.map {
-      case Right(desResponse) =>
+        desResponse <- connector.get(vrn, params)
+      } yield {
         val result = desResponse.filter {
           case OK =>
             desResponse.obligations(vrn) match {
@@ -67,12 +64,7 @@ class ObligationsResource @Inject()(
         }
         audit(result, desResponse.getCorrelationId)
         result
-
-      case Left(errorResult) =>
-        val result = handleErrors(errorResult)
-        audit(result, Response.defaultCorrelationId)
-        result
-    }
+      }
 
     result.recover {
       case ex =>

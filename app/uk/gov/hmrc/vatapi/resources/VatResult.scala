@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package uk.gov.hmrc.vatapi.resources
 
 import play.api.libs.json.{Json, Writes}
@@ -40,29 +41,29 @@ object VatResult {
       AuditResponse(status, None, Some(Json.toJson(body)))
   }
 
-  case class Failure[E: Writes](status: Int, error: E, headers: Seq[(String, String)] = Nil)(implicit extractor: ErrorCodeExtractor[E]) extends VatResult {
+  case class Failure[E: Writes](status: Int, error: E, headers: Seq[(String, String)] = Nil)(implicit extractor: AuditErrorExtractor[E]) extends VatResult {
     def withHeaders(newHeaders: (String, String)*): VatResult = copy(headers = headers ++ newHeaders)
 
     def result: Result =
       new Results.Status(status)(Json.toJson(error)).withHeaders(headers: _*)
 
     def auditResponse: AuditResponse =
-      AuditResponse(status, Some(extractor.errors(error)), None)
+      AuditResponse(status, Some(extractor.auditErrors(error)), None)
   }
 
-// FIXME to handle inconsistent cases when Vat returns empty body with error code
-  case class FailureEmptyBody[E](status: Int, error: E, headers: Seq[(String, String)] = Nil)(implicit extractor: ErrorCodeExtractor[E]) extends VatResult {
+// TODO: remove this. Here only to handle existing inconsistent cases when Vat returns empty body with no error code
+  case class FailureEmptyBody[E](status: Int, error: E, headers: Seq[(String, String)] = Nil)(implicit extractor: AuditErrorExtractor[E]) extends VatResult {
     def withHeaders(newHeaders: (String, String)*): VatResult = copy(headers = headers ++ newHeaders)
 
     def result: Result =
       new Results.Status(status).withHeaders(headers: _*)
 
     def auditResponse: AuditResponse =
-      AuditResponse(status, Some(extractor.errors(error)), None)
+      AuditResponse(status, Some(extractor.auditErrors(error)), None)
   }
 
 }
 
-trait ErrorCodeExtractor[-E] {
-  def errors(e: E): Seq[AuditError]
+trait AuditErrorExtractor[-E] {
+  def auditErrors(e: E): Seq[AuditError]
 }
