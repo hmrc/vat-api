@@ -47,6 +47,7 @@ class VatReturnsResource @Inject()(
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
     val result = fromDes {
+
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }

@@ -44,8 +44,8 @@ class JsonErrorSanitiserSpec extends UnitSpec {
 
     "return the original sensitive string sanitised with spaces trimmed" in {
 
-      val inputString = "Some super sensitive data was found at [Source: 'Some super sensitive location here']    \n   "
-      val expectedString = "Some super sensitive data was found"
+      val inputString = "Invalid Json: Unexpected character (''' (code 39)): expected a valid value (number, String, array, object, 'true', 'false' or 'null')     "
+      val expectedString = "Invalid Json"
 
       val result = JsonErrorSanitiser.sanitise(inputString)
       result shouldBe expectedString

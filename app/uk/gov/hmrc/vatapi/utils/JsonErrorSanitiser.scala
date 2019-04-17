@@ -19,11 +19,18 @@ package uk.gov.hmrc.vatapi.utils
 object JsonErrorSanitiser {
 
   def sanitise(str: String): String = {
-    val index = str.indexOf(" at [Source:")
-    if (index > 0) {
-      str.substring(0, index).trim
+
+    val searchString = "Invalid Json"
+
+    if (str.startsWith(searchString)) {
+      "Invalid Json"
     } else {
-      str.trim
+      val index = str.indexOf(searchString)
+      if (index > 0) {
+        str.substring(0, index).trim
+      } else {
+        str.trim
+      }
     }
   }
 
