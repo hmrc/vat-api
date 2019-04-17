@@ -238,7 +238,7 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(400)
         .bodyHasPath("\\statusCode", 400)
-        .bodyHasPath("\\message", "Invalid Json: Unrecognized token 'thisiswrongsosowrong': was expecting 'null', 'true', 'false' or NaN")
+        .bodyHasPath("\\message", "Invalid Json")
     }
 
 
