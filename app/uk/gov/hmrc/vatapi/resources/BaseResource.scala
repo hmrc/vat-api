@@ -54,7 +54,7 @@ trait BaseResource extends BaseController {
             case Left(authError) => Left(authError)
           }
         case (false, _) =>
-          Future.successful (Right (new AuthRequest (Organisation (), request) ) )
+          Future.successful(Right(new AuthRequest(Organisation(), request)))
       }
     }
   }
@@ -78,8 +78,6 @@ trait BaseResource extends BaseController {
       case c: AuthContext => c.agentReference
     }
   }
-
-
 }
 
 class AuthRequest[A](val authContext: AuthContext, request: Request[A]) extends WrappedRequest[A](request)

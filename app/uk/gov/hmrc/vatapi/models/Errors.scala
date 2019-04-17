@@ -18,6 +18,8 @@ package uk.gov.hmrc.vatapi.models
 
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode.ErrorCode
+import uk.gov.hmrc.vatapi.resources.AuditErrorExtractor
+import v2.models.audit.AuditError
 
 object Errors {
 
@@ -77,14 +79,32 @@ object Errors {
 
   case class Error(code: String, message: String, path: Option[String])
 
+  object Error {
+    implicit val auditErrorExtractor: AuditErrorExtractor[Error] = new AuditErrorExtractor[Error] {
+      override def auditErrors(e: Error): Seq[AuditError] = Seq(AuditError(e.code))
+    }
+  }
+
   case class BadRequest(errors: Seq[Error], message: String) {
     val code = "INVALID_REQUEST"
+  }
+
+  object BadRequest {
+    implicit val auditErrorExtractor: AuditErrorExtractor[BadRequest] = new AuditErrorExtractor[BadRequest] {
+      override def auditErrors(e: BadRequest): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
+    }
   }
 
   case class DesError(code: String, reason: String)
 
   case class BusinessError(errors: Seq[Error], message: String) {
     val code = "BUSINESS_ERROR"
+  }
+
+  object BusinessError {
+    implicit val auditErrorExtractor: AuditErrorExtractor[BusinessError] = new AuditErrorExtractor[BusinessError] {
+      override def auditErrors(e: BusinessError): Seq[AuditError] = e.errors.map(e => AuditError(e.code))
+    }
   }
 
   case class InternalServerError(message: String) {
@@ -106,7 +126,11 @@ object Errors {
 
   object InvalidRequest extends Error("INVALID_REQUEST", "Invalid request", None)
 
-  object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None)
+  object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred", None) {
+    implicit val auditErrorExtractor: AuditErrorExtractor[InternalServerError] = new AuditErrorExtractor[InternalServerError] {
+      override def auditErrors(e: InternalServerError): Seq[AuditError] = Seq(AuditError(e.code))
+    }
+  }
 
   object NotFinalisedDeclaration extends Error("NOT_FINALISED", "The return cannot be accepted without a declaration it is finalised.", Some("/finalised"))
 

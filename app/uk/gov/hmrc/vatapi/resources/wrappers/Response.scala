@@ -17,25 +17,22 @@
 package uk.gov.hmrc.vatapi.resources.wrappers
 
 import play.api.Logger
+import play.api.http.Status
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json.toJson
-import play.api.mvc.Result
-import play.api.mvc.Results._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
-import uk.gov.hmrc.vatapi.resources.AuthRequest
+import uk.gov.hmrc.vatapi.resources.{AuthRequest, VatResult}
 
 import scala.PartialFunction.{apply => _, _}
 import scala.util.{Failure, Success, Try}
 
-object Response{
+object Response {
   val defaultCorrelationId = "No Correlation ID"
 
-
-  def getCorrelationId(desResponse: Option[Response]): String =
-    desResponse.map(_.getCorrelationId()).getOrElse(Response.defaultCorrelationId)
+  def getCorrelationId(httpResponse: HttpResponse): String =
+    httpResponse.header("CorrelationId").getOrElse(defaultCorrelationId)
 }
 
 trait Response {
@@ -45,7 +42,7 @@ trait Response {
 
   def underlying: HttpResponse
 
-  def filter[A](pf: PartialFunction[Int, Result])(implicit request: AuthRequest[A]): Result =
+  def filter[A](pf: PartialFunction[Int, VatResult])(implicit request: AuthRequest[A]): VatResult =
     status / 100 match {
       case 4 | 5 =>
         logger.error(s"DES error occurred. User type: ${request.authContext.affinityGroup}\n" +
@@ -54,18 +51,18 @@ trait Response {
       case _ => (pf andThen addCorrelationHeader) (status)
     }
 
-  private def addCorrelationHeader(result: Result) =
+  private def addCorrelationHeader(result: VatResult) =
     underlying
       .header("CorrelationId")
       .fold(result)(correlationId => result.withHeaders("X-CorrelationId" -> correlationId))
 
-  def errorMappings: PartialFunction[Int, Result] = empty
+  def errorMappings: PartialFunction[Int, VatResult] = empty
 
-  private def standardErrorMapping: PartialFunction[Int, Result] = {
-    case 404 => NotFound
-    case 500 if errorCodeIsOneOf(SERVER_ERROR) => InternalServerError(toJson(Errors.InternalServerError))
-    case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => InternalServerError(toJson(Errors.InternalServerError))
-    case _ => InternalServerError(toJson(Errors.InternalServerError))
+  private def standardErrorMapping: PartialFunction[Int, VatResult] = {
+    case 404 => VatResult.FailureEmptyBody(Status.NOT_FOUND, Errors.NotFound)
+    case 500 if errorCodeIsOneOf(SERVER_ERROR) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 503 if errorCodeIsOneOf(SERVICE_UNAVAILABLE) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case _ => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
   }
 
   def errorCodeIsOneOf(errorCodes: DesErrorCode*): Boolean = jsonOrError match {
@@ -81,9 +78,6 @@ trait Response {
     }
   }
 
-  def getCorrelationId(): String = {
-    underlying.header("CorrelationId").getOrElse(Response.defaultCorrelationId)
-  }
-
+  def getCorrelationId: String = Response.getCorrelationId(underlying)
 }
 

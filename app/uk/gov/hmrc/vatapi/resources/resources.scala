@@ -19,9 +19,10 @@ package uk.gov.hmrc.vatapi
 import cats.data.EitherT
 import cats.implicits._
 import play.api.Logger
+import play.api.http.Status
 import play.api.libs.json._
 import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, Forbidden, InternalServerError}
+import play.api.mvc.Results.InternalServerError
 import uk.gov.hmrc.vatapi.models.{AuthorisationErrorResult, ErrorResult, Errors, GenericErrorResult, InternalServerErrorResult, JsonValidationErrorResult, ValidationErrorResult}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
@@ -37,13 +38,13 @@ package object resources {
     InternalServerError(Json.toJson(Errors.InternalServerError("An internal server error occurred")))
   }
 
-  def handleErrors(errorResult: ErrorResult): Result = {
+  def handleErrors(errorResult: ErrorResult): VatResult = {
     errorResult match {
-      case GenericErrorResult(message) => BadRequest(Json.toJson(Errors.badRequest(message)))
-      case JsonValidationErrorResult(errors) => BadRequest(Json.toJson(Errors.badRequest(errors)))
-      case ValidationErrorResult(error) => BadRequest(Json.toJson(Errors.badRequest(error)))
-      case AuthorisationErrorResult(error) => Forbidden(Json.toJson(error))
-      case InternalServerErrorResult(error) => InternalServerError(Json.toJson(Errors.InternalServerError(error)))
+      case GenericErrorResult(message) => VatResult.Failure(Status.BAD_REQUEST, Errors.badRequest(message))
+      case JsonValidationErrorResult(errors) => VatResult.Failure(Status.BAD_REQUEST,Errors.badRequest(errors))
+      case ValidationErrorResult(error) => VatResult.Failure(Status.BAD_REQUEST, Errors.badRequest(error))
+      case AuthorisationErrorResult(error) => VatResult.Failure(Status.FORBIDDEN, error)
+      case InternalServerErrorResult(error) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError(error))
     }
   }
 

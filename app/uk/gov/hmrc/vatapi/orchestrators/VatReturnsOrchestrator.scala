@@ -45,7 +45,7 @@ class VatReturnsOrchestrator @Inject()(
 
   def submissionTimestamp: DateTime = DateTime.now()
 
-  def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration)
+  def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration, arn: Option[String])
                      (implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
 
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
@@ -56,27 +56,19 @@ class VatReturnsOrchestrator @Inject()(
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
       case Right(nrsData) =>
         logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Successfully retrieved data from NRS: $nrsData")
-        val arn: Option[String] = request.authContext match {
-          case Agent(_, _, _, enrolments) => enrolments.getEnrolment("HMRC-AS-AGENT").flatMap(_.getIdentifier("AgentReferenceNumber")).map(_.value)
-          case c: AuthContext => c.agentReference
-        }
 
         val thisSubmissionTimestamp = submissionTimestamp
 
         nrsData match {
           case EmptyNrsData =>
             vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
-              response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, response, None, arn))
-                Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
+              response => Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
           case _ =>
             auditService.audit(buildNrsAudit(vrn, nrsData, request))
 
             vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
-              response =>
-                auditService.audit(buildSubmitVatReturnAudit(request, response, Some(nrsData.nrSubmissionId), arn))
-                Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
+              response => Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
         }
     }
@@ -86,9 +78,6 @@ class VatReturnsOrchestrator @Inject()(
 
   private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
     AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""))
-
-  private def buildSubmitVatReturnAudit(request: AuthRequest[_], response: VatReturnResponse, nrSubmissionId: Option[String], arn: Option[String]): AuditEvent[Map[String, String]] =
-    AuditEvents.submitVatReturn(response.underlying.header("CorrelationId").getOrElse(""), request.authContext.affinityGroup, nrSubmissionId, arn)
 
 }
 

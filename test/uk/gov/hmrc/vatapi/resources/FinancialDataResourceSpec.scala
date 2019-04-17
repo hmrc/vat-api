@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.data.EitherT
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
@@ -28,7 +27,7 @@ import uk.gov.hmrc.vatapi.mocks.MockAuditService
 import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockFinancialDataConnector
 import uk.gov.hmrc.vatapi.models.audit.AuditResponse
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, FinancialDataQueryParams}
+import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.{FinancialDataResponse, Response}
 import v2.models.audit.AuditError
 
@@ -66,7 +65,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe expectedResponseBody
 
         val auditResponse = AuditResponse(OK, None, Some(expectedResponseBody))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -78,13 +77,12 @@ class FinancialDataResourceSpec extends ResourceSpec
         MockFinancialDataConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
-        val expectedResponseBody = Json.toJson(Jsons.FinancialData.oneLiability)
         val result = testFinancialDataResource.retrieveLiabilities(vrn, queryParams)(FakeRequest())
         status(result) shouldBe NOT_FOUND
         contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(desResponse.getCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -103,15 +101,32 @@ class FinancialDataResourceSpec extends ResourceSpec
           authContext.affinityGroup, None, auditResponse))
       }
     }
+
+
+    "return a failure error code" when {
+      "des backend returns an error code" in new Setup {
+        val failureResponse = FinancialDataResponse(HttpResponse(BAD_REQUEST,
+          Some(Json.parse("""{"code" : "VRN_INVALID", "reason": ""}"""))))
+
+        MockFinancialDataConnector.get(vrn, queryParams)
+          .returns(Future.successful(failureResponse))
+
+        val result = testFinancialDataResource.retrieveLiabilities(vrn, queryParams)(FakeRequest())
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+        contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+
+        val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatLiabilitiesAudit(failureResponse.getCorrelationId,
+          authContext.affinityGroup, None, auditResponse))
+      }
+    }
   }
 
   "retrievePayments" should {
     "return a 200 and the correct financial data json" when {
       "for a given valid period" in new Setup {
         val desResponse = FinancialDataResponse(HttpResponse(OK, Some(Jsons.FinancialData.singlePaymentDesResponse)))
-
-        MockAuditService.audit()
-          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
         MockFinancialDataConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
@@ -123,7 +138,7 @@ class FinancialDataResourceSpec extends ResourceSpec
         contentAsJson(result) shouldBe expectedResponseBody
 
         val auditResponse = AuditResponse(OK, None, Some(expectedResponseBody))
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -132,19 +147,15 @@ class FinancialDataResourceSpec extends ResourceSpec
       "no data for the period" in new Setup {
         val desResponse = FinancialDataResponse(HttpResponse(OK, Some(Jsons.FinancialData.missingPaymentDesResponse)))
 
-        MockAuditService.audit()
-          .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
-
         MockFinancialDataConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
-        val expectedResponseBody = Json.toJson(Jsons.FinancialData.onePayment)
         val result = testFinancialDataResource.retrievePayments(vrn, queryParams)(FakeRequest())
         status(result) shouldBe NOT_FOUND
         contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
-        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId(),
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(desResponse.getCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }
@@ -160,6 +171,26 @@ class FinancialDataResourceSpec extends ResourceSpec
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(Response.defaultCorrelationId,
+          authContext.affinityGroup, None, auditResponse))
+      }
+    }
+
+    "return a failure error code" when {
+      "des backend returns an error code" in new Setup {
+        val failureResponse = FinancialDataResponse(HttpResponse(BAD_REQUEST,
+          Some(Json.parse("""{"code" : "INVALID_VRN", "reason": ""}"""))))
+
+        MockFinancialDataConnector.get(vrn, queryParams)
+          .returns(Future.successful(failureResponse))
+
+        val result = testFinancialDataResource.retrievePayments(vrn, queryParams)(FakeRequest())
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+        contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
+
+
+        val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
+        MockAuditService.verifyAudit(AuditEvents.retrieveVatPaymentsAudit(failureResponse.getCorrelationId,
           authContext.affinityGroup, None, auditResponse))
       }
     }

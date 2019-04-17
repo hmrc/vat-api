@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.vatapi.resources.wrappers
 
-import play.api.libs.json.Json.toJson
+import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
-import play.api.mvc.Result
-import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
 import uk.gov.hmrc.vatapi.models.{DesTransformError, DesTransformValidator, Errors, Liabilities, Payments, des}
+import uk.gov.hmrc.vatapi.resources.VatResult
 
 case class FinancialDataResponse(underlying: HttpResponse) extends Response {
 
@@ -61,16 +60,16 @@ case class FinancialDataResponse(underlying: HttpResponse) extends Response {
     }
   }
 
-  override def errorMappings: PartialFunction[Int, Result] = {
-    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => BadRequest(toJson(Errors.VrnInvalid))
-    case 400 if errorCodeIsOneOf(INVALID_DATEFROM) => BadRequest(toJson(Errors.InvalidDateFrom))
-    case 400 if errorCodeIsOneOf(INVALID_DATETO) => BadRequest(toJson(Errors.InvalidDateTo))
-    case 400 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
+  override def errorMappings: PartialFunction[Int, VatResult] = {
+    case 400 if errorCodeIsOneOf(INVALID_IDNUMBER) => VatResult.Failure(Status.BAD_REQUEST, Errors.VrnInvalid)
+    case 400 if errorCodeIsOneOf(INVALID_DATEFROM) => VatResult.Failure(Status.BAD_REQUEST, Errors.InvalidDateFrom)
+    case 400 if errorCodeIsOneOf(INVALID_DATETO) => VatResult.Failure(Status.BAD_REQUEST,Errors.InvalidDateTo)
+    case 400 if errorCodeIsOneOf(NOT_FOUND) => VatResult.Failure(Status.NOT_FOUND, Errors.NotFound)
     case 400 if errorCodeIsOneOf(INVALID_IDTYPE, INVALID_ONLYOPENITEMS, INVALID_REGIMETYPE,
       INVALID_INCLUDELOCKS, INVALID_CALCULATEACCRUEDINTEREST, INVALID_CUSTOMERPAYMENTINFORMATION
-    ) => InternalServerError(toJson(Errors.InternalServerError))
-    case 404 if errorCodeIsOneOf(NOT_FOUND) => NotFound(toJson(Errors.NotFound))
-    case 422 if errorCodeIsOneOf(INVALID_DATA) => BadRequest(toJson(Errors.InvalidData))
+    ) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 404 if errorCodeIsOneOf(NOT_FOUND) => VatResult.Failure(Status.NOT_FOUND,Errors.NotFound)
+    case 422 if errorCodeIsOneOf(INVALID_DATA) => VatResult.Failure(Status.BAD_REQUEST,Errors.InvalidData)
   }
 
 }
