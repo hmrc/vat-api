@@ -113,7 +113,7 @@ class Givens(httpVerbs: HttpVerbs) {
                         |        "agentId": "BDGL"
                         |    },
                         |  "affinityGroup": "Organisation",
-                        |  "authorisedEnrolments": [
+                        |  "allEnrolments": [
                         |   {
                         |         "key":"HMRC-MTD-VAT",
                         |         "identifiers":[
