@@ -62,7 +62,7 @@ class AuthorisationService @Inject()(
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
         .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
       .retrieve(
-        affinityGroup and authorisedEnrolments and agentInformation
+        affinityGroup and allEnrolments and agentInformation
       ) {
         case Some(userType) ~ enrolments ~ agentInfo
           if userType == AffinityGroup.Organisation || userType == AffinityGroup.Individual || userType == AffinityGroup.Agent =>
