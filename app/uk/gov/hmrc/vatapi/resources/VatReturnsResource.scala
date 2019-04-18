@@ -54,6 +54,7 @@ class VatReturnsResource @Inject()(
         request.authContext.affinityGroup, nrsId, arn, vatResult.auditResponse))
 
     val result = fromDes {
+
       for {
         vatReturn <- validateJson[VatReturnDeclaration](request.body)
         _ <- authorise(vatReturn) { case _ if !vatReturn.finalised => Errors.NotFinalisedDeclaration }

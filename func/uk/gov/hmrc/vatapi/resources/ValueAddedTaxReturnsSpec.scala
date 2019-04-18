@@ -1,12 +1,12 @@
 package uk.gov.hmrc.vatapi.resources
 
-import org.joda.time.DateTime
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
 
-  private def body(finalised: Boolean = true) =  s"""{
+  private def body(finalised: Boolean = true) =
+    s"""{
           "periodKey": "#001",
           "vatDueSales": 50.00,
           "vatDueAcquisitions": 100.30,
@@ -20,7 +20,8 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
           "finalised": $finalised
         }"""
 
-  private def requestWithNegativeAmounts(finalised: Boolean = true) =  s"""{
+  private def requestWithNegativeAmounts(finalised: Boolean = true) =
+    s"""{
           "periodKey": "#001",
           "vatDueSales": 50.00,
           "vatDueAcquisitions": 100.30,
@@ -207,6 +208,39 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .statusIs(403)
         .bodyHasPath("\\errors(0)\\code", "DUPLICATE_SUBMISSION")
     }
+
+    "reject submission with malformed JSON and not expose internal class details" in {
+
+      val dudJson =
+        """
+          |{
+          |   "periodKey": "#001",
+          |   "vatDueSales": 50.00,
+          |   "vatDueAcquisitions": 100.30,
+          |   "totalVatDue": 150.30,
+          |   "vatReclaimedCurrPeriod": 40.00,
+          |   "netVatDue": 110.30,
+          |   "totalValueSalesExVAT": 1000,
+          |   "totalValuePurchasesExVAT": 200.00,
+          |   "totalValueGoodsSuppliedExVAT": 100.00,
+          |   "totalAcquisitionsExVAT": 540.00,
+          |   "finalised": thisiswrongsosowrong
+          |}
+        """.stripMargin
+
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsVatReturnSuccessFor(vrn)
+        .when()
+        .post(s"/$vrn/returns", dudJson)
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(400)
+        .bodyHasPath("\\statusCode", 400)
+        .bodyHasPath("\\message", "Invalid Json")
+    }
+
 
     "reject submissions that are made too early" in {
       given()
