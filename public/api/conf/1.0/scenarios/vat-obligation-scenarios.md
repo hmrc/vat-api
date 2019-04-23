@@ -49,6 +49,36 @@
             <td><p>Simulates the scenario where the client has monthly obligations and three months are fulfilled</p></td>
         </tr>
         <tr>
+            <td><p>MONTHLY_OBS_##_OPEN</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations for 2018 and the ## month is open. All previous obligations for same year will show as fulfilled. Accepts 01 to 12. 
+                   Example: MONTHLY_OBS_03_OPEN</p></td>
+        </tr>
+        <tr>
+            <td><p>MONTHLY_OBS_12_FULFILLED</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations for 2018 and all obligations are fulfilled.</p></td>
+        </tr>
+        <tr>
+            <td><p>QUARTERLY_OBS_##_OPEN</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and the ## quarter is open.  All previous obligations for same year will show as fulfilled. Accepts 01 to 04. 
+                   Example: QUARTERLY_OBS_02_OPEN</p></td>
+        </tr>
+        <tr>
+            <td><p>QUARTERLY_OBS_04_FULFILLED</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and all obligations are fulfilled.</p></td>
+        </tr>
+        <tr>
+            <td><p>MULTIPLE_OPEN_MONTHLY</p></td>
+            <td><p>Simulates the scenario where the client has monthly obligations for 2018 and two are open.</p></td>
+        </tr>
+        <tr>
+            <td><p>MULTIPLE_OPEN_QUARTERLY</p></td>
+            <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and two are open.</p></td>
+        </tr>
+        <tr>
+            <td><p>OBS_SPANS_MULTIPLE_YEARS</p></td>
+            <td><p>Simulates the scenario where the client has an obligation that spans both calendar years 2018 and 2019.</p></td>
+        </tr>
+        <tr>
             <td><p>NOT_FOUND</p></td>
             <td><p>Simulates the scenario where no data is found</p></td>
         </tr>                  
