@@ -20,5 +20,6 @@ If your issue falls into any of the below categories please contact the SDST at 
 - Onboarding 
 - Performance metrics
 - Questions relating to the process pre MTD
+- Fraud Prevention Headers
 
 Please see answers to common questions in the [VAT API Wiki](https://github.com/hmrc/vat-api/wiki/FAQ) and see if anyone has previously encountered the issue by searching [here](https://github.com/hmrc/vat-api/issues?utf8=%E2%9C%93&q=).
