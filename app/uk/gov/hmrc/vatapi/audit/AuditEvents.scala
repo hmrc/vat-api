@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.audit
 
+import nrs.models.NRSSubmission
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
@@ -32,6 +33,18 @@ object AuditEvents {
         "vrn" -> vrn.vrn,
         "authorization" -> authorization,
         "nrSubmissionID" -> nrsData.nrSubmissionId,
+        "correlationId" -> "" //this is meant to be empty and with an incorrect name - see Vat Api TxM assessment confluence page
+      )
+    )
+
+  def nrsEmptyAudit(vrn: Vrn, submission: NRSSubmission, authorization: String): AuditEvent[Map[String, String]] =
+    AuditEvent(
+      auditType = "submitToNonRepudiationStoreFailure",
+      transactionName = "submit-vat-return",
+      detail = Map(
+        "vrn" -> vrn.vrn,
+        "authorization" -> authorization,
+        "request" -> NRSSubmission.format.writes(submission).toString(),
         "correlationId" -> "" //this is meant to be empty and with an incorrect name - see Vat Api TxM assessment confluence page
       )
     )

@@ -17,12 +17,12 @@
 package uk.gov.hmrc.vatapi.orchestrators
 
 import javax.inject.Inject
+import nrs.models.NRSSubmission
 import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.audit.AuditEvents
-import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
 import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, VatReturnDeclaration}
@@ -50,7 +50,9 @@ class VatReturnsOrchestrator @Inject()(
 
     logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Orchestrating calls to NRS and Vat Returns")
 
-    nrsService.submit(vrn, vatReturn) flatMap {
+    val submission = nrsService.convertToNrsSubmission(vrn, vatReturn)
+
+    nrsService.submit(vrn, submission) flatMap {
       case Left(e) =>
         logger.error(s"[VatReturnsOrchestrator][submitVatReturn] - Error retrieving data from NRS: $e")
         Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message)))
@@ -61,6 +63,7 @@ class VatReturnsOrchestrator @Inject()(
 
         nrsData match {
           case EmptyNrsData =>
+            auditService.audit(buildEmptyNrsAudit(vrn, submission, request))
             vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
               response => Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
@@ -78,6 +81,9 @@ class VatReturnsOrchestrator @Inject()(
 
   private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
     AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""))
+
+  private def buildEmptyNrsAudit(vrn: Vrn, submission: NRSSubmission, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
+    AuditEvents.nrsEmptyAudit(vrn, submission, request.headers.get("Authorization").getOrElse(""))
 
 }
 

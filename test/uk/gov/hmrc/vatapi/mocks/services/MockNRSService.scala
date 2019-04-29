@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.vatapi.mocks.services
 
+import nrs.models.{Metadata, NRSSubmission, SearchKeys}
+import org.joda.time.DateTime
+import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
@@ -36,10 +39,19 @@ trait MockNRSService extends UnitSpec with Mock {
     reset(mockNrsService)
   }
 
-  def setupNrsSubmission(vrn: Vrn, submission: VatReturnDeclaration)(response: NrsSubmissionOutcome): Unit =
+  def setupNrsSubmission(vrn: Vrn, submission: VatReturnDeclaration)(response: NrsSubmissionOutcome): Unit = {
     when(mockNrsService
       .submit(
         eqTo(vrn),
-        any[VatReturnDeclaration]())(any[HeaderCarrier](), any[ExecutionContext](), any[AuthRequest[_]]()))
+        any[NRSSubmission]())(any[HeaderCarrier](), any[ExecutionContext](), any[AuthRequest[_]]()))
       .thenReturn(Future.successful(response))
+
+    when(mockNrsService.convertToNrsSubmission(
+      eqTo(vrn),
+      eqTo(submission)
+    )(any[AuthRequest[_]]()))
+      .thenReturn(
+        NRSSubmission("", Metadata("", "", "", None, DateTime.now(), None, "", Json.obj(), SearchKeys()))
+      )
+  }
 }

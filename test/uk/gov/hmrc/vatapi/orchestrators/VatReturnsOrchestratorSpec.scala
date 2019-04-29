@@ -50,7 +50,7 @@ class VatReturnsOrchestratorSpec extends UnitSpec
   with MockAuditService {
 
   class Test {
-    val orchestrator: VatReturnsOrchestrator = new VatReturnsOrchestrator (mockNrsService, mockVatReturnsService, mockAuditService)
+    val orchestrator: VatReturnsOrchestrator = new VatReturnsOrchestrator(mockNrsService, mockVatReturnsService, mockAuditService)
   }
 
   val authorisationToken = "Bearer test-bearer-token"
@@ -99,9 +99,9 @@ class VatReturnsOrchestratorSpec extends UnitSpec
     }
 
     "a successful response is returned from NRS Service" should {
-      "audit the submitToNonRepudiationStore event and" +
-      "retrieve a VatReturnsResponse from VatReturnsService and" +
-      "audit the submitVatReturn event" in new Test {
+      "audit the submitToNonRepudiationStore event and " +
+        "retrieve a VatReturnsResponse from VatReturnsService and " +
+        "audit the submitVatReturn event" in new Test {
         MockAuditService.audit()
           .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
@@ -126,8 +126,8 @@ class VatReturnsOrchestratorSpec extends UnitSpec
     }
 
     "an empty response is returned from NRS Service" should {
-      "retrieve a VatReturnsResponse from VatReturnsService and" +
-      "audit the submitVatReturn event without the nrSubmissionId" in new Test {
+      "retrieve a VatReturnsResponse from VatReturnsService and " +
+        "audit the submitVatReturn event without the nrSubmissionId" in new Test {
         MockAuditService.audit()
           .returns(EitherT[Future, ErrorResult, Unit](Future.successful(Right(()))))
 
@@ -136,15 +136,6 @@ class VatReturnsOrchestratorSpec extends UnitSpec
 
         val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration, None))
         result shouldBe Right(vatReturnSuccessResponse)
-
-        val expectedSubmitVatReturnAudit = AuditEvent(
-          "submitVatReturn",
-          "submit-vat-return",
-          Map(
-            "X-CorrelationId" -> correlationId,
-            "userType" -> "Organisation"
-          )
-        )
       }
     }
   }
