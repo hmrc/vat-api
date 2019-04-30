@@ -41,12 +41,12 @@ class NRSService @Inject()(
 
   val logger: Logger = Logger(this.getClass)
 
-  def submit(vrn: Vrn, payload: VatReturnDeclaration)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
+  def submit(vrn: Vrn, submission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
-    nrsConnector.submit(vrn, convertToNrsSubmission(vrn, payload))
+    nrsConnector.submit(vrn, submission)
   }
 
-  private def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {
+  def convertToNrsSubmission(vrn: Vrn, payload: VatReturnDeclaration)(implicit request: AuthRequest[_]): NRSSubmission = {
 
     val encoder = Base64.getEncoder
     NRSSubmission(

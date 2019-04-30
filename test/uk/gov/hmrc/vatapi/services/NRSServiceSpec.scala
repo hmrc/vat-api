@@ -49,7 +49,10 @@ class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with
   "NRSService.submit" when {
 
     lazy val testVrn: Vrn = Vrn("123456789")
-    def result(submission: VatReturnDeclaration): Future[NrsSubmissionOutcome] = testNRSService.submit(testVrn, submission)
+    def result(declaration: VatReturnDeclaration): Future[NrsSubmissionOutcome] = {
+      val submission = testNRSService.convertToNrsSubmission(testVrn, declaration)
+      testNRSService.submit(testVrn, submission)
+    }
 
     "successful responses are returned from the connector" should {
       "return the correctly formatted NRS Data model" in {
