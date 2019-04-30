@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.audit
 
 import nrs.models.NRSSubmission
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
@@ -37,14 +38,14 @@ object AuditEvents {
       )
     )
 
-  def nrsEmptyAudit(vrn: Vrn, submission: NRSSubmission, authorization: String): AuditEvent[Map[String, String]] =
+  def nrsEmptyAudit(vrn: Vrn, submission: NRSSubmission, authorization: String): AuditEvent[JsObject] =
     AuditEvent(
       auditType = "submitToNonRepudiationStoreFailure",
       transactionName = "submit-vat-return",
-      detail = Map(
+      detail = Json.obj(
         "vrn" -> vrn.vrn,
         "authorization" -> authorization,
-        "request" -> NRSSubmission.format.writes(submission).toString(),
+        "request" -> NRSSubmission.format.writes(submission),
         "correlationId" -> "" //this is meant to be empty and with an incorrect name - see Vat Api TxM assessment confluence page
       )
     )

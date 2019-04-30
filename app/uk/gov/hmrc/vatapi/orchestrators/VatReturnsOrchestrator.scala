@@ -20,6 +20,7 @@ import javax.inject.Inject
 import nrs.models.NRSSubmission
 import org.joda.time.DateTime
 import play.api.Logger
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.audit.AuditEvents
@@ -82,7 +83,7 @@ class VatReturnsOrchestrator @Inject()(
   private def buildNrsAudit(vrn: Vrn, nrsData: NRSData, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
     AuditEvents.nrsAudit(vrn, nrsData, request.headers.get("Authorization").getOrElse(""))
 
-  private def buildEmptyNrsAudit(vrn: Vrn, submission: NRSSubmission, request: AuthRequest[_]): AuditEvent[Map[String, String]] =
+  private def buildEmptyNrsAudit(vrn: Vrn, submission: NRSSubmission, request: AuthRequest[_]): AuditEvent[JsObject] =
     AuditEvents.nrsEmptyAudit(vrn, submission, request.headers.get("Authorization").getOrElse(""))
 
 }
