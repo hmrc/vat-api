@@ -19,7 +19,7 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  val bootstrapPlayVersion = "4.9.0"
+  val bootstrapPlayVersion = "4.11.0"
   val authClientVersion = "2.20.0-play-25"
   val domainVersion = "5.6.0-play-25"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
@@ -28,7 +28,7 @@ private object AppDependencies {
   val json4SnativeVersion = "3.6.3"
   val json4SextVersion = "3.6.3"
 
-  val hmrcTestVersion = "3.6.0-play-25"
+  val hmrcTestVersion = "3.8.0-play-25"
   val scalaTestVersion = "3.0.5"
   val pegdownVersion = "1.6.0"
   val scalaTestPlusVerson = "2.0.1"

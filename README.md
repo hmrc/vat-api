@@ -17,7 +17,7 @@ vat-api has five endpoints:
 
 ### Development Setup
 
-Run from the console using: `$ sbt "run 9675"`
+Run from the console using: `sbt "~run 9675"`
 
 ## Highlighted SBT Tasks
 Task | Description | Command
