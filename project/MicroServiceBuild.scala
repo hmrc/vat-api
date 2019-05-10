@@ -20,7 +20,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   val bootstrapPlayVersion = "4.11.0"
-  val authClientVersion = "2.20.0-play-25"
+  val authClientVersion = "2.21.0-play-25"
   val domainVersion = "5.6.0-play-25"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
   val jsonJodaVersion = "2.6.13"
