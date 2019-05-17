@@ -38,6 +38,7 @@ import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class VatReturnsOrchestratorSpec extends UnitSpec

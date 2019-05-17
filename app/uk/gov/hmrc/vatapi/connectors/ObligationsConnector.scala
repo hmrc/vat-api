@@ -26,13 +26,12 @@ import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ObligationsConnector @Inject()(
                                       override val http: DefaultHttpClient,
                                       override val appContext: AppContext
-                                    ) extends BaseConnector {
+                                    )(implicit ec: ExecutionContext) extends BaseConnector {
 
   private val logger: Logger = Logger(this.getClass)
 

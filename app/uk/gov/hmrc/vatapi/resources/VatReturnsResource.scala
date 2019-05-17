@@ -30,7 +30,7 @@ import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class VatReturnsResource @Inject()(
@@ -39,7 +39,7 @@ class VatReturnsResource @Inject()(
                                     override val authService: AuthorisationService,
                                     override val appContext: AppContext,
                                     auditService: AuditService
-                                  ) extends BaseResource {
+                                  )(implicit ec: ExecutionContext) extends BaseResource {
 
   def submitVatReturn(vrn: Vrn): Action[JsValue] = APIAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
     val receiptId = "Receipt-ID"

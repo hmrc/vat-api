@@ -36,7 +36,9 @@ import uk.gov.hmrc.vatapi.models.{Errors, InternalServerErrorResult}
 import uk.gov.hmrc.vatapi.resources.wrappers.{Response, VatReturnResponse}
 import v2.models.audit.AuditError
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 class VatReturnsResourceSpec extends ResourceSpec
   with MockVatReturnsConnector

@@ -32,15 +32,14 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{AuditService, NRSService, VatReturnsService}
 import uk.gov.hmrc.vatapi.utils.ImplicitDateTimeFormatter
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class VatReturnsOrchestrator @Inject()(
                                         nrsService: NRSService,
                                         vatReturnsService: VatReturnsService,
                                         auditService: AuditService
-                                      ) extends ImplicitDateTimeFormatter {
+                                      )(implicit ec: ExecutionContext) extends ImplicitDateTimeFormatter {
 
   val logger: Logger = Logger(this.getClass)
 
