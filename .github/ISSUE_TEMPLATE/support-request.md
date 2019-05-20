@@ -15,7 +15,7 @@ The MTD API team cannot help if your query is about:
 
 - Fraud Prevention Headers
 - Issues relating to OAuth2
-- Subscribing or registering to use the API Platform, MTD enrolment, de-enrolment, registration for VAT, Beta services etc
+- Subscribing or registering to use the API Platform, MTD enrolment, de-enrolment, registration for VAT, Beta services, etc
 - Issues integrating with the API Platform (e.g. setting up an application/access)
 - Code examples in a given programming language
 - Business-related questions or processes pre MTD
@@ -23,7 +23,7 @@ The MTD API team cannot help if your query is about:
 - Onboarding (e.g. registering)
 - Performance metrics
 
-For any of the above, you **must** contact the software developer support team directly at SDSTeam@hmrc.gov.uk.  The SDS team do not monitor this repository.
+For any of the above, you **must** contact the Software Developer Support Team directly at SDSTeam@hmrc.gov.uk.  The SDS Team do not monitor this repository.
 
 This repository is for technical queries relating to the VAT API.  We can help with VAT-API technical queries only.
 
