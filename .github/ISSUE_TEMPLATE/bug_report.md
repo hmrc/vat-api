@@ -25,7 +25,9 @@ The MTD API team cannot help if your bug report is about:
 
 For any of the above, you **must** contact the software developer support team directly at SDSTeam@hmrc.gov.uk.  The SDS team do not monitor this repository.
 
-This repository is for bug reports relating to the VAT API, fill in the sections below to submit your bug report:
+This repository is for bug reports relating to the VAT API only.
+
+Fill in the sections below to submit your bug report:
 
 
 - [ ] Documentation
