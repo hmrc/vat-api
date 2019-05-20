@@ -25,7 +25,9 @@ The MTD API team cannot help if your feature request is about:
 
 For any of the above, you **must** contact the software developer support team directly at SDSTeam@hmrc.gov.uk.  The SDS team do not monitor this repository.
 
-This repository is for feature requests relating to the VAT API only, fill in the sections below to submit your feature request:
+This repository is for feature requests relating to the VAT API only.
+
+Fill in the sections below to submit your feature request:
 
 
 **Is your feature request related to a problem? Please describe.**
