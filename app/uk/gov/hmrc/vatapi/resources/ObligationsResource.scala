@@ -27,7 +27,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ObligationsResource @Inject()(
@@ -35,7 +35,7 @@ class ObligationsResource @Inject()(
                                      override val authService: AuthorisationService,
                                      override val appContext: AppContext,
                                      auditService: AuditService
-                                   ) extends BaseResource {
+                                   )(implicit ec: ExecutionContext) extends BaseResource {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")

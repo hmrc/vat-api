@@ -31,6 +31,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.{FinancialDataResponse, Response}
 import v2.models.audit.AuditError
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FinancialDataResourceSpec extends ResourceSpec

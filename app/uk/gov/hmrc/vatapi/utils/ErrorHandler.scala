@@ -27,7 +27,6 @@ import play.api.routing.Router
 import uk.gov.hmrc.http.NotImplementedException
 import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 @Singleton
@@ -36,7 +35,7 @@ class ErrorHandler @Inject()(
                               config: Configuration,
                               sourceMapper: OptionalSourceMapper,
                               router: Provider[Router]
-                            ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+                            )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
     super.onServerError(request, ex).map { result =>

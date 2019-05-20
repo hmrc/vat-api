@@ -28,9 +28,10 @@ import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 import uk.gov.hmrc.vatapi.mocks.connectors.MockObligationsConnector
 import uk.gov.hmrc.vatapi.models.audit.AuditResponse
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
-import uk.gov.hmrc.vatapi.resources.wrappers.{FinancialDataResponse, ObligationsResponse, Response}
+import uk.gov.hmrc.vatapi.resources.wrappers.{ObligationsResponse, Response}
 import v2.models.audit.AuditError
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ObligationsResourceSpec extends ResourceSpec

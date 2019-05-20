@@ -28,7 +28,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities,
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class FinancialDataResource @Inject()(
@@ -36,7 +36,7 @@ class FinancialDataResource @Inject()(
                                        override val authService: AuthorisationService,
                                        override val appContext: AppContext,
                                        auditService: AuditService
-                                     ) extends BaseResource {
+                                     )(implicit ec: ExecutionContext) extends BaseResource {
 
   def retrieveLiabilities(vrn: Vrn, params: FinancialDataQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
 
