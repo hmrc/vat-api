@@ -56,7 +56,7 @@ class ObligationsResource @Inject()(
               case Right(Some(obligations)) =>
                 VatResult.Success(OK, obligations)
               case Right(None) =>
-                VatResult.FailureEmptyBody(NOT_FOUND, Errors.NotFound)
+                VatResult.Failure(NOT_FOUND, Errors.NotFound)
               case Left(ex) =>
                 logger.error(s"[ObligationsResource][retrieveObligations] Json format from DES doesn't match the Obligations model: ${ex.msg}")
                 VatResult.Failure(INTERNAL_SERVER_ERROR, Errors.InternalServerError)

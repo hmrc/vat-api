@@ -111,6 +111,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(NOT_FOUND)
+        .contentTypeIsJson().bodyIsError("NOT_FOUND")
     }
 
     "return code 500 when regime type parameter is invalid" in {
