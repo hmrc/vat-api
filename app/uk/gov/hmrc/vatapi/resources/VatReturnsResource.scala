@@ -89,6 +89,7 @@ class VatReturnsResource @Inject()(
         result
 
       case Left(errorResult) =>
+        logger.warn(s"[VatReturnsResource] [submitVatReturn] Unexpected downstream error $errorResult")
         val result = handleErrors(errorResult)
         audit(result, Response.defaultCorrelationId, None)
         result
@@ -136,6 +137,7 @@ class VatReturnsResource @Inject()(
           result
 
         case Left(errorResult) =>
+          logger.warn(s"[VatReturnsResource][retrieveVatReturns] Unexpected downstream error $errorResult")
           val result = handleErrors(errorResult)
           audit(result, Response.defaultCorrelationId)
           result
