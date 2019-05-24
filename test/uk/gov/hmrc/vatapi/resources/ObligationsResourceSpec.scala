@@ -93,7 +93,7 @@ class ObligationsResourceSpec extends ResourceSpec
       }
     }
 
-    "return a 404 with no body" when {
+    "return a 404 with a json body" when {
       "DES returns a 200 response with the correct obligations body but the obligationDetails are empty" in new Setup {
         val desResponse = ObligationsResponse(HttpResponse(OK, Some(desObligationsNoDetailsJson)))
 
@@ -102,7 +102,8 @@ class ObligationsResourceSpec extends ResourceSpec
 
         val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
         status(result) shouldBe NOT_FOUND
-        contentType(result) shouldBe None
+        contentType(result) shouldBe Some(MimeTypes.JSON)
+        contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId,

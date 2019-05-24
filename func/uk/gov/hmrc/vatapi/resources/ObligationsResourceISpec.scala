@@ -111,6 +111,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(NOT_FOUND)
+        .contentTypeIsJson().bodyIsError("NOT_FOUND")
     }
 
     "return code 500 when regime type parameter is invalid" in {
@@ -155,7 +156,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
-        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
+        .bodyIsLike(Jsons.Obligations().toString)
     }
 
     "return code 200 with a set of obligations with out identifications" in {
@@ -167,7 +168,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
-        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
+        .bodyIsLike(Jsons.Obligations().toString)
     }
 
     "return code 200 with a set of obligations with identifications but no incomeSourceType" in {
@@ -179,7 +180,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
         .thenAssertThat()
         .statusIs(OK)
-        .bodyIsLike(Jsons.Obligations(firstMet = "F").toString)
+        .bodyIsLike(Jsons.Obligations().toString)
     }
 
     "reject client with no authorization" in {
