@@ -124,6 +124,7 @@ class VatReturnsResource @Inject()(
           val result = response.filter {
             case OK => response.vatReturnOrError match {
               case Right(vatReturn) =>
+                logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Successfully retrieved Vat Return from DES")
                 VatResult.Success(OK, vatReturn)
               case Left(error) =>
                 logger.error(s"[VatReturnsResource] [retrieveVatReturns] Json format from DES doesn't match the VatReturn model: ${error.msg}")
