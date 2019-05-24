@@ -17,8 +17,6 @@
 package uk.gov.hmrc.vatapi.resources.wrappers
 
 import play.api.http.Status
-import play.api.libs.json.Json.toJson
-import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._

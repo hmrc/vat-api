@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{Action, AnyContent}
