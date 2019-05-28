@@ -60,7 +60,8 @@ object DesErrorCode extends Enumeration {
   INVALID_CUSTOMERPAYMENTINFORMATION,
   INVALID_DATA,
   INVALID_INPUTDATA,
-  TAX_PERIOD_NOT_ENDED
+  TAX_PERIOD_NOT_ENDED,
+  INVALID_ORIGINATOR_ID
   = Value
 
   implicit val format: Format[DesErrorCode] = EnumJson.enumFormat(DesErrorCode,

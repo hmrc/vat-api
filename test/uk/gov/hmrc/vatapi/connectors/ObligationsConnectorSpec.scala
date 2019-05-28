@@ -66,7 +66,6 @@ class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
       headers("Accept") shouldBe MimeTypes.JSON
       headers("Environment") shouldBe desEnvironment
       headers("Authorization") shouldBe s"Bearer $desToken"
-      headers("Originator-Id") shouldBe "DA_SDI"
     }
 
     "return an ObligationsResponse" when {
