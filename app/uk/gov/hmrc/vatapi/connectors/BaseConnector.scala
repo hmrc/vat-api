@@ -35,18 +35,23 @@ trait BaseConnector {
   private val logger = Logger("connectors")
 
   def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withDesHeaders) {
+    withAdditionalHeaders[R](url, withDesHeaders()) {
       http.GET(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
-  private def withDesHeaders: HeaderCarrier => HeaderCarrier = { hc =>
-    val newHc: HeaderCarrier = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
-      .withExtraHeaders(
-        "Environment" -> appContext.desEnv,
-        "Accept" -> "application/json",
-        "Originator-Id" -> "DA_SDI"
-      )
+  private def withDesHeaders(orgFlag: Boolean = false): HeaderCarrier => HeaderCarrier = { hc =>
+
+    val newHc: HeaderCarrier = if(orgFlag) {
+      hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
+        .withExtraHeaders("Environment" -> appContext.desEnv,
+          "Accept" -> "application/json",
+          "OriginatorID" -> "MDTP")
+    }
+    else{
+      hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
+        .withExtraHeaders("Environment" -> appContext.desEnv,
+      "Accept" -> "application/json")
+    }
 
     // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
     //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
@@ -59,55 +64,17 @@ trait BaseConnector {
     lastHc
   }
 
+  private def desHeadersWithOriginatorId: HeaderCarrier => HeaderCarrier = withDesHeaders(true)
+
   private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
     implicit hc: HeaderCarrier): Future[R] = {
     val newHc = header(hc)
     f(newHc)
   }
 
-  def httpPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withDesHeaders) {
-      http.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
-    }
-
-  def httpEmptyPost[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withDesHeaders) {
-      http.POSTEmpty(url)(NoExceptionsReads, _, ec) map toResponse
-    }
-
-  def httpPut[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withDesHeaders) {
-      http.PUT(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
-    }
-
-  def httpNonDesPost[T: Writes, R <: Response](url: String, elem: T, toResponse: HttpResponse => R)(
-    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withTestHeader) {
-      http.POST(url, elem)(implicitly[Writes[T]], NoExceptionsReads, _, ec) map toResponse
-    }
-
-  def withTestHeader: HeaderCarrier => HeaderCarrier = { hc =>
-    val newHc: HeaderCarrier = hc
-      .copy()
-      .withExtraHeaders(
-        "Accept" -> "application/json"
-      )
-
-    // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
-    //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
-    //       and remove it from "otherHeaders" to prevent it from being removed again.
-    hc.otherHeaders
-      .find { case (name, _) => name == GovTestScenarioHeader }
-      .map(newHc.withExtraHeaders(_))
-      .map(headers => headers.copy(otherHeaders = headers.otherHeaders.filterNot(_._1 == GovTestScenarioHeader)))
-      .getOrElse(newHc)
-  }
-
   def httpDesPostString[R <: Response](url: String, elem: String, toResponse: HttpResponse => R)(
     implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withContentTypeJsonHeader andThen withTestHeader andThen withDesHeaders) {
+    withAdditionalHeaders[R](url, withContentTypeJsonHeader andThen desHeadersWithOriginatorId) {
       http.POSTString(url, elem)(NoExceptionsReads, _, ec) map toResponse
     }
 

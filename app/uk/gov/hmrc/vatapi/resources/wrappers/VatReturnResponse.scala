@@ -61,6 +61,7 @@ case class VatReturnResponse(underlying: HttpResponse) extends Response {
   override def errorMappings: PartialFunction[Int, VatResult] = {
     case 400 if errorCodeIsOneOf(INVALID_VRN) => VatResult.Failure(Status.BAD_REQUEST, Errors.VrnInvalid)
     case 400 if errorCodeIsOneOf(INVALID_ARN) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
+    case 400 if errorCodeIsOneOf(INVALID_ORIGINATOR_ID) => VatResult.Failure(Status.INTERNAL_SERVER_ERROR, Errors.InternalServerError)
     case 400 if errorCodeIsOneOf(INVALID_PAYLOAD) => VatResult.Failure(Status.BAD_REQUEST, Errors.InvalidRequest)
     case 400 if errorCodeIsOneOf(INVALID_PERIODKEY) => VatResult.Failure(Status.BAD_REQUEST, Errors.InvalidPeriodKey)
     case 400 if errorCodeIsOneOf(INVALID_SUBMISSION) =>

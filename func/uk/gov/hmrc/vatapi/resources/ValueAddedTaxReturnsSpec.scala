@@ -181,6 +181,20 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .bodyHasPath("\\code", "VRN_INVALID")
     }
 
+    "reject submission with invalid INVALID_ORIGINATOR_ID" in {
+      given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheNrsDependantResource
+        .nrs().nrsVatReturnSuccessFor(vrn)
+        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ORIGINATOR_ID", 400)
+        .when()
+        .post(s"/$vrn/returns", Some(Json.parse(body())))
+        .withHeaders("Authorization", "Bearer testtoken")
+        .thenAssertThat()
+        .statusIs(500)
+        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    }
+
     "reject submission with invalid payload" in {
       given()
         .stubAudit
