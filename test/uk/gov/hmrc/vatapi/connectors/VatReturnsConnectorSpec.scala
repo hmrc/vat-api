@@ -22,6 +22,7 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status._
 import play.api.libs.json.Json
+import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
@@ -65,6 +66,10 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
         val testUrl: String = s"$testDesUrl/vat/traders/$testVrn/returns"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
         await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
+
+        val headers = MockHttp.fetchHeaderCarrier.headers.toMap
+        headers("Accept") shouldBe "application/json"
+        headers("OriginatorID") shouldBe "MDTP"
       }
 
       "pointing to the vat normal" in new Test {
@@ -72,6 +77,10 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
         val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
         await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
+
+        val headers = MockHttp.fetchHeaderCarrier.headers.toMap
+        headers("Accept") shouldBe "application/json"
+        headers("OriginatorID") shouldBe "MDTP"
       }
     }
 

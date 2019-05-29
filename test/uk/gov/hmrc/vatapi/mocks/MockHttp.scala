@@ -35,8 +35,9 @@ trait MockHttp extends Mock { _: Suite =>
     reset(mockHttp)
   }
 
+  private val headerCarrierCaptor = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+
   object MockHttp {
-    private val headerCarrierCaptor = ArgumentCaptor.forClass(classOf[HeaderCarrier])
 
     def GET[T](url: String): OngoingStubbing[Future[T]] = {
       when(mockHttp.GET[T](eqTo(url))(any(), headerCarrierCaptor.capture(), any()))
@@ -65,7 +66,7 @@ trait MockHttp extends Mock { _: Suite =>
   def setupMockHttpPostString[R](url: String, elem: String)(response: R): OngoingStubbing[Future[R]] ={
     when(
       mockHttp.POSTString[R](eqTo(url), eqTo[String](elem), any[Seq[(String, String)]]())
-        (any[HttpReads[R]](), any[HeaderCarrier](), any[ExecutionContext]())
+        (any[HttpReads[R]](), headerCarrierCaptor.capture(), any[ExecutionContext]())
     ).thenReturn(
       Future.successful(response))
   }

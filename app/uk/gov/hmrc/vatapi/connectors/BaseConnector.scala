@@ -41,14 +41,19 @@ trait BaseConnector {
     }
 
   private def withDesHeaders(orgFlag: Boolean = false): HeaderCarrier => HeaderCarrier = { hc =>
-    val newHc: HeaderCarrier = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
-      .withExtraHeaders(
-        "Environment" -> appContext.desEnv,
-        "Accept" -> "application/json"
-      )
 
-    if(orgFlag) newHc.withExtraHeaders("OriginatorID" -> "MDTP")
+    val newHc: HeaderCarrier = if(orgFlag) {
+      hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
+        .withExtraHeaders("Environment" -> appContext.desEnv,
+          "Accept" -> "application/json",
+          "OriginatorID" -> "MDTP")
+    }
+    else{
+      hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
+        .withExtraHeaders("Environment" -> appContext.desEnv,
+      "Accept" -> "application/json")
+    }
+
     // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
     //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
     //       and remove it from "otherHeaders" to prevent it from being removed again.
