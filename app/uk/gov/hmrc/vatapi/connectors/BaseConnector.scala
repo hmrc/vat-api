@@ -48,7 +48,7 @@ trait BaseConnector {
         "Accept" -> "application/json"
       )
 
-    if(orgFlag) newHc.withExtraHeaders("OriginatorID " -> "MDTP")
+    if(orgFlag) newHc.withExtraHeaders("OriginatorID" -> "MDTP")
     // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
     //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
     //       and remove it from "otherHeaders" to prevent it from being removed again.

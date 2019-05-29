@@ -190,7 +190,6 @@ class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
         .when()
         .post(s"/$vrn/returns", Some(Json.parse(body())))
         .withHeaders("Authorization", "Bearer testtoken")
-        .withHeaders("OriginatorID", "XXX")
         .thenAssertThat()
         .statusIs(500)
         .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
