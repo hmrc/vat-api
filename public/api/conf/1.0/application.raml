@@ -123,7 +123,7 @@ traits:
                     value:
                       code: INVALID_DATE_TO
                   invalidDateRange:
-                    description: Invalid date range
+                    description: Invalid date range, must be 366 days or less
                     value:
                       code: INVALID_DATE_RANGE
                   invalidStatus:
@@ -264,19 +264,11 @@ traits:
                     value:
                       code: VAT_NET_VALUE
                   invalidNumericValue:
-                    description: please provide a numeric field
+                    description: Please provide a numeric field
                     value:
                       code: INVALID_NUMERIC_VALUE
-                  nonNegInvalidMonetaryAmount:
-                    description: amounts should be a non-negative number less than 9999999999999.99 with up to 2 decimal places
-                    value:
-                      code: INVALID_MONETARY_AMOUNT
-                  wholeInvalidMonetaryAmount:
-                    description: The value must be between -9999999999999 and 9999999999999
-                    value:
-                      code: INVALID_MONETARY_AMOUNT
-                  netVatInvalidMonetaryAmount:
-                    description: amount should be a monetary value (to 2 decimal places), between 0 and 99999999999.99
+                  invalidMonetaryAmount:
+                    description: The monetary amount is invalid
                     value:
                       code: INVALID_MONETARY_AMOUNT
           403:
@@ -346,7 +338,7 @@ traits:
                     value:
                       code: DATE_TO_INVALID
                   invalidDateRange:
-                    description: Invalid date range, must be 1 year or less
+                    description: Invalid date range, must be 365 days or less
                     value:
                       code: DATE_RANGE_INVALID
           404:
@@ -407,7 +399,7 @@ traits:
                     value:
                       code: DATE_TO_INVALID
                   invalidDateRange:
-                    description: Invalid date range, must be 1 year or less
+                    description: Invalid date range, must be 365 days or less
                     value:
                       code: DATE_RANGE_INVALID
           404:
