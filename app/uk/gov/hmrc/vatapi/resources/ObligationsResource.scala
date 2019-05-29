@@ -53,6 +53,7 @@ class ObligationsResource @Inject()(
           case OK =>
             desResponse.obligations(vrn) match {
               case Right(Some(obligations)) =>
+                logger.debug(s"[ObligationsResource][retrieveObligations] Successfully retrieved Obligations from DES")
                 VatResult.Success(OK, obligations)
               case Right(None) =>
                 VatResult.Failure(NOT_FOUND, Errors.NotFound)

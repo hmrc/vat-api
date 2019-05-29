@@ -17,8 +17,6 @@
 package uk.gov.hmrc.vatapi.resources.wrappers
 
 import play.api.http.Status
-import play.api.libs.json.Json.toJson
-import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode._
@@ -32,7 +30,7 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
   def obligations(vrn: Vrn): Either[DesTransformError, Option[Obligations]] = {
 
     def noneFound: Either[DesTransformError, Option[Obligations]] = {
-      logger.error(s"[ObligationsResponse][noneFound] No obligation details found. JSON: ${underlying.status}")
+      logger.warn(s"[ObligationsResponse][noneFound] No obligation details found. JSON: ${underlying.status}")
       Right(None)
     }
 

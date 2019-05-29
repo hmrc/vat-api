@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{Action, AnyContent}
@@ -63,7 +62,7 @@ class FinancialDataResource @Inject()(
 
                 remainingLiabilities match {
                   case Nil =>
-                    logger.error(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
+                    logger.warn(s"[FinancialDataResource][retrieveLiabilities] Retrieved liabilities from DES but exceeded the 'dateTo' query parameter range")
                     VatResult.Failure(NOT_FOUND, Errors.NotFound)
                   case _ =>
                     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
@@ -113,7 +112,7 @@ class FinancialDataResource @Inject()(
                 )
                 payments.payments match {
                   case Seq() =>
-                    logger.error(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
+                    logger.warn(s"[FinancialDataResource][retrievePayments] Retrieved payments from DES but exceeded the 'dateTo' query parameter range")
                     VatResult.Failure(NOT_FOUND, Errors.NotFound)
                   case _ =>
                     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
