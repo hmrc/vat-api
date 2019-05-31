@@ -20,6 +20,7 @@ import java.net.URLEncoder
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.mvc.Http.MimeTypes
@@ -27,6 +28,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
@@ -59,9 +61,11 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
 
   "VatReturnsConnector.post" should {
 
-    "return a VatReturnsResponse model with correct body in case of success" when {
+    val config = Configuration("submit-with-originatorId.enabled" -> true)
 
+    "return a VatReturnsResponse model with correct body in case of success" when {
       "pointing to the vat hybrid" in new Test {
+        when(mockAppContext.featureSwitch).thenReturn(Some(config))
         MockAppContext.vatHybridFeatureEnabled.thenReturn(true)
         val testUrl: String = s"$testDesUrl/vat/traders/$testVrn/returns"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
@@ -73,6 +77,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
       }
 
       "pointing to the vat normal" in new Test {
+        when(mockAppContext.featureSwitch).thenReturn(Some(config))
         MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
         val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
@@ -87,6 +92,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
     "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" when {
 
       "pointing to the vat hybrid" in new Test {
+        when(mockAppContext.featureSwitch).thenReturn(Some(config))
         MockAppContext.vatHybridFeatureEnabled.thenReturn(true)
         val testUrl: String = s"$testDesUrl/vat/traders/$testVrn/returns"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
@@ -94,6 +100,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
       }
 
       "pointing to the vat normal" in new Test {
+        when(mockAppContext.featureSwitch).thenReturn(Some(config))
         MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
         val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
