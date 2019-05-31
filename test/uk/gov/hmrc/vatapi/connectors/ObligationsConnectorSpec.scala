@@ -28,6 +28,7 @@ import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
 import uk.gov.hmrc.vatapi.resources.Jsons
 import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite

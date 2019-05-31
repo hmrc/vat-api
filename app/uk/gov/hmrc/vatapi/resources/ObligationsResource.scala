@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.domain.Vrn
@@ -27,7 +26,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ObligationsResource @Inject()(
@@ -35,7 +34,7 @@ class ObligationsResource @Inject()(
                                      override val authService: AuthorisationService,
                                      override val appContext: AppContext,
                                      auditService: AuditService
-                                   ) extends BaseResource {
+                                   )(implicit ec: ExecutionContext) extends BaseResource {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
@@ -54,9 +53,10 @@ class ObligationsResource @Inject()(
           case OK =>
             desResponse.obligations(vrn) match {
               case Right(Some(obligations)) =>
+                logger.debug(s"[ObligationsResource][retrieveObligations] Successfully retrieved Obligations from DES")
                 VatResult.Success(OK, obligations)
               case Right(None) =>
-                VatResult.FailureEmptyBody(NOT_FOUND, Errors.NotFound)
+                VatResult.Failure(NOT_FOUND, Errors.NotFound)
               case Left(ex) =>
                 logger.error(s"[ObligationsResource][retrieveObligations] Json format from DES doesn't match the Obligations model: ${ex.msg}")
                 VatResult.Failure(INTERNAL_SERVER_ERROR, Errors.InternalServerError)

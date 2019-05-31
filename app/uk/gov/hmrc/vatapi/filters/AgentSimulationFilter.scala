@@ -22,10 +22,9 @@ import play.api.mvc._
 import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class AgentSimulationFilter @Inject()(implicit val mat: Materializer) extends Filter {
+class AgentSimulationFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     val method = rh.method

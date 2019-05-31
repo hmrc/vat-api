@@ -20,10 +20,9 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class SetContentTypeFilter @Inject()(implicit val mat: Materializer) extends Filter {
+class SetContentTypeFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     f(rh).map(_.as("application/json"))

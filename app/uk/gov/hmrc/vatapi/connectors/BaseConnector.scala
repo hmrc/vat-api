@@ -25,7 +25,6 @@ import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseConnector {
