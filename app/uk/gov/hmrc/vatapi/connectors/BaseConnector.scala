@@ -21,7 +21,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
@@ -31,6 +31,7 @@ trait BaseConnector {
 
   val http: DefaultHttpClient
   val appContext: AppContext
+  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
 
   private val logger = Logger("connectors")
 
@@ -64,7 +65,7 @@ trait BaseConnector {
     lastHc
   }
 
-  private def desHeadersWithOriginatorId: HeaderCarrier => HeaderCarrier = withDesHeaders(true)
+  private def desHeadersWithOriginatorId: HeaderCarrier => HeaderCarrier = withDesHeaders(featureSwitch.isOriginatorIdForSubmitEnabled)
 
   private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
     implicit hc: HeaderCarrier): Future[R] = {

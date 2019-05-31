@@ -51,5 +51,12 @@ case class FeatureSwitch @Inject()(value: Option[Configuration], env: String) {
       case None => true
     }
   }
+
+  def isOriginatorIdForSubmitEnabled: Boolean = {
+    value match {
+      case Some(config) => config.getBoolean("submit-with-originatorId.enabled").getOrElse(false)
+      case None => false
+    }
+  }
 }
 
