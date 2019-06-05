@@ -52,7 +52,7 @@ traits:
             type: types.errorResponse
             examples:
               clientNotSubscribedToMTD:
-                description: The client and/or agent is not authorised.
+                description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                 value:
                   code: CLIENT_OR_AGENT_NOT_AUTHORISED
 
