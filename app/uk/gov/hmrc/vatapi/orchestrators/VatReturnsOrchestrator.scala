@@ -45,6 +45,7 @@ class VatReturnsOrchestrator @Inject()(
 
   def submissionTimestamp: DateTime = DateTime.now()
 
+
   def submitVatReturn(vrn: Vrn, vatReturn: VatReturnDeclaration, arn: Option[String])
                      (implicit hc: HeaderCarrier, request: AuthRequest[_]): Future[Either[ErrorResult, VatReturnResponse]] = {
 
@@ -60,6 +61,8 @@ class VatReturnsOrchestrator @Inject()(
         logger.debug(s"[VatReturnsOrchestrator][submitVatReturn] - Successfully retrieved data from NRS: $nrsData")
 
         val thisSubmissionTimestamp = submissionTimestamp
+        logger.debug(s"[VatReturnsOrchestrator][submitVatReturn][timestamp] - About to submit vat return with submission timestamp: " +
+          s"$thisSubmissionTimestamp and JSON for submission is:\n${vatReturn.toDes(thisSubmissionTimestamp, arn).toJsonString}")
 
         nrsData match {
           case EmptyNrsData =>
