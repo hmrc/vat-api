@@ -1,4 +1,5 @@
-<p>Scenario simulations using <b> Gov-Test-Scenario </b> headers are only available in sandbox environment</p>
+<p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+<p>Using this endpoint in the sandbox environment will return the previously submitted data. A 404 (Not Found) response will be returned for a periodKey that has not been submitted.</p>
 <table>
     <thead>
         <tr>
