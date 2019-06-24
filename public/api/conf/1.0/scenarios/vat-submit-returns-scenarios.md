@@ -1,4 +1,5 @@
-<p>Scenario simulations using <b> Gov-Test-Scenario </b> headers are only available in sandbox environment</p>
+<p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+<p>Using this endpoint in the sandbox environment will store the data submitted. There is no requirement to use the periodKeys in the obligation response in the sandbox environment.</p>
 <table>
     <thead>
         <tr>
