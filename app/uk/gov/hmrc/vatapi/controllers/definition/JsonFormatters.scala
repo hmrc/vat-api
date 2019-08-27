@@ -27,7 +27,6 @@ object JsonFormatters {
   implicit val formatGroupName = EnumJson.enumFormat(GroupName)
 
   implicit val formatParameter = Json.format[Parameter]
-  implicit val formatEndpoint = Json.format[Endpoint]
   implicit val formatAccess = Json.format[Access]
   implicit val formatAPIVersion = Json.format[APIVersion]
   implicit val formatAPIDefinition = Json.format[APIDefinition]
