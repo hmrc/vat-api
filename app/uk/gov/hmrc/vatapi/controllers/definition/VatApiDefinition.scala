@@ -20,10 +20,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
-import uk.gov.hmrc.vatapi.controllers.definition.AuthType._
-import uk.gov.hmrc.vatapi.controllers.definition.GroupName._
-import uk.gov.hmrc.vatapi.controllers.definition.HttpMethod._
-import uk.gov.hmrc.vatapi.controllers.definition.ResourceThrottlingTier._
 
 @Singleton
 class VatApiDefinition @Inject()(appContext: AppContext) {
@@ -52,7 +48,6 @@ class VatApiDefinition @Inject()(appContext: AppContext) {
             version = "1.0",
             access = buildWhiteListingAccess(),
             status = buildAPIStatus("1.0"),
-            endpoints = allEndpoints,
             endpointsEnabled = true
           )
         ),
@@ -60,57 +55,9 @@ class VatApiDefinition @Inject()(appContext: AppContext) {
       )
     )
   val logger: Logger = Logger(this.getClass)
-  val vatEndpoints: Seq[Endpoint] = {
-    Seq(
-      Endpoint(
-        uriPattern = "/{vrn}/obligations",
-        endpointName = "Retrieve all VAT obligations",
-        method = GET,
-        authType = USER,
-        throttlingTier = UNLIMITED,
-        scope = Some(readScope),
-        groupName = Vat)
-      ,
-      Endpoint(
-        uriPattern = "/{vrn}/returns",
-        endpointName = "Submit VAT return for period.",
-        method = POST,
-        authType = USER,
-        throttlingTier = UNLIMITED,
-        scope = Some(writeScope),
-        groupName = Vat,
-        queryParameters = Some(Seq(
-          Parameter("from", true),
-          Parameter("to", true),
-          Parameter("status", true)
-        )))
-      ,
-      Endpoint(
-        uriPattern = "/{vrn}/returns",
-        endpointName = "Retrieve submitted VAT returns",
-        method = GET,
-        authType = USER,
-        throttlingTier = UNLIMITED,
-        scope = Some(readScope),
-        groupName = Vat),
-      Endpoint(
-        uriPattern = "/{vrn}/liabilities",
-        endpointName = "Retrieve VAT liabilities",
-        method = GET,
-        authType = USER,
-        throttlingTier = UNLIMITED,
-        scope = Some(readScope),
-        groupName = Vat,
-        queryParameters = Some(Seq(
-          Parameter("from", true),
-          Parameter("to", true)
-        ))
-      )
-    )
-  }
+
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
-  private val allEndpoints = vatEndpoints
 
   private def buildAPIStatus(version: String): APIStatus = {
     appContext.apiStatus(version) match {
