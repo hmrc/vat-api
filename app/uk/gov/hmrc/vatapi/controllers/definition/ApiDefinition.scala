@@ -66,23 +66,3 @@ object APIStatus extends Enumeration {
   type APIStatus = Value
   val ALPHA, BETA, STABLE, DEPRECATED, RETIRED = Value
 }
-
-object AuthType extends Enumeration {
-  type AuthType = Value
-  val NONE, APPLICATION, USER = Value
-}
-
-object HttpMethod extends Enumeration {
-  type HttpMethod = Value
-  val GET, POST, PUT = Value
-}
-
-object ResourceThrottlingTier extends Enumeration {
-  type ResourceThrottlingTier = Value
-  val UNLIMITED = Value
-}
-
-object GroupName extends Enumeration {
-  type GroupName = Value
-  val Vat = Value("VAT")
-}

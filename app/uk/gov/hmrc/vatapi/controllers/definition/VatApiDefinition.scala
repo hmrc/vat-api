@@ -20,10 +20,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
-import uk.gov.hmrc.vatapi.controllers.definition.AuthType._
-import uk.gov.hmrc.vatapi.controllers.definition.GroupName._
-import uk.gov.hmrc.vatapi.controllers.definition.HttpMethod._
-import uk.gov.hmrc.vatapi.controllers.definition.ResourceThrottlingTier._
 
 @Singleton
 class VatApiDefinition @Inject()(appContext: AppContext) {
