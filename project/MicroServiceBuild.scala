@@ -19,8 +19,7 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  val bootstrapPlayVersion = "4.15.0"
-  val authClientVersion = "2.22.0-play-25"
+  val bootstrapPlayVersion = "5.1.0"
   val domainVersion = "5.6.0-play-25"
   val hmrcApiVersion = "2.1.0"  // updating this is a breaking change to the project.....
   val jsonJodaVersion = "2.6.13"
@@ -42,7 +41,6 @@ private object AppDependencies {
   val compile = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
     "uk.gov.hmrc" %% "bootstrap-play-25" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "auth-client" % authClientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "uk.gov.hmrc" %% "play-hmrc-api" % hmrcApiVersion,
     "com.typesafe.play" %% "play-json-joda" % jsonJodaVersion,
