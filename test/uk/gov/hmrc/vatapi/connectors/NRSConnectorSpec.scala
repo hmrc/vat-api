@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.connectors
 
 import java.util.concurrent.TimeoutException
 
-import nrs.models.NRSSubmission
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.{JsResultException, Json, Writes}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
@@ -30,6 +29,7 @@ import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutco
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
 import uk.gov.hmrc.vatapi.mocks.MockHttp
 import uk.gov.hmrc.vatapi.mocks.config.MockAppContext
+import uk.gov.hmrc.vatapi.models.NRSSubmission
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

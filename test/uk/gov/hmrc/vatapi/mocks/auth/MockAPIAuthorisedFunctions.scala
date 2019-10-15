@@ -141,8 +141,8 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
   def setupMockAuthRetrievalSuccess[X, Y](retrievalValue: X ~ Y): Unit = {
     when(mockAPIAuthorisedFunctions.authorised(any()))
       .thenReturn(
-        new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
-          override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray.empty), retrieval) {
+        new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray())) {
+          override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray()), retrieval) {
             override def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[B] = body.apply(retrievalValue.asInstanceOf[A])
           }
         })
@@ -151,10 +151,10 @@ trait MockAPIAuthorisedFunctions extends UnitSpec with Mock {
   def setupMockAuthorisationException(exception: Exception = InsufficientEnrolments()): Unit =
     when(mockAPIAuthorisedFunctions.authorised(any()))
       .thenReturn(
-        new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray.empty)) {
+        new mockAPIAuthorisedFunctions.AuthorisedFunction(RawJsonPredicate(JsArray())) {
           override def apply[A](body: => Future[A])(implicit hc: HeaderCarrier, executionContext: ExecutionContext) = Future.failed(exception)
 
-          override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray.empty), retrieval) {
+          override def retrieve[A](retrieval: Retrieval[A]) = new mockAPIAuthorisedFunctions.AuthorisedFunctionWithResult[A](RawJsonPredicate(JsArray()), retrieval) {
             override def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[B] = Future.failed(exception)
           }
         })

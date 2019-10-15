@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.resources
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.models.ErrorCode.ErrorCode
@@ -89,14 +90,14 @@ trait JsonSpec extends UnitSpec {
       value: JsValue,
       pathAndMessage: Map[String, Seq[String]]): Unit = {
     val expectedError = pathAndMessage.map {
-      case (path, msg) => path -> Seq(JsonValidationError(msg))
+      case (path, msg) => path -> Seq(ValidationError(msg))
     }.toSeq
 
     value.validate[T].asEither match {
       case Left(errs) =>
         errs.map {
           case (p, e) =>
-            p.toString -> e.map(x => JsonValidationError(x.message))
+            p.toString -> e.map(x => ValidationError(x.message))
         } should contain theSameElementsAs expectedError
       case Right(_) =>
         fail(

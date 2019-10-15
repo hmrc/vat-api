@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.DateTime
+import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.Validation._
@@ -59,7 +60,7 @@ object VatReturnDeclaration {
 
   private val periodKeyValidator: Reads[String] = Reads
     .of[String]
-    .filter(JsonValidationError("period key should be a 4 character string",
+    .filter(ValidationError("period key should be a 4 character string",
       ErrorCode.PERIOD_KEY_INVALID))(_.length == 4)
 
   implicit val reads: Reads[VatReturnDeclaration] = (
@@ -82,7 +83,7 @@ object VatReturnDeclaration {
         Validation[VatReturnDeclaration](
           JsPath \ "totalVatDue",
           vatReturn => vatReturn.totalVatDue == vatReturn.vatDueSales + vatReturn.vatDueAcquisitions,
-          JsonValidationError(
+          ValidationError(
             "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
             ErrorCode.VAT_TOTAL_VALUE)
         ),
@@ -90,7 +91,7 @@ object VatReturnDeclaration {
           JsPath \ "netVatDue",
           vatReturn =>
             vatReturn.netVatDue == (vatReturn.totalVatDue - vatReturn.vatReclaimedCurrPeriod).abs,
-          JsonValidationError(
+          ValidationError(
             "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
             ErrorCode.VAT_NET_VALUE)
         )

@@ -18,8 +18,8 @@ package uk.gov.hmrc.vatapi.auth
 
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import AuthConstants._
-import nrs.models.IdentityData
 import uk.gov.hmrc.auth.core.retrieve.AgentInformation
+import uk.gov.hmrc.vatapi.models.IdentityData
 
 sealed trait AuthContext {
   val affinityGroup: String

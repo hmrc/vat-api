@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.{JsPath, JsonValidationError}
+import play.api.data.validation.ValidationError
+import play.api.libs.json.JsPath
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.models.{ErrorCode, Errors}
 
@@ -25,12 +26,12 @@ class ResourcesSpec extends UnitSpec {
   "Errors.badRequest" should {
 
     "translate Json string validation error to the appropriate error code" in {
-      val errors = Seq((JsPath \ "a", Seq(JsonValidationError("error.expected.jsstring"))))
+      val errors = Seq((JsPath \ "a", Seq(ValidationError("error.expected.jsstring"))))
       Errors.badRequest(errors).errors.head.code shouldBe ErrorCode.INVALID_STRING_VALUE.toString
     }
 
     "translate Json numeric validation error to the appropriate error code" in {
-      val errors = Seq((JsPath \ "a", Seq(JsonValidationError("error.expected.numberformatexception"))))
+      val errors = Seq((JsPath \ "a", Seq(ValidationError("error.expected.numberformatexception"))))
       Errors.badRequest(errors).errors.head.code shouldBe ErrorCode.INVALID_NUMERIC_VALUE.toString
     }
   }
