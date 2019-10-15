@@ -17,19 +17,17 @@
 package uk.gov.hmrc.vatapi.services
 
 import java.nio.charset.StandardCharsets
+import org.joda.time.DateTime
 import java.util.Base64
 
 import javax.inject.Inject
-import nrs.models._
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.{GatewayTimeoutException, HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.connectors.NRSConnector
-import uk.gov.hmrc.vatapi.httpparsers.EmptyNrsData
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
-import uk.gov.hmrc.vatapi.models.VatReturnDeclaration
+import uk.gov.hmrc.vatapi.models.{Metadata, NRSSubmission, SearchKeys, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 
 import scala.concurrent.{ExecutionContext, Future}

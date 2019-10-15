@@ -34,6 +34,6 @@ case class VatReturn(periodKey: String,
                      receivedAt: Option[DateTime] = None)
 
 object VatReturn {
-  import uk.gov.hmrc.vatapi.models.dateTimeFormat
-  implicit val reads: Format[VatReturn] = Json.format[VatReturn]
+  implicit val dateFormats: Format[DateTime] = uk.gov.hmrc.vatapi.models.dateTimeFormat
+  implicit val format: Format[VatReturn] = Json.format[VatReturn]
 }

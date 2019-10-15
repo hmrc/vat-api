@@ -26,6 +26,6 @@ case class GenericErrorResult(message: String) extends ErrorResult
 
 case class ValidationErrorResult(error: Errors.Error) extends ErrorResult
 
-case class JsonValidationErrorResult(validationErrors: JsonValidationErrors) extends ErrorResult
+case class JsonValidationErrorResult(validationErrors: ValidationErrors) extends ErrorResult
 
 case class AuthorisationErrorResult(error: BusinessError) extends ErrorResult

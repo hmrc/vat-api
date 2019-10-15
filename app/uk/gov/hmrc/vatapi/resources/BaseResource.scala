@@ -37,7 +37,7 @@ trait BaseResource extends BaseController {
 
   val logger: Logger = Logger(this.getClass)
 
-  def AuthAction(vrn: Vrn, nrsRequired: Boolean = false) = new ActionRefiner[Request, AuthRequest] {
+  def AuthAction(vrn: Vrn, nrsRequired: Boolean = false): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
 
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] = {

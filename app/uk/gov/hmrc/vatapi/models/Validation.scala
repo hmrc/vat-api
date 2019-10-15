@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.vatapi.models
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 case class Validation[T](path: JsPath,
                          validator: T => Boolean,
-                         validationError: JsonValidationError)
+                         validationError: ValidationError)
 
 object Validation {
 
@@ -29,7 +30,7 @@ object Validation {
       reads.flatMap { t =>
         Reads[T] { _ =>
           val errors = validations.foldLeft(
-            Seq.empty[(JsPath, Seq[JsonValidationError])]) {
+            Seq.empty[(JsPath, Seq[ValidationError])]) {
             case (errs, Validation(path, validator, err)) =>
               if (validator(t)) errs else errs :+ path -> Seq(err)
           }

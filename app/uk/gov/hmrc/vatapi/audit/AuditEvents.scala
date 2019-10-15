@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.vatapi.audit
 
-import nrs.models.NRSSubmission
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
+import uk.gov.hmrc.vatapi.models.NRSSubmission
 import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
 
 object AuditEvents {

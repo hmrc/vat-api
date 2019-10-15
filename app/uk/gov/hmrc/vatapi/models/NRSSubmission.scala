@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package nrs.models
+package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{AffinityGroup, ConfidenceLevel, CredentialRole}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.controllers.RestFormats
-import uk.gov.hmrc.vatapi.models.isoInstantDateFormat
 
 case class NRSSubmission(payload: String,
                          metadata: Metadata)
@@ -45,6 +43,7 @@ case class Metadata(businessId: String,
 
 object Metadata {
   implicit val idformat: OFormat[IdentityData] = IdentityData.format
+  implicit val dateFormats: Format[DateTime] = isoInstantDateFormat
   implicit val format: OFormat[Metadata] = Json.format[Metadata]
 }
 
@@ -71,7 +70,6 @@ case class IdentityData(internalId: Option[String] = None,
                         loginTimes: LoginTimes)
 
 object IdentityData {
-  implicit val localDateFormat: Format[LocalDate] = RestFormats.localDateFormats
   implicit val credFormat: OFormat[Credentials] = Json.format[Credentials]
   implicit val nameFormat: OFormat[Name] = Json.format[Name]
   implicit val agentInfoFormat: OFormat[AgentInformation] = Json.format[AgentInformation]
@@ -89,6 +87,5 @@ case class SearchKeys(vrn: Option[Vrn] = None,
                      )
 
 object SearchKeys {
-  implicit val localDateFormat: Format[LocalDate] = RestFormats.localDateFormats
   implicit val format: OFormat[SearchKeys] = Json.format[SearchKeys]
 }

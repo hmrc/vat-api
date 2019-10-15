@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.models
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode.ErrorCode
 import uk.gov.hmrc.vatapi.resources.AuditErrorExtractor
@@ -40,9 +41,9 @@ object Errors {
       Json.obj("code" -> req.code, "message" -> req.message)
   }
 
-  def badRequest(validationErrors: JsonValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
+  def badRequest(validationErrors: ValidationErrors) = BadRequest(flattenValidationErrors(validationErrors), "Invalid request")
 
-  private def flattenValidationErrors(validationErrors: JsonValidationErrors): Seq[Error] = {
+  private def flattenValidationErrors(validationErrors: ValidationErrors): Seq[Error] = {
     validationErrors.flatMap { validationError =>
       val (path, errors) = validationError
       errors.map { err =>
@@ -59,7 +60,7 @@ object Errors {
    * Converts a Play error without an error code into an Error that contains an error code
    * based on the content of the error message.
    */
-  private def convertErrorMessageToCode(playError: JsonValidationError, errorPath: String): Error = {
+  private def convertErrorMessageToCode(playError: ValidationError, errorPath: String): Error = {
     playError.message match {
       case "error.expected.jodadate.format" => Error("INVALID_DATE", "please provide a date in ISO format (i.e. YYYY-MM-DD)", Some(errorPath))
       case "error.path.missing" => Error("MANDATORY_FIELD_MISSING", "a mandatory field is missing", Some(errorPath))

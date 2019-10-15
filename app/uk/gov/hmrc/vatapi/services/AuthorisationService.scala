@@ -17,15 +17,14 @@
 package uk.gov.hmrc.vatapi.services
 
 import javax.inject.Inject
-import nrs.models.IdentityData
 import org.joda.time.LocalDate
 import play.api.Logger
+import uk.gov.hmrc.vatapi.models.IdentityData
 //import play.api.Logger
+import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsArray, JsResultException, Json}
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
-import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn

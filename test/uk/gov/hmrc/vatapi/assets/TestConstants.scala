@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.assets
 
-import nrs.models._
 import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.auth.core._
@@ -25,7 +24,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Individual, Organisation}
 import uk.gov.hmrc.vatapi.httpparsers.NRSData
 import uk.gov.hmrc.vatapi.models.des.PaymentIndicator
-import uk.gov.hmrc.vatapi.models.{VatReturnDeclaration, des}
+import uk.gov.hmrc.vatapi.models.{IdentityData, Metadata, NRSSubmission, SearchKeys, VatReturnDeclaration, des}
 
 object TestConstants {
 

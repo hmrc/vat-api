@@ -35,7 +35,6 @@ package uk.gov.hmrc.vatapi.connectors
 import java.util.concurrent.TimeoutException
 
 import javax.inject.Inject
-import nrs.models.NRSSubmission
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.libs.ws.WSClient
@@ -46,6 +45,7 @@ import uk.gov.hmrc.vatapi.BaseConnector
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.httpparsers.EmptyNrsData
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.{NrsSubmissionOutcome, NrsSubmissionOutcomeReads}
+import uk.gov.hmrc.vatapi.models.NRSSubmission
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}

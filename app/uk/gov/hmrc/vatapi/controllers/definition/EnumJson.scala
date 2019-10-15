@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode
 
@@ -31,9 +32,9 @@ object EnumJson {
           JsSuccess(enum.withName(s))
         } catch {
           case _: NoSuchElementException =>
-            JsError(JsPath, JsonValidationError(valueMissingMessage.getOrElse(defaultValueMissingMessage(s)), ErrorCode.INVALID_VALUE))
+            JsError(JsPath, ValidationError(valueMissingMessage.getOrElse(defaultValueMissingMessage(s)), ErrorCode.INVALID_VALUE))
         }
-      case _ => JsError(JsPath(), JsonValidationError("String value expected", ErrorCode.INVALID_TYPE))
+      case _ => JsError(JsPath(), ValidationError("String value expected", ErrorCode.INVALID_TYPE))
     }
   }
 
