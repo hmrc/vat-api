@@ -75,12 +75,14 @@ case class Liability(
                     )
 
 object Liability {
+  implicit val dateFormats: Format[LocalDate] = uk.gov.hmrc.vatapi.models.dateFormat
   implicit val format: OFormat[Liability] = Json.format[Liability]
 }
 
 case class TaxPeriod(from: LocalDate, to: LocalDate)
 
 object TaxPeriod {
+  implicit val dateFormats: Format[LocalDate] = uk.gov.hmrc.vatapi.models.dateFormat
   implicit val format: OFormat[TaxPeriod] = Json.format[TaxPeriod]
 }
 
@@ -128,5 +130,6 @@ case class Payment(amount: Amount, received: Option[LocalDate] = None) {
 }
 
 object Payment {
+  implicit val dateFormats: Format[LocalDate] = uk.gov.hmrc.vatapi.models.dateFormat
   implicit val format: OFormat[Payment] = Json.format[Payment]
 }

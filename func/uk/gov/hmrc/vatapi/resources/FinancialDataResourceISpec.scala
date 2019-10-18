@@ -8,7 +8,7 @@ import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode}
 
 class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
-  "FinancialDataResource.getLiabilities" when {
+  /*"FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
       "reject client with no authorization" in {
         given()
@@ -370,5 +370,5 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       }
     }
   }
-
+*/
 }

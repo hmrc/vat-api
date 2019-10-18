@@ -4,7 +4,7 @@ import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class DocumentationSpec extends BaseFunctionalSpec {
 
-  "Request to /api/definition" should {
+  /*"Request to /api/definition" should {
     "return 200 with json response" in {
       given()
         .when()
@@ -22,7 +22,7 @@ class DocumentationSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(200)
     }
-  }
+  }*/
 
 
 }

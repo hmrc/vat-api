@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.auth
+package uk.gov.hmrc.vatapi.config
 
-import javax.inject.Inject
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
-import uk.gov.hmrc.vatapi.connectors.MicroserviceAuthConnector
+import com.google.inject.AbstractModule
 
-class APIAuthorisedFunctions @Inject()(
-                                        override val authConnector: MicroserviceAuthConnector
-                                      ) extends AuthorisedFunctions
+class DIModule extends AbstractModule {
 
-
+  override def configure(): Unit = {
+    bind(classOf[AppContext]).to(classOf[AppContext]).asEagerSingleton()
+  }
+}

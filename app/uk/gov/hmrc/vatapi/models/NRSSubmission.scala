@@ -70,12 +70,14 @@ case class IdentityData(internalId: Option[String] = None,
                         loginTimes: LoginTimes)
 
 object IdentityData {
+  implicit val localDateFormats: Format[LocalDate] = dateFormat
   implicit val credFormat: OFormat[Credentials] = Json.format[Credentials]
   implicit val nameFormat: OFormat[Name] = Json.format[Name]
   implicit val agentInfoFormat: OFormat[AgentInformation] = Json.format[AgentInformation]
   implicit val mdtpInfoFormat: OFormat[MdtpInformation] = Json.format[MdtpInformation]
   implicit val itmpNameFormat: OFormat[ItmpName] = Json.format[ItmpName]
   implicit val itmpAddressFormat: OFormat[ItmpAddress] = Json.format[ItmpAddress]
+  implicit val dateTimeFormats: Format[DateTime] = isoInstantDateFormat
   implicit val loginTimesFormat: OFormat[LoginTimes] = Json.format[LoginTimes]
   implicit val format: OFormat[IdentityData] = Json.format[IdentityData]
 }
@@ -87,5 +89,6 @@ case class SearchKeys(vrn: Option[Vrn] = None,
                      )
 
 object SearchKeys {
+  implicit val dateFormats: Format[LocalDate] = dateFormat
   implicit val format: OFormat[SearchKeys] = Json.format[SearchKeys]
 }

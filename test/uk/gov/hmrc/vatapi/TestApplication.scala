@@ -21,10 +21,8 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import org.scalatestplus.play.OneServerPerSuite
 import play.api.http.Status._
 
 import scala.concurrent.duration._
@@ -33,24 +31,20 @@ trait TestApplication
   extends UnitSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll
-    with OneServerPerSuite
-    with Eventually
-    with ScalaFutures
-    with IntegrationPatience
     with MockitoSugar {
 
   override implicit val timeout: FiniteDuration = 100 seconds
 
-  private val WIREMOCK_PORT = 22222
-  private val stubHost = "localhost"
+  val mockPort = 22222
+  val mockHost = "localhost"
 
-  protected val wiremockBaseUrl: String = s"http://$stubHost:$WIREMOCK_PORT"
-  private val wireMockServer = new WireMockServer(wireMockConfig().port(WIREMOCK_PORT))
+  protected val wiremockBaseUrl: String = s"http://$mockHost:$mockHost"
+  private val wireMockServer = new WireMockServer(wireMockConfig().port(mockPort))
 
   protected def baseBeforeAll(): StubMapping = {
     wireMockServer.stop()
     wireMockServer.start()
-    WireMock.configureFor(stubHost, WIREMOCK_PORT)
+    WireMock.configureFor(mockHost, mockPort)
     // the below stub is here so that the application finds the registration endpoint which is called on startup
     stubFor(post(urlPathEqualTo("/registration")).willReturn(aResponse().withStatus(OK)))
   }

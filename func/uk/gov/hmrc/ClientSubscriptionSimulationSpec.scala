@@ -6,7 +6,7 @@ import uk.gov.hmrc.vatapi.resources._
 
 class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
 
-  "Request for vat returns with Gov-Test-Scenario = CLIENT_OR_AGENT_NOT_AUTHORISED" should {
+  /*"Request for vat returns with Gov-Test-Scenario = CLIENT_OR_AGENT_NOT_AUTHORISED" should {
     "return HTTP 403 with error code informing client should be subscribed to MTD" in {
       given()
         .userIsFullyAuthorisedForTheResource
@@ -56,5 +56,5 @@ class ClientSubscriptionSimulationSpec extends BaseFunctionalSpec {
         .statusIs(403)
         .bodyIsError(ErrorCode.CLIENT_OR_AGENT_NOT_AUTHORISED.toString)
     }
-  }
+  }*/
 }

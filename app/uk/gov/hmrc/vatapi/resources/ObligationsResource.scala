@@ -17,10 +17,9 @@
 package uk.gov.hmrc.vatapi.resources
 
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.AuditEvents
-import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
@@ -31,14 +30,14 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ObligationsResource @Inject()(
                                      connector: ObligationsConnector,
-                                     override val authService: AuthorisationService,
-                                     override val appContext: AppContext,
-                                     auditService: AuditService
-                                   )(implicit ec: ExecutionContext) extends BaseResource {
+                                     val authService: AuthorisationService,
+                                     auditService: AuditService,
+                                     cc: ControllerComponents
+                                   )(implicit ec: ExecutionContext) extends BaseResource(cc) {
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
-
+    print(s" *************** [ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
     val arn = getArn
 
     def audit(vatResult: VatResult, correlationId: String) =

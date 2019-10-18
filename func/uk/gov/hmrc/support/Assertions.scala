@@ -96,8 +96,8 @@ class Assertions(request: String, response: HttpResponse) (
             case pattern(arrayName, index) =>
               js match {
                 case Some(v) =>
-                  if (arrayName.isEmpty) v(index.toInt).toOption
-                  else (v \ arrayName) (index.toInt).toOption
+                  if (arrayName.isEmpty) Some(v(index.toInt))
+                  else Some((v \ arrayName) (index.toInt))
                 case None => None
               }
             case _ => (v \ pathElement).toOption

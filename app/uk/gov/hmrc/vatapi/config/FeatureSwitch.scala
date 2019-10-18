@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.config
 import javax.inject.Inject
 import play.api.Configuration
 
-case class FeatureSwitch @Inject()(value: Option[Configuration], env: String) {
+case class FeatureSwitch @Inject()(value: Option[Configuration]) {
 
   val DEFAULT_VALUE = true
 
@@ -40,7 +40,7 @@ case class FeatureSwitch @Inject()(value: Option[Configuration], env: String) {
       case Some(config) =>
         config
           .getStringSeq("white-list.applicationIds")
-          .getOrElse(throw new RuntimeException(s"$env.feature-switch.white-list.applicationIds is not configured"))
+          .getOrElse(throw new RuntimeException(s"feature-switch.white-list.applicationIds is not configured"))
       case None => Seq()
     }
   }

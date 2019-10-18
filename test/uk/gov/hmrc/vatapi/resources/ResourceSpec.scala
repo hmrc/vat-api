@@ -18,8 +18,9 @@ package uk.gov.hmrc.vatapi.resources
 
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, OptionValues, WordSpec}
-import play.api.Configuration
 import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.mvc.ControllerComponents
+import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.TestUtils
@@ -42,11 +43,13 @@ trait ResourceSpec extends WordSpec
 
   val mockAppContext = mock[AppContext]
 
-  def mockAuthAction(vrn: Vrn, authEnabled: Boolean = false) = {
-    val config = Configuration("auth.enabled" -> authEnabled)
-    when(mockAppContext.featureSwitch)
-      .thenReturn(Some(config))
+  lazy val cc: ControllerComponents = stubControllerComponents()
 
+  def mockAuthAction(vrn: Vrn) = {
     MockAuthorisationService.authCheck(vrn)
+  }
+
+  def mockAuthActionWithNrs(vrn: Vrn) = {
+    MockAuthorisationService.authCheckWithNrsRequirement(vrn)
   }
 }

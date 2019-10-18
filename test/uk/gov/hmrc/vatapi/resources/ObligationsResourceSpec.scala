@@ -51,7 +51,7 @@ class ObligationsResourceSpec extends ResourceSpec
   val authContext = Organisation(None)
 
   class Setup {
-    val testObligationResource = new ObligationsResource(mockObligationsConnector, mockAuthorisationService, mockAppContext, mockAuditService)
+    val testObligationResource = new ObligationsResource(mockObligationsConnector, mockAuthorisationService, mockAuditService, cc)
     mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
   }
 

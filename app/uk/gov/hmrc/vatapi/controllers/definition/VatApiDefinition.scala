@@ -46,7 +46,6 @@ class VatApiDefinition @Inject()(appContext: AppContext) {
         versions = Seq(
           APIVersion(
             version = "1.0",
-            access = buildWhiteListingAccess(),
             status = buildAPIStatus("1.0"),
             endpointsEnabled = true
           )
@@ -71,12 +70,4 @@ class VatApiDefinition @Inject()(appContext: AppContext) {
     }
   }
 
-  private def buildWhiteListingAccess(): Option[Access] = {
-    val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
-    featureSwitch.isWhiteListingEnabled match {
-      case true =>
-        Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds))
-      case false => None
-    }
-  }
 }

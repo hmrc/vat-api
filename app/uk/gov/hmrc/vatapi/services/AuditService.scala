@@ -23,14 +23,14 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import uk.gov.hmrc.vatapi.connectors.MicroserviceAuditConnector
 import uk.gov.hmrc.vatapi.models.audit.AuditEvent
 import uk.gov.hmrc.vatapi.resources.BusinessResult
 
 import scala.concurrent.ExecutionContext
 
-class AuditService @Inject()(auditConnector: MicroserviceAuditConnector) {
+class AuditService @Inject()(auditConnector: AuditConnector) {
 
   val logger: Logger = Logger(this.getClass)
 

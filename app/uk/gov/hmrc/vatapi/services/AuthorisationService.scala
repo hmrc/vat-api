@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Logger
 import uk.gov.hmrc.vatapi.models.IdentityData
@@ -30,17 +30,22 @@ import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.auth.AffinityGroupToAuthContext._
-import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AuthContext}
+import uk.gov.hmrc.vatapi.auth.AuthContext
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class AuthorisationService @Inject()(
-                                      apiAuthorisedFunctions: APIAuthorisedFunctions,
+                                      val connector: AuthConnector,
                                       appContext: AppContext
                                     ) {
+  private val apiAuthorisedFunctions: AuthorisedFunctions = new AuthorisedFunctions {
+    override def authConnector: AuthConnector = connector
+  }
+
   type AuthResult = Either[Result, AuthContext]
 
   private lazy val vatAuthEnrolments = appContext.vatAuthEnrolments

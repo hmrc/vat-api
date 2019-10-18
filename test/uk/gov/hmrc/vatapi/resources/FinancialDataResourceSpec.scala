@@ -45,7 +45,7 @@ class FinancialDataResourceSpec extends ResourceSpec
   val authContext = Organisation(None)
 
   class Setup {
-    val testFinancialDataResource = new FinancialDataResource(mockFinancialDataConnector, mockAuthorisationService, mockAppContext, mockAuditService)
+    val testFinancialDataResource = new FinancialDataResource(mockFinancialDataConnector, mockAuthorisationService, mockAuditService, cc)
     mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
   }
 

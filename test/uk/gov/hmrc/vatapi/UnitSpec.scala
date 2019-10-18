@@ -17,12 +17,14 @@
 package uk.gov.hmrc.vatapi
 
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.scalatest.{AsyncWordSpec, Matchers, OptionValues, WordSpec}
+import org.scalatest._
+import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-trait BaseUnitSpec extends Matchers with OptionValues with TestUtils {
+trait BaseUnitSpec extends Matchers with OptionValues with TestUtils with FutureAwaits
+  with DefaultAwaitTimeout {
   implicit val timeout: FiniteDuration = 5 seconds
 
   def await[T](f: Future[T])(implicit duration: FiniteDuration = timeout): T =

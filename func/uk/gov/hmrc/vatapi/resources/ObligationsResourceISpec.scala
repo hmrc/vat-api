@@ -1,23 +1,86 @@
 package uk.gov.hmrc.vatapi.resources
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.joda.time.LocalDate
+import play.api.http.Status
 import play.api.http.Status._
+import play.api.libs.json.Json
+import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.assets.des.Errors
+import uk.gov.hmrc.assets.des.Obligations.Obligations
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.support.BaseFunctionalSpec
+import uk.gov.hmrc.vatapi.models.ObligationsQueryParams
+import uk.gov.hmrc.vatapi.stubs.AuditStub
+import uk.gov.hmrc.vatapi.stubs.{AuditStub, AuthStub, DesStub}
 
 class ObligationsResourceISpec extends BaseFunctionalSpec {
 
+  private trait Test {
+
+    def setupStubs(): StubMapping
+
+    def uri: String
+
+    def desUrl(vrn: Vrn) = s"/enterprise/obligation-data/vrn/$vrn/VATC"
+
+    def request(): WSRequest = {
+      setupStubs()
+      buildRequest(uri)
+    }
+  }
+
+  def errorBody(code: String): String =
+    s"""
+       |      {
+       |        "code": "$code",
+       |        "reason": "des message"
+       |      }
+      """.stripMargin
+
   "retrieveObligations" should {
 
-    "return code 400 when vrn is invalid" in {
-      given()
-        .stubAudit
-      when()
-        .get(s"/abc/obligations?from=2017-01-01&to=2017-03-31")
-        .thenAssertThat()
-        .statusIs(BAD_REQUEST)
-        .isBadRequest("VRN_INVALID")
+    "return code 400 when vrn is invalid" in new Test {
+
+//      val queryParams = ObligationsQueryParams(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2017-03-31")))
+//      override def setupStubs(): StubMapping = {
+//        AuditStub.audit()
+//        AuthStub.authorised()
+//        DesStub.onError(DesStub.GET, desUrl(vrn, queryParams), BAD_REQUEST, errorBody("VRN_INVALID"))
+//      }
+
+      override def setupStubs(): StubMapping = {
+                AuditStub.audit()
+              }
+
+      override def uri: String = s"/abc/obligations"
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe BAD_REQUEST
     }
 
+    "return code 200 with a set of obligations" in new Test {
+
+      override def uri: String = s"/$vrn/obligations?from=2017-01-01&to=2017-08-31"
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, desUrl(vrn), Map("from" -> "2017-01-01", "to" -> "2017-08-31"), OK, Json.parse(Obligations(vrn.toString())))
+      }
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe OK
+
+      /*given()
+        .stubAudit
+        .userIsFullyAuthorisedForTheResource
+        .des().obligations.returnObligationsFor(vrn)
+        .when()
+        .get(s"/$vrn/obligations?from=2017-01-01&to=2017-08-31")
+        .thenAssertThat()
+        .statusIs(OK)
+        .bodyIsLike(Jsons.Obligations().toString)*/
+    }
+
+/*
     "return code 400 when status is A" in {
       given()
         .stubAudit
@@ -192,7 +255,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(FORBIDDEN)
         .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
-    }
+    }*/
   }
 
 }
