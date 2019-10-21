@@ -37,7 +37,7 @@ class ObligationsResource @Inject()(
 
   def retrieveObligations(vrn: Vrn, params: ObligationsQueryParams): Action[AnyContent] = APIAction(vrn).async { implicit request =>
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
-    print(s" *************** [ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
+
     val arn = getArn
 
     def audit(vatResult: VatResult, correlationId: String) =

@@ -27,12 +27,12 @@ object AuthStub extends WireMockMethods {
 
   def authorised(): StubMapping = {
     when(method = POST, uri = authoriseUri)
-      .thenReturn(status = OK, body = successfulAuthResponse())
+      .thenReturn(status = OK, body = successfulAuthResponse)
   }
 
   def unauthorisedNotLoggedIn(): StubMapping = {
     when(method = POST, uri = authoriseUri)
-      .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="MissingBearerToken""""))
+      .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
   }
 
   def unauthorisedOther(): StubMapping = {
@@ -40,7 +40,7 @@ object AuthStub extends WireMockMethods {
       .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InvalidBearerToken""""))
   }
 
-  private def successfulAuthResponse(): JsValue = Json.parse("""
+  private val successfulAuthResponse: JsValue = Json.parse("""
                                                                 |{
                                                                 |  "agentInformation": {
                                                                 |        "agentCode" : "TZRXXV",
