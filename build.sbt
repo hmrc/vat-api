@@ -61,7 +61,6 @@ lazy val microservice = Project(appName, file("."))
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
     addTestReportOption(FuncTest, "int-test-reports"),
     testGrouping in FuncTest := FuncTestPhases.oneForkedJvmPerTest((definedTests in FuncTest).value),
-    parallelExecution in FuncTest := false,
-    routesGenerator := StaticRoutesGenerator)
+    parallelExecution in FuncTest := false)
   .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"), resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)

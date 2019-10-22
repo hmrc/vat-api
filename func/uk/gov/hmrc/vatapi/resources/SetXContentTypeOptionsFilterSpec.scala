@@ -5,7 +5,7 @@ import uk.gov.hmrc.vatapi.filters.SetXContentTypeOptionsFilter
 
 class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
 
-  /*"SetXContentTypeOptionsFilter filter should" should {
+  "SetXContentTypeOptionsFilter filter should" should {
     "be applied for api definition" in {
       given()
         .when()
@@ -83,5 +83,4 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
   }
-*/
 }
