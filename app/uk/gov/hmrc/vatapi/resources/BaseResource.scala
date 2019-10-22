@@ -50,8 +50,6 @@ abstract class BaseResource(cc: ControllerComponents) extends BackendController(
             case Right(authContext) => Right(new AuthRequest(authContext, request))
             case Left(authError) => Left(authError)
           }
-        case _ =>
-          Future.successful(Right(new AuthRequest(Organisation(), request)))
       }
     }
   }
