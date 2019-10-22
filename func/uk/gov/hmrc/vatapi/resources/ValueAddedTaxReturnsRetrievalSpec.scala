@@ -35,7 +35,7 @@ class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
           "finalised": $finalised
         }"""
 
- /* "VAT returns submission" should {
+  "VAT returns submission" should {
 
     val isoInstantRegex = "^\\d\\d\\d\\d-(0?[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(\\d\\d):(\\d\\d):(\\d\\d)Z"
 
@@ -520,5 +520,5 @@ class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .hasHeader("X-Content-Type-Options")
     }
-  }*/
+  }
 }

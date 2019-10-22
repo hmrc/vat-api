@@ -59,7 +59,7 @@ trait WireMockMethods {
       thenReturnInternal(status, headers, None)
     }
 
-    private def thenReturnInternal(status: Int, headers: Map[String, String], body: Option[String]): StubMapping = {
+    def thenReturnInternal(status: Int, headers: Map[String, String], body: Option[String]): StubMapping = {
       val response = {
         val statusResponse = aResponse().withStatus(status)
         val responseWithHeaders = headers.foldLeft(statusResponse) {

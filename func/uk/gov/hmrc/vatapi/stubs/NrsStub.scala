@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.support.WireMockMethods
 
 object NrsStub extends WireMockMethods {
@@ -27,7 +26,7 @@ object NrsStub extends WireMockMethods {
 
   def success(): StubMapping = {
     when(method = POST, uri = uri)
-      .thenReturn(status = ACCEPTED, body = successfulAuthResponse)
+      .thenReturnInternal(status = ACCEPTED, headers, body = Some(successResponse))
   }
 
   def onError(errorStatus: Int, errorBody: String = "{}"): StubMapping = {
@@ -35,12 +34,16 @@ object NrsStub extends WireMockMethods {
       .thenReturn(status = errorStatus, errorBody)
   }
 
-  private val successfulAuthResponse: JsValue = Json.parse(
+  private val successResponse: String =
     s"""
        |{
        |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
        |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
        |  "timestamp":"2018-02-14T09:32:15Z"
        |}
-         """.stripMargin)
+         """.stripMargin
+
+  private val headers = Map("Content-Type" -> "application/json", "Receipt-Id" -> "de1249ad-c242-4f22-9fe6-f357b1bfcccf",
+    "Receipt-Signature" -> "757b1365-d89e-4dac-8317-ba87efca6c21",
+    "Receipt-Timestamp" -> "2018-03-27T15:10:44.798Z")
 }
