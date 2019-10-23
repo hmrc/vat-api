@@ -19,6 +19,7 @@ package uk.gov.hmrc.vatapi.services
 import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Logger
+import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.IdentityData
 //import play.api.Logger
 import play.api.libs.json.JsResultException
@@ -39,12 +40,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthorisationService @Inject()(
-                                      val connector: AuthConnector,
+                                      apiAuthorisedFunctions: APIAuthorisedFunctions,
                                       appContext: AppContext
                                     ) {
-  private val apiAuthorisedFunctions: AuthorisedFunctions = new AuthorisedFunctions {
-    override def authConnector: AuthConnector = connector
-  }
 
   type AuthResult = Either[Result, AuthContext]
 
