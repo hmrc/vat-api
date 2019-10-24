@@ -46,12 +46,9 @@ class AppContext @Inject()(config: ServicesConfig) extends FixedConfig {
 
   lazy val featureSwitch: String = config.getString(s"feature-switch")
 
-  lazy val auditEnabled: Boolean = config.getBoolean(s"auditing.enabled")
-  lazy val authEnabled: Boolean = config.getBoolean(s"microservice.services.auth.enabled")
   lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString(s"enrolments.key"),
     config.getString(s"enrolments.identifier"),
     Some(config.getString(s"enrolments.authRule")))
-  lazy val vatHybridFeatureEnabled = config.getBoolean(s"feature-switch.des.hybrid")
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status")
 }

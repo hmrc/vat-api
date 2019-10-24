@@ -60,7 +60,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
 
     "return a VatReturnsResponse model with correct body in case of success" when {
       "pointing to the vat normal" in new Test {
-        MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
+        
         val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(successResponse)
         await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(successResponse)
@@ -73,7 +73,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
 
     "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" when {
       "pointing to the vat normal" in new Test {
-        MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
+        
         val testUrl: String = s"$testDesUrl/enterprise/return/vat/$testVrn"
         setupMockHttpPostString(testUrl, desVatReturnDeclaration(testDateTime).toJsonString)(invalidPayloadResponse)
         await(connector.post(testVrn, desVatReturnDeclaration(testDateTime))) shouldBe VatReturnResponse(invalidPayloadResponse)
@@ -85,7 +85,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
       val periodKey = "test"
       "return a VatReturnsResponse model in case of success" when {
         "pointing to the vat normal" in new Test {
-          MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
+          
           val testUrl: String = s"$testDesUrl/vat/returns/vrn/$testVrn?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
           setupMockHttpGet(testUrl)(successResponse)
           await(connector.query(testVrn, periodKey)) shouldBe VatReturnResponse(successResponse)
@@ -94,7 +94,7 @@ class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
 
       "return a VatReturnsResponse with the correct error body when an error is retrieved from DES" when {
         "pointing to the vat normal" in new Test {
-          MockAppContext.vatHybridFeatureEnabled.thenReturn(false)
+          
           val testUrl: String = s"$testDesUrl/vat/returns/vrn/$testVrn?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
           setupMockHttpGet(testUrl)(invalidPayloadResponse)
           await(connector.query(testVrn, periodKey)) shouldBe VatReturnResponse(invalidPayloadResponse)
