@@ -48,7 +48,7 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
 
   val mockAppContext = mock[AppContext]
 
-  when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN"))
+  when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN", "mtd-vat-auth"))
 
   val testAuthorisationService = new AuthorisationService(mockAPIAuthorisedFunctions, mockAppContext)
 

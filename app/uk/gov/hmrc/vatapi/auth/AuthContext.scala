@@ -48,7 +48,7 @@ case class Agent(override val agentCode: Option[String],
   override val affinityGroup: String = AGENT
 }
 
-case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: Option[String] = None)
+case class VATAuthEnrolments(enrolmentToken: String, identifier: String, authRule: String)
 
 object AffinityGroupToAuthContext {
   def authContext(enrolments: Enrolments,

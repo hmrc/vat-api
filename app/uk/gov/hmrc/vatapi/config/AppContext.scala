@@ -48,7 +48,7 @@ class AppContext @Inject()(config: ServicesConfig) extends FixedConfig {
 
   lazy val vatAuthEnrolments: VATAuthEnrolments = VATAuthEnrolments(config.getString(s"enrolments.key"),
     config.getString(s"enrolments.identifier"),
-    Some(config.getString(s"enrolments.authRule")))
+    config.getConfString(s"enrolments.authRule", "mtd-vat-auth"))
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status")
 }

@@ -62,7 +62,7 @@ class AuthorisationService @Inject()(
     apiAuthorisedFunctions.authorised(
       Enrolment(vatAuthEnrolments.enrolmentToken)
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule))
       .retrieve(
         affinityGroup and allEnrolments and agentInformation
       ) {
@@ -110,7 +110,7 @@ class AuthorisationService @Inject()(
     apiAuthorisedFunctions.authorised(
       Enrolment(vatAuthEnrolments.enrolmentToken)
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule))
       .retrieve(
         affinityGroup and allEnrolments
           and internalId and externalId and agentCode and credentials
