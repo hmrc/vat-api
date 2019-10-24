@@ -26,10 +26,12 @@ import uk.gov.hmrc.vatapi.config.ControllerConfiguration
 
 import scala.concurrent.Future
 
-class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controllerConfiguration: ControllerConfiguration) extends Filter with HeaderValidator {
+class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controllerConfiguration: ControllerConfiguration,
+                                      cc: MessagesControllerComponents
+                                     ) extends Filter with HeaderValidator {
 
-  protected def executionContext: scala.concurrent.ExecutionContext = ???
-  def parser: play.api.mvc.BodyParser[play.api.mvc.AnyContent] = ???
+  protected def executionContext: scala.concurrent.ExecutionContext = cc.executionContext
+  def parser: play.api.mvc.BodyParser[play.api.mvc.AnyContent] = cc.parsers.defaultBodyParser
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     val controller = rh.tags.get(Tags.ROUTE_CONTROLLER)

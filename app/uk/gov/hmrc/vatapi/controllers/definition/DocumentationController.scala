@@ -27,7 +27,7 @@ import uk.gov.hmrc.vatapi.controllers.definition.JsonFormatters._
 @Singleton
 class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition,
                                         cc: ControllerComponents, assets: Assets, errorHandler: HttpErrorHandler)
-  extends HmrcDocumentationController(cc,assets , errorHandler ) {
+  extends HmrcDocumentationController(cc, assets , errorHandler ) {
 
   override def definition() = Action {
     Ok(Json.toJson(vatApiDefinition.definition))
@@ -36,5 +36,4 @@ class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition,
   def raml(version: String, file: String): Action[AnyContent] = {
     assets.at(s"/public/api/conf/$version", file)
   }
-
 }
