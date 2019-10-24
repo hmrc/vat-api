@@ -16,20 +16,24 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
+import controllers.Assets
 import javax.inject.{Inject, Singleton}
-import play.api.http.LazyHttpErrorHandler
+import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.api.controllers.{DocumentationController => HmrcDocumentationController}
 import uk.gov.hmrc.vatapi.controllers.definition.JsonFormatters._
 
 @Singleton
-class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition) extends uk.gov.hmrc.api.controllers.DocumentationController(LazyHttpErrorHandler) {
+class DocumentationController @Inject()(vatApiDefinition: VatApiDefinition,
+                                        cc: ControllerComponents, assets: Assets, errorHandler: HttpErrorHandler)
+  extends HmrcDocumentationController(cc, assets , errorHandler ) {
 
   override def definition() = Action {
     Ok(Json.toJson(vatApiDefinition.definition))
   }
 
-  override def conf(version: String, file: String) = {
-    super.at(s"/public/api/conf/$version", file)
+  def raml(version: String, file: String): Action[AnyContent] = {
+    assets.at(s"/public/api/conf/$version", file)
   }
 }

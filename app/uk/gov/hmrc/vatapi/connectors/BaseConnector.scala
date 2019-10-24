@@ -17,11 +17,10 @@
 package uk.gov.hmrc.vatapi
 
 import play.api.Logger
-import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
@@ -31,28 +30,21 @@ trait BaseConnector {
 
   val http: DefaultHttpClient
   val appContext: AppContext
-  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
 
   private val logger = Logger("connectors")
 
   def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withDesHeaders()) {
+    withAdditionalHeaders[R](url, withDesHeaders) {
       http.GET(url)(NoExceptionsReads, _, ec) map toResponse
     }
 
-  private def withDesHeaders(orgFlag: Boolean = false): HeaderCarrier => HeaderCarrier = { hc =>
+  private def withDesHeaders: HeaderCarrier => HeaderCarrier = { hc =>
 
-    val newHc: HeaderCarrier = if(orgFlag) {
+    val newHc: HeaderCarrier =
       hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
         .withExtraHeaders("Environment" -> appContext.desEnv,
           "Accept" -> "application/json",
           "OriginatorID" -> "MDTP")
-    }
-    else{
-      hc.copy(authorization = Some(Authorization(s"Bearer ${appContext.desToken}")))
-        .withExtraHeaders("Environment" -> appContext.desEnv,
-      "Accept" -> "application/json")
-    }
 
     // HACK: http-verbs removes all "otherHeaders" from HeaderCarrier on outgoing requests.
     //       We want to preserve the Gov-Test-Scenario header, so we copy it into "extraHeaders".
@@ -65,8 +57,6 @@ trait BaseConnector {
     lastHc
   }
 
-  private def desHeadersWithOriginatorId: HeaderCarrier => HeaderCarrier = withDesHeaders(featureSwitch.isOriginatorIdForSubmitEnabled)
-
   private def withAdditionalHeaders[R <: Response](url: String, header: HeaderCarrier => HeaderCarrier)(f: HeaderCarrier => Future[R])(
     implicit hc: HeaderCarrier): Future[R] = {
     val newHc = header(hc)
@@ -75,7 +65,7 @@ trait BaseConnector {
 
   def httpDesPostString[R <: Response](url: String, elem: String, toResponse: HttpResponse => R)(
     implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
-    withAdditionalHeaders[R](url, withContentTypeJsonHeader andThen desHeadersWithOriginatorId) {
+    withAdditionalHeaders[R](url, withContentTypeJsonHeader andThen withDesHeaders) {
       http.POSTString(url, elem)(NoExceptionsReads, _, ec) map toResponse
     }
 

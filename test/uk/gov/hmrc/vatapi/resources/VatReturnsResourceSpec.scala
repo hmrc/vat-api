@@ -52,10 +52,9 @@ class VatReturnsResourceSpec extends ResourceSpec
       mockVatReturnsConnector,
       mockVatReturnsOrchestrator,
       mockAuthorisationService,
-      mockAppContext,
-      mockAuditService
+      mockAuditService,
+      cc
     )
-    mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
   }
 
   val vatReturnsDeclaration = VatReturnDeclarationFixture.vatReturnDeclaration
@@ -108,6 +107,8 @@ class VatReturnsResourceSpec extends ResourceSpec
   "submitVatReturn" should {
     "return a 201 with the correct response and headers" when {
       "the orchestrator returns a valid response" in new Setup {
+
+        mockAuthActionWithNrs(vrn).thenReturn(Future.successful(Right(authContext)))
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(vatReturnResponse)))
 
@@ -131,6 +132,8 @@ class VatReturnsResourceSpec extends ResourceSpec
 
     "return a 500 with the message" when {
       "the orchestrator returns error from NRS submission" in new Setup {
+
+        mockAuthActionWithNrs(vrn).thenReturn(Future.successful(Right(authContext)))
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message))))
 
@@ -147,6 +150,8 @@ class VatReturnsResourceSpec extends ResourceSpec
 
     "return a 403 duplication submission" when {
       "re-submit the same vat return" in new Setup {
+
+        mockAuthActionWithNrs(vrn).thenReturn(Future.successful(Right(authContext)))
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(duplicateSubmissionResponse)))
 
@@ -162,6 +167,8 @@ class VatReturnsResourceSpec extends ResourceSpec
     }
     "return a 403 tax period not ended error" when {
       "des indicates that the return has been sent too early" in new Setup {
+
+        mockAuthActionWithNrs(vrn).thenReturn(Future.successful(Right(authContext)))
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(taxPeriodNotEndedResponse)))
 
@@ -178,6 +185,8 @@ class VatReturnsResourceSpec extends ResourceSpec
     }
     "return an INTERNAL_SERVER_ERROR" when {
       "backend failed to respond" in new Setup {
+
+        mockAuthActionWithNrs(vrn).thenReturn(Future.successful(Right(authContext)))
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.failed(new Exception("DES FAILED")))
 
@@ -197,6 +206,7 @@ class VatReturnsResourceSpec extends ResourceSpec
     "return a 200 " when {
       "a valid vrn and period key is supplied" in new Setup {
 
+        mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
         val successResponse = VatReturnResponse(HttpResponse(OK, responseJson =
           Some(Json.toJson(desVatReturn))))
         retrieveVatReturn(vrn, "#001")(successResponse)
@@ -215,6 +225,7 @@ class VatReturnsResourceSpec extends ResourceSpec
     "return a 500" when {
       "des backend return 200 with empty data" in new Setup {
 
+        mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
         val successResponse = VatReturnResponse(HttpResponse(OK, responseJson =
           Some(Json.toJson(""))))
         retrieveVatReturnFailed(vrn, "#001")
@@ -230,6 +241,8 @@ class VatReturnsResourceSpec extends ResourceSpec
 
     "return an 400" when {
       "period key invalid" in new Setup {
+
+        mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
         val result = resource.retrieveVatReturns(vrn, "xxxxx")(FakeRequest())
         status(result) shouldBe BAD_REQUEST
 
@@ -241,6 +254,8 @@ class VatReturnsResourceSpec extends ResourceSpec
 
     "return a failure error code" when {
       "des backend returns an error code" in new Setup {
+
+        mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
         val failureResponse = VatReturnResponse(HttpResponse(BAD_REQUEST, responseJson =
           Some(Json.parse("""{"code" : "INVALID_VRN", "reason": ""}"""))))
         retrieveVatReturn(vrn, "#001")(failureResponse)

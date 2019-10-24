@@ -32,9 +32,9 @@ object EnumJson {
           JsSuccess(enum.withName(s))
         } catch {
           case _: NoSuchElementException =>
-            JsError(JsPath, ValidationError(valueMissingMessage.getOrElse(defaultValueMissingMessage(s)), ErrorCode.INVALID_VALUE))
+            JsError(JsPath, JsonValidationError(valueMissingMessage.getOrElse(defaultValueMissingMessage(s)), ErrorCode.INVALID_VALUE))
         }
-      case _ => JsError(JsPath(), ValidationError("String value expected", ErrorCode.INVALID_TYPE))
+      case _ => JsError(JsPath(), JsonValidationError("String value expected", ErrorCode.INVALID_TYPE))
     }
   }
 

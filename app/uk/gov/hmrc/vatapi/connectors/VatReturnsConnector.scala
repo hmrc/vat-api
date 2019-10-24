@@ -40,10 +40,9 @@ class VatReturnsConnector @Inject()(override val appContext: AppContext, overrid
     logger.debug(s"[VatReturnsConnector][post] - Submission for 9 box vat return for VRN: $vrn")
 
     val desUrl = s"${appContext.desUrl}/enterprise/return/vat/$vrn"
-    val hybridUrl = s"${appContext.desUrl}/vat/traders/$vrn/returns"
 
     httpDesPostString[VatReturnResponse](
-      url = if (appContext.vatHybridFeatureEnabled) hybridUrl else desUrl,
+      url = desUrl,
       elem = vatReturn.toJsonString,
       toResponse = VatReturnResponse
     )
@@ -54,9 +53,8 @@ class VatReturnsConnector @Inject()(override val appContext: AppContext, overrid
     logger.debug(s"[VatReturnsConnector][query] - Retrieve vat returns for VRN: $vrn and periodKey: $periodKey")
 
     val desUrl = s"${appContext.desUrl}/vat/returns/vrn/$vrn"
-    val hybridUrl = s"${appContext.desUrl}/vat/traders/$vrn/returns"
 
-    val getUrl: String = s"${if (appContext.vatHybridFeatureEnabled) hybridUrl else desUrl}?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
+    val getUrl: String = s"$desUrl?period-key=${URLEncoder.encode(periodKey, "UTF-8")}"
 
     httpGet[VatReturnResponse](getUrl, VatReturnResponse)
   }

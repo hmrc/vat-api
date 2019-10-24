@@ -18,48 +18,43 @@ package uk.gov.hmrc.vatapi.resources
 
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Organisation}
-import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Right
 
-trait BaseResource extends BaseController {
-
-  lazy val featureSwitch = FeatureSwitch(appContext.featureSwitch, appContext.env)
+abstract class BaseResource(cc: ControllerComponents) extends BackendController(cc) {
   val authService: AuthorisationService
-  val appContext: AppContext
 
   val logger: Logger = Logger(this.getClass)
 
-  def AuthAction(vrn: Vrn, nrsRequired: Boolean = false): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
+  def AuthAction(vrn: Vrn, nrsRequired: Boolean = false)(implicit ec: ExecutionContext): ActionRefiner[Request, AuthRequest] = new ActionRefiner[Request, AuthRequest] {
     logger.debug(s"[BaseResource][AuthAction] Check MTD VAT authorisation for the VRN : $vrn")
+
+    override def executionContext: ExecutionContext = ec
 
     override protected def refine[A](request: Request[A]): Future[Either[Result, AuthRequest[A]]] = {
       implicit val ev: Request[A] = request
-      (featureSwitch.isAuthEnabled, nrsRequired) match {
-        case (true, false) =>
+      nrsRequired match {
+        case false =>
           authService.authCheck(vrn) map {
             case Right(authContext) => Right(new AuthRequest(authContext, request))
             case Left(authError) => Left(authError)
           }
-        case (true, true) =>
+        case true =>
           authService.authCheckWithNrsRequirement(vrn) map {
             case Right(authContext) => Right(new AuthRequest(authContext, request))
             case Left(authError) => Left(authError)
           }
-        case (false, _) =>
-          Future.successful(Right(new AuthRequest(Organisation(), request)))
       }
     }
   }
 
-  def APIAction(vrn: Vrn, nrsRequired: Boolean = false): ActionBuilder[AuthRequest] = Action andThen AuthAction(vrn, nrsRequired)
+  def APIAction(vrn: Vrn, nrsRequired: Boolean = false)(implicit ec: ExecutionContext): ActionBuilder[AuthRequest, AnyContent] = Action andThen AuthAction(vrn, nrsRequired)
 
   def getRequestDateTimestamp(implicit request: AuthRequest[_]): String = {
     val requestTimestampHeader = "X-Request-Timestamp"

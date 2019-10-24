@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi
 
 import org.joda.time.{DateTime, LocalDate}
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 package object models {
@@ -27,7 +26,7 @@ package object models {
   type PropertyId = String
   type PeriodId = String
   type SummaryId = String
-  type ValidationErrors = Seq[(JsPath, Seq[ValidationError])]
+  type ValidationErrors = Seq[(JsPath, Seq[JsonValidationError])]
 
   type OptEither[T] = Option[Either[String, T]]
   /**
@@ -36,34 +35,34 @@ package object models {
   val amountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
-      ValidationError("amount should be a number less than 99999999999999.98 with up to 2 decimal places", ErrorCode.INVALID_MONETARY_AMOUNT))(
+      JsonValidationError("amount should be a number less than 99999999999999.98 with up to 2 decimal places", ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount => amount.scale < 3 && amount <= MAX_AMOUNT)
   /**
     * Asserts that amounts must be non-negative and have a maximum of two decimal places
     */
   val nonNegativeAmountValidator: Reads[Amount] = Reads
     .of[Amount]
-    .filter(ValidationError("amounts should be a non-negative number less than 99999999999999.98 with up to 2 decimal places",
+    .filter(JsonValidationError("amounts should be a non-negative number less than 99999999999999.98 with up to 2 decimal places",
       ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount => amount >= 0 && amount.scale < 3 && amount <= MAX_AMOUNT)
   val vatAmountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
-      ValidationError(
+      JsonValidationError(
         "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
         ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
       amount.scale < 3 && amount >= -VAT_MAX_AMOUNT_13_DIGITS && amount <= VAT_MAX_AMOUNT_13_DIGITS)
   val vatNonNegativeAmountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
-      ValidationError(
+      JsonValidationError(
         "amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99",
         ErrorCode.INVALID_MONETARY_AMOUNT))(amount =>
       amount.scale < 3 && amount >= 0 && amount <= VAT_MAX_AMOUNT_11_DIGITS)
   val vatWholeAmountValidator: Reads[Amount] = Reads
     .of[Amount]
     .filter(
-      ValidationError(
+      JsonValidationError(
         "amount should be a whole monetary value between 0 and 9,999,999,999,999",
         ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount =>
@@ -73,7 +72,7 @@ package object models {
   val vatAmountValidatorWithZeroDecimals: Reads[Amount] = Reads
     .of[Amount]
     .filter(
-      ValidationError(
+      JsonValidationError(
         "The value must be between -9999999999999 and 9999999999999",
         ErrorCode.INVALID_MONETARY_AMOUNT))(
       amount =>

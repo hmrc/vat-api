@@ -22,5 +22,6 @@ import play.api.libs.json._
 case class Period(key: String, start: LocalDate, end: LocalDate)
 
 object Period {
+  implicit val dateFormats: Format[LocalDate] = uk.gov.hmrc.vatapi.models.dateFormat
   implicit val format: Format[Period] = Json.format[Period]
 }

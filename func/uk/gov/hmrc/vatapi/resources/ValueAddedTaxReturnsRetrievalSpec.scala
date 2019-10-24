@@ -3,7 +3,7 @@ package uk.gov.hmrc.vatapi.resources
 import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
-class ValueAddedTaxReturnsSpec extends BaseFunctionalSpec {
+class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
 
   private def body(finalised: Boolean = true) =
     s"""{

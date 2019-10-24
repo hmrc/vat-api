@@ -26,7 +26,7 @@ case class VatApiFilters @Inject()(
                                     headerValidatorFilter: HeaderValidatorFilter,
                                     setContentTypeFilter: SetContentTypeFilter,
                                     setXContentTypeOptionsFilter: SetXContentTypeOptionsFilter,
-                                    logging: Logging,
+                                    logging: LoggingFilter,
                                     defaultFilters: MicroserviceFilters
                                   ) extends DefaultHttpFilters(
   defaultFilters.filters :+

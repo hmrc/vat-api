@@ -1,374 +1,447 @@
 package uk.gov.hmrc.vatapi.resources
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.assets.des.Errors
+import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.assets.des.{FinancialData, Errors => DesErrors}
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.support.BaseFunctionalSpec
-import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode}
+import uk.gov.hmrc.vatapi.models.Errors
+import uk.gov.hmrc.vatapi.models.Errors.{ClientOrAgentNotAuthorized, Error}
+import uk.gov.hmrc.vatapi.stubs.{AuditStub, AuthStub, DesStub}
 
 class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
-  "FinancialDataResource.getLiabilities" when {
-    "a valid request is made" should {
-      "reject client with no authorization" in {
-        given()
-          .stubAudit
-          .userIsNotAuthorisedForTheResource
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(FORBIDDEN)
-          .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
-      }
+  def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
+    "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
 
-      "retrieve a single liability where they exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.singleLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
-      }
+  private trait Test {
 
-      "retrieve a single liability when VAT Hybrid data is returned" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.vatHybridLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.vatHybrid.toString)
-      }
+    def setupStubs(): StubMapping
 
-      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is after period to date" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.singleLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
-      }
+    def uri: String
 
-      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is equal to period to date " in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.singleLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-03-31")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
-      }
+    def desUrl(vrn: Vrn) = s"/enterprise/financial-data/VRN/$vrn/VATC"
 
-      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date before period to date " in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.singleLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-03-30")
-          .thenAssertThat()
-          .statusIs(NOT_FOUND)
-          .bodyIsLike(Json.toJson(uk.gov.hmrc.vatapi.models.Errors.NotFound).toString())
-      }
-
-      "retrieve a single liability where the minimum data exists" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.minLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.minLiability.toString)
-      }
-
-      "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.overlappingLiabilitiesFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.oneLiability.toString)
-      }
-
-      "retrieve multiple liabilities where they exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.multipleLiabilitiesFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.multipleLiabilities.toString)
-      }
-
-      "retrieve multiple liabilities where they exist excluding Payment on Account" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.multipleLiabilitiesWithPaymentOnAccountFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutNoHybrids.toString)
-      }
-
-      "retrieve multiple liabilities where they exist excluding Hybrid Payments" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.multipleLiabilitiesWithHybridPaymentsFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.multipleLiabilitiesWithoutNoHybrids.toString)
-      }
-
-      "return code 400 when idNumber parameter is invalid" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdNumber)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
-      }
-
-      "a date range of greater than 1 year is supplied" should {
-        "return an INVALID_DATE_RANGE error" in {
-          given()
-            .stubAudit
-          when()
-            .get(s"/$vrn/liabilities?from=2015-01-01&to=2016-01-01")
-            .thenAssertThat()
-            .statusIs(BAD_REQUEST)
-        }
-      }
-
-      "an invalid 'from' date is supplied" should {
-        "return an INVALID_DATE_TO error" in {
-          given()
-            .stubAudit
-          when()
-            .get(s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31")
-            .thenAssertThat()
-            .statusIs(BAD_REQUEST)
-        }
-      }
-
-      "an invalid 'to' date is supplied" should {
-        "return and INVALID_DATE_FROM error" in {
-          given()
-            .stubAudit
-          when()
-            .get(s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31")
-            .thenAssertThat()
-            .statusIs(BAD_REQUEST)
-        }
-      }
-
-      "an invalid VRN is supplied" should {
-        "return an VRN_INVALID error" in {
-          given()
-            .stubAudit
-          when()
-            .get(s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31")
-            .thenAssertThat()
-            .statusIs(BAD_REQUEST)
-        }
-      }
-      "return a 404 (Not Found) if no liabilities exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.emptyLiabilitiesFor(vrn)
-          .when()
-          .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(NOT_FOUND)
-      }
-    }
-
-    "return code 500 when idType parameter is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidIdType)
-        .when()
-        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-        .thenAssertThat()
-        .statusIs(INTERNAL_SERVER_ERROR)
-    }
-
-    "return code 500 when regime type parameter is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidRegimeType)
-        .when()
-        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-        .thenAssertThat()
-        .statusIs(INTERNAL_SERVER_ERROR)
-    }
-
-    "return code 500 when openitems parameter is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().FinancialData.invalidPaymentsParamsFor(vrn, Errors.invalidOnlyOpenItems)
-        .when()
-        .get(s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31")
-        .thenAssertThat()
-        .statusIs(INTERNAL_SERVER_ERROR)
+    def request(): WSRequest = {
+      setupStubs()
+      buildRequest(uri)
     }
   }
 
-  "FinancialDataResource.getPayments" when {
+  def errorBody(code: String): String =
+    s"""
+       |      {
+       |        "code": "$code",
+       |        "reason": "des message"
+       |      }
+      """.stripMargin
+
+  "FinancialDataResource.getLiabilities" when {
     "a valid request is made" should {
-      "retrieve a single payment where they exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.singlePaymentFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.onePayment.toString)
+
+      "reject client with no authorization" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.unauthorisedNotLoggedIn()
+        }
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe FORBIDDEN
+        response.json shouldBe Json.toJson(ClientOrAgentNotAuthorized)
       }
 
-      "retrieve a single payment when VAT Hybrid data is returned" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.vatHybridLiabilityFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(NOT_FOUND)
+      "retrieve a single liability where they exist" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.oneLiability)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.oneLiability
       }
 
-      "retrieve no VAT Hybrid payments when no relevant data is returned" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.vatHybridPaymentForNoPOA(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(NOT_FOUND)
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is after period to date" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.oneLiability)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.oneLiability
+      }
+
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date before period to date " in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-03-30"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-03-30"), OK, FinancialData.oneLiability)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe NOT_FOUND
+        response.json shouldBe Json.toJson(uk.gov.hmrc.vatapi.models.Errors.NotFound)
+      }
+
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date is equal to period to date " in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-03-31"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-03-31"), OK, FinancialData.oneLiability)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.oneLiability
+      }
+
+      "retrieve a single liability where the minimum data exists" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.minLiability)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.minLiability
+      }
+
+      "retrieve a single liability if DES returns two liabilities and the second liability overlaps the supplied 'to' date" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.liabilitiesOverlapping)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.oneLiability
+      }
+
+      "retrieve multiple liabilities where they exist" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multipleLiabilities)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.multipleLiabilities
+      }
+
+      "retrieve multiple liabilities where they exist excluding Payment on Account" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multipleLiabilitiesWithPaymentOnAccount)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe OK
+        response.json shouldBe Jsons.FinancialData.multipleLiabilitiesWithoutNoHybrids
+      }
+
+      "return code 400 when idNumber parameter is invalid" in new Test {
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidIdNumber)
+        }
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.toJson(Errors.VrnInvalid)
       }
 
 
-      "retrieve a single payment where the minimum data exists" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.minPaymentFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.minPayment.toString)
-      }
+      "return a 404 (Not Found) if no liabilities exist" in new Test {
 
-      "return only those payments belonging to a liability that falls before the 'to' date" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.overlappingPaymentsFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-06-02")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.onePayment.toString)
-      }
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
-      "retrieve multiple payments where they exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.multiplePaymentsFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(OK)
-          .bodyIsLike(Jsons.FinancialData.multiplePayments.toString)
-      }
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.emptyLiabilities)
+        }
 
-      "return a 404 (Not Found) if no payments exist" in {
-        given()
-          .stubAudit
-          .userIsFullyAuthorisedForTheResource
-          .des().FinancialData.emptyPaymentsFor(vrn)
-          .when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(NOT_FOUND)
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe NOT_FOUND
       }
     }
 
+    "return code 500 when idType parameter is invalid" in new Test {
+
+      override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidIdType)
+      }
+
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return code 500 when regime type parameter is invalid" in new Test {
+
+      override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidRegimeType)
+      }
+
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return code 500 when openitems parameter is invalid" in new Test {
+
+      override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidOnlyOpenItems)
+      }
+
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
+    }
+
     "a date range of greater than 1 year is supplied" should {
-      "return an INVALID_DATE_RANGE error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/payments?from=2015-01-01&to=2016-01-01")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
+      "return an INVALID_DATE_RANGE error" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+        }
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2019-01-01"
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_RANGE_INVALID"}""")
       }
     }
 
     "an invalid 'from' date is supplied" should {
-      "return an INVALID_DATE_TO error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/payments?from=2017-01-01&to=3017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
+      "return an INVALID_DATE_TO error" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+        }
+
+        override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31"
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_TO_INVALID"}""")
       }
     }
 
     "an invalid 'to' date is supplied" should {
-      "return and INVALID_DATE_FROM error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/$vrn/payments?from=2001-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
+      "return and INVALID_DATE_FROM error" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+        }
+
+        override def uri: String = s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31"
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_FROM_INVALID"}""")
       }
     }
 
     "an invalid VRN is supplied" should {
-      "return an VRN_INVALID error" in {
-        given()
-          .stubAudit
-        when()
-          .get(s"/invalidvrn/payments?from=2015-01-01&to=2017-12-31")
-          .thenAssertThat()
-          .statusIs(BAD_REQUEST)
+      "return an VRN_INVALID error" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+        }
+
+        override def uri: String = s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31"
+
+        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.toJson(Error("VRN_INVALID", "The provided Vrn is invalid", None))
       }
     }
   }
 
+
+ "FinancialDataResource.getPayments" when {
+   "a valid request is made" should {
+     "retrieve a single payment where they exist" in new Test {
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
+
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+         AuthStub.authorised()
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.onePayment)
+       }
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe OK
+       response.json shouldBe Jsons.FinancialData.onePayment
+     }
+
+     "retrieve a single payment where the minimum data exists" in new Test {
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
+
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+         AuthStub.authorised()
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.minPayment)
+       }
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe OK
+       response.json shouldBe Jsons.FinancialData.minPayment
+     }
+
+     "return only those payments belonging to a liability that falls before the 'to' date" in new Test {
+
+       def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
+         "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
+
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+         AuthStub.authorised()
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.overlappingPayment)
+       }
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe OK
+       response.json shouldBe Jsons.FinancialData.onePayment
+     }
+
+     "retrieve multiple payments where they exist" in new Test {
+
+       def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
+         "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-12-31"
+
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+         AuthStub.authorised()
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multiplePayments)
+       }
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe OK
+       response.json shouldBe Jsons.FinancialData.multiplePayments
+     }
+
+     "return a 404 (Not Found) if no payments exist" in new Test {
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-12-31"
+
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+         AuthStub.authorised()
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.emptyLiabilities)
+       }
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe NOT_FOUND
+     }
+   }
+
+   "a date range of greater than 1 year is supplied" should {
+     "return an INVALID_DATE_RANGE error" in new Test {
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+       }
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2019-01-01"
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe BAD_REQUEST
+       response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_RANGE_INVALID"}""")
+     }
+   }
+
+   "an invalid 'from' date is supplied" should {
+     "return an INVALID_DATE_TO error" in new Test {
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+       }
+
+       override def uri: String = s"/$vrn/payments?from=2017-01-01&to=3017-12-31"
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe BAD_REQUEST
+       response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_TO_INVALID"}""")
+     }
+   }
+
+   "an invalid 'to' date is supplied" should {
+     "return and INVALID_DATE_FROM error" in new Test {
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+       }
+
+       override def uri: String = s"/$vrn/payments?from=2001-01-01&to=2017-12-31"
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe BAD_REQUEST
+       response.json shouldBe Json.parse("""{"statusCode":400,"message":"DATE_FROM_INVALID"}""")
+     }
+   }
+
+   "an invalid VRN is supplied" should {
+     "return an VRN_INVALID error" in new Test {
+       override def setupStubs(): StubMapping = {
+         AuditStub.audit()
+       }
+
+       override def uri: String = s"/invalidvrn/payments?from=2015-01-01&to=2017-12-31"
+
+       val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+       response.status shouldBe BAD_REQUEST
+       response.json shouldBe Json.toJson(Error("VRN_INVALID", "The provided Vrn is invalid", None))
+     }
+   }
+ }
 }

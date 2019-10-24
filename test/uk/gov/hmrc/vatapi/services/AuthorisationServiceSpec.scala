@@ -20,21 +20,23 @@ import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.Configuration
 import play.api.http.HeaderNames
 import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Results
 import play.api.mvc.Results.Forbidden
 import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.{Enrolments, InsufficientConfidenceLevel, UnsupportedAuthProvider}
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.testVrn
-import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, VATAuthEnrolments}
+import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 import uk.gov.hmrc.vatapi.config.AppContext
+import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
@@ -42,11 +44,11 @@ import scala.concurrent.ExecutionContext
 import scala.util.Right
 
 
-class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockAPIAuthorisedFunctions {
+class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
 
   val mockAppContext = mock[AppContext]
 
-  when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN"))
+  when(mockAppContext.vatAuthEnrolments).thenReturn(VATAuthEnrolments("enrolmentTokenHere", "VRN", "mtd-vat-auth"))
 
   val testAuthorisationService = new AuthorisationService(mockAPIAuthorisedFunctions, mockAppContext)
 
@@ -62,9 +64,11 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
+  val retrievalsResult = new ~(Some(Individual), Enrolments(Set.empty))
+  import testAuthSuccessResponseWithNrsData._
+
   "TestAuthorisationService.authCheckWithNrsRequirement" when {
 
-    import testAuthSuccessResponseWithNrsData._
     val testVrn: Vrn = Vrn("123456789")
     val invalidVrn: Vrn = Vrn("111111111")
 

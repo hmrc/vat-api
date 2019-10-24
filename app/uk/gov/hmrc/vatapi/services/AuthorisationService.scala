@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.vatapi.services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Logger
+import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.IdentityData
 //import play.api.Logger
 import play.api.libs.json.JsResultException
@@ -30,17 +31,19 @@ import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.auth.AffinityGroupToAuthContext._
-import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AuthContext}
+import uk.gov.hmrc.vatapi.auth.AuthContext
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class AuthorisationService @Inject()(
                                       apiAuthorisedFunctions: APIAuthorisedFunctions,
                                       appContext: AppContext
                                     ) {
+
   type AuthResult = Either[Result, AuthContext]
 
   private lazy val vatAuthEnrolments = appContext.vatAuthEnrolments
@@ -59,7 +62,7 @@ class AuthorisationService @Inject()(
     apiAuthorisedFunctions.authorised(
       Enrolment(vatAuthEnrolments.enrolmentToken)
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule))
       .retrieve(
         affinityGroup and allEnrolments and agentInformation
       ) {
@@ -107,7 +110,7 @@ class AuthorisationService @Inject()(
     apiAuthorisedFunctions.authorised(
       Enrolment(vatAuthEnrolments.enrolmentToken)
         .withIdentifier(vatAuthEnrolments.identifier, vrn.vrn)
-        .withDelegatedAuthRule(vatAuthEnrolments.authRule.getOrElse("mtd-vat-auth")))
+        .withDelegatedAuthRule(vatAuthEnrolments.authRule))
       .retrieve(
         affinityGroup and allEnrolments
           and internalId and externalId and agentCode and credentials

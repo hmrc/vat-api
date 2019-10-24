@@ -83,5 +83,4 @@ class SetXContentTypeOptionsFilterSpec extends BaseFunctionalSpec {
         .responseContainsHeader(SetXContentTypeOptionsFilter.xContentTypeOptionsHeader, "nosniff".r)
     }
   }
-
 }

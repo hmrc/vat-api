@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.filters
+package uk.gov.hmrc.vatapi.stubs
 
-import javax.inject.Inject
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.http.Status._
+import uk.gov.hmrc.support.WireMockMethods
 
-import akka.stream.Materializer
-import play.api.mvc.Filter
-import uk.gov.hmrc.vatapi.config.ControllerConfiguration
-import uk.gov.hmrc.play.bootstrap.filters.LoggingFilter
+object AuditStub extends WireMockMethods {
 
-class Logging @Inject()(config: ControllerConfiguration)(implicit val mat: Materializer) extends Filter with LoggingFilter {
-  override def controllerNeedsLogging(controllerName: String) = config.paramsForController(controllerName).needsLogging
+  private val auditUri: String = s"/write/audit.*"
+
+  def audit(): StubMapping = {
+    when(method = POST, uri = auditUri)
+      .thenReturn(status = NO_CONTENT)
+  }
+
 }
