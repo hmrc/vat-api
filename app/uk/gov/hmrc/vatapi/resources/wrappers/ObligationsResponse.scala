@@ -42,16 +42,17 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
     }
 
     def oneFound(obligation: des.Obligations): Either[DesTransformError, Option[Obligations]] = {
-      obligation.obligations.find(obj => obj.obligationDetails.nonEmpty).fold(noneFound) {
+      val obligationsOrError = obligation.obligations.filter(obj => obj.obligationDetails.nonEmpty).flatMap {
         desObligation =>
-          val obligationsOrError: Seq[Either[DesTransformError, Obligation]] = for {
-            details <- desObligation.obligationDetails
-          } yield DesTransformValidator[ObligationDetail, Obligation].from(details)
+            desObligation.obligationDetails.map { details =>
+              DesTransformValidator[ObligationDetail, Obligation].from(details)
+            }
+        }
 
-          obligationsOrError.find(_.isLeft) match {
-            case Some(ex) => Left(ex.left.get)
-            case None => Right(Some(Obligations(obligationsOrError map (_.right.get))))
-          }
+      obligationsOrError.find(_.isLeft) match {
+        case Some(ex) => Left(ex.left.get)
+        case _ if obligationsOrError.map(_.right.get).isEmpty => Right(None)
+        case _ => Right(Some(Obligations(obligationsOrError.map(_.right.get))))
       }
     }
 

@@ -250,6 +250,32 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
       response.status shouldBe OK
       response.json shouldBe Jsons.Obligations()
     }
+
+    "return code 200 with two sets of obligations" in new Test {
+
+      override def uri: String = s"/$vrn/obligations?from=2017-01-01&to=2017-08-31"
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, desUrl(vrn), Map("from" -> "2017-01-01", "to" -> "2017-08-31"), OK, Jsons.Obligations.desResponseTwo(vrn))
+      }
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe OK
+      response.json shouldBe Jsons.Obligations.responseTwo()
+    }
+
+    "return code 200 with two sets of obligations but no identification" in new Test {
+
+      override def uri: String = s"/$vrn/obligations?from=2017-01-01&to=2017-08-31"
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, desUrl(vrn), Map("from" -> "2017-01-01", "to" -> "2017-08-31"), OK, Jsons.Obligations.desResponseTwoWithNoidentification(vrn))
+      }
+      val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe OK
+      response.json shouldBe Jsons.Obligations.responseTwo()
+    }
   }
 
 }
