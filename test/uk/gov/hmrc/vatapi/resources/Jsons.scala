@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.resources
 
 import org.joda.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
-import sun.util.resources.LocaleData
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.models.{Liabilities, Liability, Payment, Payments, TaxPeriod}
 
@@ -159,6 +158,76 @@ object Jsons {
          """.stripMargin)
     }
 
+    def responseTwo(firstMet: String = "F",
+              secondMet: String = "O",
+              thirdMet: String = "O",
+              fourthMet: String = "O"): JsValue = {
+      Json.parse(s"""
+                    |{
+                    |  "obligations": [
+                    |    {
+                    |      "start": "2017-04-06",
+                    |      "end": "2017-07-05",
+                    |      "due": "2017-08-05",
+                    |      "status": "$firstMet",
+                    |      "received": "2017-08-01",
+                    |      "periodKey": "#001"
+                    |    },
+                    |    {
+                    |      "start": "2017-07-06",
+                    |      "end": "2017-10-05",
+                    |      "due": "2017-11-05",
+                    |      "status": "$secondMet",
+                    |      "periodKey": "#002"
+                    |    },
+                    |    {
+                    |      "start": "2017-10-06",
+                    |      "end": "2018-01-05",
+                    |      "due": "2018-02-05",
+                    |      "status": "$thirdMet",
+                    |      "periodKey": "#003"
+                    |    },
+                    |    {
+                    |      "start": "2018-01-06",
+                    |      "end": "2018-04-05",
+                    |      "due": "2018-05-06",
+                    |      "status": "$fourthMet",
+                    |      "periodKey": "#004"
+                    |    },
+                    |    {
+                    |      "start": "2017-04-06",
+                    |      "end": "2017-07-05",
+                    |      "due": "2017-08-05",
+                    |      "status": "$firstMet",
+                    |      "received": "2017-08-01",
+                    |      "periodKey": "#011"
+                    |    },
+                    |    {
+                    |      "start": "2017-07-06",
+                    |      "end": "2017-10-05",
+                    |      "due": "2017-11-05",
+                    |      "status": "$secondMet",
+                    |      "periodKey": "#012"
+                    |    },
+                    |    {
+                    |      "start": "2017-10-06",
+                    |      "end": "2018-01-05",
+                    |      "due": "2018-02-05",
+                    |      "status": "$thirdMet",
+                    |      "periodKey": "#013"
+                    |    },
+                    |    {
+                    |      "start": "2018-01-06",
+                    |      "end": "2018-04-05",
+                    |      "due": "2018-05-06",
+                    |      "status": "$fourthMet",
+                    |      "periodKey": "#014"
+                    |    }
+                    |  ]
+                    |}
+         """.stripMargin)
+    }
+
     def desResponse(vrn: Vrn): JsValue = Json.parse(
         s"""
            |{
@@ -203,6 +272,169 @@ object Jsons {
            |  }
            |  ]
            |}
+    """.stripMargin)
+
+    def desResponseTwo(vrn: Vrn): JsValue = Json.parse(
+      s"""
+         |{
+         |  "obligations": [
+         |  {
+         |    "identification": {
+         |        "incomeSourceType": "A",
+         |        "referenceNumber": "$vrn",
+         |        "referenceType": "VRN"
+         |    },
+         |    "obligationDetails": [
+         |    {
+         |      "status": "F",
+         |      "inboundCorrespondenceFromDate": "2017-04-06",
+         |      "inboundCorrespondenceToDate": "2017-07-05",
+         |      "inboundCorrespondenceDateReceived": "2017-08-01",
+         |      "inboundCorrespondenceDueDate": "2017-08-05",
+         |      "periodKey": "#001"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-07-06",
+         |      "inboundCorrespondenceToDate": "2017-10-05",
+         |      "inboundCorrespondenceDueDate": "2017-11-05",
+         |      "periodKey": "#002"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-10-06",
+         |      "inboundCorrespondenceToDate": "2018-01-05",
+         |      "inboundCorrespondenceDueDate": "2018-02-05",
+         |      "periodKey": "#003"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2018-01-06",
+         |      "inboundCorrespondenceToDate": "2018-04-05",
+         |      "inboundCorrespondenceDueDate": "2018-05-06",
+         |      "periodKey": "#004"
+         |    }
+         |    ]
+         |  },
+         |  {
+         |    "identification": {
+         |        "incomeSourceType": "A",
+         |        "referenceNumber": "$vrn",
+         |        "referenceType": "VRN"
+         |    },
+         |    "obligationDetails": [
+         |    {
+         |      "status": "F",
+         |      "inboundCorrespondenceFromDate": "2017-04-06",
+         |      "inboundCorrespondenceToDate": "2017-07-05",
+         |      "inboundCorrespondenceDateReceived": "2017-08-01",
+         |      "inboundCorrespondenceDueDate": "2017-08-05",
+         |      "periodKey": "#011"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-07-06",
+         |      "inboundCorrespondenceToDate": "2017-10-05",
+         |      "inboundCorrespondenceDueDate": "2017-11-05",
+         |      "periodKey": "#012"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-10-06",
+         |      "inboundCorrespondenceToDate": "2018-01-05",
+         |      "inboundCorrespondenceDueDate": "2018-02-05",
+         |      "periodKey": "#013"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2018-01-06",
+         |      "inboundCorrespondenceToDate": "2018-04-05",
+         |      "inboundCorrespondenceDueDate": "2018-05-06",
+         |      "periodKey": "#014"
+         |    }
+         |    ]
+         |  }
+         |  ]
+         |}
+    """.stripMargin)
+
+    def desResponseTwoWithNoidentification(vrn: Vrn): JsValue = Json.parse(
+      s"""
+         |{
+         |  "obligations": [
+         |  {
+         |    "identification": {
+         |        "incomeSourceType": "A",
+         |        "referenceNumber": "$vrn",
+         |        "referenceType": "VRN"
+         |    },
+         |    "obligationDetails": [
+         |    {
+         |      "status": "F",
+         |      "inboundCorrespondenceFromDate": "2017-04-06",
+         |      "inboundCorrespondenceToDate": "2017-07-05",
+         |      "inboundCorrespondenceDateReceived": "2017-08-01",
+         |      "inboundCorrespondenceDueDate": "2017-08-05",
+         |      "periodKey": "#001"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-07-06",
+         |      "inboundCorrespondenceToDate": "2017-10-05",
+         |      "inboundCorrespondenceDueDate": "2017-11-05",
+         |      "periodKey": "#002"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-10-06",
+         |      "inboundCorrespondenceToDate": "2018-01-05",
+         |      "inboundCorrespondenceDueDate": "2018-02-05",
+         |      "periodKey": "#003"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2018-01-06",
+         |      "inboundCorrespondenceToDate": "2018-04-05",
+         |      "inboundCorrespondenceDueDate": "2018-05-06",
+         |      "periodKey": "#004"
+         |    }
+         |    ]
+         |  },
+         |  {
+         |   "obligationDetails": [
+         |    {
+         |      "status": "F",
+         |      "inboundCorrespondenceFromDate": "2017-04-06",
+         |      "inboundCorrespondenceToDate": "2017-07-05",
+         |      "inboundCorrespondenceDateReceived": "2017-08-01",
+         |      "inboundCorrespondenceDueDate": "2017-08-05",
+         |      "periodKey": "#011"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-07-06",
+         |      "inboundCorrespondenceToDate": "2017-10-05",
+         |      "inboundCorrespondenceDueDate": "2017-11-05",
+         |      "periodKey": "#012"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2017-10-06",
+         |      "inboundCorrespondenceToDate": "2018-01-05",
+         |      "inboundCorrespondenceDueDate": "2018-02-05",
+         |      "periodKey": "#013"
+         |    },
+         |    {
+         |      "status": "O",
+         |      "inboundCorrespondenceFromDate": "2018-01-06",
+         |      "inboundCorrespondenceToDate": "2018-04-05",
+         |      "inboundCorrespondenceDueDate": "2018-05-06",
+         |      "periodKey": "#014"
+         |    }
+         |    ]
+         |  }
+         |  ]
+         |}
     """.stripMargin)
 
     def desResponseWithoutObligationDetails(vrn: Vrn): JsValue = Json.parse(
