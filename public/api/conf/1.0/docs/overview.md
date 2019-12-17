@@ -16,4 +16,4 @@ For more background on the VAT API, see the [MTDfB VAT Guide for Vendors](https:
 
 ### Fraud prevention
 
-It is compulsory to supply fraud prevention header information for this API. You can use the <a href="/api-documentation/docs/api/service/txm-fph-validator-api/1.0">Test Fraud Prevention Headers API</a> to make sure your application can produce correctly formatted fraud prevention headers.   You can use this API during development and as part of your regular quality assurance checks.
+It is compulsory to supply fraud prevention header information for this API. You can use the <a href="/api-documentation/docs/api/service/txm-fph-validator-api/1.0" target="_blank">Test Fraud Prevention Headers API (opens in a new tab)</a> to make sure your application can produce correctly formatted fraud prevention headers.   You can use this API during development and as part of your regular quality assurance checks.
