@@ -20,9 +20,9 @@ import sbt._
 
 object AppDependencies {
 
-  val bootstrapPlayVersion = "1.1.0"
+  val bootstrapPlayVersion = "1.3.0"
   val domainVersion = "5.6.0-play-26"
-  val hmrcApiVersion = "3.4.0-play-26"
+  val hmrcApiVersion = "3.6.0-play-26"
   val jsonJodaVersion = "2.6.13"
   val catsCoreVersion = "1.6.0"
   val json4SnativeVersion = "3.6.3"

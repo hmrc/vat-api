@@ -17,7 +17,7 @@
 package uk.gov.hmrc.vatapi.support
 
 import uk.gov.hmrc.vatapi.models.des
-import uk.gov.hmrc.vatapi.models.des.{FinancialData, FinancialItem, FinancialTransaction}
+import uk.gov.hmrc.vatapi.models.des.{FinancialItem, FinancialTransaction}
 
 
 object FinancialData {
