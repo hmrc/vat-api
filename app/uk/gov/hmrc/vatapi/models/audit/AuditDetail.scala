@@ -23,6 +23,7 @@ case class AuditDetail(
                         arn: Option[String],
                         `X-CorrelationId`: String,
                         response: AuditResponse,
+                        applicationProductionClientId: String,
                         nrSubmissionID: Option[String] = None
                       )
 

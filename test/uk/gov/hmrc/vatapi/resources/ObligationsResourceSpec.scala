@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi.resources
 
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.auth.core.Enrolments
@@ -46,6 +47,7 @@ class ObligationsResourceSpec extends ResourceSpec
 
   val enrolments = Enrolments(Set.empty)
   val arn = "someAgentRefNo"
+  val clientId = "someClientId"
   val clientObligationsJson: JsValue = Jsons.Obligations()
 
   val authContext = Organisation(None)
@@ -53,6 +55,8 @@ class ObligationsResourceSpec extends ResourceSpec
   class Setup {
     val testObligationResource = new ObligationsResource(mockObligationsConnector, mockAuthorisationService, mockAuditService, cc)
     mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
+
+    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("X-Client-Id" -> clientId)
   }
 
   "retrieveObligations" should {
@@ -64,14 +68,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
         status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
 
         val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -82,14 +86,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParamsWithNoStatus)
           .returns(Future.successful(desResponse))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParamsWithNoStatus)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParamsWithNoStatus)(fakeRequest)
         status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientObligationsJson
 
         val auditResponse = AuditResponse(OK, None, Some(clientObligationsJson))
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -100,14 +104,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(desResponse))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
         status(result) shouldBe NOT_FOUND
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.NotFound)
 
         val auditResponse = AuditResponse(NOT_FOUND, Some(Seq(AuditError(Errors.NotFound.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(desResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -118,14 +122,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(invalidDesResponse))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
         status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(invalidDesResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -135,14 +139,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.failed(new Exception("Connection refused error")))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
         status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(Response.defaultCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -152,14 +156,14 @@ class ObligationsResourceSpec extends ResourceSpec
       MockObligationsConnector.get(vrn, queryParams)
         .returns(Future.successful(nonJsonDesResponse))
 
-      val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+      val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
       status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
       val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
       MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(nonJsonDesResponse.getCorrelationId,
-        authContext.affinityGroup, None, auditResponse))
+        authContext.affinityGroup, None, clientId, auditResponse))
     }
 
     "DES returns a 200 response with an empty body" in new Setup {
@@ -168,7 +172,7 @@ class ObligationsResourceSpec extends ResourceSpec
       MockObligationsConnector.get(vrn, queryParams)
         .returns(Future.successful(nonJsonDesResponse))
 
-      val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+      val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
       status(result) shouldBe INTERNAL_SERVER_ERROR
       contentType(result) shouldBe Some(MimeTypes.JSON)
       contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
@@ -182,14 +186,14 @@ class ObligationsResourceSpec extends ResourceSpec
         MockObligationsConnector.get(vrn, queryParams)
           .returns(Future.successful(failureResponse))
 
-        val result = testObligationResource.retrieveObligations(vrn, queryParams)(FakeRequest())
+        val result = testObligationResource.retrieveObligations(vrn, queryParams)(fakeRequest)
         status(result) shouldBe INTERNAL_SERVER_ERROR
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.InternalServerError)
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatObligationsAudit(failureResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
   }

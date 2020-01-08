@@ -47,10 +47,11 @@ class VatReturnsResource @Inject()(
 
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
     val arn = getArn
+    val clientId = getClientId
 
     def audit(vatResult: VatResult, correlationId: String, nrsId: Option[String]) =
       auditService.audit(AuditEvents.submitVatReturn(correlationId,
-        request.authContext.affinityGroup, nrsId, arn, vatResult.auditResponse))
+        request.authContext.affinityGroup, nrsId, clientId, arn, vatResult.auditResponse))
 
     val result = fromDes {
 
@@ -108,10 +109,11 @@ class VatReturnsResource @Inject()(
       logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
 
       val arn = getArn
+      val clientId = getClientId
 
       def audit(vatResult: VatResult, correlationId: String) =
         auditService.audit(AuditEvents.retrieveVatReturnsAudit(correlationId,
-          request.authContext.affinityGroup, arn, vatResult.auditResponse))
+          request.authContext.affinityGroup, arn, clientId, vatResult.auditResponse))
 
       val result = fromDes {
         for {
