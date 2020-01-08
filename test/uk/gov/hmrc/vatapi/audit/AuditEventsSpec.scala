@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.vatapi.audit
 
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.models.audit.{AuditDetail, AuditEvent, AuditResponse}
 
-class AuditEventsSpec extends UnitSpec with OneAppPerSuite {
+class AuditEventsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   val xCorrelationId = "testXCorrelationId"
   val userType = "testUserType"

@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.services
 import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.HeaderNames
 import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
@@ -44,7 +44,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.Right
 
 
-class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
+class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
 
   val mockAppContext = mock[AppContext]
 

@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.services
 import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,7 +37,7 @@ import uk.gov.hmrc.vatapi.resources.AuthRequest
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NRSServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with MockNRSConnector {
+class NRSServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MockNRSConnector {
 
   val testNRSService = new NRSService(mockNRSConnector)
 

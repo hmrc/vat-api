@@ -18,12 +18,13 @@ package uk.gov.hmrc.vatapi.config
 
 import com.typesafe.config.ConfigFactory
 import javax.inject.{Inject, Singleton}
+import play.api.Application
 import play.api.Play._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 
 @Singleton
-class AppContext @Inject()(config: ServicesConfig) extends FixedConfig {
+class AppContext @Inject()(config: ServicesConfig, application: Application) extends FixedConfig {
 
 
   //API Platform Config
@@ -32,7 +33,7 @@ class AppContext @Inject()(config: ServicesConfig) extends FixedConfig {
   lazy val apiGatewayContext: String = config.getString("api.gateway.context")
   lazy val apiGatewayRegistrationContext: String = apiGatewayContext
   lazy val apiGatewayLinkContext: String = apiGatewayContext
-  lazy val registrationEnabled: Boolean = current.configuration.getBoolean(s"microservice.services.service-locator.enabled").getOrElse(true)
+  lazy val registrationEnabled: Boolean = application.configuration.getOptional[Boolean](s"microservice.services.service-locator.enabled").getOrElse(true)
   lazy val serviceLocatorUrl: String = config.baseUrl("service-locator")
 
   //DES Config

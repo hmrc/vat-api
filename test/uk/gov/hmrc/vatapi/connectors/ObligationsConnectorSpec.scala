@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.vatapi.connectors
 
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.JsValue
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.domain.Vrn
@@ -31,7 +31,7 @@ import uk.gov.hmrc.vatapi.resources.wrappers.ObligationsResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ObligationsConnectorSpec extends UnitSpec with OneAppPerSuite
+class ObligationsConnectorSpec extends UnitSpec with GuiceOneAppPerSuite
   with MockHttp
   with MockAppContext {
 
