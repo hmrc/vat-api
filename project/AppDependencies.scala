@@ -20,10 +20,11 @@ import sbt._
 
 object AppDependencies {
 
-  val bootstrapPlayVersion = "1.1.0"
+  val bootstrapPlayVersion = "1.3.0"
   val domainVersion = "5.6.0-play-26"
-  val hmrcApiVersion = "3.4.0-play-26"
+  val hmrcApiVersion = "3.6.0-play-26"
   val jsonJodaVersion = "2.6.13"
+  val playJsonVersion = "2.6.0"
   val catsCoreVersion = "1.6.0"
   val json4SnativeVersion = "3.6.3"
   val json4SextVersion = "3.6.3"
@@ -45,6 +46,7 @@ object AppDependencies {
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "uk.gov.hmrc" %% "play-hmrc-api" % hmrcApiVersion,
     "org.typelevel" %% "cats-core" % catsCoreVersion,
+    "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
     "org.json4s" %% "json4s-native" % json4SnativeVersion,
     "org.json4s" %% "json4s-ext" % json4SextVersion
   )

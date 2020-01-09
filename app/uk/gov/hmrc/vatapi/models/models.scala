@@ -95,25 +95,25 @@ package object models {
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
 
   val isoInstantDateFormat: Format[DateTime] = Format[DateTime](
-    Reads.jodaDateReads(isoInstantDatePattern),
-    Writes.jodaDateWrites(isoInstantDatePattern)
+    JodaReads.jodaDateReads(isoInstantDatePattern),
+    JodaWrites.jodaDateWrites(isoInstantDatePattern)
   )
   private val VAT_MAX_AMOUNT_13_DIGITS = BigDecimal("9999999999999.99")
 
   val dateTimeFormat: Format[DateTime] = Format[DateTime](
-    Reads.jodaDateReads(dateTimePattern),
-    Writes.jodaDateWrites(dateTimePattern)
+    JodaReads.jodaDateReads(dateTimePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
   )
 
   val defaultDateTimeFormat: Format[DateTime] = Format[DateTime](
-    Reads.jodaDateReads(isoInstantDatePattern),
-    Writes.jodaDateWrites(dateTimePattern)
+    JodaReads.jodaDateReads(isoInstantDatePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
   )
   private val VAT_MAX_AMOUNT_11_DIGITS = BigDecimal("99999999999.99")
 
   val dateFormat: Format[LocalDate] = Format[LocalDate](
-    Reads.jodaLocalDateReads(datePattern),
-    Writes.jodaLocalDateWrites(datePattern)
+    JodaReads.jodaLocalDateReads(datePattern),
+    JodaWrites.jodaLocalDateWrites(datePattern)
   )
 
 }

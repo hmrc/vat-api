@@ -75,7 +75,7 @@ class NRSConnector @Inject()(
       implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
 
       ws.url(submitUrl)
-        .withHeaders(headers: _*)
+        .withHttpHeaders(headers: _*)
         .withRequestTimeout(nrsMaxTimeout)
         .post(Json.toJson(nrsSubmission))
     }
@@ -90,7 +90,7 @@ class NRSConnector @Inject()(
       val httpResponse = HttpResponse(
         res.status,
         resJson,
-        res.allHeaders,
+        res.headers,
         None
       )
 

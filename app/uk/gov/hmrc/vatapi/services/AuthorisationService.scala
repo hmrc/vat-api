@@ -21,7 +21,6 @@ import org.joda.time.LocalDate
 import play.api.Logger
 import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.IdentityData
-//import play.api.Logger
 import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Results._
@@ -56,7 +55,7 @@ class AuthorisationService @Inject()(
   private def authoriseAsClient(vrn: Vrn)(implicit hc: HeaderCarrier,
                                           requestHeader: RequestHeader,
                                           ec: ExecutionContext): Future[AuthResult] = {
-    import Retrievals._
+    import v2.Retrievals._
 
     logger.debug(s"[AuthorisationService] [authoriseAsClient] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(
@@ -104,7 +103,7 @@ class AuthorisationService @Inject()(
   private def authoriseAsClientWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier,
                                                             requestHeader: RequestHeader,
                                                             ec: ExecutionContext): Future[AuthResult] = {
-    import Retrievals._
+    import v2.Retrievals._
 
     logger.debug(s"[AuthorisationService] [authoriseAsClientWithNrsRequirement] Check user authorisation for MTD VAT based on VRN $vrn.")
     apiAuthorisedFunctions.authorised(

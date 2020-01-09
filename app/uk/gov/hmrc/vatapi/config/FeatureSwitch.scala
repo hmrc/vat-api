@@ -25,13 +25,13 @@ case class FeatureSwitch @Inject()(value: Option[Configuration]) {
 
   def isWhiteListingEnabled: Boolean = {
     value match {
-      case Some(config) => config.getBoolean("white-list.enabled").getOrElse(false)
+      case Some(config) => config.getOptional[Boolean]("white-list.enabled").getOrElse(false)
       case None => false
     }
   }
 
   def isAgentSimulationFilterEnabled: Boolean = value match {
-    case Some(config) => config.getBoolean("client-agent-simulation.enabled").getOrElse(false)
+    case Some(config) => config.getOptional[Boolean]("client-agent-simulation.enabled").getOrElse(false)
     case None => false
   }
 
@@ -39,7 +39,7 @@ case class FeatureSwitch @Inject()(value: Option[Configuration]) {
     value match {
       case Some(config) =>
         config
-          .getStringSeq("white-list.applicationIds")
+          .getOptional[Seq[String]]("white-list.applicationIds")
           .getOrElse(throw new RuntimeException(s"feature-switch.white-list.applicationIds is not configured"))
       case None => Seq()
     }
@@ -47,14 +47,14 @@ case class FeatureSwitch @Inject()(value: Option[Configuration]) {
 
   def isAuthEnabled: Boolean = {
     value match {
-      case Some(config) => config.getBoolean("auth.enabled").getOrElse(true)
+      case Some(config) => config.getOptional[Boolean]("auth.enabled").getOrElse(true)
       case None => true
     }
   }
 
   def isOriginatorIdForSubmitEnabled: Boolean = {
     value match {
-      case Some(config) => config.getBoolean("submit-with-originatorId.enabled").getOrElse(false)
+      case Some(config) => config.getOptional[Boolean]("submit-with-originatorId.enabled").getOrElse(false)
       case None => false
     }
   }

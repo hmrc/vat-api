@@ -19,7 +19,7 @@ package uk.gov.hmrc.vatapi.connectors
 import java.net.URLEncoder
 
 import org.joda.time.DateTime
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
@@ -33,7 +33,7 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class VatReturnsConnectorSpec extends UnitSpec with OneAppPerSuite
+class VatReturnsConnectorSpec extends UnitSpec with GuiceOneAppPerSuite
   with MockHttp
   with MockAppContext {
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.connectors
 
 import java.util.concurrent.TimeoutException
 
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.{JsResultException, Json, Writes}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import uk.gov.hmrc.domain.Vrn
@@ -34,7 +34,7 @@ import uk.gov.hmrc.vatapi.models.NRSSubmission
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
+class NRSConnectorSpec extends UnitSpec with GuiceOneAppPerSuite
   with MockHttp
   with MockAppContext {
 
@@ -67,7 +67,7 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
         val meJson = Json.toJson(nrsSubmission)
 
         when(wsClient.url(testUrl)).thenReturn(request)
-        when(request.withHeaders(any())).thenReturn(request)
+        when(request.withHttpHeaders(any())).thenReturn(request)
         when(request.withRequestTimeout(testNrsConnector.nrsMaxTimeout)).thenReturn(request)
         when(request.post(eqTo(meJson))(any())).thenReturn(Future.successful(response))
         when(response.json).thenReturn(nrsResponseJson)
@@ -87,7 +87,7 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
         implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
 
         when(wsClient.url(testUrl)).thenReturn(request)
-        when(request.withHeaders(any())).thenReturn(request)
+        when(request.withHttpHeaders(any())).thenReturn(request)
         when(request.withRequestTimeout(testNrsConnector.nrsMaxTimeout)).thenReturn(request)
         when(request.post(eqTo(Json.toJson(nrsSubmission)))(any())).thenReturn(Future.failed(new TimeoutException("Expected Error")))
 
@@ -103,7 +103,7 @@ class NRSConnectorSpec extends UnitSpec with OneAppPerSuite
         implicit val nrsWrites = implicitly[Writes[NRSSubmission]]
 
         when(wsClient.url(testUrl)).thenReturn(request)
-        when(request.withHeaders(any())).thenReturn(request)
+        when(request.withHttpHeaders(any())).thenReturn(request)
         when(request.withRequestTimeout(testNrsConnector.nrsMaxTimeout)).thenReturn(request)
         when(request.post(eqTo(Json.toJson(nrsSubmission)))(any())).thenReturn(Future.successful(response))
         when(response.json).thenThrow(JsResultException(Seq()))

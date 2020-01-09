@@ -37,15 +37,15 @@ object TestConstants {
       internalId = Some("Int-a7688cda-d983-472d-9971-ddca5f124641"),
       externalId = Some("Ext-c4ebc935-ac7a-4cc2-950a-19e6fac91f2a"),
       agentCode = None,
-      credentials = retrieve.Credentials(
+      credentials = Some(retrieve.Credentials(
         providerId = "8124873381064832",
         providerType = "GovernmentGateway"
-      ),
+      )),
       confidenceLevel = ConfidenceLevel.L200,
-      name = Name(
+      name = Some(Name(
         name = Some("TestUser"),
         lastName = None
-      ),
+      )),
       email = Some("user@test.com"),
       agentInformation = AgentInformation(
         agentCode = None,
