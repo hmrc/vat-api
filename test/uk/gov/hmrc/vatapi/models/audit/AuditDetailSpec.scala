@@ -27,6 +27,7 @@ class AuditDetailSpec extends UnitSpec {
   private val userType = "Organisation"
   private val agentReferenceNumber = Some("012345678")
   private val vrn: Vrn = generateVrn
+  private val clientId = "123456789"
   private val `X-CorrelationId` = "X-123"
   private val vatReturnDeclarationJson = Json.parse(
     """
@@ -63,11 +64,12 @@ class AuditDetailSpec extends UnitSpec {
              |        "response": {
              |            "httpStatus": 200,
              |            "payload": $jsonResponse
-             |        }
+             |        },
+             |        "applicationProductionClientId": "$clientId"
              |}
            """.stripMargin)
 
-        val model = AuditDetail("Agent", agentReferenceNumber, `X-CorrelationId`, response = responseSuccess)
+        val model = AuditDetail("Agent", agentReferenceNumber, `X-CorrelationId`, response = responseSuccess, clientId)
 
         Json.toJson(model) shouldBe json
       }
@@ -87,11 +89,12 @@ class AuditDetailSpec extends UnitSpec {
              |        "errorCode": "VRN_INVALID"
              |      }
              |     ]
-             |    }
+             |    },
+             |    "applicationProductionClientId": "$clientId"
              |}
            """.stripMargin)
 
-        val model = AuditDetail(userType, None, `X-CorrelationId`, responseFail)
+        val model = AuditDetail(userType, None, `X-CorrelationId`, responseFail, clientId)
 
         Json.toJson(model) shouldBe json
       }

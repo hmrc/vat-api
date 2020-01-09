@@ -50,47 +50,55 @@ object AuditEvents {
       )
     )
 
-  def submitVatReturn(correlationId: String, userType: String, nrSubmissionId: Option[String], arn: Option[String],
+  def submitVatReturn(correlationId: String,
+                      userType: String,
+                      nrSubmissionId: Option[String],
+                      clientId: String,
+                      arn: Option[String],
                       response: AuditResponse): AuditEvent[AuditDetail] = {
     AuditEvent(
       auditType = "submitVatReturn",
       transactionName = "submit-vat-return",
-      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, nrSubmissionId)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, clientId, nrSubmissionId)
     )
   }
 
-  def retrieveVatObligationsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
+  def retrieveVatObligationsAudit(correlationId: String,
+                                  userType: String,
+                                  arn: Option[String],
+                                  clientId: String,
+                                  response: AuditResponse): AuditEvent[AuditDetail] = {
     AuditEvent(
       auditType = "retrieveVatObligations",
       transactionName = "retrieve-vat-obligations",
-      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, clientId)
     )
   }
 
-  def retrieveVatReturnsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
+  def retrieveVatReturnsAudit(correlationId: String, userType: String, arn: Option[String], clientId: String, response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatReturns",
       transactionName = "retrieve-vat-returns",
-      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, clientId)
     )
   }
 
-  def retrieveVatLiabilitiesAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
+  def retrieveVatLiabilitiesAudit(correlationId: String, userType: String, arn: Option[String], clientId: String, response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatLiabilities",
       transactionName = "retrieve-vat-liabilities",
-      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, clientId)
     )
   }
 
-  def retrieveVatPaymentsAudit(correlationId: String, userType: String, arn: Option[String], response: AuditResponse): AuditEvent[AuditDetail] = {
+  def retrieveVatPaymentsAudit(correlationId: String, userType: String, arn: Option[String], clientId: String, response: AuditResponse): AuditEvent[AuditDetail] = {
 
     AuditEvent(
       auditType = "retrieveVatPayments",
       transactionName = "retrieve-vat-payments",
-      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response)
+      detail = AuditDetail(userType = userType, arn = arn, `X-CorrelationId` = correlationId, response, clientId)
     )
 
   }

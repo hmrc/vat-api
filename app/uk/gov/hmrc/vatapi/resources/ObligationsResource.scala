@@ -39,10 +39,11 @@ class ObligationsResource @Inject()(
     logger.debug(s"[ObligationsResource][retrieveObligations] - Retrieve Obligations for VRN : $vrn")
 
     val arn = getArn
+    val clientId = getClientId
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatObligationsAudit(correlationId,
-        request.authContext.affinityGroup, arn, vatResult.auditResponse))
+        request.authContext.affinityGroup, arn, clientId, vatResult.auditResponse))
 
     val result =
       for {

@@ -87,6 +87,8 @@ class VatReturnsResourceSpec extends ResourceSpec
       |  "totalAcquisitionsExVAT": 100
       |}""".stripMargin)
 
+  val clientId = "testClientId"
+
   val nrsSubmissionId = "test-sub-id"
   val nrsTimestamp = "test-timestamp"
   val nrsData = NRSData(nrsSubmissionId, "This has been deprecated - DO NOT USE", nrsTimestamp)
@@ -112,7 +114,7 @@ class VatReturnsResourceSpec extends ResourceSpec
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(vatReturnResponse)))
 
-        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson).withHeaders("X-Client-Id" -> clientId)
         val result = resource.submitVatReturn(vrn)(request)
 
         status(result) shouldBe CREATED
@@ -126,7 +128,7 @@ class VatReturnsResourceSpec extends ResourceSpec
 
         val auditResponse = AuditResponse(CREATED, None, Some(vatReturnResponseJson))
         MockAuditService.verifyAudit(AuditEvents.submitVatReturn(vatReturnResponse.getCorrelationId,
-          authContext.affinityGroup, Some(nrsSubmissionId), None, auditResponse))
+          authContext.affinityGroup, Some(nrsSubmissionId), clientId, None, auditResponse))
       }
     }
 
@@ -137,14 +139,14 @@ class VatReturnsResourceSpec extends ResourceSpec
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Left(InternalServerErrorResult(Errors.InternalServerError.message))))
 
-        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson).withHeaders("X-Client-Id" -> clientId)
         val result = resource.submitVatReturn(vrn)(request)
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.submitVatReturn(Response.defaultCorrelationId,
-          authContext.affinityGroup, None, None, auditResponse))
+          authContext.affinityGroup, None, clientId, None, auditResponse))
       }
     }
 
@@ -155,14 +157,14 @@ class VatReturnsResourceSpec extends ResourceSpec
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(duplicateSubmissionResponse)))
 
-        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson).withHeaders("X-Client-Id" -> clientId)
         val result = resource.submitVatReturn(vrn)(request)
 
         status(result) shouldBe FORBIDDEN
 
         val auditResponse = AuditResponse(FORBIDDEN, Some(Seq(AuditError(Errors.DuplicateVatSubmission.code))), None)
         MockAuditService.verifyAudit(AuditEvents.submitVatReturn(duplicateSubmissionResponse.getCorrelationId,
-          authContext.affinityGroup, None, None, auditResponse))
+          authContext.affinityGroup, None, clientId, None, auditResponse))
       }
     }
     "return a 403 tax period not ended error" when {
@@ -172,7 +174,7 @@ class VatReturnsResourceSpec extends ResourceSpec
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.successful(Right(taxPeriodNotEndedResponse)))
 
-        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson).withHeaders("X-Client-Id" -> clientId)
         val result = resource.submitVatReturn(vrn)(request)
 
         status(result) shouldBe FORBIDDEN
@@ -180,7 +182,7 @@ class VatReturnsResourceSpec extends ResourceSpec
 
         val auditResponse = AuditResponse(FORBIDDEN, Some(Seq(AuditError(Errors.TaxPeriodNotEnded.code))), None)
         MockAuditService.verifyAudit(AuditEvents.submitVatReturn(taxPeriodNotEndedResponse.getCorrelationId,
-          authContext.affinityGroup, None, None, auditResponse))
+          authContext.affinityGroup, None, clientId, None, auditResponse))
       }
     }
     "return an INTERNAL_SERVER_ERROR" when {
@@ -190,14 +192,14 @@ class VatReturnsResourceSpec extends ResourceSpec
         MockVatReturnsOrchestrator.submitVatReturn(vrn, vatReturnsDeclaration)
           .returns(Future.failed(new Exception("DES FAILED")))
 
-        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson)
+        val request = FakeRequest().withBody[JsValue](vatReturnDeclarationJson).withHeaders("X-Client-Id" -> clientId)
         val result = resource.submitVatReturn(vrn)(request)
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.submitVatReturn(Response.defaultCorrelationId,
-          authContext.affinityGroup, None, None, auditResponse))
+          authContext.affinityGroup, None, clientId, None, auditResponse))
       }
     }
   }
@@ -211,14 +213,14 @@ class VatReturnsResourceSpec extends ResourceSpec
           Some(Json.toJson(desVatReturn))))
         retrieveVatReturn(vrn, "#001")(successResponse)
 
-        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest())
+        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest().withHeaders("X-Client-Id" -> clientId))
         status(result) shouldBe OK
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe clientVatReturnJson
 
         val auditResponse = AuditResponse(OK, None, Some(clientVatReturnJson))
         MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(successResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -230,12 +232,12 @@ class VatReturnsResourceSpec extends ResourceSpec
           Some(Json.toJson(""))))
         retrieveVatReturnFailed(vrn, "#001")
 
-        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest())
+        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest().withHeaders("X-Client-Id" -> clientId))
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
         val auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(Errors.InternalServerError.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(successResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -243,12 +245,12 @@ class VatReturnsResourceSpec extends ResourceSpec
       "period key invalid" in new Setup {
 
         mockAuthAction(vrn).thenReturn(Future.successful(Right(authContext)))
-        val result = resource.retrieveVatReturns(vrn, "xxxxx")(FakeRequest())
+        val result = resource.retrieveVatReturns(vrn, "xxxxx")(FakeRequest().withHeaders("X-Client-Id" -> clientId))
         status(result) shouldBe BAD_REQUEST
 
         val auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(Errors.InvalidPeriodKey.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(Response.defaultCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
 
@@ -260,14 +262,14 @@ class VatReturnsResourceSpec extends ResourceSpec
           Some(Json.parse("""{"code" : "INVALID_VRN", "reason": ""}"""))))
         retrieveVatReturn(vrn, "#001")(failureResponse)
 
-        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest())
+        val result = resource.retrieveVatReturns(vrn, "#001")(FakeRequest().withHeaders("X-Client-Id" -> clientId))
         status(result) shouldBe BAD_REQUEST
         contentType(result) shouldBe Some(MimeTypes.JSON)
         contentAsJson(result) shouldBe Json.toJson(Errors.VrnInvalid)
 
         val auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(Errors.VrnInvalid.code))), None)
         MockAuditService.verifyAudit(AuditEvents.retrieveVatReturnsAudit(failureResponse.getCorrelationId,
-          authContext.affinityGroup, None, auditResponse))
+          authContext.affinityGroup, None, clientId, auditResponse))
       }
     }
   }

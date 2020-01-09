@@ -42,10 +42,11 @@ class FinancialDataResource @Inject()(
     logger.debug(s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
 
     val arn = getArn
+    val clientId = getClientId
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(correlationId,
-        request.authContext.affinityGroup, arn, vatResult.auditResponse))
+        request.authContext.affinityGroup, arn, clientId, vatResult.auditResponse))
 
     val result =
       for {
@@ -93,10 +94,11 @@ class FinancialDataResource @Inject()(
     logger.debug(s"[FinancialDataResource][retrievePayments] Retrieving Payments from DES")
 
     val arn = getArn
+    val clientId = getClientId
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatPaymentsAudit(correlationId,
-        request.authContext.affinityGroup, arn, vatResult.auditResponse))
+        request.authContext.affinityGroup, arn, clientId, vatResult.auditResponse))
 
     val result =
       for {

@@ -73,6 +73,9 @@ abstract class BaseResource(cc: ControllerComponents) extends BackendController(
       case c: AuthContext => c.agentReference
     }
   }
+
+  def getClientId(implicit request: AuthRequest[_]): String = request.headers.get("X-Client-Id").getOrElse("N/A")
+
 }
 
 class AuthRequest[A](val authContext: AuthContext, request: Request[A]) extends WrappedRequest[A](request)
