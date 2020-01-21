@@ -42,7 +42,7 @@ trait MockNRSService extends UnitSpec with Mock {
     when(mockNrsService
       .submit(
         eqTo(vrn),
-        any[NRSSubmission]())(any[HeaderCarrier](), any[ExecutionContext](), any[AuthRequest[_]]()))
+        any[NRSSubmission]())(any[HeaderCarrier](), any[ExecutionContext]()))
       .thenReturn(Future.successful(response))
 
     when(mockNrsService.convertToNrsSubmission(

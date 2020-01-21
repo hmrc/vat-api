@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi
+package uk.gov.hmrc.vatapi.connectors
 
-import play.api.Logger
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.vatapi.config.AppContext
-import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,8 +28,6 @@ trait BaseConnector {
 
   val http: DefaultHttpClient
   val appContext: AppContext
-
-  private val logger = Logger("connectors")
 
   def httpGet[R <: Response](url: String, toResponse: HttpResponse => R)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[R] =
     withAdditionalHeaders[R](url, withDesHeaders) {

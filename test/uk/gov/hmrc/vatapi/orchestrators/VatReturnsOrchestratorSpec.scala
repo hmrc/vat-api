@@ -17,9 +17,9 @@
 package uk.gov.hmrc.vatapi.orchestrators
 
 import cats.data.EitherT
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.Json
@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class VatReturnsOrchestratorSpec extends UnitSpec
   with GuiceOneAppPerSuite
-  with MockitoSugar
+  with MockFactory
   with ScalaFutures
   with EitherValues
   with MockNRSService
@@ -111,16 +111,6 @@ class VatReturnsOrchestratorSpec extends UnitSpec
 
         val result: Either[_, VatReturnResponse] = await(orchestrator.submitVatReturn(testVrn, vatReturnDeclaration, Some(nrsClientData.nrSubmissionId)))
         result shouldBe Right(vatReturnSuccessResponse)
-
-        val expectedSubmitVatReturnAudit = AuditEvent(
-          "submitVatReturn",
-          "submit-vat-return",
-          Map(
-            "X-CorrelationId" -> correlationId,
-            "userType" -> "Organisation",
-            "nrSubmissionId" -> nrsClientData.nrSubmissionId
-          )
-        )
 
         verify(mockAuditService, once).audit(eqTo(expectedNrsAudit))(any(), any(), any(), any())
       }

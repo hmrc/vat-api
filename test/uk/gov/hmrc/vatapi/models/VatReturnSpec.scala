@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.models
 
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.resources.JsonSpec
-import org.joda.time.LocalDate
 
 class VatReturnSpec extends UnitSpec with JsonSpec {
 

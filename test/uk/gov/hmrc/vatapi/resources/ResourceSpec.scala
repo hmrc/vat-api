@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, OptionValues, WordSpec}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
@@ -27,10 +29,10 @@ import uk.gov.hmrc.vatapi.TestUtils
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 
-trait ResourceSpec extends WordSpec
+trait ResourceSpec extends AnyWordSpec
   with Matchers
   with OptionValues
-  with MockitoSugar
+  with MockFactory
   with TestUtils
   with ResultExtractors
   with HeaderNames

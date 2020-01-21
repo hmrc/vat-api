@@ -21,7 +21,6 @@ import play.api.Logger
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.audit.AuditEvents
-import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
 import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response

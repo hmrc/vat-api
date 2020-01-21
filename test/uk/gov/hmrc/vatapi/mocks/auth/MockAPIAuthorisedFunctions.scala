@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.mocks.auth
 
-import org.mockito.{ArgumentMatchers => Matchers}
 import org.scalatest.Suite
 import play.api.libs.json.JsArray
 import uk.gov.hmrc.auth.core._

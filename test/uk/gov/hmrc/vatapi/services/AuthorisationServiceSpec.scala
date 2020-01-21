@@ -17,8 +17,8 @@
 package uk.gov.hmrc.vatapi.services
 
 import org.joda.time.DateTime
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.HeaderNames
 import play.api.libs.json.JsResultException
@@ -40,11 +40,11 @@ import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Right
 
 
-class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
+class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockFactory with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
 
   val mockAppContext = mock[AppContext]
 
@@ -75,35 +75,35 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, ec)) shouldBe Right(orgAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, ec)) shouldBe Right(indAuthContextWithNrsData)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContextWithNrsData)
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, ec)) shouldBe Right(agentAuthContextWithNrsData)
       }
     }
 
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, ec)).isLeft shouldBe true
       }
     }
 
     "verify the auth with invalid client confidenceLevel details" should {
       "should reject the client " in {
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, ec)) shouldBe
           Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
       }
     }
@@ -111,7 +111,7 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
       "reject the client" in {
         setupMockAuthorisationException(new JsResultException(errors = Seq()))
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(testVrn)(hc, ec)) shouldBe
         Left(Forbidden(toJson(Errors.InternalServerError)))
       }
     }
@@ -119,7 +119,7 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify the auth with unexpected auth error" should {
       "should reject the client " in {
         setupMockAuthorisationException(new UnsupportedAuthProvider)
-        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheckWithNrsRequirement(invalidVrn)(hc, ec)) shouldBe
           Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
       }
     }
@@ -134,35 +134,35 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify the auth with valid organisation client details" should {
       "should return valid auth enrolments " in {
         setupMockAuthRetrievalSuccess(organisationResponse)
-        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(orgAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, ec)) shouldBe Right(orgAuthContext)
       }
     }
 
     "verify the auth with valid individual client details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(individualResponse)
-        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(indAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, ec)) shouldBe Right(indAuthContext)
       }
     }
 
     "verify the auth with valid agent details" should {
       "should return valid auth enrolments" in {
         setupMockAuthRetrievalSuccess(agentResponse)
-        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe Right(agentAuthContext)
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, ec)) shouldBe Right(agentAuthContext)
       }
     }
 
     "verify the auth with invalid client details" should {
       "should reject the client " in {
         setupMockAuthorisationException()
-        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)).isLeft shouldBe true
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, ec)).isLeft shouldBe true
       }
     }
 
     "verify the auth with invalid client confidenceLevel details" should {
       "should reject the client " in {
         setupMockAuthorisationException(new InsufficientConfidenceLevel())
-        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, ec)) shouldBe
           Left(Forbidden(toJson(Errors.ClientOrAgentNotAuthorized)))
       }
     }
@@ -170,7 +170,7 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify auth when JSON response from auth.authorise has insufficient data for creating NRS data" should {
       "reject the client" in {
         setupMockAuthorisationException(new JsResultException(errors = Seq()))
-        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(testVrn)(hc, ec)) shouldBe
         Left(Forbidden(toJson(Errors.InternalServerError)))
       }
     }
@@ -178,7 +178,7 @@ class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with Mo
     "verify the auth with unexpected auth error" should {
       "should reject the client " in {
         setupMockAuthorisationException(new UnsupportedAuthProvider)
-        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, fakeRequestWithActiveSession, ec)) shouldBe
+        extractAwait(testAuthorisationService.authCheck(invalidVrn)(hc, ec)) shouldBe
           Left(Results.InternalServerError(toJson(Errors.InternalServerError("An internal server error occurred"))))
       }
     }

@@ -17,11 +17,14 @@
 package uk.gov.hmrc.vatapi
 
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.scalatest._
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec, AsyncWordSpec}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 trait BaseUnitSpec extends Matchers with OptionValues with TestUtils with FutureAwaits
   with DefaultAwaitTimeout {
@@ -31,7 +34,7 @@ trait BaseUnitSpec extends Matchers with OptionValues with TestUtils with Future
     Await.result(f, duration)
 }
 
-trait UnitSpec extends WordSpec with BaseUnitSpec
+trait UnitSpec extends AnyWordSpec with BaseUnitSpec
 
 trait AsyncUnitSpec extends AsyncWordSpec with BaseUnitSpec
 

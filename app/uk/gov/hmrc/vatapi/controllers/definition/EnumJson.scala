@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.controllers.definition
 
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import uk.gov.hmrc.vatapi.models.ErrorCode
 

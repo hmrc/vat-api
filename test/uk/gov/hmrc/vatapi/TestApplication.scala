@@ -21,17 +21,18 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.mockito.MockitoSugar
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.http.Status._
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 trait TestApplication
   extends UnitSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll
-    with MockitoSugar {
+    with MockFactory {
 
   override implicit val timeout: FiniteDuration = 100 seconds
 

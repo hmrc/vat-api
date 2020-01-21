@@ -19,21 +19,19 @@ package uk.gov.hmrc.vatapi.services
 import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Logger
-import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
-import uk.gov.hmrc.vatapi.models.IdentityData
 import play.api.libs.json.JsResultException
 import play.api.libs.json.Json.toJson
+import play.api.mvc.Result
 import play.api.mvc.Results._
-import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.auth.AffinityGroupToAuthContext._
-import uk.gov.hmrc.vatapi.auth.AuthContext
+import uk.gov.hmrc.vatapi.auth.{APIAuthorisedFunctions, AuthContext}
 import uk.gov.hmrc.vatapi.config.AppContext
-import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.Errors.ClientOrAgentNotAuthorized
+import uk.gov.hmrc.vatapi.models.{Errors, IdentityData}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,11 +47,10 @@ class AuthorisationService @Inject()(
 
   val logger = Logger(this.getClass)
 
-  def authCheck(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
+  def authCheck(vrn: Vrn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthResult] =
     authoriseAsClient(vrn)
 
   private def authoriseAsClient(vrn: Vrn)(implicit hc: HeaderCarrier,
-                                          requestHeader: RequestHeader,
                                           ec: ExecutionContext): Future[AuthResult] = {
     import v2.Retrievals._
 
@@ -97,11 +94,10 @@ class AuthorisationService @Inject()(
         Errors.InternalServerError("An internal server error occurred")))))
   }
 
-  def authCheckWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier, reqHeader: RequestHeader, ec: ExecutionContext): Future[AuthResult] =
+  def authCheckWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthResult] =
     authoriseAsClientWithNrsRequirement(vrn)
 
   private def authoriseAsClientWithNrsRequirement(vrn: Vrn)(implicit hc: HeaderCarrier,
-                                                            requestHeader: RequestHeader,
                                                             ec: ExecutionContext): Future[AuthResult] = {
     import v2.Retrievals._
 
