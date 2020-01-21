@@ -26,6 +26,7 @@ import uk.gov.hmrc.vatapi.connectors.FinancialDataConnector
 import uk.gov.hmrc.vatapi.models.{Errors, FinancialDataQueryParams, Liabilities, Payments}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
+import uk.gov.hmrc.vatapi.utils.pagerDutyLogging.Endpoint
 
 import scala.concurrent.ExecutionContext
 
@@ -43,6 +44,8 @@ class FinancialDataResource @Inject()(
 
     val arn = getArn
     val clientId = getClientId
+
+    implicit val endpoint: Endpoint = Endpoint.RetrieveLiabilities
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatLiabilitiesAudit(correlationId,
@@ -95,6 +98,8 @@ class FinancialDataResource @Inject()(
 
     val arn = getArn
     val clientId = getClientId
+
+    implicit val endpoint: Endpoint = Endpoint.RetrievePayments
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatPaymentsAudit(correlationId,

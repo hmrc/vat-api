@@ -24,6 +24,7 @@ import uk.gov.hmrc.vatapi.models.Errors
 import uk.gov.hmrc.vatapi.models.des.DesError
 import uk.gov.hmrc.vatapi.models.des.DesErrorCode.{DesErrorCode, _}
 import uk.gov.hmrc.vatapi.resources.{AuthRequest, VatResult}
+import uk.gov.hmrc.vatapi.utils.pagerDutyLogging.{Endpoint, PagerDutyLogging}
 
 import scala.PartialFunction.{apply => _, _}
 import scala.util.{Failure, Success, Try}
@@ -42,14 +43,19 @@ trait Response {
 
   def underlying: HttpResponse
 
-  def filter[A](pf: PartialFunction[Int, VatResult])(implicit request: AuthRequest[A]): VatResult =
-    status / 100 match {
+  def filter[A](pf: PartialFunction[Int, VatResult])(implicit endpoint: Endpoint, request: AuthRequest[A]): VatResult = {
+    val statusPrefix: Int = status / 100
+    statusPrefix match {
       case 4 | 5 =>
-        logger.error(s"DES error occurred. User type: ${request.authContext.affinityGroup}\n" +
-          s"Status code: ${underlying.status}\nBody: ${underlying.body}")
+        val message = s"DES error occurred. User type: ${request.authContext.affinityGroup}\n" +
+          s"Status code: ${underlying.status}\nBody: ${underlying.body}"
+
+        PagerDutyLogging.logError(endpoint.toLoggerMessage, message, statusPrefix, logger.error(_))
+
         (pf orElse errorMappings orElse standardErrorMapping) (status)
       case _ => (pf andThen addCorrelationHeader) (status)
     }
+  }
 
   private def addCorrelationHeader(result: VatResult) =
     underlying

@@ -24,6 +24,7 @@ import uk.gov.hmrc.vatapi.connectors.ObligationsConnector
 import uk.gov.hmrc.vatapi.models.{Errors, ObligationsQueryParams}
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
+import uk.gov.hmrc.vatapi.utils.pagerDutyLogging.Endpoint
 
 import scala.concurrent.ExecutionContext
 
@@ -40,6 +41,8 @@ class ObligationsResource @Inject()(
 
     val arn = getArn
     val clientId = getClientId
+
+    implicit val endpoint: Endpoint = Endpoint.RetrieveObligations
 
     def audit(vatResult: VatResult, correlationId: String) =
       auditService.audit(AuditEvents.retrieveVatObligationsAudit(correlationId,

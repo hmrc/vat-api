@@ -28,6 +28,7 @@ import uk.gov.hmrc.vatapi.models.{Errors, VatReturnDeclaration}
 import uk.gov.hmrc.vatapi.orchestrators.VatReturnsOrchestrator
 import uk.gov.hmrc.vatapi.resources.wrappers.Response
 import uk.gov.hmrc.vatapi.services.{AuditService, AuthorisationService}
+import uk.gov.hmrc.vatapi.utils.pagerDutyLogging.Endpoint
 
 import scala.concurrent.ExecutionContext
 
@@ -48,6 +49,8 @@ class VatReturnsResource @Inject()(
     logger.debug(s"[VatReturnsResource][submitVatReturn] - Submitting Vat Return")
     val arn = getArn
     val clientId = getClientId
+
+    implicit val endpoint: Endpoint = Endpoint.SubmitReturn
 
     def audit(vatResult: VatResult, correlationId: String, nrsId: Option[String]) =
       auditService.audit(AuditEvents.submitVatReturn(correlationId,
@@ -110,6 +113,8 @@ class VatReturnsResource @Inject()(
 
       val arn = getArn
       val clientId = getClientId
+
+      implicit val endpoint: Endpoint = Endpoint.RetrieveReturns
 
       def audit(vatResult: VatResult, correlationId: String) =
         auditService.audit(AuditEvents.retrieveVatReturnsAudit(correlationId,
