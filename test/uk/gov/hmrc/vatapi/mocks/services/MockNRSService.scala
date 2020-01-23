@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.{Metadata, NRSSubmission, SearchKeys, VatReturnDeclaration}

@@ -1,6 +1,6 @@
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {

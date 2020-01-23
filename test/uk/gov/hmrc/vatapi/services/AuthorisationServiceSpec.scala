@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi.services
 
 import org.joda.time.DateTime
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.HeaderNames
@@ -40,11 +39,11 @@ import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.mocks.auth.MockAPIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.models.Errors
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.Right
 
 
-class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockFactory with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
+class AuthorisationServiceSpec extends UnitSpec with GuiceOneAppPerSuite with ScalaFutures with Mock with MockAPIAuthorisedFunctions{
 
   val mockAppContext = mock[AppContext]
 

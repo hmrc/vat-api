@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.vatapi.resources
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -32,7 +31,6 @@ import uk.gov.hmrc.vatapi.mocks.auth.MockAuthorisationService
 trait ResourceSpec extends AnyWordSpec
   with Matchers
   with OptionValues
-  with MockFactory
   with TestUtils
   with ResultExtractors
   with HeaderNames

@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.mocks.services
 
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.mocks.Mock
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse

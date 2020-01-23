@@ -18,7 +18,6 @@ package uk.gov.hmrc.vatapi.models.audit
 
 import play.api.http.Status
 import play.api.libs.json.Json
-import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.vatapi.UnitSpec
 import v2.models.audit.AuditError
 
@@ -26,7 +25,6 @@ class AuditDetailSpec extends UnitSpec {
 
   private val userType = "Organisation"
   private val agentReferenceNumber = Some("012345678")
-  private val vrn: Vrn = generateVrn
   private val clientId = "123456789"
   private val `X-CorrelationId` = "X-123"
   private val vatReturnDeclarationJson = Json.parse(

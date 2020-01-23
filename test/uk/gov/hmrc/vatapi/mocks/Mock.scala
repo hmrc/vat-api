@@ -20,10 +20,10 @@ import org.mockito.{ArgumentMatchers => Matchers}
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
 import org.mockito.verification.VerificationMode
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.scalatestplus.mockito.MockitoSugar
 
-trait Mock extends MockFactory with BeforeAndAfterEach { _: Suite =>
+trait Mock extends MockitoSugar with BeforeAndAfterEach { _: Suite =>
 
   def any[T]() = Matchers.any[T]()
   def eqTo[T](t: T) = Matchers.eq[T](t)

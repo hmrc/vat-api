@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.RawJsonPredicate
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.auth.APIAuthorisedFunctions
 import uk.gov.hmrc.vatapi.mocks.Mock

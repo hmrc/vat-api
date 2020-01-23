@@ -26,7 +26,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth._
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
