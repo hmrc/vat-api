@@ -43,11 +43,14 @@ class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controller
             .needsHeaderValidation)
 
     if (!needsHeaderValidation || acceptHeaderValidationRules(
-      rh.headers.get("Accept"))) f(rh)
-    else
+      rh.headers.get("Accept"))) {
+      f(rh)
+    }
+    else {
       Future.successful(
         Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
           Json.toJson(ErrorAcceptHeaderInvalid)))
+    }
   }
 
 }

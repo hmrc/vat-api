@@ -28,7 +28,9 @@ class HttpVerbs() (
     }
 
     def post(path: String, body: Option[JsValue] = None): HttpRequest = {
-      new HttpRequest("POST", path, body.map(Json.prettyPrint))
+      val request = new HttpRequest("POST", path, body.map(Json.prettyPrint))
+      request.withAcceptHeader().withHeaders("Authorization", "Bearer testtoken")
+      request
     }
 
     def post(path: String, body: String): HttpRequest = {
