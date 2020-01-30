@@ -28,10 +28,10 @@ trait MockAuthorisationService extends Mock {
 
   object MockAuthorisationService {
     def authCheck(vrn: Vrn) =
-      when(mockAuthorisationService.authCheck(eqTo(vrn))(any(),any(),any()))
+      when(mockAuthorisationService.authCheck(eqTo(vrn))(any(),any()))
 
     def authCheckWithNrsRequirement(vrn: Vrn) =
-      when(mockAuthorisationService.authCheckWithNrsRequirement(eqTo(vrn))(any(),any(),any()))
+      when(mockAuthorisationService.authCheckWithNrsRequirement(eqTo(vrn))(any(),any()))
   }
 
   override protected def beforeEach(): Unit = {

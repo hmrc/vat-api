@@ -29,12 +29,12 @@ import scala.concurrent.{ExecutionContext, Future}
 trait MockVatReturnsConnector extends Mock {
   _: Suite =>
 
-  val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
+val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
 
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockVatReturnsConnector)
-  }
+override protected def beforeEach(): Unit = {
+  super.beforeEach()
+  reset(mockVatReturnsConnector)
+}
 
   def setupVatReturnSubmission(vrn: Vrn, submission: VatReturnDeclaration)(response: VatReturnResponse): Unit =
     when(mockVatReturnsConnector

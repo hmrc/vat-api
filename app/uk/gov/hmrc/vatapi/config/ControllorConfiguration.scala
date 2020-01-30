@@ -19,11 +19,9 @@ package uk.gov.hmrc.vatapi.config
 import com.typesafe.config.Config
 import javax.inject.Inject
 import net.ceedubs.ficus.Ficus._
-import net.ceedubs.ficus.readers.{StringReader, ValueReader}
+import net.ceedubs.ficus.readers.ValueReader
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ControllerConfig
-
-import scala.util.matching.Regex
 
 case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
                                   needsLogging: Boolean = true,
@@ -31,8 +29,6 @@ case class ControllerConfigParams(needsHeaderValidation: Boolean = true,
                                   needsTaxYear: Boolean = true)
 
 class ControllerConfiguration @Inject()(configuration: Configuration) extends ControllerConfig {
-  private implicit val regexValueReader: ValueReader[Regex] =
-    StringReader.stringValueReader.map(_.r)
   private implicit val controllerParamsReader: ValueReader[ControllerConfigParams] =
     ValueReader.relative[ControllerConfigParams] { config =>
       ControllerConfigParams(

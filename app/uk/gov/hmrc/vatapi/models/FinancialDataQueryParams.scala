@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.models
 
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
-import uk.gov.hmrc.vatapi.config.{AppContext, FixedConfig}
+import uk.gov.hmrc.vatapi.config.FixedConfig
 
 import scala.util.Try
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.vatapi.controllers.definition
 
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
-import uk.gov.hmrc.vatapi.config.{AppContext, FeatureSwitch}
+import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
 
 @Singleton

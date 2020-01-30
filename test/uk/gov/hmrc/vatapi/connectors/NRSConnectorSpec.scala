@@ -59,7 +59,6 @@ class NRSConnectorSpec extends UnitSpec with GuiceOneAppPerSuite
 
         val request = mock[WSRequest]
         val response = mock[WSResponse]
-        val json = nrsResponseJson
         val expectedResponse = NRSData("2dd537bc-4244-4ebf-bac9-96321be13cdc","This has been deprecated - DO NOT USE","")
 
 

@@ -17,8 +17,8 @@
 package uk.gov.hmrc.vatapi.services
 
 import org.joda.time.DateTime
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.Json
@@ -27,7 +27,6 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.connectors.VatReturnsConnector
 import uk.gov.hmrc.vatapi.mocks.connectors.MockVatReturnsConnector
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.models.des.{DesError, DesErrorCode}
@@ -36,7 +35,7 @@ import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VatReturnsServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MockVatReturnsConnector {
+class VatReturnsServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockFactory with ScalaFutures with MockVatReturnsConnector {
 
   val testVatReturnsService = new VatReturnsService(mockVatReturnsConnector)
 

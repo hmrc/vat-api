@@ -29,11 +29,6 @@ case class ObligationsResponse(underlying: HttpResponse) extends Response {
 
   def obligations(vrn: Vrn): Either[DesTransformError, Option[Obligations]] = {
 
-    def noneFound: Either[DesTransformError, Option[Obligations]] = {
-      logger.warn(s"[ObligationsResponse][noneFound] No obligation details found. JSON: ${underlying.status}")
-      Right(None)
-    }
-
     def error(message: String): Either[DesTransformError, Option[Obligations]] = {
       logger.error(s"[ObligationsResponse][error] $message. status: ${underlying.status}")
       Left(new DesTransformError {

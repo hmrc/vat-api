@@ -1,7 +1,15 @@
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.libs.json.{JsNull, Json}
+import play.api.http.Status._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.assets.des.VatReturns
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.support.BaseFunctionalSpec
+import uk.gov.hmrc.vatapi.models.Errors
+import uk.gov.hmrc.vatapi.models.Errors.{ClientOrAgentNotAuthorized, DateRangeTooLarge, DuplicateVatSubmission, InvalidPeriodKey, InvalidRequest, NotFinalisedDeclaration, TaxPeriodNotEnded, VrnInvalid}
+import uk.gov.hmrc.vatapi.stubs.{AuditStub, AuthStub, DesStub, NrsStub}
 
 class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
 
@@ -35,490 +43,563 @@ class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
           "finalised": $finalised
         }"""
 
+  val invalidJson: JsValue = Json.parse(
+    """
+      |{
+      |   "periodKey": "#001",
+      |   "vatDueSales": 50.00,
+      |   "vatDueAcquisitions": 100.30,
+      |   "totalVatDue": 150.30,
+      |   "vatReclaimedCurrPeriod": 40.00,
+      |   "netVatDue": 110.30,
+      |   "totalValueSalesExVAT": 1000,
+      |   "totalValuePurchasesExVAT": 200.00,
+      |   "totalValueGoodsSuppliedExVAT": 100.00,
+      |   "totalAcquisitionsExVAT": 540.00,
+      |   "finalised": "thisiswrongsosowrong"
+      |}
+        """.stripMargin)
+
+  private trait Test {
+
+    def setupStubs(): StubMapping
+
+    def uri: String
+
+    def desUrl(vrn: Vrn) = s"/enterprise/return/vat/$vrn"
+
+    def retrieveDesUrl(vrn: Vrn) = s"/vat/returns/vrn/$vrn"
+
+    def request(): WSRequest = {
+      setupStubs()
+      buildRequest(uri)
+    }
+  }
+
+  def errorBody(code: String): String =
+    s"""
+       |      {
+       |        "code": "$code",
+       |        "reason": "des message"
+       |      }
+      """.stripMargin
+
   "VAT returns submission" should {
 
-    val isoInstantRegex = "^\\d\\d\\d\\d-(0?[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(\\d\\d):(\\d\\d):(\\d\\d)Z"
+    "allow users to submit VAT returns" in new Test {
 
-    "allow users to submit VAT returns" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "return processing date with milliseconds and no paymentIndicator if DES returns them without" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnSubmissionWithIncorrectProcessingDateFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.000Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "return processing date with milliseconds and no paymentIndicator if DES returns them without" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.successBodyWithoutPaymentIndicator))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.000Z","formBundleNumber":"891713832155"}""")
     }
 
-    "allow users to submit VAT returns for non bad_request NRS response" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsFailureforNonBadRequest(vrn)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "allow users to submit VAT returns even with negative amounts" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(requestWithNegativeAmounts())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "allow users to submit VAT returns even with negative amounts" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(requestWithNegativeAmounts())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "2dd537bc-4244-4ebf-bac9-96321be13cdc")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "allow users to submit VAT returns for non bad_request NRS response" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(FORBIDDEN)
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "reject client with no authorization" in {
-      given()
-        .stubAudit
-        .userIsNotAuthorisedForTheResource
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
+    "reject client with no authorization" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.unauthorisedNotLoggedIn()
+      }
+
+      override def uri: String = s"/$vrn/returns"
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientOrAgentNotAuthorized)
     }
 
-    "not allow users to submit undeclared VAT returns" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body(false))))
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\errors(0)\\code", "NOT_FINALISED")
-        .bodyHasPath("\\errors(0)\\path", "/finalised")
+    "not allow users to submit undeclared VAT returns" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      override def uri: String = s"/$vrn/returns"
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body(false))))
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(Errors.businessError(NotFinalisedDeclaration))
     }
 
-    "reject submission with invalid period key" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PERIODKEY", 400)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "PERIOD_KEY_INVALID")
+    "reject submission with invalid period key" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), BAD_REQUEST, errorBody("INVALID_PERIODKEY"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe BAD_REQUEST
+      response.json shouldBe Json.toJson(InvalidPeriodKey)
     }
 
-    "reject submission with invalid ARN" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ARN", 400)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(500)
-        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    "reject submission with invalid ARN" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), BAD_REQUEST, errorBody("INVALID_ARN"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "reject submission with invalid VRN" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_VRN", 400)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "VRN_INVALID")
+    "reject submission with invalid VRN" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), BAD_REQUEST, errorBody("INVALID_VRN"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe BAD_REQUEST
+      response.json shouldBe Json.toJson(VrnInvalid)
     }
 
-    "reject submission with invalid INVALID_ORIGINATOR_ID" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_ORIGINATOR_ID", 400)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(500)
-        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    "reject submission with invalid INVALID_ORIGINATOR_ID" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), BAD_REQUEST, errorBody("INVALID_ORIGINATOR_ID"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "reject submission with invalid payload" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "INVALID_PAYLOAD", 400)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "INVALID_REQUEST")
+    "reject submission with invalid payload" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), BAD_REQUEST, errorBody("INVALID_PAYLOAD"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe BAD_REQUEST
+      response.json shouldBe Json.toJson(InvalidRequest)
     }
 
-    "reject duplicate submission" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "DUPLICATE_SUBMISSION", 409)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\errors(0)\\code", "DUPLICATE_SUBMISSION")
+    "reject duplicate submission" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), CONFLICT, errorBody("DUPLICATE_SUBMISSION"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(Errors.businessError(DuplicateVatSubmission))
     }
 
-    "reject submission with malformed JSON and not expose internal class details" in {
+    "reject submission with malformed JSON and not expose internal class details" in new Test {
+      override def uri: String = s"/$vrn/returns"
 
-      val dudJson =
-        """
-          |{
-          |   "periodKey": "#001",
-          |   "vatDueSales": 50.00,
-          |   "vatDueAcquisitions": 100.30,
-          |   "totalVatDue": 150.30,
-          |   "vatReclaimedCurrPeriod": 40.00,
-          |   "netVatDue": 110.30,
-          |   "totalValueSalesExVAT": 1000,
-          |   "totalValuePurchasesExVAT": 200.00,
-          |   "totalValueGoodsSuppliedExVAT": 100.00,
-          |   "totalAcquisitionsExVAT": 540.00,
-          |   "finalised": thisiswrongsosowrong
-          |}
-        """.stripMargin
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+      }
 
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", dudJson)
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\statusCode", 400)
-        .bodyHasPath("\\message", "Invalid Json")
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").post(invalidJson))
+
+      response.status shouldBe BAD_REQUEST
     }
 
+    "reject submissions that are made too early" in new Test {
 
-    "reject submissions that are made too early" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsVatReturnSuccessFor(vrn)
-        .des().vatReturns.expectVatReturnToFail(vrn, "TAX_PERIOD_NOT_ENDED", 403)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\code", "TAX_PERIOD_NOT_ENDED")
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.success()
+        DesStub.onError(DesStub.POST, desUrl(vrn), FORBIDDEN, errorBody("TAX_PERIOD_NOT_ENDED"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(TaxPeriodNotEnded)
     }
 
-    "fail if submission to  Non-Repudiation service failed" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsFailurefor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(500)
-        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    "fail if submission to Non-Repudiation service failed" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(BAD_REQUEST)
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "pass if submission to Non-Repudiation service call times out" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrsTimeoutFor(vrn)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "pass if submission to Non-Repudiation service call times out" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(499)
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "pass if Non-Repudiation service returns a 500 Internal Server Error" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrs5xx(vrn, 500)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "pass if Non-Repudiation service returns a 500 Internal Server Error" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(INTERNAL_SERVER_ERROR)
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "pass if Non-Repudiation service returns a 502 Bad Gateway" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrs5xx(vrn, 502)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "pass if Non-Repudiation service returns a 502 Bad Gateway" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(BAD_GATEWAY)
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
 
-    "pass if Non-Repudiation service returns a 503 Service Unavailable" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheNrsDependantResource
-        .nrs().nrs5xx(vrn, 503)
-        .des().vatReturns.expectVatReturnSubmissionFor(vrn)
-        .when()
-        .post(s"/$vrn/returns", Some(Json.parse(body())))
-        .withHeaders("Authorization", "Bearer testtoken")
-        .thenAssertThat()
-        .statusIs(201)
-        .bodyHasPath("\\paymentIndicator", "BANK")
-        .bodyHasPath("\\processingDate", "2018-03-01T11:43:43.195Z")
-        .bodyHasPath("\\formBundleNumber", "891713832155")
-        .responseContainsHeader("Receipt-Id", "")
-        .responseContainsHeader("Receipt-Signature", "This has been deprecated - DO NOT USE")
-        .responseContainsHeader("Receipt-TimeStamp", isoInstantRegex)
+    "pass if Non-Repudiation service returns a 503 Service Unavailable" in new Test {
+
+      override def uri: String = s"/$vrn/returns"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorisedWithNrs()
+        NrsStub.onError(SERVICE_UNAVAILABLE)
+        DesStub.onSuccess(DesStub.POST, desUrl(vrn), OK, Json.parse(VatReturns.submissionSuccessBody))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Authorization" -> "Bearer testtoken").
+        post(Json.parse(body())))
+      response.status shouldBe CREATED
+      response.json shouldBe Json.parse("""{"processingDate":"2018-03-01T11:43:43.195Z","paymentIndicator":"BANK","formBundleNumber":"891713832155"}""")
     }
   }
 
   "VAT returns retrieval" should {
 
-    "allow users to retrieve VAT returns for last four years" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnSearchFor(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(200)
-        .bodyHasPath("\\periodKey", "0001")
-        .bodyHasPath("\\vatDueSales", 100.25)
-        .bodyHasPath("\\vatDueAcquisitions", 100.25)
-        .bodyHasPath("\\totalVatDue", 200.50)
-        .bodyHasPath("\\vatReclaimedCurrPeriod", 100.25)
-        .bodyHasPath("\\netVatDue", 100.25)
-        .bodyHasPath("\\totalValueSalesExVAT", 100)
-        .bodyHasPath("\\totalValuePurchasesExVAT", 100)
-        .bodyHasPath("\\totalValueGoodsSuppliedExVAT", 100)
-        .bodyHasPath("\\totalAcquisitionsExVAT", 100)
+    "allow users to retrieve VAT returns for last four years" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), OK, VatReturns.retrieveVatReturnsDesSuccessBody)
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe OK
+      response.json shouldBe VatReturns.retrieveVatReturnsMtdSuccessBody
     }
 
-    "allow users to retrieve VAT returns without receivedAt field for last four years" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnSearchForWithoutReceivedAt(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(200)
-        .bodyHasPath("\\periodKey", "0001")
-        .bodyHasPath("\\vatDueSales", 100.25)
-        .bodyHasPath("\\vatDueAcquisitions", 100.25)
-        .bodyHasPath("\\totalVatDue", 200.50)
-        .bodyHasPath("\\vatReclaimedCurrPeriod", 100.25)
-        .bodyHasPath("\\netVatDue", 100.25)
-        .bodyHasPath("\\totalValueSalesExVAT", 100)
-        .bodyHasPath("\\totalValuePurchasesExVAT", 100)
-        .bodyHasPath("\\totalValueGoodsSuppliedExVAT", 100)
-        .bodyHasPath("\\totalAcquisitionsExVAT", 100)
+    "allow users to retrieve VAT returns without receivedAt field for last four years" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), OK, VatReturns.retrieveVatReturnsDesResponseWithNoReceivedAt)
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe OK
+      response.json shouldBe VatReturns.retrieveVatReturnsMtdSuccessBody
     }
 
-    "return internal server error on malformed response" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectInvalidVatReturnSearchFor(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(500)
+    "return internal server error on malformed response" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), OK, "not-json")
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "return internal server error on empty body response" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectEmptyVatReturnSearchFor(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(500)
+    "return internal server error on empty body response" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onSuccess(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), OK, "")
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "reject client with no authorization" in {
-      given()
-        .stubAudit
-        .userIsNotAuthorisedForTheResource
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\code", "CLIENT_OR_AGENT_NOT_AUTHORISED")
+    "reject client with no authorization" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.unauthorisedNotLoggedIn()
+      }
+
+      override def uri: String = s"/$vrn/returns/0001"
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientOrAgentNotAuthorized)
     }
 
-    "return bad request (400) if the vrn is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnSearchFor(vrn, "0001")
-        .when()
-        .get(s"/invalid_vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "VRN_INVALID")
+    "return bad request (400) if the vrn is invalid" in new Test {
+
+      override def uri: String = s"/invalid_vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe BAD_REQUEST
+      response.json shouldBe Json.parse(
+        """
+          |{"code":"VRN_INVALID","message":"The provided Vrn is invalid"}
+          |""".stripMargin)
     }
 
-    "return forbidden (403) if the vat return was submitted longer than 4 years ago" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "DATE_RANGE_TOO_LARGE")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(403)
-        .bodyHasPath("\\code", "BUSINESS_ERROR")
-        .bodyHasPath("\\errors(0)\\code", "DATE_RANGE_TOO_LARGE")
+    "return forbidden (403) if the vat return was submitted longer than 4 years ago" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), FORBIDDEN, errorBody("DATE_RANGE_TOO_LARGE"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(Errors.businessError(DateRangeTooLarge))
     }
 
-    "return internal server error (500) if the vat returns with DES vrn not found error" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "VRN_NOT_FOUND")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(500)
-        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    "return internal server error (500) if the vat returns with DES vrn not found error" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), FORBIDDEN, errorBody("VRN_NOT_FOUND"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "return internal server error (500) if the vat returns from DES got NOT_FOUND_VRN error" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnRetrieveToFail(vrn, "NOT_FOUND_VRN")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(500)
-        .bodyHasPath("\\code", "INTERNAL_SERVER_ERROR")
+    "return internal server error (500) if the vat returns from DES got NOT_FOUND_VRN error" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), FORBIDDEN, errorBody("NOT_FOUND_VRN"))
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "return bad request (400) if the periodKey is invalid" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectVatReturnSearchFor(vrn, "001")
-        .when()
-        .get(s"/$vrn/returns/001")
-        .thenAssertThat()
-        .statusIs(400)
-        .bodyHasPath("\\code", "INVALID_REQUEST")
-        .bodyHasPath("\\errors(0)\\code", "PERIOD_KEY_INVALID")
+    "return bad request (400) if the periodKey is invalid" in new Test {
+
+      override def uri: String = s"/$vrn/returns/001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe BAD_REQUEST
+      response.json shouldBe Json.toJson(Errors.badRequest(InvalidPeriodKey))
     }
 
-    "return not found (404) with non-existent VRN" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .statusIs(404)
+    "return not found (404) with non-existent VRN" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, "NOT_FOUND")
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe NOT_FOUND
     }
 
-    "return X-Content-Type-Options header with non-existent VRN" in {
-      given()
-        .stubAudit
-        .userIsFullyAuthorisedForTheResource
-        .des().vatReturns.expectNonExistentVrnFor(vrn, "0001")
-        .when()
-        .get(s"/$vrn/returns/0001")
-        .thenAssertThat()
-        .hasHeader("X-Content-Type-Options")
+    "return X-Content-Type-Options header with non-existent VRN" in new Test {
+
+      override def uri: String = s"/$vrn/returns/0001"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, "NOT_FOUND")
+      }
+
+      val response: WSResponse = await(request().
+        withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())
+      response.status shouldBe NOT_FOUND
+      response.header("X-Content-Type-Options") nonEmpty
     }
   }
 }

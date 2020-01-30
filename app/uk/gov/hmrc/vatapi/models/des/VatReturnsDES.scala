@@ -37,8 +37,6 @@ object VatReturnsDES {
 
       )(VatReturnsDES.apply _)
 
-  implicit val writes: Writes[VatReturnsDES] = {
-    implicit val dateFormats: Format[DateTime] = uk.gov.hmrc.vatapi.models.dateTimeFormat
-    Json.writes[VatReturnsDES]
-  }
+  implicit val dateFormats: Format[DateTime] = uk.gov.hmrc.vatapi.models.dateTimeFormat
+  implicit val writes: Writes[VatReturnsDES] = Json.writes[VatReturnsDES]
 }

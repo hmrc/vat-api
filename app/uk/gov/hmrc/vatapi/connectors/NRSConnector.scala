@@ -41,7 +41,6 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import uk.gov.hmrc.vatapi.BaseConnector
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.httpparsers.EmptyNrsData
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.{NrsSubmissionOutcome, NrsSubmissionOutcomeReads}

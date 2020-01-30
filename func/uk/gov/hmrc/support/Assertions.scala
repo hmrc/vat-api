@@ -1,7 +1,7 @@
 package uk.gov.hmrc.support
 
 import org.json.{JSONArray, JSONObject}
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import org.skyscreamer.jsonassert.JSONAssert.assertEquals
 import org.skyscreamer.jsonassert.JSONCompareMode.LENIENT
 import play.api.libs.json._

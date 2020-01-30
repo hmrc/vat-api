@@ -21,7 +21,7 @@ import play.api.Logger
 import play.api.mvc.{ActionBuilder, _}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext, Organisation}
+import uk.gov.hmrc.vatapi.auth.{Agent, AuthContext}
 import uk.gov.hmrc.vatapi.services.AuthorisationService
 
 import scala.concurrent.{ExecutionContext, Future}

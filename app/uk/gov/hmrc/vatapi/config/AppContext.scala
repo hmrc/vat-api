@@ -19,7 +19,6 @@ package uk.gov.hmrc.vatapi.config
 import com.typesafe.config.ConfigFactory
 import javax.inject.{Inject, Singleton}
 import play.api.Application
-import play.api.Play._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.vatapi.auth.VATAuthEnrolments
 

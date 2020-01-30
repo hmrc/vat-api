@@ -39,7 +39,7 @@ class NRSService @Inject()(
 
   val logger: Logger = Logger(this.getClass)
 
-  def submit(vrn: Vrn, submission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthRequest[_]): Future[NrsSubmissionOutcome] = {
+  def submit(vrn: Vrn, submission: NRSSubmission)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NrsSubmissionOutcome] = {
     logger.debug(s"[NRSService][submit] - Submitting payload to NRS")
     nrsConnector.submit(vrn, submission)
   }

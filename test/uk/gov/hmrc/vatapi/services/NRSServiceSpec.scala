@@ -17,8 +17,8 @@
 package uk.gov.hmrc.vatapi.services
 
 import org.joda.time.DateTime
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
@@ -27,7 +27,6 @@ import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.assets.TestConstants.Auth.orgAuthContextWithNrsData
 import uk.gov.hmrc.vatapi.assets.TestConstants.NRSResponse._
 import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
-import uk.gov.hmrc.vatapi.connectors.NRSConnector
 import uk.gov.hmrc.vatapi.httpparsers.NrsError
 import uk.gov.hmrc.vatapi.httpparsers.NrsSubmissionHttpParser.NrsSubmissionOutcome
 import uk.gov.hmrc.vatapi.mocks.connectors.MockNRSConnector
@@ -37,7 +36,7 @@ import uk.gov.hmrc.vatapi.resources.AuthRequest
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NRSServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MockNRSConnector {
+class NRSServiceSpec extends UnitSpec with GuiceOneAppPerSuite with MockFactory with ScalaFutures with MockNRSConnector {
 
   val testNRSService = new NRSService(mockNRSConnector)
 

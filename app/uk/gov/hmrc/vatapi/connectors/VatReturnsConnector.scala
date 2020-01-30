@@ -23,7 +23,6 @@ import play.api.Logger
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import uk.gov.hmrc.vatapi.BaseConnector
 import uk.gov.hmrc.vatapi.config.AppContext
 import uk.gov.hmrc.vatapi.models.des
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse

@@ -1,7 +1,5 @@
 package uk.gov.hmrc.assets.des
 
-import play.api.libs.json.{JsObject, JsString, Json}
-
 object Errors {
 
   private def error(code: String, reason: String): String = {
@@ -11,16 +9,6 @@ object Errors {
        |  "reason": "$reason"
        |}
        """.stripMargin
-  }
-
-  private def multiError(codeReason: (String, String)*): String = {
-    val errors = codeReason map {
-      case (code, reason) =>
-        JsObject(Seq("code" -> JsString(code), "reason" -> JsString(reason)))
-    }
-    Json
-      .obj("failures" -> errors)
-      .toString()
   }
 
   val invalidVrn: String = error("INVALID_VRN", "Submission has not passed validation. Invalid parameter VRN.")

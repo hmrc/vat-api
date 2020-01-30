@@ -25,7 +25,7 @@ object Http extends BaseFunctionalSpec {
   def postString(url: String, body: String, headers: Seq[(String, String)] = Seq.empty)(
     implicit hc: HeaderCarrier,
     timeout: FiniteDuration): HttpResponse = perform(url) { request =>
-    request.withHeaders("Content-Type" -> "application/json").post[String](body)
+    request.withHttpHeaders("Content-Type" -> "application/json").post[String](body)
   }
 
   def postJson(url: String, body: JsValue, headers: Seq[(String, String)] = Seq.empty)(
