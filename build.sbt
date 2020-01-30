@@ -31,6 +31,7 @@ lazy val FuncTest = config("func") extend Test
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     dependencyOverrides ++= AppDependencies.overrides,
