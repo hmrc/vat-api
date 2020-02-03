@@ -10,9 +10,9 @@ vat-api has five endpoints:
   - GET liabilities
 
 ### Prerequisites 
-- Scala 2.11.x
+- Scala 2.12.x
 - Java 8
-- sbt > 0.13.17
+- sbt > 1.3.7
 - [Service Manager](https://github.com/hmrc/service-manager)
 
 ### Development Setup
