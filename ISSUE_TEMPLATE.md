@@ -10,6 +10,15 @@ If your issue falls into any of the below categories please contact SDST at SDST
 - Performance metrics
 - Questions relating to the process pre MTD
 
+**Do not include personal or private information within your issues, this is a public repository and is available to everyone**
+
+Personal and private information includes (but is not limited to): 
+  -  Authorization Token
+  
+  -  Client Id
+  
+  -  VRN
+  
 When submitting an issue please try to provide the following information:
 
 * **I'm submitting a ...**
