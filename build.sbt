@@ -48,15 +48,16 @@ lazy val microservice = Project(appName, file("."))
   .settings(CodeCoverageSettings.settings: _*)
   .settings(defaultSettings(): _*)
   .configs(FuncTest)
-  .settings(inConfig(FuncTest)(Defaults.testSettings): _*)
-  .settings(Keys.fork in FuncTest := false,
+  .settings(inConfig(FuncTest)(Defaults.itSettings): _*)
+  .settings(
+    fork in FuncTest := true,
     unmanagedSourceDirectories in FuncTest := Seq((baseDirectory in FuncTest).value / "func"),
     unmanagedClasspath in FuncTest += baseDirectory.value / "resources",
     unmanagedClasspath in Runtime += baseDirectory.value / "resources",
-    unmanagedResourceDirectories in FuncTest += baseDirectory.value,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
+    javaOptions in FuncTest += "-Dlogger.resource=logback-test.xml",
     addTestReportOption(FuncTest, "int-test-reports"),
-    parallelExecution in FuncTest := false)
+    parallelExecution in FuncTest := false
+  )
   .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"), resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)
   .settings(
