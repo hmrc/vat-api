@@ -47,7 +47,7 @@
     <logger name="org.eclipse.jetty" level="ERROR"/>
     <logger name="akka" level="ERROR"/>
 
-    <root level="OFF">
+    <root level="WARN">
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="ASYNC_STDOUT"/>
     </root>
