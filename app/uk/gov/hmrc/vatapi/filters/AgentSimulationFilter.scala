@@ -18,8 +18,10 @@ package uk.gov.hmrc.vatapi.filters
 
 import akka.stream.Materializer
 import javax.inject.Inject
+import play.api.libs.json.Json
+import play.api.mvc.Results.Status
 import play.api.mvc._
-import uk.gov.hmrc.vatapi.config.simulation.ClientSubscriptionSimulation
+import uk.gov.hmrc.vatapi.models.ErrorClientNotAuthorizedToMTDVAT
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +32,8 @@ class AgentSimulationFilter @Inject()(implicit val mat: Materializer, ec: Execut
     val method = rh.method
 
     rh.headers.get(GovTestScenarioHeader) match {
-      case Some("CLIENT_OR_AGENT_NOT_AUTHORISED") => ClientSubscriptionSimulation(f, rh, method)
+      case Some("CLIENT_OR_AGENT_NOT_AUTHORISED") =>
+        Future.successful(Status(ErrorClientNotAuthorizedToMTDVAT.httpStatusCode)(Json.toJson(ErrorClientNotAuthorizedToMTDVAT)))
       case _ => f(rh)
     }
   }
