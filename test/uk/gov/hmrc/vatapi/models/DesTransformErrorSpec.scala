@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.config
+package uk.gov.hmrc.vatapi.models
 
-import javax.inject.Inject
-import play.api.Configuration
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import uk.gov.hmrc.vatapi.UnitSpec
 
-case class FeatureSwitch @Inject()(value: Option[Configuration]) {
+class DesTransformErrorSpec extends UnitSpec with GuiceOneAppPerTest {
 
+  "unapply" should {
+    "return a valid message" when {
+      "DesTransformError type is passed" in {
+        DesTransformError.unapply(InvalidDateError("Invalid date")) shouldBe Some("Invalid date")
+      }
+    }
+  }
 }
-

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.vatapi
 
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.{AnyWordSpec, AsyncWordSpec}
@@ -34,7 +35,7 @@ trait BaseUnitSpec extends Matchers with OptionValues with TestUtils with Future
     Await.result(f, duration)
 }
 
-trait UnitSpec extends AnyWordSpec with BaseUnitSpec {
+trait UnitSpec extends AnyWordSpec with BaseUnitSpec{
   implicit def extractAwait[A](future: Future[A]): A = await[A](future)
 
   def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)

@@ -52,5 +52,15 @@ class JsonErrorSanitiserSpec extends UnitSpec {
 
     }
 
+    "return the original sensitive string sanitised with only input sub elements " in {
+
+      val inputString = "Payload error Invalid Json: Unexpected character (''' (code 39)): expected a valid value (number, String, array, object, 'true', 'false' or 'null')     "
+      val expectedString = "Payload error"
+
+      val result = JsonErrorSanitiser.sanitise(inputString)
+      result shouldBe expectedString
+
+    }
+
   }
 }
