@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi
 
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.{AnyWordSpec, AsyncWordSpec}

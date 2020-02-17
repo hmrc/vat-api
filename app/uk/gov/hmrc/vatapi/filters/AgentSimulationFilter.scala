@@ -24,12 +24,11 @@ import play.api.mvc._
 import uk.gov.hmrc.vatapi.models.ErrorClientNotAuthorizedToMTDVAT
 import uk.gov.hmrc.vatapi.resources.GovTestScenarioHeader
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class AgentSimulationFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+class AgentSimulationFilter @Inject()(implicit val mat: Materializer) extends Filter {
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    val method = rh.method
 
     rh.headers.get(GovTestScenarioHeader) match {
       case Some("CLIENT_OR_AGENT_NOT_AUTHORISED") =>
