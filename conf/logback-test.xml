@@ -42,12 +42,12 @@
     </appender>
 
     <logger name="application" level="DEBUG"/>
-    <logger name="uk.gov" level="ERROR"/>
+    <logger name="uk.gov" level="DEBUG"/>
     <logger name="connector" level="DEBUG"/>
     <logger name="org.eclipse.jetty" level="ERROR"/>
     <logger name="akka" level="ERROR"/>
 
-    <root level="OFF">
+    <root level="DEBUG">
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="ASYNC_STDOUT"/>
     </root>

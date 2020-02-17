@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.config.simulation
+package uk.gov.hmrc.vatapi.models
 
-import play.api.mvc.{RequestHeader, Result}
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import uk.gov.hmrc.vatapi.UnitSpec
 
-import scala.concurrent.{ExecutionContext, Future}
+class DesTransformErrorSpec extends UnitSpec with GuiceOneAppPerTest {
 
-trait Simulation {
-  def apply(f: RequestHeader => Future[Result], rh: RequestHeader, method: String)(implicit ec: ExecutionContext): Future[Result]
+  "unapply" should {
+    "return a valid message" when {
+      "DesTransformError type is passed" in {
+        DesTransformError.unapply(InvalidDateError("Invalid date")) shouldBe Some("Invalid date")
+      }
+    }
+  }
 }

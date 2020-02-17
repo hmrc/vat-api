@@ -21,42 +21,5 @@ import play.api.Configuration
 
 case class FeatureSwitch @Inject()(value: Option[Configuration]) {
 
-  val DEFAULT_VALUE = true
-
-  def isWhiteListingEnabled: Boolean = {
-    value match {
-      case Some(config) => config.getOptional[Boolean]("white-list.enabled").getOrElse(false)
-      case None => false
-    }
-  }
-
-  def isAgentSimulationFilterEnabled: Boolean = value match {
-    case Some(config) => config.getOptional[Boolean]("client-agent-simulation.enabled").getOrElse(false)
-    case None => false
-  }
-
-  def whiteListedApplicationIds: Seq[String] = {
-    value match {
-      case Some(config) =>
-        config
-          .getOptional[Seq[String]]("white-list.applicationIds")
-          .getOrElse(throw new RuntimeException(s"feature-switch.white-list.applicationIds is not configured"))
-      case None => Seq()
-    }
-  }
-
-  def isAuthEnabled: Boolean = {
-    value match {
-      case Some(config) => config.getOptional[Boolean]("auth.enabled").getOrElse(true)
-      case None => true
-    }
-  }
-
-  def isOriginatorIdForSubmitEnabled: Boolean = {
-    value match {
-      case Some(config) => config.getOptional[Boolean]("submit-with-originatorId.enabled").getOrElse(false)
-      case None => false
-    }
-  }
 }
 

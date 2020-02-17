@@ -32,6 +32,19 @@ class AuditEventsSpec extends UnitSpec with GuiceOneAppPerSuite {
   val vrn = Vrn("someVrn")
   val auditResponse = AuditResponse(200, None, None)
 
+  "agentRef" should {
+    "return a valid key value" when {
+      "arn is passed" in {
+        val arn = "Arn123"
+        AuditEvents.agentRef(Some(arn)) shouldBe Map("agentReferenceNumber" -> arn)
+      }
+
+      "none is passed" in {
+        AuditEvents.agentRef(None) shouldBe Map.empty[String, String]
+      }
+    }
+  }
+
   "nrsAudit event" should {
     "return valid AuditEvent" when {
 
@@ -61,11 +74,11 @@ class AuditEventsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
     "return a valid AuditEvent" when {
       "all values are supplied" in {
-        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, Some(nrSubmissionId), clientId, Some(arn), AuditResponse(200, None, None))
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, Some(nrSubmissionId), clientId, Some(arn), auditResponse)
         val expected = AuditEvent(
           "submitVatReturn",
           "submit-vat-return",
-          AuditDetail(userType, Some(arn), xCorrelationId, AuditResponse(200, None, None), clientId, Some(nrSubmissionId))
+          AuditDetail(userType, Some(arn), xCorrelationId, auditResponse, clientId, Some(nrSubmissionId))
         )
 
         auditEvent shouldBe expected
@@ -74,21 +87,21 @@ class AuditEventsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
     "return a valid AuditEvent without optional values" when {
       "all values are supplied except arn" in {
-        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None, clientId, None, AuditResponse(200, None, None))
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None, clientId, None, auditResponse)
         val expected = AuditEvent(
           "submitVatReturn",
           "submit-vat-return",
-          AuditDetail(userType, None, xCorrelationId, AuditResponse(200, None, None), clientId, None)
+          AuditDetail(userType, None, xCorrelationId, auditResponse, clientId, None)
         )
 
         auditEvent shouldBe expected
       }
       "all values are supplied except nrSubmissionId" in {
-        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None, clientId, Some(arn), AuditResponse(200, None, None))
+        val auditEvent = AuditEvents.submitVatReturn(xCorrelationId, userType, None, clientId, Some(arn), auditResponse)
         val expected = AuditEvent(
           "submitVatReturn",
           "submit-vat-return",
-          AuditDetail(userType, Some(arn), xCorrelationId, AuditResponse(200, None, None), clientId, None)
+          AuditDetail(userType, Some(arn), xCorrelationId, auditResponse, clientId, None)
         )
 
         auditEvent shouldBe expected

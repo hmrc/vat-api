@@ -18,8 +18,8 @@ package uk.gov.hmrc.vatapi.models
 
 import play.api.libs.json.Json.toJson
 import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.assets.TestConstants.VatReturn._
 import uk.gov.hmrc.vatapi.resources.JsonSpec
+import uk.gov.hmrc.vatapi.VatReturnDeclarationFixture._
 
 class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
 
@@ -28,6 +28,10 @@ class VatReturnDeclarationSpec extends UnitSpec with JsonSpec {
       roundTripJson(
       vatReturnDeclaration
       )
+    }
+
+    "return a valid object" in{
+      vatReturnDeclarationJson.as[VatReturnDeclaration] shouldBe vatReturnDeclaration
     }
   }
 
