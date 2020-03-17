@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package v1.models.errors
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, Reads}
 
-object JsonFormatters {
-
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
-
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
-
+case class DesErrorCode(code: String) {
+  def toMtd: MtdError = MtdError(code = code, message = "")
 }
+
+object DesErrorCode {
+  implicit val reads: Reads[DesErrorCode] = Json.reads[DesErrorCode]
+}
+
+sealed trait DesError
+
+case class DesErrors(errors: List[DesErrorCode]) extends DesError
+
+object DesErrors {
+  def single(error: DesErrorCode): DesErrors = DesErrors(List(error))
+}
+
+case class OutboundError(error: MtdError, errors: Option[Seq[MtdError]] = None) extends DesError

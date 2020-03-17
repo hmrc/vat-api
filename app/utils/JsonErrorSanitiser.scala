@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package utils
 
-import play.api.libs.json._
+object JsonErrorSanitiser {
 
-object JsonFormatters {
+  def sanitise(str: String): String = {
 
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
+    val searchString = "Invalid Json"
 
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
+    if (str.startsWith(searchString)) {
+      "Invalid Json"
+    } else {
+      val index = str.indexOf(searchString)
+      if (index > 0) {
+        str.substring(0, index).trim
+      } else {
+        str.trim
+      }
+    }
+  }
 
 }

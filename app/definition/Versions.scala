@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package definition
 
-import play.api.libs.json._
+import play.api.http.HeaderNames.ACCEPT
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.HeaderCarrier
 
-object JsonFormatters {
+object Versions {
+  val VERSION_1 = "1.0"
+  val VERSION_2 = "2.0"
 
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
+  private val versionRegex = """application\/vnd.hmrc.(\d.\d)\+json""".r
 
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
+  def getFromRequest(implicit hc: HeaderCarrier): Option[String] =
+    getFrom(hc.headers)
 
+  def getFromRequest(request: RequestHeader): Option[String] =
+    getFrom(request.headers.headers)
+
+  private def getFrom(headers: Seq[(String, String)]) =
+    headers.collectFirst { case (ACCEPT, versionRegex(ver)) => ver }
 }

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package definition
 
-import play.api.libs.json._
+import definition.APIStatus.{ALPHA, BETA, DEPRECATED, RETIRED, STABLE}
+import support.UnitSpec
+import utils.enums.EnumJsonSpecSupport
 
-object JsonFormatters {
+class APIStatusSpec extends UnitSpec with EnumJsonSpecSupport {
 
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
-
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
-
+  testRoundTrip[APIStatus](
+    ("ALPHA", ALPHA),
+    ("BETA", BETA),
+    ("STABLE", STABLE),
+    ("DEPRECATED", DEPRECATED),
+    ("RETIRED", RETIRED)
+  )
 }

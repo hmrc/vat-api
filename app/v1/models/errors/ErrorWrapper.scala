@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package v1.models.errors
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, Writes}
 
-object JsonFormatters {
+case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None)
 
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
+object ErrorWrapper {
+  implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
 
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
+    val json = Json.obj(
+      "code" -> errorResponse.error.code,
+      "message" -> errorResponse.error.message
+    )
+
+    errorResponse.errors match {
+      case Some(errors) if errors.nonEmpty => json + ("errors" -> Json.toJson(errors))
+      case _ => json
+    }
+
+  }
 
 }

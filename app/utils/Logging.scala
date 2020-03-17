@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package utils
 
-import play.api.libs.json._
+import play.api.Logger
 
-object JsonFormatters {
-
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
-
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
-
+trait Logging {
+  lazy val logger: Logger = Logger(this.getClass)
 }
