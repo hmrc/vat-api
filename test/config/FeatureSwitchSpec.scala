@@ -44,8 +44,8 @@ class FeatureSwitchSpec extends UnitSpec {
 
     "config set" must {
       val featureSwitch = createFeatureSwitch("""
-          |version-1.enabled = false
-          |version-2.enabled = true
+                                                |version-1.enabled = false
+                                                |version-2.enabled = true
         """.stripMargin)
 
       "return false for disabled versions" in {
@@ -60,6 +60,27 @@ class FeatureSwitchSpec extends UnitSpec {
         featureSwitch.isVersionEnabled("x.x") shouldBe false
         featureSwitch.isVersionEnabled("2x") shouldBe false
         featureSwitch.isVersionEnabled("2.x") shouldBe false
+      }
+    }
+
+    "refactor enabled" must {
+
+      "return true when enabled" in {
+        val featureSwitch = createFeatureSwitch(
+          """
+            |refactor.enabled=true
+            |""".stripMargin)
+
+        featureSwitch.refactorEnabled shouldBe true
+      }
+
+      "return false when not enabled" in {
+        val featureSwitch = createFeatureSwitch(
+          """
+            |refactor.enabled=false
+            |""".stripMargin)
+
+        featureSwitch.refactorEnabled shouldBe false
       }
     }
   }

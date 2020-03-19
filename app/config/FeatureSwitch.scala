@@ -54,4 +54,9 @@ case class FeatureSwitch(value: Option[Configuration]) {
 
     enabled.getOrElse(false)
   }
+
+  def refactorEnabled: Boolean = value match {
+    case Some(config) => config.getOptional[Boolean] ("refactor.enabled").getOrElse(false)
+    case None => false
+  }
 }

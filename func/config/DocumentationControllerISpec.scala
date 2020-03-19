@@ -38,7 +38,7 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
       |    }
       |  ],
       |  "api":{
-      |    "name":"VAT API (MTD)",
+      |    "name":"VAT (MTD)",
       |    "description":"An API for providing VAT data",
       |    "context":"organisations/vat",
       |    "categories":["VAT_MTD"],
@@ -46,7 +46,7 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
       |      {
       |        "version":"1.0",
       |        "status":"BETA",
-      |        "endpointsEnabled":false
+      |        "endpointsEnabled":true
       |      }
       |    ]
       |  }

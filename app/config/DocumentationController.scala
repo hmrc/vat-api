@@ -25,12 +25,12 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.api.controllers.{DocumentationController => HmrcDocumentationController}
 
 @Singleton
-class DocumentationController @Inject()(selfAssessmentApiDefinition: ApiDefinitionFactory,
+class DocumentationController @Inject()(vatApiDefinition: ApiDefinitionFactory,
                                         cc: ControllerComponents, assets: Assets, errorHandler: HttpErrorHandler)
   extends HmrcDocumentationController(cc,assets , errorHandler ) {
 
   override def definition(): Action[AnyContent] = Action {
-    Ok(Json.toJson(selfAssessmentApiDefinition.definition))
+    Ok(Json.toJson(vatApiDefinition.definition))
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {

@@ -24,8 +24,6 @@ trait AppConfig {
 
   def desBaseUrl: String
 
-  def mtdIdBaseUrl: String
-
   def desEnv: String
 
   def desToken: String
@@ -42,7 +40,6 @@ trait AppConfig {
 @Singleton
 class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configuration) extends AppConfig {
 
-  val mtdIdBaseUrl: String = config.baseUrl("mtd-id-lookup")
   val desBaseUrl: String = config.baseUrl("des")
   val desEnv: String = config.getString("microservice.services.des.env")
   val desToken: String = config.getString("microservice.services.des.token")
