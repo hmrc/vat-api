@@ -47,7 +47,6 @@ class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controller
       f(rh)
     }
     else {
-      println(s"\nWe are in this filter\n")
       Future.successful(
         Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
           Json.toJson(ErrorAcceptHeaderInvalid)))
