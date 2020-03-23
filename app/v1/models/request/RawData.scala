@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package v1.models.request.viewReturn
+package v1.models.request
 
-import uk.gov.hmrc.domain.Nino
-
-case class ViewReturnParsedRequest(nino: Nino, periodKey: String)
+trait RawData
