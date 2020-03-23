@@ -16,24 +16,23 @@
 
 package uk.gov.hmrc.vatapi.utils
 
+import javax.inject.Provider
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsEmpty, RequestHeader}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.routing.Router
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, NotImplementedException}
+import play.api.{Configuration, Environment, OptionalSourceMapper}
+import uk.gov.hmrc.http.NotImplementedException
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
 
 class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFactory{
 
@@ -44,22 +43,13 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
 
     val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(versionHeader)
 
-    val auditConnector: AuditConnector = mock[AuditConnector]
-    val httpAuditEvent: HttpAuditEvent = mock[HttpAuditEvent]
+    val env: Environment = mock[Environment]
+    val sourceMapper: OptionalSourceMapper = mock[OptionalSourceMapper]
+    val provider: Provider[Router] = mock[Provider[Router]]
 
-    val eventTags: Map[String, String] = Map("transactionName" -> "event.transactionName")
-
-    val dataEvent = DataEvent(
-      auditSource = "auditSource",
-      auditType = "event.auditType",
-      eventId = "",
-      tags = eventTags,
-      detail = Map("test" -> "test"),
-      generatedAt = DateTime.now()
-    )
 
     val configuration = Configuration("appName" -> "myApp")
-    val handler = new ErrorHandler(configuration, auditConnector, httpAuditEvent)
+    val handler = new ErrorHandler(env, configuration, sourceMapper, provider)
   }
 
   "onClientError" should {
@@ -134,11 +124,6 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
     "return NotImplemented with error body and NOT_IMPLEMENTED status code" when {
       "NotImplementedException is thrown" in new Test() {
 
-        (httpAuditEvent.dataEvent(_: String, _: String, _: RequestHeader, _: Map[String, String])(_: HeaderCarrier)).expects(*, *, *, *, *)
-          .returns(dataEvent)
-
-        (auditConnector.sendEvent(_ : DataEvent)(_: HeaderCarrier, _: ExecutionContext)).expects(*, *, *)
-          .returns(Future.successful(Success))
         private val result = handler.onServerError(requestHeader, new Throwable("test", new NotImplementedException("test")))
         status(result) shouldBe NOT_IMPLEMENTED
 
@@ -146,18 +131,12 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
       }
     }
 
-    "return NotImplemented with error body" when {
-      "NotImplementedException is thrown" in new Test() {
+    "return the result as standard for any other cases" when {
+      "a any 5xx is thrown" in new Test() {
 
-        (httpAuditEvent.dataEvent(_: String, _: String, _: RequestHeader, _: Map[String, String])(_: HeaderCarrier)).expects(*, *, *, *, *)
-          .returns(dataEvent)
+        private val result = handler.onServerError(requestHeader, new Throwable("any other exception", new NullPointerException("null pointer")))
 
-        (auditConnector.sendEvent(_ : DataEvent)(_: HeaderCarrier, _: ExecutionContext)).expects(*, *, *)
-          .returns(Future.successful(Success))
-        private val result = handler.onServerError(requestHeader, new NotImplementedException("test"))
-        status(result) shouldBe NOT_IMPLEMENTED
-
-        contentAsJson(result) shouldBe Json.parse("""{"statusCode":501,"message":"test"}""".stripMargin)
+        status(result) shouldBe 500
       }
     }
   }

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.controllers.definition
+package support
 
-import play.api.libs.json._
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.EitherValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
-object JsonFormatters {
-
-  implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
-
-  implicit val formatParameter = Json.format[Parameter]
-  implicit val formatAccess = Json.format[Access]
-  implicit val formatAPIVersion = Json.format[APIVersion]
-  implicit val formatAPIDefinition = Json.format[OldAPIDefinition]
-  implicit val formatScope = Json.format[Scope]
-  implicit val formatDefinition = Json.format[Definition]
-
-}
+trait UnitSpec extends AnyWordSpecLike
+  with MockFactory
+  with EitherValues
+  with Matchers
+  with FutureAwaits
+  with DefaultAwaitTimeout

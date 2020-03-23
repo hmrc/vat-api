@@ -1,2 +1,2 @@
-GET        /api/definition                                       @uk.gov.hmrc.vatapi.controllers.definition.DocumentationController.definition()
-GET        /api/conf/:version/*file                              @uk.gov.hmrc.vatapi.controllers.definition.DocumentationController.raml(version: String, file: String)
+GET        /api/definition                                       config.DocumentationController.definition()
+GET        /api/conf/:version/*file                              config.DocumentationController.raml(version: String, file: String)

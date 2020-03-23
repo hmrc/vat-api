@@ -19,9 +19,9 @@ package uk.gov.hmrc.vatapi.controllers.definition
 import uk.gov.hmrc.vatapi.controllers.definition.APIStatus.APIStatus
 
 case class Definition(scopes: Seq[Scope],
-                      api: APIDefinition)
+                      api: OldAPIDefinition)
 
-case class APIDefinition(
+case class OldAPIDefinition(
                           name: String,
                           description: String,
                           context: String,

@@ -47,6 +47,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "domain"            % domainVersion,
     "uk.gov.hmrc"       %% "play-hmrc-api"     % hmrcApiVersion,
     "org.typelevel"     %% "cats-core"         % "2.1.0",
+    "com.chuusai"   %% "shapeless"         % "2.3.3",
     "com.typesafe.play" %% "play-json-joda"    % playJsonVersion,
     "org.json4s"        %% "json4s-native"     % json4SnativeVersion,
     "org.json4s"        %% "json4s-ext"        % json4SextVersion,
@@ -54,20 +55,20 @@ object AppDependencies {
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full)
   )
 
-def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
-  "org.scalatest"          %% "scalatest"                % scalaTestVersion    % scope,
-  "com.vladsch.flexmark"   %  "flexmark-all"             % "0.35.10"           % scope,
-  "org.scalamock"          %% "scalamock"                % "4.4.0"             % scope,
-  "com.typesafe.play"      %% "play-test"                % PlayVersion.current % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play"       % scalaTestPlusVerson % scope,
-  "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"          % scope,
-  "com.github.tomakehurst" %  "wiremock"                 % wiremockversion     % scope,
-  "org.scalacheck"         %% "scalacheck"               % scalacheckVersion   % scope,
-  "org.skyscreamer"        %  "jsonassert"               % jsonAssertVersion   % scope,
-  "com.jayway.restassured" %  "rest-assured"             % restAssuredVersion  % scope,
-  "org.mockito"            %  "mockito-core"             % mockitoVersion      % scope,
-  "org.scoverage"          %% "scalac-scoverage-runtime" % scoverageVersion    % scope
-)
+  def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
+    "org.scalatest"          %% "scalatest"                % scalaTestVersion    % scope,
+    "com.vladsch.flexmark"   %  "flexmark-all"             % "0.35.10"           % scope,
+    "org.scalamock"          %% "scalamock"                % "4.4.0"             % scope,
+    "com.typesafe.play"      %% "play-test"                % PlayVersion.current % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play"       % scalaTestPlusVerson % scope,
+    "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"          % scope,
+    "com.github.tomakehurst" %  "wiremock"                 % wiremockversion     % scope,
+    "org.scalacheck"         %% "scalacheck"               % scalacheckVersion   % scope,
+    "org.skyscreamer"        %  "jsonassert"               % jsonAssertVersion   % scope,
+    "com.jayway.restassured" %  "rest-assured"             % restAssuredVersion  % scope,
+    "org.mockito"            %  "mockito-core"             % mockitoVersion      % scope,
+    "org.scoverage"          %% "scalac-scoverage-runtime" % scoverageVersion    % scope
+  )
 
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
   val overrides: Seq[ModuleID] = {
