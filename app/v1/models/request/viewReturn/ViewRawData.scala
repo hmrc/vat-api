@@ -16,4 +16,6 @@
 
 package v1.models.request.viewReturn
 
+import v1.models.request.RawData
+
 case class ViewRawData(vrn: String, periodKey: String) extends RawData
