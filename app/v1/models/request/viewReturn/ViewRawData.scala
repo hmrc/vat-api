@@ -16,4 +16,4 @@
 
 package v1.models.request.viewReturn
 
-case class ViewRawData(nino: String, periodKey: String) extends RawData
+case class ViewRawData(vrn: String, periodKey: String) extends RawData
