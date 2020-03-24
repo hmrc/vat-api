@@ -48,7 +48,7 @@ class ViewReturnResponseSpec extends UnitSpec {
     totalValueSalesExVAT = 93732432923.00,
     totalValuePurchasesExVAT = 34853948.00,
     totalValueGoodsSuppliedExVAT = 82390428304.00,
-    totalAcquisitionsExVAT = -204832482.00)gi
+    totalAcquisitionsExVAT = -204832482.00)
 
   "ViewReturnResponse" when {
     "read from valid JSON" should {
