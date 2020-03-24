@@ -23,7 +23,7 @@ case class ObligationsResponse(obligations: Seq[Obligation])
 object ObligationsResponse {
 
   //bound case class to allow us to read from multiple lists of obligation details to merge together later
-  case class Detail(obligation: Seq[Obligation])
+  case class Detail(obligations: Seq[Obligation])
 
   object Detail {
     implicit val reads: Reads[Detail] = (JsPath \ "obligationDetails").read[Seq[Obligation]].map(Detail(_))
@@ -32,5 +32,5 @@ object ObligationsResponse {
   implicit val writes: OWrites[ObligationsResponse] = Json.writes[ObligationsResponse]
 
   implicit val reads: Reads[ObligationsResponse] =
-    (JsPath \ "obligations").read[Seq[Detail]].map(det => ObligationsResponse(det.flatMap(_.obligation)))
+    (JsPath \ "obligations").read[Seq[Detail]].map(det => ObligationsResponse(det.flatMap(_.obligations)))
 }
