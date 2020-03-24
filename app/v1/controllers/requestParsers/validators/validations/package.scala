@@ -16,21 +16,14 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{VrnValidation, PeriodKeyValidation}
-import v1.models.errors.MtdError
-import v1.models.request.viewReturn.ViewRawData
+import java.time.format.DateTimeFormatter
 
-class ViewReturnValidator extends Validator[ViewRawData] {
+package object validations {
 
-  private val validationSet = List(parameterFormatValidation)
+  val dateFormat: DateTimeFormatter = DateTimeFormatter ofPattern "yyyy-MM-dd"
+  //val maxDateRange = 732
+  //val earliestDate: LocalDate = LocalDate.parse("2018-04-06", dateFormat)
 
-  private def parameterFormatValidation: ViewRawData => List[List[MtdError]] = (data: ViewRawData) => {
-    List(
-      VrnValidation.validate(data.vrn),
-      PeriodKeyValidation.validate(data.periodKey)
-    )
-  }
-  override def validate(data: ViewRawData): List[MtdError] = {
-    run(validationSet, data).distinct
-  }
+  val NoValidationErrors = List()
+
 }

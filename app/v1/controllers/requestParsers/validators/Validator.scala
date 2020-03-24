@@ -16,21 +16,24 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{VrnValidation, PeriodKeyValidation}
 import v1.models.errors.MtdError
-import v1.models.request.viewReturn.ViewRawData
+import v1.models.request.RawData
 
-class ViewReturnValidator extends Validator[ViewRawData] {
+trait Validator[A <: RawData] {
 
-  private val validationSet = List(parameterFormatValidation)
+  type ValidationLevel[T] = T => List[MtdError]
 
-  private def parameterFormatValidation: ViewRawData => List[List[MtdError]] = (data: ViewRawData) => {
-    List(
-      VrnValidation.validate(data.vrn),
-      PeriodKeyValidation.validate(data.periodKey)
-    )
-  }
-  override def validate(data: ViewRawData): List[MtdError] = {
-    run(validationSet, data).distinct
+  def validate(data: A): List[MtdError]
+
+  def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
+
+    validationSet match {
+      case Nil => List()
+      case thisLevel :: remainingLevels =>
+        thisLevel(data).flatten match {
+          case x if x.isEmpty  => run(remainingLevels, data)
+          case x if x.nonEmpty => x
+        }
+    }
   }
 }
