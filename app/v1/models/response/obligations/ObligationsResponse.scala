@@ -18,7 +18,7 @@ package v1.models.response.obligations
 
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
 
-case class ObligationsResponse(obligation: Seq[Obligation])
+case class ObligationsResponse(obligations: Seq[Obligation])
 
 object ObligationsResponse {
 
