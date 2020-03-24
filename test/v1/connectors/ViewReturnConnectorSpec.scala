@@ -18,7 +18,6 @@ package v1.connectors
 
 import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Vrn
-import v1.connectors.httpparsers.ViewReturnConnector
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.ViewRequest

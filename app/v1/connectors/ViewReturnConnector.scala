@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package v1.connectors.httpparsers
+package v1.connectors
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v1.connectors.{BaseDesConnector, DesOutcome, DesUri}
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
 
