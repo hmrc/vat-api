@@ -20,7 +20,7 @@ import v1.models.errors.{MtdError, VrnFormatError}
 
 object VrnValidation {
 
-  private val vrnRegex = "^([0-9]{9}$"
+  private val vrnRegex = """^\d{9}$"""
 
   def validate(vrn: String): List[MtdError] = {
     if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
