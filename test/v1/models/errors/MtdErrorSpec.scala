@@ -16,24 +16,21 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.Json
+import support.UnitSpec
 
-case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None)
+class MtdErrorSpec extends UnitSpec {
 
-object ErrorWrapper {
-  implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
-
-    val json = Json.obj(
-      "code" -> errorResponse.error.code,
-      "message" -> errorResponse.error.message
-    )
-
-    errorResponse match {
-      case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => json + ("errors" -> Json.toJson(errors))
-      case ErrorWrapper(_, error: CustomError, _) => error.json
-      case _ => json
+  "writes" should {
+    "generate the correct JSON" in {
+      Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
+        """
+          |{
+          |   "code": "CODE",
+          |   "message": "some message"
+          |}
+        """.stripMargin
+      )
     }
-
   }
-
 }
