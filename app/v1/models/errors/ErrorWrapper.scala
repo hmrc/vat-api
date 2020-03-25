@@ -23,7 +23,7 @@ case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: 
 object ErrorWrapper {
   implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
 
-    lazy val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
+    val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
 
     errorResponse match {
       case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => singleJson ++ Json.obj("errors" -> errors.map(_.toJson))
