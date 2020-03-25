@@ -17,12 +17,14 @@
 package v1.controllers.requestParsers
 
 import javax.inject.Inject
-import v1.controllers.requestParsers.validators.Validator
+import uk.gov.hmrc.domain.Vrn
+import v1.controllers.requestParsers.validators.{ObligationsValidator, Validator}
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 
-class ObligationsRequestParser @Inject()(val validator: Validator[ObligationsRawData])
+class ObligationsRequestParser @Inject()(val validator: ObligationsValidator)
   extends RequestParser[ObligationsRawData, ObligationsRequest]{
 
-  _
-  override protected def requestFor(data: ObligationsRawData): ObligationsRequest = ???
+  override protected def requestFor(data: ObligationsRawData): ObligationsRequest = {
+    ObligationsRequest(Vrn(data.vrn), data.from, data.to, data.status)
+  }
 }
