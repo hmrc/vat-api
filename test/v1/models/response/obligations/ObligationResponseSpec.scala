@@ -257,7 +257,7 @@ class ObligationResponseSpec extends UnitSpec {
 
         val json = Json.parse(
           s"""{
-             |   "obligations":[ ]
+             |   "obligations":[]
              |}
              |""".stripMargin
         )
