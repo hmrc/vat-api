@@ -22,10 +22,9 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.ViewReturnConnector
-import v1.models.errors.{DownstreamError, FormatPeriodKeyError, FormatVrnError, MtdError, NotFoundError, RuleDateRangeTooLargeError}
+import v1.models.errors._
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
-import v1.services.services.ServiceOutcome
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,7 +51,7 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
       "INVALID_IDENTIFIER" -> DownstreamError,
       "NOT_FOUND_VRN" -> DownstreamError,
       "INVALID_INPUTDATA" -> RuleDateRangeTooLargeError,
-      "NOT_FOUND" -> NotFoundError,
+      "NOT_FOUND" -> EmptyNotFoundError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )

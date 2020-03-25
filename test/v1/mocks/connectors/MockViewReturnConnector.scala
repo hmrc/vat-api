@@ -29,9 +29,9 @@ trait MockViewReturnConnector extends MockFactory {
 
   val mockViewReturnConnector: ViewReturnConnector = mock[ViewReturnConnector]
 
-  object MockRetrieveAllocationsConnector {
+  object MockViewReturnConnector {
 
-    def retrieve(requestData: ViewRequest): CallHandler[Future[DesOutcome[ViewReturnResponse]]] = {
+    def viewReturn(requestData: ViewRequest): CallHandler[Future[DesOutcome[ViewReturnResponse]]] = {
       (mockViewReturnConnector
         .viewReturn(_: ViewRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(requestData, *, *)

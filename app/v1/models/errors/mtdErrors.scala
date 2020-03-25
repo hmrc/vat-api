@@ -72,6 +72,8 @@ object FormatPeriodKeyError extends MtdError("INVALID_REQUEST", "Invalid request
       |        "code": "PERIOD_KEY_INVALID",
       |        "message": "Invalid period key"
       |      }
+      |    ]
+      |}
     """.stripMargin
   )
 }

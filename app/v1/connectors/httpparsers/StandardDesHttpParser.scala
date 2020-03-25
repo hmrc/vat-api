@@ -61,9 +61,8 @@ object StandardDesHttpParser extends HttpParser {
           "[StandardDesHttpParser][read] - " +
             s"Success response received from DES with correlationId: $correlationId when calling $url")
         successOutcomeFactory(correlationId)
-      case BAD_REQUEST | NOT_FOUND | FORBIDDEN
-           | CONFLICT | UNPROCESSABLE_ENTITY => Left(ResponseWrapper(correlationId, parseErrors(response)))
-      case _                                 => Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
+      case BAD_REQUEST | NOT_FOUND | FORBIDDEN | CONFLICT => Left(ResponseWrapper(correlationId, parseErrors(response)))
+      case _                                              => Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
     }
   }
 }

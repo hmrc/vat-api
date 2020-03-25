@@ -24,13 +24,13 @@ class ErrorWrapperSpec extends UnitSpec {
   val correlationId = "X-123"
 
   "Rendering a error response with one error" should {
-    val error = ErrorWrapper(None, NinoFormatError, Some(Seq.empty))
+    val error = ErrorWrapper(None, FormatVrnError, None)
 
     val json = Json.parse(
       """
         |{
-        |   "code": "FORMAT_NINO",
-        |   "message": "The provided NINO is invalid"
+        |   "code": "VRN_INVALID",
+        |   "message": "The provided Vrn is invalid"
         |}
       """.stripMargin
     )
@@ -41,13 +41,13 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with one error and an empty sequence of errors" should {
-    val error = ErrorWrapper(None, NinoFormatError, Some(Seq.empty))
+    val error = ErrorWrapper(None, FormatVrnError, Some(Seq.empty))
 
     val json = Json.parse(
       """
         |{
-        |   "code": "FORMAT_NINO",
-        |   "message": "The provided NINO is invalid"
+        |   "code": "VRN_INVALID",
+        |   "message": "The provided Vrn is invalid"
         |}
       """.stripMargin
     )
@@ -61,8 +61,8 @@ class ErrorWrapperSpec extends UnitSpec {
     val error = ErrorWrapper(None, BadRequestError,
       Some (
         Seq(
-          NinoFormatError,
-          TaxYearFormatError
+          FormatVrnError,
+          FormatVrnError
         )
       )
     )
@@ -74,12 +74,12 @@ class ErrorWrapperSpec extends UnitSpec {
         |   "message": "Invalid request",
         |   "errors": [
         |       {
-        |         "code": "FORMAT_NINO",
-        |         "message": "The provided NINO is invalid"
+        |         "code": "VRN_INVALID",
+        |         "message": "The provided Vrn is invalid"
         |       },
         |       {
-        |         "code": "FORMAT_TAX_YEAR",
-        |         "message": "The provided tax year is invalid"
+        |         "code": "VRN_INVALID",
+        |         "message": "The provided Vrn is invalid"
         |       }
         |   ]
         |}
@@ -88,21 +88,6 @@ class ErrorWrapperSpec extends UnitSpec {
 
     "generate the correct JSON" in {
       Json.toJson(error) shouldBe json
-    }
-  }
-
-  "rendering an audit error" should {
-    "render correctly" when {
-      "there is one error" in {
-        val errorWrapper = ErrorWrapper(None, BadRequestError)
-
-        errorWrapper.auditErrors shouldBe Seq(AuditError(BadRequestError.code))
-      }
-      "there are multiple errors" in {
-        val errorWrapper = ErrorWrapper(None, BadRequestError, Some(Seq(NinoFormatError, TaxYearFormatError)))
-
-        errorWrapper.auditErrors shouldBe Seq(AuditError(NinoFormatError.code), AuditError(TaxYearFormatError.code))
-      }
     }
   }
 }

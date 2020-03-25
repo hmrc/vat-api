@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package v1.models.audit
+package v1
 
-import play.api.libs.json.{Json, OFormat}
+import v1.models.errors.ErrorWrapper
+import v1.models.outcomes.ResponseWrapper
 
-case class AuditError(errorCode: String)
-
-object AuditError {
-  implicit val format: OFormat[AuditError] = Json.format[AuditError]
+package object services {
+  type ServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
 }

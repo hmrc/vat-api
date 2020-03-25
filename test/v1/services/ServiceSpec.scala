@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package v1.models.audit
+package v1.services
 
-import play.api.libs.json.Json
+import play.api.http.{HeaderNames, MimeTypes, Status}
 import support.UnitSpec
-import v1.fixtures.audit.AuditResponseFixture._
+import uk.gov.hmrc.http.HeaderCarrier
 
-class AuditResponseSpec extends UnitSpec {
+import scala.concurrent.ExecutionContext
 
-  "AuditResponse" when {
-    "written to JSON with a body" should {
-      "produce the expected JsObject" in {
-        Json.toJson(auditResponseModelWithBody) shouldBe successAuditResponse
-      }
-    }
+trait ServiceSpec extends UnitSpec
+  with Status
+  with MimeTypes
+  with HeaderNames {
 
-    "written to JSON with Audit Errors" should {
-      "produce the expected JsObject" in {
-        Json.toJson(auditResponseModelWithErrors) shouldBe auditResponseJsonWithErrors
-      }
-    }
-  }
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+
 }
