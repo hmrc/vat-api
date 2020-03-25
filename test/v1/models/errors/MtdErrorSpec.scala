@@ -16,21 +16,39 @@
 
 package v1.models.errors
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 
 class MtdErrorSpec extends UnitSpec {
 
-  "writes" should {
+  "MtdError" when {
+    "written to JSON" should {
+      "generate the correct JSON" in {
+        Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
+          """
+            |{
+            |   "code": "CODE",
+            |   "message": "some message"
+            |}
+        """.stripMargin
+        )
+      }
+    }
+  }
+
+  "written to JSON with custom JSON" should {
     "generate the correct JSON" in {
-      Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
+
+      val customJson: JsValue = Json.parse(
         """
           |{
-          |   "code": "CODE",
-          |   "message": "some message"
+          |  "statusCode": "STATUS_CODE",
+          |  "errorMessage": "ERROR_MESSAGE"
           |}
         """.stripMargin
       )
+
+      Json.toJson(MtdError("CODE", "some message", Some(customJson))) shouldBe customJson
     }
   }
 }

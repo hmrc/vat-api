@@ -40,6 +40,29 @@ class ErrorWrapperSpec extends UnitSpec {
     }
   }
 
+  "Rendering a error response with one custom error" should {
+    val error = ErrorWrapper(None, FormatPeriodKeyError, None)
+
+    val json = Json.parse(
+      """
+        |{
+        |  "code": "INVALID_REQUEST",
+        |  "message": "Invalid request",
+        |  "errors": [
+        |      {
+        |        "code": "PERIOD_KEY_INVALID",
+        |        "message": "Invalid period key"
+        |      }
+        |    ]
+        |}
+      """.stripMargin
+    )
+
+    "generate the correct JSON" in {
+      Json.toJson(error) shouldBe json
+    }
+  }
+
   "Rendering a error response with one error and an empty sequence of errors" should {
     val error = ErrorWrapper(None, FormatVrnError, Some(Seq.empty))
 
@@ -57,12 +80,12 @@ class ErrorWrapperSpec extends UnitSpec {
     }
   }
 
-  "Rendering a error response with two errors" should {
+  "Rendering a error response with multiple errors including a custom error" should {
     val error = ErrorWrapper(None, BadRequestError,
       Some (
         Seq(
           FormatVrnError,
-          FormatVrnError
+          FormatPeriodKeyError
         )
       )
     )
@@ -78,8 +101,8 @@ class ErrorWrapperSpec extends UnitSpec {
         |         "message": "The provided Vrn is invalid"
         |       },
         |       {
-        |         "code": "VRN_INVALID",
-        |         "message": "The provided Vrn is invalid"
+        |         "code": "PERIOD_KEY_INVALID",
+        |         "message": "Invalid period key"
         |       }
         |   ]
         |}
