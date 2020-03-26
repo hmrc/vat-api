@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1
 
-import play.api.libs.json.{JsObject, Json, Writes}
+import v1.models.errors.ErrorWrapper
+import v1.models.outcomes.ResponseWrapper
 
-case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None)
-
-object ErrorWrapper {
-  implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
-
-    val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
-
-    errorResponse match {
-      case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => singleJson ++ Json.obj("errors" -> errors.map(_.toJson))
-      case _ => singleJson
-    }
-
-  }
-
+package object services {
+  type ServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
 }
