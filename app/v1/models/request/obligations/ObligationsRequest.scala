@@ -22,4 +22,4 @@ import v1.models.request.RawData
 case class ObligationsRequest(vrn: Vrn,
                               from: Option[String],
                               to: Option[String],
-                              status: String) extends RawData
+                              status: Option[String]) extends RawData

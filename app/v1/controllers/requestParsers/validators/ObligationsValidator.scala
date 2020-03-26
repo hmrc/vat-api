@@ -16,15 +16,26 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.models.errors.MtdError
+import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, DateRangeValidation, ObligationValidation, StatusValidation, VrnValidation}
+import v1.models.errors.{InvalidFromError, InvalidToError, MtdError}
 import v1.models.request.obligations.ObligationsRawData
 
 class ObligationsValidator extends Validator[ObligationsRawData]{
-  private val validationSet = List()
+  private val validationSet = List(vrnFormatValidation, obligationFormatValidation)
 
-  private def parameterFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
-    List()
+  private def vrnFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
+    List(
+      VrnValidation.validate(data.vrn),
+    )
   }
 
-  override def validate(data: ObligationsRawData): List[MtdError] = ???
+  private def obligationFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
+    List(
+      ObligationValidation.validate(data)
+    )
+  }
+
+  override def validate(data: ObligationsRawData): List[MtdError] = {
+    run(validationSet, data).distinct
+  }
 }

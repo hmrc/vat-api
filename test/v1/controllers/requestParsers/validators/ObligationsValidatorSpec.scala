@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers
+package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.Validator
-import v1.models.errors.{BadRequestError, ErrorWrapper}
-import v1.models.request.RawData
+class ObligationsValidatorSpec {
 
-trait RequestParser[Raw <: RawData, Request]  {
-  val validator: Validator[Raw]
-
-  protected def requestFor(data: Raw): Request
-
-  def parseRequest(data: Raw): Either[ErrorWrapper, Request] = {
-    validator.validate(data) match {
-      case Nil => Right(requestFor(data))
-      case err :: Nil => Left(ErrorWrapper(None, err, None))
-      case errs => Left(ErrorWrapper(None, BadRequestError, Some(errs)))
-    }
-  }
 }
