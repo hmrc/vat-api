@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package v1.mocks.validators
+package v1.mocks.requestParsers
 
-import org.scalamock.handlers.CallHandler1
+import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.ObligationsValidator
-import v1.models.errors.MtdError
-import v1.models.request.obligations.ObligationsRawData
+import v1.controllers.requestParsers.ViewReturnRequestParser
+import v1.models.errors.ErrorWrapper
+import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
 
-class MockObligationsValidator extends MockFactory{
+trait MockViewReturnRequestParser extends MockFactory {
 
-  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
+  val mockViewReturnRequestParser: ViewReturnRequestParser = mock[ViewReturnRequestParser]
 
-  object MockVrnValidator {
+  object MockViewReturnRequestParser{
 
-    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
-      (mockValidator
-        .validate(_: ObligationsRawData))
-        .expects(data)
+    def parse(rawData: ViewRawData): CallHandler[Either[ErrorWrapper, ViewRequest]] = {
+      (mockViewReturnRequestParser.parseRequest(_: ViewRawData)).expects(rawData)
     }
   }
+
 }

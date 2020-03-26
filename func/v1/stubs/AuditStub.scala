@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package v1.mocks.validators
+package v1.stubs
 
-import org.scalamock.handlers.CallHandler1
-import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.ObligationsValidator
-import v1.models.errors.MtdError
-import v1.models.request.obligations.ObligationsRawData
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.http.Status._
+import support.WireMockMethods
 
-class MockObligationsValidator extends MockFactory{
+object AuditStub extends WireMockMethods {
 
-  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
+  private val auditUri: String = s"/write/audit.*"
 
-  object MockVrnValidator {
-
-    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
-      (mockValidator
-        .validate(_: ObligationsRawData))
-        .expects(data)
-    }
+  def audit(): StubMapping = {
+    when(method = POST, uri = auditUri)
+      .thenReturn(status = NO_CONTENT)
   }
+
 }

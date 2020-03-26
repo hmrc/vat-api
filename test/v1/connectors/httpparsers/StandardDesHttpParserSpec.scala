@@ -163,7 +163,7 @@ class StandardDesHttpParserSpec extends UnitSpec {
             val httpResponse = HttpResponse(responseCode, Some(multipleErrorsJson), Map("CorrelationId" -> Seq(correlationId)))
 
             httpReads.read(method, url, httpResponse) shouldBe {
-              Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("CODE 1"), DesErrorCode("CODE 2")))))
+              Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
             }
           }
 

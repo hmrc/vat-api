@@ -19,7 +19,7 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockViewReturnValidator
-import v1.models.errors.{ErrorWrapper, FormatPeriodKeyError, VrnFormatError}
+import v1.models.errors.{ErrorWrapper, PeriodKeyFormatError, VrnFormatError}
 import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
 
 class ViewReturnRequestParserSpec extends UnitSpec {
@@ -37,7 +37,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
     "return a retrieve periodKey request" when {
       "valid data is provided" in new Test {
 
-        MockVrnValidator.validate(ViewRawData(validVrn, validPeriodKey))
+        MockViewReturnValidator.validate(ViewRawData(validVrn, validPeriodKey))
           .returns(Nil)
 
         parser.parseRequest(ViewRawData(validVrn, validPeriodKey)) shouldBe
@@ -48,7 +48,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
 
   "return an error" when {
     "invalid data is provided" in new Test{
-      MockVrnValidator.validate(ViewRawData(invalidVrn, validPeriodKey))
+      MockViewReturnValidator.validate(ViewRawData(invalidVrn, validPeriodKey))
         .returns(List(VrnFormatError))
 
       parser.parseRequest(ViewRawData(invalidVrn, validPeriodKey)) shouldBe
@@ -58,17 +58,17 @@ class ViewReturnRequestParserSpec extends UnitSpec {
 
   "return BadRequest wrapped error" when {
     "invalid period key is provided" in new Test{
-      MockVrnValidator.validate(ViewRawData(validVrn, invalidPeriodKey))
-        .returns(List(FormatPeriodKeyError))
+      MockViewReturnValidator.validate(ViewRawData(validVrn, invalidPeriodKey))
+        .returns(List(PeriodKeyFormatError))
 
       parser.parseRequest(ViewRawData(validVrn, invalidPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, FormatPeriodKeyError, None))
+        Left(ErrorWrapper(None, PeriodKeyFormatError, None))
     }
   }
 
   "return only single error" when {
     "multiple request parameters supplied are invalid" in new Test{
-      MockVrnValidator.validate(ViewRawData(invalidVrn, invalidPeriodKey))
+      MockViewReturnValidator.validate(ViewRawData(invalidVrn, invalidPeriodKey))
         .returns(List(VrnFormatError))
 
       parser.parseRequest(ViewRawData(invalidVrn, invalidPeriodKey)) shouldBe
