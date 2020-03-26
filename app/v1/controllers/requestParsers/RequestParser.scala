@@ -30,7 +30,7 @@ trait RequestParser[Raw <: RawData, Request] {
     validator.validate(data) match {
       case Nil => Right(requestFor(data))
       case err :: Nil => Left(ErrorWrapper(None, err, None))
-      case errs => Left(ErrorWrapper(None, BadRequestError, Some(errs)))
+      case errs => Left(ErrorWrapper(None, BadRequestError, Some(errs.filterNot(_ == BadRequestError))))
     }
   }
 }

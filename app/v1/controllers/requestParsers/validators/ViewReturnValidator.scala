@@ -22,11 +22,16 @@ import v1.models.request.viewReturn.ViewRawData
 
 class ViewReturnValidator extends Validator[ViewRawData] {
 
-  private val validationSet = List(parameterFormatValidation)
+  private val validationSet = List(vrnFormatValidation, periodKeyFormatValidation)
 
-  private def parameterFormatValidation: ViewRawData => List[List[MtdError]] = (data: ViewRawData) => {
+  private def vrnFormatValidation: ViewRawData => List[List[MtdError]] = (data: ViewRawData) => {
     List(
-      VrnValidation.validate(data.vrn),
+      VrnValidation.validate(data.vrn)
+    )
+  }
+
+  private def periodKeyFormatValidation: ViewRawData => List[List[MtdError]] = (data: ViewRawData) => {
+    List(
       PeriodKeyValidation.validate(data.periodKey)
     )
   }

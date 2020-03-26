@@ -56,13 +56,23 @@ class ViewReturnRequestParserSpec extends UnitSpec {
     }
   }
 
-  "return multiple errors" when {
-    "multiple request parameters are supplied" in new Test{
+  "return BadRequest wrapped error" when {
+    "invalid period key is provided" in new Test{
+      MockVrnValidator.validate(ViewRawData(validVrn, invalidPeriodKey))
+        .returns(List(PeriodKeyFormatError, BadRequestError))
+
+      parser.parseRequest(ViewRawData(validVrn, invalidPeriodKey)) shouldBe
+        Left(ErrorWrapper(None, BadRequestError, Some(Seq(PeriodKeyFormatError))))
+    }
+  }
+
+  "return only single error" when {
+    "multiple request parameters supplied are invalid" in new Test{
       MockVrnValidator.validate(ViewRawData(invalidVrn, invalidPeriodKey))
-        .returns(List(VrnFormatError, PeriodKeyFormatError))
+        .returns(List(VrnFormatError))
 
       parser.parseRequest(ViewRawData(invalidVrn, invalidPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, BadRequestError, Some(Seq(VrnFormatError, PeriodKeyFormatError))))
+        Left(ErrorWrapper(None, VrnFormatError, None))
     }
   }
 }
