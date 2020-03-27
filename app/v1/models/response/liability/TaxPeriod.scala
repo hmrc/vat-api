@@ -29,6 +29,7 @@ object TaxPeriod {
     (JsPath \ "taxPeriodFrom").read[String] and
       (JsPath \ "taxPeriodTo").read[String])(TaxPeriod.apply _)
 
+  //only returns a result if from and to exist, returns none if they don't
   implicit val reads: Reads[Option[TaxPeriod]] = { json =>
     (json \ "taxPeriodFrom", json \ "taxPeriodTo") match {
       case (from, to) if from.isDefined && to.isDefined => json.validateOpt[TaxPeriod](readPeriod)

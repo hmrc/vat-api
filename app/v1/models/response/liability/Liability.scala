@@ -29,6 +29,7 @@ object Liability {
 
   implicit val writes: OWrites[Liability] = Json.writes[Liability]
 
+  //looks for an array of items, then extract dueDate if it exists, or nothing if it doesn't
   private val dueDateReads = {
     ((JsPath \\ "items").readNullable[Seq[JsValue]]).flatMap {
       case Some(_) => (JsPath \\ "items" \\ "dueDate").readNullable[String]
