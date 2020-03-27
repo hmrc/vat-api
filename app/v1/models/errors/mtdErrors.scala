@@ -33,7 +33,9 @@ object MtdError {
 }
 
 // Format Errors
-object FormatVrnError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+
+object PeriodKeyFormatError extends MtdError("PERIOD_KEY_INVALID", "Invalid period key")
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")

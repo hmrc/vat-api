@@ -21,7 +21,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
 import v1.mocks.connectors.MockViewReturnConnector
-import v1.models.errors.{DesErrorCode, DesErrors, DownstreamError, EmptyNotFoundError, ErrorWrapper, FormatPeriodKeyError, FormatVrnError, MtdError, RuleDateRangeTooLargeError}
+import v1.models.errors.{DesErrorCode, DesErrors, DownstreamError, EmptyNotFoundError, ErrorWrapper, FormatPeriodKeyError, VrnFormatError, MtdError, RuleDateRangeTooLargeError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
@@ -89,7 +89,7 @@ class ViewReturnServiceSpec extends UnitSpec {
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          ("INVALID_VRN", FormatVrnError),
+          ("INVALID_VRN", VrnFormatError),
           ("INVALID_PERIODKEY", FormatPeriodKeyError),
           ("INVALID_IDENTIFIER", DownstreamError),
           ("NOT_FOUND_VRN", DownstreamError),

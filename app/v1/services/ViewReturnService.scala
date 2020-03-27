@@ -46,7 +46,7 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
 
   private def desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN" -> FormatVrnError,
+      "INVALID_VRN" -> VrnFormatError,
       "INVALID_PERIODKEY" -> FormatPeriodKeyError,
       "INVALID_IDENTIFIER" -> DownstreamError,
       "NOT_FOUND_VRN" -> DownstreamError,
