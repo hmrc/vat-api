@@ -24,6 +24,12 @@ object LiabilityResponse {
 
   implicit val writes: OWrites[LiabilityResponse] = Json.writes[LiabilityResponse]
 
-  implicit val reads: Reads[LiabilityResponse] =
-    (JsPath \ "financialTransactions").read[Seq[Liability]].map(det => LiabilityResponse(det))
+  implicit val reads: Reads[LiabilityResponse] = {
+    (JsPath \ "financialTransactions").read[Seq[Liability]].map { liabilities =>
+      LiabilityResponse(liabilities.filter { liability =>
+        val liabilityType = liability.`type`.toLowerCase
+        liabilityType != "payment on account" && liabilityType != "hybrid payments"
+      })
+    }
+  }
 }
