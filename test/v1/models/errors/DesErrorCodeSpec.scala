@@ -16,20 +16,23 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.json.Json
+import support.UnitSpec
 
-case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None)
+class DesErrorCodeSpec extends UnitSpec {
 
-object ErrorWrapper {
-  implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
+  "reads" should {
+    val json = Json.parse(
+      """
+        |{
+        |   "code": "CODE",
+        |   "reason": "ignored"
+        |}
+      """.stripMargin
+    )
 
-    val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
-
-    errorResponse match {
-      case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => singleJson ++ Json.obj("errors" -> errors.map(_.toJson))
-      case _ => singleJson
+    "generate the correct error code" in {
+      json.as[DesErrorCode] shouldBe DesErrorCode("CODE")
     }
-
   }
-
 }

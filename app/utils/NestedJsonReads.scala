@@ -16,6 +16,7 @@
 
 package utils
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import scala.annotation.tailrec
@@ -59,6 +60,15 @@ trait NestedJsonReads {
       step(jsPath.path, json)
     }
   }
+
+  /**
+    * Reads for optional fields that reads None if a path (typically a parent of the target
+    * JSON field or of a mandatory part of it) is absent from JSON.
+    *
+    * @param path the Json path that must be present
+    */
+  def emptyIfNotPresent[A: Reads](path: JsPath): Reads[Option[A]] =
+    path.readNestedNullable[JsValue].filter(_.isEmpty).map(_ => None) or JsPath.readNullable[A]
 }
 
 object NestedJsonReads extends NestedJsonReads

@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.services
 
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.http.{HeaderNames, MimeTypes, Status}
+import support.UnitSpec
+import uk.gov.hmrc.http.HeaderCarrier
 
-case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None)
+import scala.concurrent.ExecutionContext
 
-object ErrorWrapper {
-  implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
+trait ServiceSpec extends UnitSpec
+  with Status
+  with MimeTypes
+  with HeaderNames {
 
-    val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
-
-    errorResponse match {
-      case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => singleJson ++ Json.obj("errors" -> errors.map(_.toJson))
-      case _ => singleJson
-    }
-
-  }
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
 }
