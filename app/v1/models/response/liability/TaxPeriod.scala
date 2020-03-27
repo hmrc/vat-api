@@ -18,10 +18,11 @@ package v1.models.response.liability
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utils.NestedJsonReads
 
 case class TaxPeriod(from: String, to: String)
 
-object TaxPeriod {
+object TaxPeriod extends NestedJsonReads {
 
   implicit val writes: OWrites[TaxPeriod] = Json.writes[TaxPeriod]
 
@@ -29,7 +30,6 @@ object TaxPeriod {
     (JsPath \ "taxPeriodFrom").read[String] and
       (JsPath \ "taxPeriodTo").read[String])(TaxPeriod.apply _)
 
-  //only returns a result if from and to exist, returns none if they don't
   implicit val reads: Reads[Option[TaxPeriod]] = { json =>
     (json \ "taxPeriodFrom", json \ "taxPeriodTo") match {
       case (from, to) if from.isDefined && to.isDefined => json.validateOpt[TaxPeriod](readPeriod)

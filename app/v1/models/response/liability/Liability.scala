@@ -17,7 +17,7 @@
 package v1.models.response.liability
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, JsValue, Json, OWrites, Reads}
+import play.api.libs.json.{JsPath, Json, OWrites, Reads}
 
 case class Liability(taxPeriod: Option[TaxPeriod],
                      `type`: String,
@@ -29,19 +29,11 @@ object Liability {
 
   implicit val writes: OWrites[Liability] = Json.writes[Liability]
 
-  //looks for an array of items, then extract dueDate if it exists, or nothing if it doesn't
-  private val dueDateReads = {
-    ((JsPath \\ "items").readNullable[Seq[JsValue]]).flatMap {
-      case Some(_) => (JsPath \\ "items" \\ "dueDate").readNullable[String]
-      case None => (JsPath \\ "items").readNullable[String]
-    }
-  }
-
   implicit val reads: Reads[Liability] = (
     TaxPeriod.reads and
       (JsPath \ "chargeType").read[String] and
       (JsPath \ "originalAmount").read[BigDecimal] and
       (JsPath \ "outstandingAmount").readNullable[BigDecimal] and
-      dueDateReads
+      (JsPath \\ "dueDate").readNullable[String]
     )(Liability.apply _)
 }
