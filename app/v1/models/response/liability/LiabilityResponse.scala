@@ -24,12 +24,13 @@ object LiabilityResponse {
 
   implicit val writes: OWrites[LiabilityResponse] = Json.writes[LiabilityResponse]
 
+  //retrieve all transactions, filter out any particular payments, then return a model only if there's data
   implicit val reads: Reads[LiabilityResponse] = {
     (JsPath \ "financialTransactions").read[Seq[Liability]].map { liabilities =>
-      LiabilityResponse(liabilities.filter { liability =>
+      liabilities.filter { liability =>
         val liabilityType = liability.`type`.toLowerCase
         liabilityType != "payment on account" && liabilityType != "hybrid payments"
-      })
+      }
     }
-  }
+  }.filter(_.nonEmpty).map(LiabilityResponse(_))
 }
