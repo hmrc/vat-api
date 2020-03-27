@@ -19,8 +19,8 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockVrnValidator
-import v1.models.errors.{BadRequestError, ErrorWrapper, VrnFormatError, PeriodKeyFormatError}
-import v1.models.request.viewReturn.{ViewRequest, ViewRawData}
+import v1.models.errors.{ErrorWrapper, FormatPeriodKeyError, VrnFormatError}
+import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
 
 class ViewReturnRequestParserSpec extends UnitSpec {
 
@@ -59,10 +59,10 @@ class ViewReturnRequestParserSpec extends UnitSpec {
   "return BadRequest wrapped error" when {
     "invalid period key is provided" in new Test{
       MockVrnValidator.validate(ViewRawData(validVrn, invalidPeriodKey))
-        .returns(List(PeriodKeyFormatError, BadRequestError))
+        .returns(List(FormatPeriodKeyError))
 
       parser.parseRequest(ViewRawData(validVrn, invalidPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, BadRequestError, Some(Seq(PeriodKeyFormatError))))
+        Left(ErrorWrapper(None, FormatPeriodKeyError, None))
     }
   }
 

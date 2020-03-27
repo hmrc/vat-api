@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators
 
 import support.UnitSpec
-import v1.models.errors.{BadRequestError, PeriodKeyFormatError, VrnFormatError}
+import v1.models.errors.{FormatPeriodKeyError, VrnFormatError}
 import v1.models.request.viewReturn.ViewRawData
 
 class ViewReturnValidatorSpec extends UnitSpec {
@@ -44,7 +44,7 @@ class ViewReturnValidatorSpec extends UnitSpec {
 
     "return PeriodKeyFormatError error" when {
       "an invalid Period Key is supplied" in {
-        validator.validate(ViewRawData(validVrn, invalidPeriodKey)) shouldBe List(PeriodKeyFormatError, BadRequestError)
+        validator.validate(ViewRawData(validVrn, invalidPeriodKey)) shouldBe List(FormatPeriodKeyError)
       }
     }
 

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.vatapi.utils
 
 import javax.inject.Provider
-import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
@@ -27,8 +26,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, OptionalSourceMapper}
 import uk.gov.hmrc.http.NotImplementedException
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.vatapi.UnitSpec
 import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
 

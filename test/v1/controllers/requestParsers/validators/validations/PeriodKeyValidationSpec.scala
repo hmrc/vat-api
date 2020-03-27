@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 import support.UnitSpec
-import v1.models.errors.PeriodKeyFormatError
+import v1.models.errors.FormatPeriodKeyError
 import v1.models.utils.JsonErrorValidators
 
 class PeriodKeyValidationSpec extends UnitSpec with JsonErrorValidators {
@@ -34,8 +34,8 @@ class PeriodKeyValidationSpec extends UnitSpec with JsonErrorValidators {
       "when an invalid Period Key is supplied" in {
         val validationResult = PeriodKeyValidation.validate("thisIsNotAPeriodKey")
         validationResult.isEmpty shouldBe false
-        validationResult.length shouldBe 2
-        validationResult.head shouldBe PeriodKeyFormatError
+        validationResult.length shouldBe 1
+        validationResult.head shouldBe FormatPeriodKeyError
       }
     }
 
