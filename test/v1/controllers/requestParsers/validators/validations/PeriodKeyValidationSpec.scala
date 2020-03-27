@@ -34,7 +34,7 @@ class PeriodKeyValidationSpec extends UnitSpec with JsonErrorValidators {
       "when an invalid Period Key is supplied" in {
         val validationResult = PeriodKeyValidation.validate("thisIsNotAPeriodKey")
         validationResult.isEmpty shouldBe false
-        validationResult.length shouldBe 1
+        validationResult.length shouldBe 2
         validationResult.head shouldBe PeriodKeyFormatError
       }
     }
