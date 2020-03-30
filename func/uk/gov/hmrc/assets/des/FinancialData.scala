@@ -687,6 +687,14 @@ object FinancialData {
       }]
     }""".stripMargin)
 
+  val noPayment: JsValue = Json.parse("""{
+      "processingDate": "2017-03-07T09:30:00.000Z",
+      "financialTransactions": [{
+        "chargeType": "VAT",
+        "originalAmount": 463872
+      }]
+    }""".stripMargin)
+
   val multiplePayments: JsValue = Json.parse(
     """
       |{
