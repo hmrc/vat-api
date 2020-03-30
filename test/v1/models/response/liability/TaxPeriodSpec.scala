@@ -18,10 +18,11 @@ package v1.models.response.liability
 
 import play.api.libs.json.Json
 import support.UnitSpec
+import v1.models.response.liability.TaxPeriod._
 
-class LiabilitySpec extends UnitSpec {
+class TaxPeriodSpec extends UnitSpec {
 
-  "Liability" should {
+  "TaxPeriod" should {
     "read from the downstream model" when {
 
       "all fields are present in a single list" in {
@@ -56,63 +57,12 @@ class LiabilitySpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = Liability(
-            taxPeriod = Some(
-              TaxPeriod(
-                from = "2017-01-01",
-                to = "2017-04-05"
-              )
-            ),
-            `type` = "VAT",
-            originalAmount = 463872,
-            outstandingAmount = Some(463872),
-            due = Some("2017-03-08")
-          )
+        val liabilities = Some(TaxPeriod(
+          from = "2017-01-01",
+          to = "2017-04-05"
+        ))
 
-        desJson.as[Liability] shouldBe liabilities
-      }
-
-      "one liability is returned without items:dueDate" in {
-
-        val desJson = Json.parse(
-          s"""
-             |{
-             |            "chargeType": "VAT",
-             |            "mainType": "2100",
-             |            "periodKey": "13RL",
-             |            "periodKeyDescription": "abcde",
-             |            "taxPeriodFrom": "2017-01-01",
-             |            "taxPeriodTo": "2017-04-05",
-             |            "businessPartner": "6622334455",
-             |            "contractAccountCategory": "02",
-             |            "contractAccount": "D",
-             |            "contractObjectType": "ABCD",
-             |            "contractObject": "00000003000000002757",
-             |            "sapDocumentNumber": "1040000872",
-             |            "sapDocumentNumberItem": "XM00",
-             |            "chargeReference": "XM002610011594",
-             |            "mainTransaction": "1234",
-             |            "subTransaction": "5678",
-             |            "originalAmount": 463872,
-             |            "outstandingAmount": 463872,
-             |            "accruedInterest": 10000
-             |}
-             |""".stripMargin)
-
-        val liabilities = Liability(
-            taxPeriod = Some(
-              TaxPeriod(
-                from = "2017-01-01",
-                to = "2017-04-05"
-              )
-            ),
-            `type` = "VAT",
-            originalAmount = 463872,
-            outstandingAmount = Some(463872),
-            due = None
-          )
-
-        desJson.as[Liability] shouldBe liabilities
+        desJson.as[Option[TaxPeriod]] shouldBe liabilities
       }
 
       "not parse incorrect json" in {
@@ -124,9 +74,9 @@ class LiabilitySpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.asOpt[Liability] shouldBe None
+        desJson.as[Option[TaxPeriod]] shouldBe None
       }
-
     }
   }
+
 }

@@ -18,11 +18,10 @@ package v1.models.response.liability
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import utils.NestedJsonReads
 
 case class TaxPeriod(from: String, to: String)
 
-object TaxPeriod extends NestedJsonReads {
+object TaxPeriod {
 
   implicit val writes: OWrites[TaxPeriod] = Json.writes[TaxPeriod]
 
