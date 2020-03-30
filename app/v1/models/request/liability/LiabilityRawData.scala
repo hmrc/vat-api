@@ -19,5 +19,5 @@ package v1.models.request.liability
 import v1.models.request.RawData
 
 case class LiabilityRawData(vrn: String,
-                            from: String,
-                            to: String) extends RawData
+                            from: Option[String],
+                            to: Option[String]) extends RawData
