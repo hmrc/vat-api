@@ -21,6 +21,8 @@ import support.UnitSpec
 
 class LiabilityResponseSpec extends UnitSpec {
 
+  implicit val to: String = "2017-12-01"
+
   "LiabilityResponse" should {
     "read from the downstream model" when {
 
@@ -63,7 +65,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -78,7 +80,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned" in {
@@ -146,7 +148,7 @@ class LiabilityResponseSpec extends UnitSpec {
                    |}
                    |""".stripMargin)
 
-              val liabilities = LiabilityResponse(Seq(
+              val liabilityResponse = LiabilityResponse(Seq(
                 Liability(
                   taxPeriod = Some(
                     TaxPeriod(
@@ -173,7 +175,7 @@ class LiabilityResponseSpec extends UnitSpec {
                 )
               ))
 
-              desJson.as[LiabilityResponse] shouldBe liabilities
+              desJson.as[LiabilityResponse] shouldBe liabilityResponse
             }
 
       "one liability is returned without items:dueDate" in {
@@ -210,7 +212,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -225,7 +227,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned with the minimum amount of optional fields" in {
@@ -277,7 +279,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = None,
             `type` = "VAT",
@@ -294,7 +296,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
       "not parse incorrect json" in {
@@ -374,7 +376,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -389,7 +391,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned, but 'Hybrid Payments' should be filtered out" in {
@@ -457,7 +459,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -472,7 +474,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned, but 'Payment on account' and 'Hybrid Payments' should be filtered out" in {
@@ -566,7 +568,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilityResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -581,7 +583,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilities
+        desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
 
@@ -678,7 +680,84 @@ class LiabilityResponseSpec extends UnitSpec {
 
         desJson.asOpt[LiabilityResponse] shouldBe None
       }
+    }
 
+    "filter a result that fails the date check" in {
+
+      val desJson = Json.parse(
+        s"""
+           |{
+           |    "idType": "VRN",
+           |    "idNumber": "XQIT00000000001",
+           |    "regimeType": "VATC",
+           |    "processingDate": "2017-03-07T09:30:00.000Z",
+           |    "financialTransactions": [{
+           |            "chargeType": "VAT",
+           |            "mainType": "2100",
+           |            "periodKey": "13RL",
+           |            "periodKeyDescription": "abcde",
+           |            "taxPeriodFrom": "2017-01-01",
+           |            "taxPeriodTo": "2017-12-12",
+           |            "businessPartner": "6622334455",
+           |            "contractAccountCategory": "02",
+           |            "contractAccount": "D",
+           |            "contractObjectType": "ABCD",
+           |            "contractObject": "00000003000000002757",
+           |            "sapDocumentNumber": "1040000872",
+           |            "sapDocumentNumberItem": "XM00",
+           |            "chargeReference": "XM002610011594",
+           |            "mainTransaction": "1234",
+           |            "subTransaction": "5678",
+           |            "originalAmount": 463872,
+           |            "outstandingAmount": 463872,
+           |            "accruedInterest": 10000,
+           |            "items": [{
+           |                "subItem": "001",
+           |                "dueDate": "2017-03-08",
+           |                "amount": 463872
+           |            }]
+           |        }
+           |    ]
+           |}
+           |""".stripMargin)
+
+      desJson.asOpt[LiabilityResponse] shouldBe None
+    }
+
+    "use the writes format correctly" in {
+
+      val desJson = Json.parse(
+        s"""
+           |{
+           |	"liabilities": [{
+           |		"taxPeriod": {
+           |			"from": "2017-01-01",
+           |			"to": "2017-04-05"
+           |		},
+           |		"type": "VAT",
+           |		"originalAmount": 463872,
+           |		"outstandingAmount": 463872,
+           |		"due": "2017-03-08"
+           |	}]
+           |}
+           |""".stripMargin)
+
+      val liabilityResponse = LiabilityResponse(Seq(
+        Liability(
+          taxPeriod = Some(
+            TaxPeriod(
+              from = "2017-01-01",
+              to = "2017-04-05"
+            )
+          ),
+          `type` = "VAT",
+          originalAmount = 463872,
+          outstandingAmount = Some(463872),
+          due = Some("2017-03-08")
+        )
+      ))
+
+      Json.toJson(liabilityResponse) shouldBe desJson
     }
   }
 }

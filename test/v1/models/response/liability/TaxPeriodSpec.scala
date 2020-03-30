@@ -57,12 +57,12 @@ class TaxPeriodSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = Some(TaxPeriod(
+        val taxPeriod = Some(TaxPeriod(
           from = "2017-01-01",
           to = "2017-04-05"
         ))
 
-        desJson.as[Option[TaxPeriod]] shouldBe liabilities
+        desJson.as[Option[TaxPeriod]] shouldBe taxPeriod
       }
 
       "not parse incorrect json" in {
@@ -76,6 +76,24 @@ class TaxPeriodSpec extends UnitSpec {
 
         desJson.as[Option[TaxPeriod]] shouldBe None
       }
+    }
+
+    "use the writes format correctly" in {
+
+      val desJson = Json.parse(
+        s"""
+           |{
+           |  "from": "2017-01-01",
+           |  "to": "2017-04-05"
+           |}
+           |""".stripMargin)
+
+      val taxPeriod = TaxPeriod(
+        from = "2017-01-01",
+        to = "2017-04-05"
+      )
+
+      Json.toJson(taxPeriod) shouldBe desJson
     }
   }
 

@@ -56,7 +56,7 @@ class LiabilitySpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = Liability(
+        val liability = Liability(
             taxPeriod = Some(
               TaxPeriod(
                 from = "2017-01-01",
@@ -69,7 +69,7 @@ class LiabilitySpec extends UnitSpec {
             due = Some("2017-03-08")
           )
 
-        desJson.as[Liability] shouldBe liabilities
+        desJson.as[Liability] shouldBe liability
       }
 
       "one liability is returned without items:dueDate" in {
@@ -99,7 +99,7 @@ class LiabilitySpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilities = Liability(
+        val liability = Liability(
             taxPeriod = Some(
               TaxPeriod(
                 from = "2017-01-01",
@@ -112,7 +112,7 @@ class LiabilitySpec extends UnitSpec {
             due = None
           )
 
-        desJson.as[Liability] shouldBe liabilities
+        desJson.as[Liability] shouldBe liability
       }
 
       "not parse incorrect json" in {
@@ -127,6 +127,38 @@ class LiabilitySpec extends UnitSpec {
         desJson.asOpt[Liability] shouldBe None
       }
 
+    }
+
+    "use the writes format correctly" in {
+
+      val desJson = Json.parse(
+        s"""
+           |{
+           |		"taxPeriod": {
+           |			"from": "2017-01-01",
+           |			"to": "2017-04-05"
+           |		},
+           |		"type": "VAT",
+           |		"originalAmount": 463872,
+           |		"outstandingAmount": 463872,
+           |		"due": "2017-03-08"
+           |	}
+           |""".stripMargin)
+
+      val liability = Liability(
+        taxPeriod = Some(
+          TaxPeriod(
+            from = "2017-01-01",
+            to = "2017-04-05"
+          )
+        ),
+        `type` = "VAT",
+        originalAmount = 463872,
+        outstandingAmount = Some(463872),
+        due = Some("2017-03-08")
+      )
+
+      Json.toJson(liability) shouldBe desJson
     }
   }
 }

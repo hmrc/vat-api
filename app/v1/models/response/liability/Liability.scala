@@ -18,6 +18,7 @@ package v1.models.response.liability
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import utils.NestedJsonReads
 
 case class Liability(taxPeriod: Option[TaxPeriod],
                      `type`: String,
@@ -25,7 +26,7 @@ case class Liability(taxPeriod: Option[TaxPeriod],
                      outstandingAmount: Option[BigDecimal],
                      due: Option[String])
 
-object Liability {
+object Liability extends NestedJsonReads {
 
   implicit val writes: OWrites[Liability] = Json.writes[Liability]
 
@@ -34,6 +35,6 @@ object Liability {
       (JsPath \ "chargeType").read[String] and
       (JsPath \ "originalAmount").read[BigDecimal] and
       (JsPath \ "outstandingAmount").readNullable[BigDecimal] and
-      (JsPath \\ "dueDate").readNullable[String]
+      (JsPath\ "items" \\ "dueDate").readNestedNullable[String]
     )(Liability.apply _)
 }

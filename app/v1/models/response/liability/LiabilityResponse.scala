@@ -16,6 +16,8 @@
 
 package v1.models.response.liability
 
+import java.time.LocalDate
+
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
 
 case class LiabilityResponse(liabilities: Seq[Liability])
@@ -25,12 +27,24 @@ object LiabilityResponse {
   implicit val writes: OWrites[LiabilityResponse] = Json.writes[LiabilityResponse]
 
   //retrieve all transactions, filter out any particular payments, then return a model only if there's data
-  implicit val reads: Reads[LiabilityResponse] = {
+  implicit def reads(implicit to: String): Reads[LiabilityResponse] = {
     (JsPath \ "financialTransactions").read[Seq[Liability]].map { liabilities =>
       liabilities.filter { liability =>
-        val liabilityType = liability.`type`.toLowerCase
-        liabilityType != "payment on account" && liabilityType != "hybrid payments"
+        paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
       }
     }
   }.filter(_.nonEmpty).map(LiabilityResponse(_))
+
+  //filter particular payments
+  private def paymentCheck(liability: Liability) = {
+    val liabilityType = liability.`type`.toLowerCase
+    liabilityType != "payment on account" && liabilityType != "hybrid payments"
+  }
+
+  //filter the payments that have response to date beyond the request to date
+  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String) = {
+    val toDate = taxPeriod.fold(None: Option[LocalDate]){l => Some(LocalDate.parse(l.to))}
+    toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
+    }
+  }
 }
