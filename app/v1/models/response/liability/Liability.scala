@@ -35,6 +35,6 @@ object Liability extends NestedJsonReads {
       (JsPath \ "chargeType").read[String] and
       (JsPath \ "originalAmount").read[BigDecimal] and
       (JsPath \ "outstandingAmount").readNullable[BigDecimal] and
-      (JsPath\ "items" \\ "dueDate").readNestedNullable[String]
+      (JsPath \ "items" \\ "dueDate").readNestedNullable[String]
     )(Liability.apply _)
 }
