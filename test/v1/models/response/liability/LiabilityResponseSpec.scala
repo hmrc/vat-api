@@ -726,7 +726,7 @@ class LiabilityResponseSpec extends UnitSpec {
 
     "use the writes format correctly" in {
 
-      val desJson = Json.parse(
+      val liabilitiesJson = Json.parse(
         s"""
            |{
            |	"liabilities": [{
@@ -757,7 +757,7 @@ class LiabilityResponseSpec extends UnitSpec {
         )
       ))
 
-      Json.toJson(liabilityResponse) shouldBe desJson
+      Json.toJson(liabilityResponse) shouldBe liabilitiesJson
     }
   }
 }

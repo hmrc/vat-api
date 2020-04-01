@@ -117,21 +117,21 @@ class LiabilitySpec extends UnitSpec {
 
       "not parse incorrect json" in {
 
-        val desJson = Json.parse(
+        val badJson = Json.parse(
           s"""
              |{
              |    "idType": "VRN"
              |}
              |""".stripMargin)
 
-        desJson.asOpt[Liability] shouldBe None
+        badJson.asOpt[Liability] shouldBe None
       }
 
     }
 
     "use the writes format correctly" in {
 
-      val desJson = Json.parse(
+      val liabilityJson = Json.parse(
         s"""
            |{
            |		"taxPeriod": {
@@ -158,7 +158,7 @@ class LiabilitySpec extends UnitSpec {
         due = Some("2017-03-08")
       )
 
-      Json.toJson(liability) shouldBe desJson
+      Json.toJson(liability) shouldBe liabilityJson
     }
   }
 }
