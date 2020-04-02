@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package v1.mocks.validators
+package v1.controllers.requestParsers.validators.validations
 
-import org.scalamock.handlers.CallHandler1
-import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.ViewReturnValidator
-import v1.models.errors.MtdError
-import v1.models.request.viewReturn.ViewRawData
+import v1.models.errors.{MtdError, InvalidStatusError}
 
-class MockVrnValidator extends MockFactory {
+object StatusValidation {
+  private val statusRegex = "^(O|F)$"
 
-  val mockValidator: ViewReturnValidator = mock[ViewReturnValidator]
-
-  object MockVrnValidator {
-
-    def validate(data: ViewRawData): CallHandler1[ViewRawData, List[MtdError]] = {
-      (mockValidator
-        .validate(_: ViewRawData))
-        .expects(data)
-    }
+  def validate(status: String): List[MtdError] = {
+    if (status.matches(statusRegex)) NoValidationErrors else List(InvalidStatusError)
   }
 }

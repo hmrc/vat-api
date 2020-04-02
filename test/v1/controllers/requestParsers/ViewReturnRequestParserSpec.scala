@@ -18,13 +18,13 @@ package v1.controllers.requestParsers
 
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import v1.mocks.validators.MockVrnValidator
+import v1.mocks.validators.MockViewReturnValidator
 import v1.models.errors.{ErrorWrapper, FormatPeriodKeyError, VrnFormatError}
 import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
 
 class ViewReturnRequestParserSpec extends UnitSpec {
 
-  trait Test extends MockVrnValidator {
+  trait Test extends MockViewReturnValidator {
     lazy val parser = new ViewReturnRequestParser(mockValidator)
   }
 
