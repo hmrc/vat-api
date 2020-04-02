@@ -80,14 +80,19 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          ("INVALID_VRN", FormatVrnError),
-          ("INVALID_PERIODKEY", FormatPeriodKeyError),
-          ("INVALID_IDENTIFIER", DownstreamError),
-          ("NOT_FOUND_VRN", DownstreamError),
-          ("INVALID_INPUTDATA", RuleDateRangeTooLargeError),
-          ("NOT_FOUND", EmptyNotFoundError),
-          ("SERVER_ERROR", DownstreamError),
-          ("SERVICE_UNAVAILABLE", DownstreamError)
+          "INVALID_IDTYPE" -> DownstreamError,
+          "INVALID_IDNUMBER " -> VrnFormatError,
+          "INVALID_REGIMETYPE" -> DownstreamError,
+          "INVALID_ONLYOPENITEMS" -> DownstreamError,
+          "INVALID_INCLUDELOCKS " -> DownstreamError,
+          "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
+          "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
+          "INVALID_DATEFROM" -> InvalidDateFromError,
+          "INVALID_DATETO" -> InvalidDateToError,
+          "NOT_FOUND" -> EmptyNotFoundError,
+          "INVALID_DATA" -> InvalidDataError,
+          "SERVER_ERROR" -> DownstreamError,
+          "SERVICE_UNAVAILABLE" -> DownstreamError
         )
 
         input.foreach(args => (serviceError _).tupled(args))

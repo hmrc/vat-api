@@ -21,14 +21,13 @@ import uk.gov.hmrc.domain.Vrn
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.response.liability.{Liability, LiabilityResponse, TaxPeriod}
 
 import scala.concurrent.Future
 
 class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
   private val vrn: String = "123456789"
-  private val periodKey: String = "F034"
 
   private val retrieveLiabilitiesRequest: LiabilityRequest =
     LiabilityRequest(
@@ -37,6 +36,9 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
   private val retrieveLiabilitiesResponse: LiabilityResponse =
     LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None)))
+
+  private val retrieveMultipleLiabilitiesResponse: LiabilityResponse =
+    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None),Liability(Some(TaxPeriod("2017-1-1","2017-12-31")),"VAT",2.0,Some(1.0),None)))
 
   class Test extends MockHttpClient with MockAppConfig {
 
@@ -61,6 +63,19 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
     "retrieving liabilities" must {
       "return a valid response" in new Test {
         val outcome = Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
+
+        MockedHttpClient
+          .get(
+            url = s"$baseUrl/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
+            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
+          )
+          .returns(Future.successful(outcome))
+
+        await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe outcome
+      }
+
+      "return a valid response for multiple results" in new Test {
+        val outcome = Right(ResponseWrapper(correlationId, retrieveMultipleLiabilitiesResponse))
 
         MockedHttpClient
           .get(

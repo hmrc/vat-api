@@ -586,7 +586,6 @@ class LiabilityResponseSpec extends UnitSpec {
         desJson.as[LiabilityResponse] shouldBe liabilityResponse
       }
 
-
       "filter out all transactions and return None if they only consist of un-allowed charge types" in {
 
         val desJson = Json.parse(
@@ -726,7 +725,8 @@ class LiabilityResponseSpec extends UnitSpec {
 
     "use the writes format correctly" in {
 
-      val desJson = Json.parse(
+      val liabilitiesJson = Json.parse(
+
         s"""
            |{
            |	"liabilities": [{
@@ -757,7 +757,7 @@ class LiabilityResponseSpec extends UnitSpec {
         )
       ))
 
-      Json.toJson(liabilityResponse) shouldBe desJson
+      Json.toJson(liabilityResponse) shouldBe liabilitiesJson
     }
   }
 }

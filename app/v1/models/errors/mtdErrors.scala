@@ -17,6 +17,7 @@
 package v1.models.errors
 
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
+import uk.gov.hmrc.vatapi.models.Errors.Error
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -33,7 +34,9 @@ object MtdError {
 }
 
 // Format Errors
-object FormatVrnError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+
+object PeriodKeyFormatError extends MtdError("PERIOD_KEY_INVALID", "Invalid period key")
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
@@ -48,6 +51,14 @@ object BadRequestError extends MtdError("INVALID_REQUEST", "Invalid request")
 object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
 
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
+
+object InvalidDataError extends MtdError("INVALID_DATA", "The provided data is failed validation, contains invalid data")
+
+object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
+
+object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
+
+object InvalidCustomerPaymentInfoError extends MtdError("INTERNAL_SERVER_ERROR", "")
 
 // Authorisation Errors
 object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")

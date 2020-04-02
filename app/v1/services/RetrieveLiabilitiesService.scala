@@ -43,16 +43,21 @@ class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnect
 
     result.value
   }
-//TODO
+
   private def desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN" -> FormatVrnError,
-      "INVALID_PERIODKEY" -> FormatPeriodKeyError,
-      "INVALID_IDENTIFIER" -> DownstreamError,
-      "NOT_FOUND_VRN" -> DownstreamError,
-      "INVALID_INPUTDATA" -> RuleDateRangeTooLargeError,
+      "INVALID_IDTYPE" -> DownstreamError,
+      "INVALID_IDNUMBER " -> VrnFormatError,
+      "INVALID_REGIMETYPE" -> DownstreamError,
+      "INVALID_ONLYOPENITEMS" -> DownstreamError,
+      "INVALID_INCLUDELOCKS " -> DownstreamError,
+      "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
+      "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
+      "INVALID_DATEFROM" -> InvalidDateFromError,
+      "INVALID_DATETO" -> InvalidDateToError,
       "NOT_FOUND" -> EmptyNotFoundError,
-      "SERVICE_ERROR" -> DownstreamError,
+      "INVALID_DATA" -> InvalidDataError,
+      "SERVER_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )
 }
