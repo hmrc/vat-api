@@ -58,8 +58,6 @@ object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to d
 
 object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
 
-object InvalidCustomerPaymentInfoError extends MtdError("INTERNAL_SERVER_ERROR", "")
-
 // Authorisation Errors
 object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
 
