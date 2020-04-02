@@ -52,7 +52,7 @@ object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
 
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
 
-object InvalidDataError extends MtdError("INVALID_DATA", "The provided data is failed validation, contains invalid data")
+object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
 
 object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
 
