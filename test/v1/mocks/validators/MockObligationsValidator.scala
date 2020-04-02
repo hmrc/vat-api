@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.mocks.validators
 
-import v1.models.errors.{MtdError, InvalidStatusError}
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.validators.ObligationsValidator
+import v1.models.errors.MtdError
+import v1.models.request.obligations.ObligationsRawData
 
-object StatusValidation {
-  private val statusRegex = "^(O|F)$"
 
-  def validate(status: String): List[MtdError] = {
-    if (status.matches(statusRegex)) NoValidationErrors else List(InvalidStatusError)
+class MockObligationsValidator extends MockFactory{
+  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
+
+  object MockVrnValidator {
+
+    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: ObligationsRawData))
+        .expects(data)
+    }
   }
 }

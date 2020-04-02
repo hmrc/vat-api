@@ -22,7 +22,7 @@ import v1.controllers.requestParsers.validators.ViewReturnValidator
 import v1.models.errors.MtdError
 import v1.models.request.viewReturn.ViewRawData
 
-class MockVrnValidator extends MockFactory {
+class MockViewReturnValidator extends MockFactory {
 
   val mockValidator: ViewReturnValidator = mock[ViewReturnValidator]
 

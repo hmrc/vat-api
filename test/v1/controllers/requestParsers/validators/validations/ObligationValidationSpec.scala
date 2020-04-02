@@ -22,12 +22,12 @@ import v1.models.request.obligations.ObligationsRawData
 
 class ObligationValidationSpec extends UnitSpec {
 
-  val validVRN = "123456789"
-  val validFromDate = "2017-01-01"
-  val validToDate = "2017-03-31"
+  private val validVRN = "123456789"
+  private val validFromDate = "2017-01-01"
+  private val validToDate = "2017-03-31"
 
-  val invalidFrom = "2017-34-45"
-  val invalidTo = "2017-14-31"
+  private val invalidFrom = "2017-34-45"
+  private val invalidTo = "2017-14-31"
 
   "validate" should {
     "return no errors" when {
