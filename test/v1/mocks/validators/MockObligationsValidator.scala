@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.mocks.validators
 
-import v1.models.errors.{MtdError, VrnFormatError}
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.validators.ObligationsValidator
+import v1.models.errors.MtdError
+import v1.models.request.obligations.ObligationsRawData
 
-object VrnValidation {
-  private val vrnRegex = """^\d{9}$"""
 
-  def validate(vrn: String): List[MtdError] = {
-    if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
+class MockObligationsValidator extends MockFactory{
+  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
+
+  object MockVrnValidator {
+
+    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: ObligationsRawData))
+        .expects(data)
+    }
   }
 }

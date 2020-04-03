@@ -16,12 +16,16 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{MtdError, VrnFormatError}
+import play.api.libs.json.{JsSuccess, JsValue, Reads}
+import v1.models.errors.MtdError
 
-object VrnValidation {
-  private val vrnRegex = """^\d{9}$"""
+object JsonFormatValidation {
+  def validate[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
 
-  def validate(vrn: String): List[MtdError] = {
-    if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
+    data.validate[A] match {
+      case JsSuccess(_, _) => NoValidationErrors
+      case _               => List(error)
+    }
+
   }
 }

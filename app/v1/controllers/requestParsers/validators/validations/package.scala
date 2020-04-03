@@ -21,7 +21,10 @@ import java.time.format.DateTimeFormatter
 package object validations {
 
   val dateFormat: DateTimeFormatter = DateTimeFormatter ofPattern "yyyy-MM-dd"
-  
-  val NoValidationErrors = List()
+  val maxDateRange = 365
+  val maxDateRangeForObligations = 366
+  //val earliestDate: LocalDate = LocalDate.parse("2018-04-06", dateFormat)
 
+
+  val NoValidationErrors = List()
 }

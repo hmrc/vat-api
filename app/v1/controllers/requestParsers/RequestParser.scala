@@ -20,8 +20,7 @@ import v1.controllers.requestParsers.validators.Validator
 import v1.models.errors.{BadRequestError, ErrorWrapper}
 import v1.models.request.RawData
 
-trait RequestParser[Raw <: RawData, Request] {
-
+trait RequestParser[Raw <: RawData, Request]  {
   val validator: Validator[Raw]
 
   protected def requestFor(data: Raw): Request

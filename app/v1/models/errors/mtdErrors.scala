@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package v1.models.errors
 
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
@@ -36,10 +52,50 @@ object MtdError {
 // Format Errors
 object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
 
-object PeriodKeyFormatError extends MtdError("PERIOD_KEY_INVALID", "Invalid period key")
+object InvalidFromError extends MtdError("INVALID_DATE_FROM", "Invalid date from", Some(Json.parse(
+  """
+    |{
+    |   "statusCode": 400,
+    |   "message": "INVALID_DATE_FROM"
+    |}
+    |""".stripMargin)))
+
+object InvalidToError extends MtdError("INVALID_DATE_TO", "Invalid date to", Some(Json.parse(
+  """
+    |{
+    |   "statusCode": 400,
+    |   "message": "INVALID_DATE_TO"
+    |}
+    |""".stripMargin)))
+
+object InvalidStatusError extends MtdError("INVALID_STATUS", "Invalid status", Some(Json.parse(
+  """
+    |{
+    |   "statusCode": 400,
+    |   "message": "INVALID_STATUS"
+    |}
+    |""".stripMargin)))
+
+
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
+
+object RuleDateRangeInvalidError extends MtdError("INVALID_DATE_RANGE", "Invalid date range, must be 366 days or less", Some(Json.parse(
+  """
+    |{
+    |    "statusCode": 400,
+    |    "message": "INVALID_DATE_RANGE"
+    |}
+    |""".stripMargin)))
+
+object RuleMissingDateRangeError extends MtdError("MISSING_DATE_RANGE", "Missing date range", Some(Json.parse(
+  """
+    |{
+    |    "statusCode": 400,
+    |    "message": "MISSING_DATE_RANGE"
+    |}
+    |""".stripMargin)))
 
 // Standard Errors
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")

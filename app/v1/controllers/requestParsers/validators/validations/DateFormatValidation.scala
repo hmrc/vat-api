@@ -16,12 +16,17 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{MtdError, VrnFormatError}
+import java.time.LocalDate
 
-object VrnValidation {
-  private val vrnRegex = """^\d{9}$"""
+import v1.models.errors.MtdError
 
-  def validate(vrn: String): List[MtdError] = {
-    if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
+import scala.util.{Failure, Success, Try}
+
+object DateFormatValidation {
+  def validate(date: String, error: MtdError): List[MtdError] = Try {
+    LocalDate.parse(date, dateFormat)
+  } match {
+    case Success(_) => NoValidationErrors
+    case Failure(_) => List(error)
   }
 }

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.controllers.requestParsers
 
-import v1.models.errors.{MtdError, VrnFormatError}
+import javax.inject.Inject
+import uk.gov.hmrc.domain.Vrn
+import v1.controllers.requestParsers.validators.{ObligationsValidator, Validator}
+import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 
-object VrnValidation {
-  private val vrnRegex = """^\d{9}$"""
+class ObligationsRequestParser @Inject()(val validator: ObligationsValidator)
+  extends RequestParser[ObligationsRawData, ObligationsRequest]{
 
-  def validate(vrn: String): List[MtdError] = {
-    if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
+  override protected def requestFor(data: ObligationsRawData): ObligationsRequest = {
+    ObligationsRequest(Vrn(data.vrn), data.from, data.to, data.status)
   }
 }
