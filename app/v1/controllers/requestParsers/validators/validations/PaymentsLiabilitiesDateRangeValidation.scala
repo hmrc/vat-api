@@ -16,12 +16,12 @@
 
 package v1.controllers.requestParsers.validators.validations
 
+import java.time.LocalDate
 
-import java.time.{Duration, LocalDate}
-
+import play.api.Logger
 import v1.models.errors.{MtdError, RuleDateRangeInvalidError}
 
-object DateRangeValidation {
+object PaymentsLiabilitiesDateRangeValidation {
 
   def validate(from: String, to: String): List[MtdError] = {
     val fmtFrom = LocalDate.parse(from, dateFormat)
@@ -32,9 +32,12 @@ object DateRangeValidation {
   }
 
   private def checkIfDateRangeIsIncorrect(from: LocalDate, to: LocalDate): List[MtdError] = {
-    val start = from.atStartOfDay()
-    val end = to.atStartOfDay()
-    val daysRange = Duration.between(start, end.plusDays(1) /* add day to make inclusive */).toDays
-    if(daysRange > maxDateRangeForObligations || daysRange < 1) List(RuleDateRangeInvalidError) else Nil
+
+    if(!from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to)) {
+      Logger.error(s"from.plusYears(1).minusDays(1) :\n" +
+        s" ${from.plusYears(1).minusDays(1)} date is after $to")
+      
+      List(RuleDateRangeInvalidError)
+    } else Nil
   }
 }

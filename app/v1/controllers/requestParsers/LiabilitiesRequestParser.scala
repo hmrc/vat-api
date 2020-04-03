@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.request.liability
+package v1.controllers.requestParsers
 
-import v1.models.request.RawData
+import javax.inject.Inject
+import uk.gov.hmrc.domain.Vrn
+import v1.controllers.requestParsers.validators.LiabilitiesValidator
+import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
 
-case class LiabilityRawData(vrn: String,
-                            from: String,
-                            to: String) extends RawData
+class LiabilitiesRequestParser @Inject()(val validator: LiabilitiesValidator)
+  extends RequestParser[LiabilityRawData, LiabilityRequest] {
+
+  override protected def requestFor(data: LiabilityRawData): LiabilityRequest = {
+    LiabilityRequest(Vrn(data.vrn), data.from, data.to)
+  }
+}
