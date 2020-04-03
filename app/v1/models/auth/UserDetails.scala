@@ -16,4 +16,4 @@
 
 package v1.models.auth
 
-case class UserDetails(mtdId: String, userType: String, agentReferenceNumber: Option[String])
+case class UserDetails(userType: String, agentReferenceNumber: Option[String], clientId: String)
