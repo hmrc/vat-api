@@ -52,14 +52,6 @@ object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
 
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
 
-// Liability Errors
-
-object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
-
-object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
-
-object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
-
 // Authorisation Errors
 object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
 
@@ -116,3 +108,9 @@ object RuleDateRangeTooLargeError extends MtdError(
     )
   )
 )
+
+object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
+
+object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
+
+object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
