@@ -20,59 +20,58 @@ import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
-import v1.mocks.connectors.MockViewReturnConnector
+import v1.mocks.connectors.MockObligationsConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.viewReturn.ViewRequest
-import v1.models.response.viewReturn.ViewReturnResponse
+import v1.models.request.obligations.ObligationsRequest
+import v1.models.response.obligations.{Obligation, ObligationsResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ViewReturnServiceSpec extends UnitSpec {
+class ObligationsServiceSpec extends UnitSpec {
 
   private val vrn: String = "123456789"
-  private val periodKey: String = "F034"
   private val correlationId = "X-123"
 
-  private val viewReturnRequest: ViewRequest =
-    ViewRequest(
+  private val obligationsRequest: ObligationsRequest =
+    ObligationsRequest(
       vrn = Vrn(vrn),
-      periodKey = periodKey
+      from = Some("2018-06-04"),
+      to = Some("2018-06-04"),
+      status = Some("O")
     )
 
-  private val viewReturnResponse: ViewReturnResponse =
-    ViewReturnResponse(
-      periodKey = "F034",
-      vatDueSales = 4567.23,
-      vatDueAcquisitions = -456675.5,
-      totalVatDue = 7756.65,
-      vatReclaimedCurrPeriod = -756822354.64,
-      vatDueNet = 8956743245.12,
-      totalValueSalesExVAT = 43556767890.00,
-      totalValuePurchasesExVAT = 34556790.00,
-      totalValueGoodsSuppliedExVAT = 34556.00,
-      totalAcquisitionsExVAT = -68978.00
-    )
+  private val obligationsResponse: ObligationsResponse =
+    ObligationsResponse(Seq(
+      Obligation(
+        periodKey = "18A2",
+        start = "2018-04-06",
+        end = "2018-04-05",
+        due = "2017-05-05",
+        status = "O",
+        received  = None
+      )
+    ))
 
-  trait Test extends MockViewReturnConnector {
+  trait Test extends MockObligationsConnector {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
-    val service = new ViewReturnService(
-      connector = mockViewReturnConnector
+    val service = new ObligationsService(
+      connector = mockObligationsConnector
     )
   }
 
-  "service" when {
+  "obligationsService" when {
     "service call successful" must {
       "return the mapped result" in new Test {
 
-        MockViewReturnConnector.viewReturn(viewReturnRequest)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, viewReturnResponse))))
+        MockObligationsConnector.retrieveObligations(obligationsRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, obligationsResponse))))
 
-        await(service.viewReturn(viewReturnRequest)) shouldBe Right(ResponseWrapper(correlationId, viewReturnResponse))
+        await(service.retrieveObligations(obligationsRequest)) shouldBe Right(ResponseWrapper(correlationId, obligationsResponse))
       }
     }
 
@@ -82,19 +81,22 @@ class ViewReturnServiceSpec extends UnitSpec {
         def serviceError(desErrorCode: String, error: MtdError): Unit =
           s"a $desErrorCode error is returned from the service" in new Test {
 
-            MockViewReturnConnector.viewReturn(viewReturnRequest)
+            MockObligationsConnector.retrieveObligations(obligationsRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.viewReturn(viewReturnRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.retrieveObligations(obligationsRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          ("INVALID_VRN", VrnFormatError),
-          ("INVALID_PERIODKEY", FormatPeriodKeyError),
-          ("INVALID_IDENTIFIER", DownstreamError),
-          ("NOT_FOUND_VRN", DownstreamError),
-          ("INVALID_INPUTDATA", NestedRuleDateRangeTooLargeError),
-          ("NOT_FOUND", EmptyNotFoundError),
+          ("INVALID_IDTYPE", DownstreamError),
+          ("INVALID_IDNUMBER", VrnFormatError),
+          ("INVALID_REGIME", DownstreamError),
+          ("NOT_FOUND_BPKEY", DownstreamError),
+          ("NOT_FOUND", LegacyNotFoundError),
+          ("INVALID_STATUS", LegacyInvalidStatusError),
+          ("INVALID_DATE_FROM", LegacyInvalidDateFromError),
+          ("INVALID_DATE_TO", LegacyInvalidDateToError),
+          ("INVALID_DATE_RANGE", LegacyInvalidDateRangeError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )

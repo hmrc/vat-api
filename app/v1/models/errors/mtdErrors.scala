@@ -142,9 +142,70 @@ object FormatPeriodKeyError extends MtdError(
   )
 )
 
+object LegacyInvalidDateFromError extends MtdError(
+  code = "INVALID_DATE_FROM",
+  message = "Invalid date from",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "INVALID_DATE_FROM"
+        |}
+        |""".stripMargin
+    )
+  )
+)
+
+object LegacyInvalidDateToError extends MtdError(
+  code = "INVALID_DATE_TO",
+  message = "Invalid date to",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "INVALID_DATE_TO"
+        |}
+        |""".stripMargin
+    )
+  )
+)
+
+object LegacyInvalidDateRangeError extends MtdError(
+  code = "INVALID_DATE_RANGE",
+  message = "Invalid date to",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "INVALID_DATE_RANGE"
+        |}
+        |""".stripMargin
+    )
+  )
+)
+
+object LegacyInvalidStatusError extends MtdError(
+  code = "INVALID_STATUS",
+  message = "Invalid status",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "INVALID_STATUS"
+        |}
+        |""".stripMargin
+    )
+  )
+)
 object EmptyNotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "", Some(JsObject.empty))
 
-object RuleDateRangeTooLargeError extends MtdError(
+object LegacyNotFoundError extends MtdError("NOT_FOUND", "The remote endpoint has indicated that no data can be found")
+
+object NestedRuleDateRangeTooLargeError extends MtdError(
   code = "DATE_RANGE_TOO_LARGE",
   message = "The date of the requested return cannot be further than four years from the current date.",
   customJson = Some(

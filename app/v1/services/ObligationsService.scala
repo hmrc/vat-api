@@ -19,26 +19,27 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
-import v1.connectors.ViewReturnConnector
+import v1.connectors.ObligationsConnector
 import v1.models.errors._
-import v1.models.request.viewReturn.ViewRequest
-import v1.models.response.viewReturn.ViewReturnResponse
+import v1.models.request.obligations.ObligationsRequest
+import v1.models.response.obligations.ObligationsResponse
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesResponseMappingSupport with Logging {
+class ObligationsService @Inject()(connector: ObligationsConnector) extends DesResponseMappingSupport with Logging {
 
-  def viewReturn(request: ViewRequest)(
+  def retrieveObligations(request: ObligationsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[ViewReturnResponse]] = {
+    logContext: EndpointLogContext): Future[ServiceOutcome[ObligationsResponse]] = {
 
     val result = for {
-      desResponseWrapper <- EitherT(connector.viewReturn(request)).leftMap(mapDesErrors(desErrorMap))
+      desResponseWrapper <- EitherT(connector.retrieveObligations(request)).leftMap(mapDesErrors(desErrorMap))
     } yield desResponseWrapper
 
     result.value
@@ -46,12 +47,18 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
 
   private def desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN" -> VrnFormatError,
-      "INVALID_PERIODKEY" -> FormatPeriodKeyError,
-      "INVALID_IDENTIFIER" -> DownstreamError,
-      "NOT_FOUND_VRN" -> DownstreamError,
-      "INVALID_INPUTDATA" -> NestedRuleDateRangeTooLargeError,
-      "NOT_FOUND" -> EmptyNotFoundError,
+      "INVALID_IDTYPE" -> DownstreamError,
+      "INVALID_IDNUMBER" -> VrnFormatError,
+      "INVALID_STATUS" -> LegacyInvalidStatusError,
+      "INVALID_REGIME" -> DownstreamError,
+      "INVALID_DATE_FROM" -> LegacyInvalidDateFromError,
+      "INVALID_DATE_TO" -> LegacyInvalidDateToError,
+      "INVALID_DATE_RANGE" -> LegacyInvalidDateRangeError,
+      "NOT_FOUND_BP_KEY" -> {
+        Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BPKEY error")
+        DownstreamError
+      },
+      "NOT_FOUND" -> LegacyNotFoundError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )
