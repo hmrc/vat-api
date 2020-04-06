@@ -65,22 +65,20 @@ class TaxPeriodSpec extends UnitSpec {
       }
 
       "not parse incorrect json" in {
-
-        val desJson = Json.parse(
+        val badJson = Json.parse(
           s"""
              |{
              |    "idType": "VRN"
              |}
              |""".stripMargin)
 
-        desJson.as[Option[TaxPeriod]] shouldBe None
+        badJson.as[Option[TaxPeriod]] shouldBe None
       }
     }
 
     "use the writes format correctly" in {
 
-      val desJson = Json.parse(
-        s"""
+      val periodJson = Json.parse(s"""
            |{
            |  "from": "2017-01-01",
            |  "to": "2017-04-05"
@@ -92,7 +90,7 @@ class TaxPeriodSpec extends UnitSpec {
         to = "2017-04-05"
       )
 
-      Json.toJson(taxPeriod) shouldBe desJson
+      Json.toJson(taxPeriod) shouldBe periodJson
     }
   }
 

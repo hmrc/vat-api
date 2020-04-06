@@ -133,6 +133,7 @@ class LiabilitySpec extends UnitSpec {
     "use the writes format correctly" in {
 
       val liabilityJson = Json.parse(
+
         s"""
            |{
            |		"taxPeriod": {
