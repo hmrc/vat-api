@@ -33,6 +33,7 @@
 package v1.models.errors
 
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
+import uk.gov.hmrc.vatapi.models.Errors.Error
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -224,3 +225,9 @@ object NestedRuleDateRangeTooLargeError extends MtdError(
     )
   )
 )
+
+object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
+
+object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
+
+object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")

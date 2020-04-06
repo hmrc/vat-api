@@ -68,6 +68,7 @@ class TaxPeriodSpec extends UnitSpec {
       "not parse incorrect json" in {
 
         val badJson = Json.parse(
+
           s"""
              |{
              |    "idType": "VRN"
@@ -81,6 +82,7 @@ class TaxPeriodSpec extends UnitSpec {
     "use the writes format correctly" in {
 
       val periodJson = Json.parse(
+
         s"""
            |{
            |  "from": "2017-01-01",
