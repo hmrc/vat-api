@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.response.liability
+package v1.models.response.common
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._

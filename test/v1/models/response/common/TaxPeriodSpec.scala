@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package v1.models.response.payments
+package v1.models.response.common
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import v1.models.response.payments.TaxPeriod._
 
 class TaxPeriodSpec extends UnitSpec {
 

@@ -19,6 +19,7 @@ package v1.models.response.payments
 import java.time.LocalDate
 
 import play.api.libs.json._
+import v1.models.response.common.TaxPeriod
 
 case class PaymentsResponse(payments: Seq[Payment])
 

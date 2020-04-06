@@ -19,6 +19,7 @@ package v1.models.response.liability
 import java.time.LocalDate
 
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import v1.models.response.common.TaxPeriod
 
 case class LiabilityResponse(liabilities: Seq[Liability])
 

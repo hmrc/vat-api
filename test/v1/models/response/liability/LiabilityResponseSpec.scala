@@ -18,6 +18,7 @@ package v1.models.response.liability
 
 import play.api.libs.json.Json
 import support.UnitSpec
+import v1.models.response.common.TaxPeriod
 
 class LiabilityResponseSpec extends UnitSpec {
 
