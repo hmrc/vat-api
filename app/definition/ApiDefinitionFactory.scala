@@ -17,7 +17,6 @@
 package definition
 
 import config.{AppConfig, FeatureSwitch}
-import definition.Versions._
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 

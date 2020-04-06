@@ -19,6 +19,7 @@ package v1.models.response.liability
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
 import utils.NestedJsonReads
+import v1.models.response.common.TaxPeriod
 
 case class Liability(taxPeriod: Option[TaxPeriod],
                      `type`: String,

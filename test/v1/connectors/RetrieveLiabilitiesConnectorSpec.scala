@@ -21,7 +21,8 @@ import uk.gov.hmrc.domain.Vrn
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.{Liability, LiabilityResponse, TaxPeriod}
+import v1.models.response.common.TaxPeriod
+import v1.models.response.liability.{Liability, LiabilityResponse}
 
 import scala.concurrent.Future
 

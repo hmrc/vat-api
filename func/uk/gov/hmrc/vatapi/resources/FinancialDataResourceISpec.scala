@@ -380,7 +380,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def setupStubs(): StubMapping = {
          AuditStub.audit()
          AuthStub.authorised()
-         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.emptyLiabilities)
+         DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.noPayment)
        }
 
        val response: WSResponse = await(request().withHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json").get())

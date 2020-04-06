@@ -14,32 +14,42 @@
  * limitations under the License.
  */
 
-package v1.models.response.liability
+package v1.models.response.payments
 
 import java.time.LocalDate
 
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json._
 import v1.models.response.common.TaxPeriod
 
-case class LiabilityResponse(liabilities: Seq[Liability])
+case class PaymentsResponse(payments: Seq[Payment])
 
-object LiabilityResponse {
+object PaymentsResponse {
 
-  implicit val writes: OWrites[LiabilityResponse] = Json.writes[LiabilityResponse]
+  implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) => Json.obj("payments" -> {
+    for (
+      payment <- paymentsResponse.payments
+      if payment.paymentItem.isDefined;
+      item <- payment.paymentItem.get
+    ) yield Json.obj(
+      "amount" -> item.amount,
+      "received" -> item.received
+    )
+  }
+  )
 
   //retrieve all transactions, filter out any particular payments, then return a model only if there's data
-  implicit def reads(implicit to: String): Reads[LiabilityResponse] = {
-    (JsPath \ "financialTransactions").read[Seq[Liability]].map { liabilities =>
-      liabilities.filter { liability =>
-        paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
+  implicit def reads(implicit to: String): Reads[PaymentsResponse] = {
+    (JsPath \ "financialTransactions").read[Seq[Payment]].map { payments =>
+      payments.filter { payment =>
+        paymentCheck(payment) && dateCheck(payment.taxPeriod, to)
       }
     }
-  }.filter(_.nonEmpty).map(LiabilityResponse(_))
+  }.filter(_.nonEmpty).map(PaymentsResponse(_))
 
   //filter particular payments
-  private def paymentCheck(liability: Liability) = {
-    val liabilityType = liability.`type`.toLowerCase
-    liabilityType != "payment on account" && liabilityType != "hybrid payments"
+  private def paymentCheck(payment: Payment) = {
+    val paymentType = payment.`type`.toLowerCase
+    paymentType != "payment on account"
   }
 
   //filter the payments that have response to date beyond the request to date
@@ -48,4 +58,7 @@ object LiabilityResponse {
     toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }
   }
+
+
+
 }

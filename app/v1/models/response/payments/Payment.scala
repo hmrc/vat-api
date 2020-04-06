@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers
+package v1.models.response.payments
 
-import javax.inject.Inject
-import uk.gov.hmrc.domain.Vrn
-import v1.controllers.requestParsers.validators.ObligationsValidator
-import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import v1.models.response.common.TaxPeriod
 
-class ObligationsRequestParser @Inject()(val validator: ObligationsValidator)
-  extends RequestParser[ObligationsRawData, ObligationsRequest]{
+case class Payment(taxPeriod: Option[TaxPeriod],
+                   `type`: String,
+                   paymentItem: Option[Seq[PaymentItem]])
 
-  override protected def requestFor(data: ObligationsRawData): ObligationsRequest = {
-    ObligationsRequest(Vrn(data.vrn), data.from, data.to, data.status)
-  }
+object Payment {
+
+  implicit val writes: Writes[Payment] = Json.writes[Payment]
+
+  implicit val reads: Reads[Payment] = (
+    TaxPeriod.reads and
+      (JsPath \ "chargeType").read[String] and
+      (JsPath \ "items").readNullable[Seq[PaymentItem]]
+    )(Payment.apply _)
+
 }

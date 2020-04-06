@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package v1.models.response.liability
+package v1.models.response.payments
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
-case class TaxPeriod(from: String, to: String)
+case class PaymentItem(amount: Option[BigDecimal],
+                     received: Option[String])
 
-object TaxPeriod {
+  object PaymentItem {
 
-  implicit val writes: OWrites[TaxPeriod] = Json.writes[TaxPeriod]
+    implicit val writes: Writes[PaymentItem] = Json.writes[PaymentItem]
 
-  private val readPeriod: Reads[TaxPeriod] = (
-    (JsPath \ "taxPeriodFrom").read[String] and
-      (JsPath \ "taxPeriodTo").read[String])(TaxPeriod.apply _)
-
-  implicit val reads: Reads[Option[TaxPeriod]] = { json =>
-    (json \ "taxPeriodFrom", json \ "taxPeriodTo") match {
-      case (from, to) if from.isDefined && to.isDefined => json.validateOpt[TaxPeriod](readPeriod)
-      case _ => JsResult.applicativeJsResult.pure(None)
-    }
-  }
+    implicit val reads: Reads[PaymentItem] = (
+      (JsPath \ "paymentAmount").readNullable[BigDecimal] and
+        (JsPath \ "clearingDate").readNullable[String]
+      )(PaymentItem.apply _)
 
 }
