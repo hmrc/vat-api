@@ -55,7 +55,7 @@ class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnect
       "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
       "INVALID_DATEFROM" -> InvalidDateFromError,
       "INVALID_DATETO" -> InvalidDateToError,
-      "NOT_FOUND" -> EmptyNotFoundError,
+      "NOT_FOUND" -> LegacyNotFoundError,
       "INVALID_DATA" -> InvalidDataError,
       "SERVER_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
