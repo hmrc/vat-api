@@ -48,7 +48,7 @@ object PaymentsResponse {
   //filter particular payments
   private def paymentCheck(payment: Payment) = {
     val paymentType = payment.`type`.toLowerCase
-    paymentType != "payment on account" && paymentType != "hybrid payments"
+    paymentType != "payment on account"
   }
 
   //filter the payments that have response to date beyond the request to date
