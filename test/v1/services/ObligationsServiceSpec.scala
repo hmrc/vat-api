@@ -89,14 +89,14 @@ class ObligationsServiceSpec extends UnitSpec {
 
         val input: Seq[(String, MtdError)] = Seq(
           ("INVALID_IDTYPE", DownstreamError),
-          ("INVALID_IDNUMBER", VrnFormatError),
+          ("INVALID_IDNUMBER", VRNInvalidError),
           ("INVALID_REGIME", DownstreamError),
           ("NOT_FOUND_BPKEY", DownstreamError),
           ("NOT_FOUND", LegacyNotFoundError),
-          ("INVALID_STATUS", LegacyInvalidStatusError),
-          ("INVALID_DATE_FROM", LegacyInvalidDateFromError),
-          ("INVALID_DATE_TO", LegacyInvalidDateToError),
-          ("INVALID_DATE_RANGE", LegacyInvalidDateRangeError),
+          ("INVALID_STATUS", InvalidDesStatusError),
+          ("INVALID_DATE_FROM", InvalidDateFromError),
+          ("INVALID_DATE_TO", InvalidDateToError),
+          ("INVALID_DATE_RANGE", DateRangeToLargeError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
