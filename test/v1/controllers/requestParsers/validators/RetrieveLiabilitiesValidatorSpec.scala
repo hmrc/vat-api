@@ -32,41 +32,41 @@ class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
   "running a validation" should {
     "return no errors" when {
       "a valid request" in {
-        validator.validate(LiabilityRawData(validVrn, validFrom, validTo)) shouldBe Nil
+        validator.validate(LiabilityRawData(validVrn, Some(validFrom), Some(validTo))) shouldBe Nil
       }
     }
 
     "return VrnFormatError error" when {
       "an invalid Vrn is supplied" in {
-        validator.validate(LiabilityRawData(invalidVrn, validFrom, validTo)) shouldBe List(VrnFormatError)
+        validator.validate(LiabilityRawData(invalidVrn, Some(validFrom), Some(validTo))) shouldBe List(VrnFormatError)
       }
 
       //maintain order of preference to match legacy validation
       "an invalid Vrn, and invalid dates are supplied" in {
-        validator.validate(LiabilityRawData(invalidVrn, "invalidFromDate", "invalidToDate")) shouldBe List(VrnFormatError)
+        validator.validate(LiabilityRawData(invalidVrn, Some("invalidFromDate"), Some("invalidToDate"))) shouldBe List(VrnFormatError)
       }
     }
 
     "return only FromDateFormatError error" when {
       "an invalid from date format is supplied" in {
-        validator.validate(LiabilityRawData(validVrn, "12-31-2020", validTo)) shouldBe List(InvalidFromError)
+        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some(validTo))) shouldBe List(InvalidFromError)
       }
 
       //maintain order of preference to match legacy validation
       "an invalid from date and invalid to date are supplied" in {
-        validator.validate(LiabilityRawData(validVrn, "12-31-2020", "invalidDateTo")) shouldBe List(InvalidFromError)
+        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some("invalidDateTo"))) shouldBe List(InvalidFromError)
       }
     }
 
     "return only ToDateFormatError error" when {
       "an invalid to date format is supplied" in {
-        validator.validate(LiabilityRawData(validVrn, validFrom, "12-31-2020")) shouldBe List(InvalidToError)
+        validator.validate(LiabilityRawData(validVrn, Some(validFrom), Some("12-31-2020"))) shouldBe List(InvalidToError)
       }
     }
 
     "return RuleDateRangeError error" when {
       "invalid date range is supplied" in {
-        validator.validate(LiabilityRawData(validVrn, "2018-01-01", "2019-01-01")) shouldBe List(RuleDateRangeInvalidError)
+        validator.validate(LiabilityRawData(validVrn, Some("2018-01-01"), Some("2019-01-01"))) shouldBe List(RuleDateRangeInvalidError)
       }
     }
   }

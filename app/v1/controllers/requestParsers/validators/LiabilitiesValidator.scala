@@ -32,19 +32,25 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
 
   private def fromDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
-      DateFormatValidation.validate(data.from, InvalidFromError)
+      data.from match {
+        case None => List(InvalidFromError)
+        case Some(from) => DateFormatValidation.validate(from, InvalidFromError)
+      }
     )
   }
 
   private def toDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
-      DateFormatValidation.validate(data.to, InvalidToError)
+      data.to match {
+        case None => List(InvalidToError)
+        case Some(to) => DateFormatValidation.validate(to, InvalidToError)
+      }
     )
   }
 
   private def dateRangeValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
-      PaymentsLiabilitiesDateRangeValidation.validate(data.from, data.to)
+      PaymentsLiabilitiesDateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 

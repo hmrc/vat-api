@@ -40,34 +40,34 @@ class LiabilityRequestParserSpec extends UnitSpec {
     "return a retrieve Liability request" when {
       "valid data is provided" in new Test {
 
-        MockVrnValidator.validate(LiabilityRawData(validVrn, validFromDate, validToDate)).returns(Nil)
+        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(validFromDate), Some(validToDate))).returns(Nil)
 
-        parser.parseRequest(LiabilityRawData(validVrn, validFromDate, validToDate)) shouldBe
+        parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(validToDate))) shouldBe
           Right(LiabilityRequest(Vrn(validVrn), validFromDate, validToDate))
       }
     }
 
     "return an error" when {
       "invalid VRN is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(invalidVrn, validFromDate, validToDate)).returns(List(VrnFormatError))
+        MockVrnValidator.validate(LiabilityRawData(invalidVrn, Some(validFromDate), Some(validToDate))).returns(List(VrnFormatError))
 
-        parser.parseRequest(LiabilityRawData(invalidVrn, validFromDate, validToDate)) shouldBe
+        parser.parseRequest(LiabilityRawData(invalidVrn, Some(validFromDate), Some(validToDate))) shouldBe
           Left(ErrorWrapper(None, VrnFormatError, None))
       }
 
       "invalid from date is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(validVrn, invalidFrom, validToDate))
+        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate)))
           .returns(List(InvalidFromError))
 
-        parser.parseRequest(LiabilityRawData(validVrn, invalidFrom, validToDate)) shouldBe
+        parser.parseRequest(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
           Left(ErrorWrapper(None, InvalidFromError, None))
       }
 
       "invalid to date is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(validVrn, validFromDate, invalidTo))
+        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo)))
           .returns(List(InvalidToError))
 
-        parser.parseRequest(LiabilityRawData(validVrn, validFromDate, invalidTo)) shouldBe
+        parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
           Left(ErrorWrapper(None, InvalidToError, None))
       }
     }

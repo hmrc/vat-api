@@ -25,6 +25,6 @@ class LiabilitiesRequestParser @Inject()(val validator: LiabilitiesValidator)
   extends RequestParser[LiabilityRawData, LiabilityRequest] {
 
   override protected def requestFor(data: LiabilityRawData): LiabilityRequest = {
-    LiabilityRequest(Vrn(data.vrn), data.from, data.to)
+    LiabilityRequest(Vrn(data.vrn), data.from.get, data.to.get)
   }
 }
