@@ -39,36 +39,25 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
     override def authConnector: AuthConnector = connector
   }
 
+  private def newUserDetails(affinityGroup: String): UserDetails =
+    UserDetails(
+      userType = affinityGroup,
+      agentReferenceNumber = None,
+      clientId = ""
+    )
+
   def authorised(predicate: Predicate)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
     authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
       case Some(Individual) ~ _ =>
-        val user: UserDetails =
-          UserDetails(
-            userType = "Individual",
-            agentReferenceNumber = None,
-            clientId = ""
-          )
-
+        val user: UserDetails = newUserDetails(affinityGroup = "Individual")
         successLogging(Individual)
         Future.successful(Right(user))
       case Some(Organisation) ~ _ =>
-        val user: UserDetails =
-          UserDetails(
-            userType = "Organisation",
-            agentReferenceNumber = None,
-            clientId = ""
-          )
-
+        val user: UserDetails = newUserDetails(affinityGroup = "Organisation")
         successLogging(Organisation)
         Future.successful(Right(user))
       case Some(Agent) ~ _ =>
-        val user: UserDetails =
-          UserDetails(
-            userType = "Agent",
-            agentReferenceNumber = None,
-            clientId = ""
-          )
-
+        val user: UserDetails = newUserDetails(affinityGroup = "Agent")
         successLogging(Agent)
         retrieveAgentReference().map(arn => Right(user.copy(agentReferenceNumber = arn)))
       case _ =>
