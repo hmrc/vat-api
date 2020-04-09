@@ -34,9 +34,6 @@ object PaymentsLiabilitiesDateRangeValidation {
   private def checkIfDateRangeIsIncorrect(from: LocalDate, to: LocalDate): List[MtdError] = {
 
     if(!from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to)) {
-      Logger.error(s"from.plusYears(1).minusDays(1) :\n" +
-        s" ${from.plusYears(1).minusDays(1)} date is after $to")
-      
       List(RuleDateRangeInvalidError)
     } else Nil
   }
