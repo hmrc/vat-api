@@ -45,7 +45,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
 
   def viewReturn(vrn: String, periodKey: String): Action[AnyContent] =
     authorisedAction(vrn).async{ implicit request =>
-      logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Retrieve VAT returns for VRN : $vrn")
+      logger.debug(s"[ViewReturnController] [viewReturn] Retrieve VAT returns for VRN : $vrn")
 
       val rawRequest: ViewRawData =
         ViewRawData(
@@ -58,7 +58,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.viewReturn(parsedRequest))
         } yield {
-          logger.debug(s"[VatReturnsResource] [retrieveVatReturns] Successfully retrieved Vat Return from DES")
+          logger.debug(s"[ViewReturnController] [viewReturn] Successfully retrieved Vat Return from DES")
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
