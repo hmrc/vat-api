@@ -21,7 +21,7 @@ import v1.fixtures.audit.AuditResponseFixture._
 import v1.models.audit.AuditDetail
 import v1.models.auth.UserDetails
 
-object GenericAuditDetailFixture {
+object AuditDetailFixture {
 
   val nino: String = "ZG903729C"
   val userType: String = "Agent"

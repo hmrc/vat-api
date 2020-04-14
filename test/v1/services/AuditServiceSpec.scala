@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import v1.fixtures.audit.GenericAuditDetailFixture._
+import v1.fixtures.audit.AuditDetailFixture._
 import v1.models.audit.AuditEvent
 
 import scala.concurrent.{ExecutionContext, Future}
