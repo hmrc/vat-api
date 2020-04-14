@@ -65,6 +65,14 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
 
         await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
       }
+
+      "return a 404 Not Found for an empty liabilities response" in new Test {
+
+        MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilityResponse(Seq.empty[Liability])))))
+
+        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), NotFoundError))
+      }
     }
 
     "service call unsuccessful" must {
@@ -81,7 +89,7 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
 
         val input: Seq[(String, MtdError)] = Seq(
           "INVALID_IDTYPE" -> DownstreamError,
-          "INVALID_IDNUMBER" -> VrnFormatError,
+          "INVALID_IDNUMBER" -> VrnFormatErrorDes,
           "INVALID_REGIMETYPE" -> DownstreamError,
           "INVALID_ONLYOPENITEMS" -> DownstreamError,
           "INVALID_INCLUDELOCKS" -> DownstreamError,
