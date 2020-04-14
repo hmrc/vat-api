@@ -22,12 +22,11 @@ import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.auth.UserDetails
-import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError}
+import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import v1.models.outcomes.AuthOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,64 +38,40 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
     override def authConnector: AuthConnector = connector
   }
 
-  private def newUserDetails(affinityGroup: String): UserDetails =
-    UserDetails(
+  def authorised(predicate: Predicate)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
+    authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
+      case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
+      case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
+      case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
+      case _ =>
+        Logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
+        Future.successful(Left(LegacyUnauthorisedError))
+    } recoverWith unauthorisedError
+  }
+
+  private def createUserDetailsWithLogging(affinityGroup: String, enrolments: Enrolments): Future[Right[MtdError, UserDetails]] = {
+
+    val clientReference = getClientReferenceFromEnrolments(enrolments)
+    Logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
+      s"fully-authorised organisation for VRN $clientReference.")
+
+    val userDetails = UserDetails(
       userType = affinityGroup,
       agentReferenceNumber = None,
       clientId = ""
     )
 
-  def authorised(predicate: Predicate)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
-    authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
-      case Some(Individual) ~ _ =>
-        val user: UserDetails = newUserDetails(affinityGroup = "Individual")
-        successLogging(Individual)
-        Future.successful(Right(user))
-      case Some(Organisation) ~ _ =>
-        val user: UserDetails = newUserDetails(affinityGroup = "Organisation")
-        successLogging(Organisation)
-        Future.successful(Right(user))
-      case Some(Agent) ~ _ =>
-        val user: UserDetails = newUserDetails(affinityGroup = "Agent")
-        successLogging(Agent)
-        retrieveAgentReference().map(arn => Right(user.copy(agentReferenceNumber = arn)))
-      case _ =>
-        Logger.error(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
-        Future.successful(Left(LegacyUnauthorisedError))
-    } recoverWith unauthorisedError
-  }
-
-  private def successLogging(affinityGroup: AffinityGroup)(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = {
-
-    val clientReference = retrieveClientReference(affinityGroup).map {
-      case Some(clientReference) => clientReference
-      case _ => ""
+    if (affinityGroup != "Agent") {
+      Future.successful(Right(userDetails))
+    } else {
+      Future.successful(Right(userDetails.copy(agentReferenceNumber = getAgentReferenceFromEnrolments(enrolments))))
     }
-
-    Logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as fully-authorised organisation " +
-      s"for VRN $clientReference.")
-  }
-
-  private def retrieveClientReference(affinityGroup: AffinityGroup)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
-    authFunction.authorised(affinityGroup and Enrolment("HMRC-MTD-VAT"))
-      .retrieve(Retrievals.agentCode and Retrievals.allEnrolments) {
-        case _ ~ enrolments => Future.successful(getClientReferenceFromEnrolments(enrolments))
-        case _ => Future.successful(None)
-      }
   }
 
   def getClientReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments
     .getEnrolment("HMRC-MTD-VAT")
     .flatMap(_.getIdentifier("VRN"))
     .map(_.value)
-
-  private def retrieveAgentReference()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
-    authFunction.authorised(AffinityGroup.Agent and Enrolment("HMRC-AS-AGENT"))
-      .retrieve(Retrievals.agentCode and Retrievals.allEnrolments) {
-        case _ ~ enrolments => Future.successful(getAgentReferenceFromEnrolments(enrolments))
-        case _ => Future.successful(None)
-      }
-  }
 
   def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments
     .getEnrolment("HMRC-AS-AGENT")
