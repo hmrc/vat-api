@@ -81,10 +81,10 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
 
         val input: Seq[(String, MtdError)] = Seq(
           "INVALID_IDTYPE" -> DownstreamError,
-          "INVALID_IDNUMBER " -> VrnFormatError,
+          "INVALID_IDNUMBER" -> VrnFormatError,
           "INVALID_REGIMETYPE" -> DownstreamError,
           "INVALID_ONLYOPENITEMS" -> DownstreamError,
-          "INVALID_INCLUDELOCKS " -> DownstreamError,
+          "INVALID_INCLUDELOCKS" -> DownstreamError,
           "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
           "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
           "INVALID_DATEFROM" -> InvalidDateFromError,

@@ -48,10 +48,10 @@ class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) ex
   private def desErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_IDTYPE" -> DownstreamError,
-      "INVALID_IDNUMBER " -> VrnFormatErrorDes,
+      "INVALID_IDNUMBER" -> VrnFormatErrorDes,
       "INVALID_REGIMETYPE" -> DownstreamError,
       "INVALID_ONLYOPENITEMS" -> DownstreamError,
-      "INVALID_INCLUDELOCKS " -> DownstreamError,
+      "INVALID_INCLUDELOCKS" -> DownstreamError,
       "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
       "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
       "INVALID_DATEFROM" -> InvalidDateFromError,
