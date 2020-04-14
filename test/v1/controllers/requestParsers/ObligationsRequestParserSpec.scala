@@ -28,6 +28,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
     lazy val parser = new ObligationsRequestParser(mockValidator)
   }
 
+
   private val validVrn = "123456789"
   private val validFromDate = "2020-01-01"
   private val validToDate = "2020-03-31"
