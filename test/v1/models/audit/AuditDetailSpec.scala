@@ -27,7 +27,7 @@ class AuditDetailSpec extends UnitSpec {
     "written to JSON (success)" should {
       "produce the expected JsObject" in {
         Json.toJson(auditDetailModelSuccess) shouldBe auditDetailJsonSuccess
-        Json.toJson(AuditDetail(userDetails, nino, correlationId, auditResponseModelWithBody)) shouldBe auditDetailJsonSuccess
+        Json.toJson(AuditDetail(userDetails, nino, correlationId, auditResponseModelWithoutBody)) shouldBe auditDetailJsonSuccess
       }
     }
 

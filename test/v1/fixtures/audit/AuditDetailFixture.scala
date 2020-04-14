@@ -34,7 +34,7 @@ object AuditDetailFixture {
       userType = userType,
       agentReferenceNumber = agentReferenceNumber,
       nino = nino,
-      response = auditResponseModelWithBody,
+      response = auditResponseModelWithoutBody,
       `X-CorrelationId` = correlationId
     )
 
@@ -50,7 +50,7 @@ object AuditDetailFixture {
        |   "agentReferenceNumber" : "${agentReferenceNumber.get}",
        |   "nino" : "$nino",
        |   "response":{
-       |     "httpStatus": ${auditResponseModelWithBody.httpStatus}
+       |     "httpStatus": ${auditResponseModelWithoutBody.httpStatus}
        |   },
        |   "X-CorrelationId": "$correlationId"
        |}

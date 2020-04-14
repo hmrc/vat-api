@@ -24,7 +24,13 @@ class AuditResponseSpec extends UnitSpec {
   "AuditResponse" when {
     "written to JSON with a body" should {
       "produce the expected JsObject" in {
-        Json.toJson(auditResponseModelWithBody) shouldBe successAuditResponse
+        Json.toJson(auditResponseModelWithBody) shouldBe successAuditResponseWithBody
+      }
+    }
+
+    "written to JSON with no body" should {
+      "produce the expected JsObject" in {
+        Json.toJson(auditResponseModelWithoutBody) shouldBe successAuditResponse
       }
     }
 
