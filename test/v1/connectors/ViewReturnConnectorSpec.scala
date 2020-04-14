@@ -43,7 +43,7 @@ class ViewReturnConnectorSpec extends ConnectorSpec {
       vatDueAcquisitions = -456675.5,
       totalVatDue = 7756.65,
       vatReclaimedCurrPeriod = -756822354.64,
-      vatDueNet = 8956743245.12,
+      netVatDue = 8956743245.12,
       totalValueSalesExVAT = 43556767890.00,
       totalValuePurchasesExVAT = 34556790.00,
       totalValueGoodsSuppliedExVAT = 34556.00,

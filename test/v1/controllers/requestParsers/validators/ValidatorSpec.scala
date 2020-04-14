@@ -135,9 +135,9 @@ private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawDa
 private class TestValidator extends Validator[TestRawData] {
   override def validate(data: TestRawData): List[MtdError] = {
     run(List(), data) match {
-      case Nil => List()
+      case Nil        => List()
       case err :: Nil => List(err)
-      case errs => errs
+      case errs       => errs
     }
   }
 }

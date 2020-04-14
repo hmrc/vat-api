@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2020 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package v1.models.errors
 
-import play.api.libs.json.{JsObject, JsValue, Json, Writes}
-import uk.gov.hmrc.vatapi.models.Errors.Error
+import play.api.libs.json.{JsValue, Json, Writes}
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -51,6 +34,7 @@ object MtdError {
 
 // Format Errors
 object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 
 object InvalidFromError extends MtdError("INVALID_DATE_FROM", "Invalid date from", Some(Json.parse(
   """
@@ -75,8 +59,6 @@ object InvalidStatusError extends MtdError("INVALID_STATUS", "Invalid status", S
     |   "message": "INVALID_STATUS"
     |}
     |""".stripMargin)))
-
-
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
@@ -121,7 +103,7 @@ object UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested reso
 object InvalidBodyTypeError extends MtdError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
 
 // Custom VAT errors
-object FormatPeriodKeyError extends MtdError(
+object PeriodKeyFormatError extends MtdError(
   code = "PERIOD_KEY_INVALID",
   message = "Invalid period key",
   customJson = Some(
@@ -141,6 +123,25 @@ object FormatPeriodKeyError extends MtdError(
     )
   )
 )
+
+object PeriodKeyFormatErrorDes extends MtdError(code = "PERIOD_KEY_INVALID", message = "Invalid period key", None)
+
+object PeriodKeyFormatErrorDesNotFound extends MtdError(
+  code = "PERIOD_KEY_INVALID",
+  message = "Invalid period key",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "code": "PERIOD_KEY_INVALID",
+        |  "message": "Invalid period key"
+        |}
+      """.stripMargin
+    )
+  )
+)
+
+object EmptyNotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "", None)
 
 object LegacyInvalidDateFromError extends MtdError(
   code = "INVALID_DATE_FROM",
@@ -201,11 +202,10 @@ object LegacyInvalidStatusError extends MtdError(
     )
   )
 )
-object EmptyNotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "", Some(JsObject.empty))
 
 object LegacyNotFoundError extends MtdError("NOT_FOUND", "The remote endpoint has indicated that no data can be found")
 
-object NestedRuleDateRangeTooLargeError extends MtdError(
+object RuleDateRangeTooLargeError extends MtdError(
   code = "DATE_RANGE_TOO_LARGE",
   message = "The date of the requested return cannot be further than four years from the current date.",
   customJson = Some(
@@ -225,6 +225,38 @@ object NestedRuleDateRangeTooLargeError extends MtdError(
     )
   )
 )
+
+object InvalidInputDataError extends MtdError(
+  code = "DATE_RANGE_TOO_LARGE",
+  message = "The date of the requested return cannot be further than four years from the current date.",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "code": "INVALID_REQUEST",
+        |  "message": "Invalid request"
+        |}
+      """.stripMargin
+    )
+  )
+)
+
+object ForbiddenDownstreamError extends MtdError(
+  code = "INTERNAL_SERVER_ERROR",
+  message = "An internal server error occurred",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "code": "INTERNAL_SERVER_ERROR",
+        |  "message": "An internal server error occurred"
+        |}
+      """.stripMargin
+    )
+  )
+)
+
+object LegacyUnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
 
 object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
 

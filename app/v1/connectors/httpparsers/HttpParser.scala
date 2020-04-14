@@ -47,7 +47,8 @@ trait HttpParser {
 
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
 
-  private val multipleErrorReads: Reads[List[DesErrorCode]] = (__ \ "failures").read[List[DesErrorCode]]
+  // Not required while multiple errors are not supported
+  //private val multipleErrorReads: Reads[List[DesErrorCode]] = (__ \ "failures").read[List[DesErrorCode]]
 
   private val bvrErrorReads: Reads[Seq[DesErrorCode]] = {
     implicit val errorIdReads: Reads[DesErrorCode] = (__ \ "id").read[String].map(DesErrorCode(_))
@@ -56,14 +57,15 @@ trait HttpParser {
 
   def parseErrors(response: HttpResponse): DesError = {
     val singleError         = response.validateJson[DesErrorCode].map(err => DesErrors(List(err)))
-    lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
+    // FIXME: Legacy VAT can't handle multiple errors so this must be commented out
+    //lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
     lazy val bvrErrors      = response.validateJson(bvrErrorReads).map(errs => OutboundError(BVRError, Some(errs.map(_.toMtd))))
     lazy val unableToParseJsonError = {
       Logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)
     }
 
-    singleError orElse multipleErrors orElse bvrErrors getOrElse unableToParseJsonError
+    singleError orElse bvrErrors getOrElse unableToParseJsonError
   }
 
 }

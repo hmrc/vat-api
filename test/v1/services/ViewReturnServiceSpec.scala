@@ -48,7 +48,7 @@ class ViewReturnServiceSpec extends UnitSpec {
       vatDueAcquisitions = -456675.5,
       totalVatDue = 7756.65,
       vatReclaimedCurrPeriod = -756822354.64,
-      vatDueNet = 8956743245.12,
+      netVatDue = 8956743245.12,
       totalValueSalesExVAT = 43556767890.00,
       totalValuePurchasesExVAT = 34556790.00,
       totalValueGoodsSuppliedExVAT = 34556.00,
@@ -89,11 +89,12 @@ class ViewReturnServiceSpec extends UnitSpec {
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          ("INVALID_VRN", VrnFormatError),
-          ("INVALID_PERIODKEY", FormatPeriodKeyError),
-          ("INVALID_IDENTIFIER", DownstreamError),
+          ("INVALID_VRN", VrnFormatErrorDes),
+          ("INVALID_PERIODKEY", PeriodKeyFormatErrorDes),
+          ("INVALID_IDENTIFIER", PeriodKeyFormatErrorDesNotFound),
           ("NOT_FOUND_VRN", DownstreamError),
-          ("INVALID_INPUTDATA", NestedRuleDateRangeTooLargeError),
+          ("INVALID_INPUTDATA", InvalidInputDataError),
+          ("DATE_RANGE_TOO_LARGE", RuleDateRangeTooLargeError),
           ("NOT_FOUND", EmptyNotFoundError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)

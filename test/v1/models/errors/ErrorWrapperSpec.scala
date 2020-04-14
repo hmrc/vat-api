@@ -41,7 +41,7 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with one custom error" should {
-    val error = ErrorWrapper(None, FormatPeriodKeyError, None)
+    val error = ErrorWrapper(None, PeriodKeyFormatError, None)
 
     val json = Json.parse(
       """
@@ -85,7 +85,7 @@ class ErrorWrapperSpec extends UnitSpec {
       Some (
         Seq(
           VrnFormatError,
-          FormatPeriodKeyError
+          PeriodKeyFormatError
         )
       )
     )
