@@ -66,23 +66,6 @@ class ViewReturnControllerSpec
       periodKey = periodKey
     )
 
-  val desJson: JsValue = Json.parse(
-    """
-       |{
-       |    "periodKey": "A001",
-       |    "vatDueSales": 1234567890123.23,
-       |    "vatDueAcquisitions": -9876543210912.87,
-       |    "vatDueTotal": 1234567890112.23,
-       |    "vatReclaimedCurrPeriod": -1234567890122.23,
-       |    "vatDueNet": 2345678901.12,
-       |    "totalValueSalesExVAT": 1234567890123.00,
-       |    "totalValuePurchasesExVAT": 1234567890123.00,
-       |    "totalValueGoodsSuppliedExVAT": 1234567890123.00,
-       |    "totalAllAcquisitionsExVAT": -1234567890123.00
-       |}
-    """.stripMargin
-  )
-
   val mtdJson: JsValue = Json.parse(
     """
       |{

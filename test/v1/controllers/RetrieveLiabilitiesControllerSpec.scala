@@ -20,12 +20,13 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.mocks.requestParsers.MockViewReturnRequestParser
-import v1.mocks.services.{MockEnrolmentsAuthService, MockViewReturnService}
+import v1.mocks.requestParsers.MockLiabilitiesRequestParser
+import v1.mocks.services.{MockEnrolmentsAuthService, MockRetrieveLiabilitiesService}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
-import v1.models.response.viewReturn.ViewReturnResponse
+import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
+import v1.models.response.common.TaxPeriod
+import v1.models.response.liability.{Liability, LiabilityResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,9 +34,8 @@ import scala.concurrent.Future
 class RetrieveLiabilitiesControllerSpec
   extends ControllerBaseSpec
     with MockEnrolmentsAuthService
-    with MockViewReturnService
-    with MockViewReturnRequestParser {
-
+    with MockRetrieveLiabilitiesService
+    with MockLiabilitiesRequestParser{
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -43,7 +43,7 @@ class RetrieveLiabilitiesControllerSpec
     val controller: RetrieveLiabilitiesController = new RetrieveLiabilitiesController(
       mockEnrolmentsAuthService,
       mockLiabilitiesRequestParser,
-      mockViewReturnService,
+      mockRetrieveLiabilitiesService,
       cc
     )
 
@@ -53,80 +53,61 @@ class RetrieveLiabilitiesControllerSpec
   val vrn: String = "123456789"
   val from: String = "01-01-2017"
   val to: String = "01-12-2017"
+  val correlationId: String = "X-ID"
 
-  val viewReturnRawData: ViewRawData =
-    ViewRawData(
-      vrn = vrn,
-      periodKey = periodKey
+  val retrieveLiabilitiesRawData: LiabilityRawData =
+    LiabilityRawData(
+      vrn, Some(from), Some(to)
     )
 
-  val viewReturnRequest: ViewRequest =
-    ViewRequest(
-      vrn = Vrn(vrn),
-      periodKey = periodKey
+  val retrieveLiabilitiesRequest: LiabilityRequest =
+    LiabilityRequest(
+      vrn = Vrn(vrn),  from, to
     )
-
-  val desJson: JsValue = Json.parse(
-    """
-       |{
-       |    "periodKey": "A001",
-       |    "vatDueSales": 1234567890123.23,
-       |    "vatDueAcquisitions": -9876543210912.87,
-       |    "vatDueTotal": 1234567890112.23,
-       |    "vatReclaimedCurrPeriod": -1234567890122.23,
-       |    "vatDueNet": 2345678901.12,
-       |    "totalValueSalesExVAT": 1234567890123.00,
-       |    "totalValuePurchasesExVAT": 1234567890123.00,
-       |    "totalValueGoodsSuppliedExVAT": 1234567890123.00,
-       |    "totalAllAcquisitionsExVAT": -1234567890123.00
-       |}
-    """.stripMargin
-  )
 
   val mtdJson: JsValue = Json.parse(
-    """
+    s"""
       |{
-      |    "periodKey": "A001",
-      |    "vatDueSales": 1234567890123.23,
-      |    "vatDueAcquisitions": -9876543210912.87,
-      |    "totalVatDue": 1234567890112.23,
-      |    "vatReclaimedCurrPeriod": -1234567890122.23,
-      |    "netVatDue": 2345678901.12,
-      |    "totalValueSalesExVAT": 1234567890123.00,
-      |    "totalValuePurchasesExVAT": 1234567890123.00,
-      |    "totalValueGoodsSuppliedExVAT": 1234567890123.00,
-      |    "totalAcquisitionsExVAT": -1234567890123.00
+      |	"liabilities": [{
+      |		"taxPeriod": {
+      |			"from": "$from",
+      |			"to": "$to"
+      |		},
+      |		"type": "VAT",
+      |		"originalAmount": 1,
+      |		"outstandingAmount": 1,
+      |		"due": "2017-11-11"
+      |	}]
       |}
     """.stripMargin
   )
 
-  val viewReturnResponse: ViewReturnResponse =
-    ViewReturnResponse(
-      periodKey = "A001",
-      vatDueSales = 1234567890123.23,
-      vatDueAcquisitions = -9876543210912.87,
-      totalVatDue = 1234567890112.23,
-      vatReclaimedCurrPeriod = -1234567890122.23,
-      netVatDue = 2345678901.12,
-      totalValueSalesExVAT = 1234567890123.00,
-      totalValuePurchasesExVAT = 1234567890123.00,
-      totalValueGoodsSuppliedExVAT = 1234567890123.00,
-      totalAcquisitionsExVAT = -1234567890123.00
+  val liabilityResponse: LiabilityResponse =
+    LiabilityResponse(
+      Seq(
+        Liability(
+          Some(TaxPeriod(from, to)),
+          "VAT",
+          1.0,
+          Some(1.0),
+          Some("2017-11-11")
+        )
+      )
     )
 
-  "viewReturn" when {
+  "retrieveLiabilities" when {
     "a valid request is supplied" should {
       "return the expected data on a successful service call" in new Test {
 
-        MockViewReturnRequestParser
-          .parse(viewReturnRawData)
-          .returns(Right(viewReturnRequest))
+        MockLiabilitiesRequestParser
+          .parse(retrieveLiabilitiesRawData)
+          .returns(Right(retrieveLiabilitiesRequest))
 
-        MockViewReturnService
-          .viewReturn(viewReturnRequest)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, viewReturnResponse))))
+        MockRetrieveLiabilitiesService
+          .retrieveLiabilities(retrieveLiabilitiesRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, liabilityResponse))))
 
-        private val result = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
+        private val result = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 
         status(result) shouldBe OK
         contentAsJson(result) shouldBe mtdJson
@@ -139,11 +120,11 @@ class RetrieveLiabilitiesControllerSpec
         def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
           s"a ${error.code} error is returned from the parser" in new Test {
 
-            MockViewReturnRequestParser
-              .parse(viewReturnRawData)
+            MockLiabilitiesRequestParser
+              .parse(retrieveLiabilitiesRawData)
               .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
 
-            val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
+            val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(error)
@@ -153,8 +134,9 @@ class RetrieveLiabilitiesControllerSpec
 
         val input = Seq(
           (VrnFormatError, BAD_REQUEST),
-          (PeriodKeyFormatError, BAD_REQUEST),
-          (RuleDateRangeTooLargeError, FORBIDDEN)
+          (InvalidDateFromError, BAD_REQUEST),
+          (InvalidDateToError, BAD_REQUEST),
+          (RuleDateRangeInvalidError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
@@ -164,15 +146,15 @@ class RetrieveLiabilitiesControllerSpec
         def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
           s"a $mtdError error is returned from the service" in new Test {
 
-            MockViewReturnRequestParser
-              .parse(viewReturnRawData)
-              .returns(Right(viewReturnRequest))
+            MockLiabilitiesRequestParser
+              .parse(retrieveLiabilitiesRawData)
+              .returns(Right(retrieveLiabilitiesRequest))
 
-            MockViewReturnService
-              .viewReturn(viewReturnRequest)
+            MockRetrieveLiabilitiesService
+              .retrieveLiabilities(retrieveLiabilitiesRequest)
               .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
 
-            val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
+            val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(mtdError)
@@ -181,35 +163,15 @@ class RetrieveLiabilitiesControllerSpec
         }
 
         val input = Seq(
-          (VrnFormatErrorDes, BAD_REQUEST),
-          (PeriodKeyFormatErrorDes, BAD_REQUEST),
-          (PeriodKeyFormatErrorDesNotFound, NOT_FOUND),
-          (RuleDateRangeTooLargeError, FORBIDDEN),
-          (InvalidInputDataError, FORBIDDEN),
+          (BadRequestError, BAD_REQUEST),
+          (LegacyUnauthorisedError, FORBIDDEN),
+          (LegacyNotFoundError, NOT_FOUND),
+          (InvalidDataError, NOT_FOUND),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
         input.foreach(args => (serviceErrors _).tupled(args))
       }
-
-      "a NOT_FOUND error is returned from the service" must {
-          s"return a 404 status with an empty body" in new Test {
-
-            MockViewReturnRequestParser
-              .parse(viewReturnRawData)
-              .returns(Right(viewReturnRequest))
-
-            MockViewReturnService
-              .viewReturn(viewReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), EmptyNotFoundError))))
-
-            val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
-
-            status(result) shouldBe NOT_FOUND
-            contentAsString(result) shouldBe ""
-            header("X-CorrelationId", result) shouldBe Some(correlationId)
-          }
-        }
     }
   }
 }
