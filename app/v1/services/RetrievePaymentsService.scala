@@ -39,7 +39,8 @@ class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) ex
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))
-    } yield desResponseWrapper
+      mtdResponseWrapper <- EitherT.fromEither[Future](validatePaymentsSuccessResponse(desResponseWrapper))
+    } yield mtdResponseWrapper
 
     result.value
   }

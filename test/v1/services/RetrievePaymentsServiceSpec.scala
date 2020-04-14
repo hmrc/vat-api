@@ -37,14 +37,20 @@ class RetrievePaymentsServiceSpec extends UnitSpec {
   private val correlationId = "X-123"
 
   private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(
-      vrn = Vrn(vrn),
-      from = from,
-      to = to
-    )
+    LiabilityRequest(vrn = Vrn(vrn), from = from, to = to)
 
   private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None)))
+    LiabilityResponse(
+      liabilities = Seq(
+        Liability(
+          taxPeriod = None,
+          `type` = "VAT",
+          originalAmount = 1.0,
+          outstandingAmount = None,
+          due = None
+        )
+      )
+    )
 
   trait Test extends MockRetrieveLiabilitiesConnector {
 
@@ -81,7 +87,7 @@ class RetrievePaymentsServiceSpec extends UnitSpec {
 
         val input: Seq[(String, MtdError)] = Seq(
           "INVALID_IDTYPE" -> DownstreamError,
-          "INVALID_IDNUMBER " -> VrnFormatError,
+          "INVALID_IDNUMBER " -> VrnFormatErrorDes,
           "INVALID_REGIMETYPE" -> DownstreamError,
           "INVALID_ONLYOPENITEMS" -> DownstreamError,
           "INVALID_INCLUDELOCKS " -> DownstreamError,
