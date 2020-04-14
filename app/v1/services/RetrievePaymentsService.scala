@@ -21,24 +21,24 @@ import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
-import v1.connectors.RetrieveLiabilitiesConnector
+import v1.connectors.RetrievePaymentsConnector
 import v1.models.errors._
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.LiabilityResponse
+import v1.models.request.payments.PaymentsRequest
+import v1.models.response.payments.PaymentsResponse
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrievePaymentsService @Inject()(connector: RetrieveLiabilitiesConnector) extends DesResponseMappingSupport with Logging {
+class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
 
-  def retrieveLiabilities(request: LiabilityRequest)(
+  def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[LiabilityResponse]] = {
+    logContext: EndpointLogContext): Future[ServiceOutcome[PaymentsResponse]] = {
 
     val result = for {
-      desResponseWrapper <- EitherT(connector.retrieveLiabilities(request)).leftMap(mapDesErrors(desErrorMap))
+      desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))
     } yield desResponseWrapper
 
     result.value
@@ -47,7 +47,7 @@ class RetrievePaymentsService @Inject()(connector: RetrieveLiabilitiesConnector)
   private def desErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_IDTYPE" -> DownstreamError,
-      "INVALID_IDNUMBER " -> VrnFormatError,
+      "INVALID_IDNUMBER " -> VrnFormatErrorDes,
       "INVALID_REGIMETYPE" -> DownstreamError,
       "INVALID_ONLYOPENITEMS" -> DownstreamError,
       "INVALID_INCLUDELOCKS " -> DownstreamError,
