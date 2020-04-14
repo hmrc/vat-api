@@ -48,12 +48,12 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
   private def desErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_IDTYPE" -> DownstreamError,
-      "INVALID_IDNUMBER" -> VRNInvalidError,
+      "INVALID_IDNUMBER" -> VrnFormatErrorDes,
       "INVALID_STATUS" -> InvalidDesStatusError,
       "INVALID_REGIME" -> DownstreamError,
       "INVALID_DATE_FROM" -> InvalidDateFromError,
       "INVALID_DATE_TO" -> InvalidDateToError,
-      "INVALID_DATE_RANGE" -> DateRangeToLargeError,
+      "INVALID_DATE_RANGE" -> RuleDateRangeTooLargeError,
       "NOT_FOUND_BP_KEY" -> {
         Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BPKEY error")
         DownstreamError

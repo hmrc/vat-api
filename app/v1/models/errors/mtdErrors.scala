@@ -263,3 +263,6 @@ object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has 
 object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
 
 object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
+
+object InvalidDesStatusError extends MtdError("INVALID_STATUS","The provided data is failed validation, invalid status")
+
