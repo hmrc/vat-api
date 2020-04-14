@@ -31,15 +31,40 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
   private val vrn: String = "123456789"
 
   private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(
-      Vrn(vrn),"2017-1-1","2017-12-31"
-    )
+    LiabilityRequest(vrn = Vrn(vrn),from = "2017-1-1",to = "2017-12-31")
 
   private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None)))
+    LiabilityResponse(
+      liabilities = Seq(
+        Liability(
+          taxPeriod = None,
+          `type` = "VAT",
+          originalAmount = 1.0,
+          outstandingAmount = None,
+          due = None
+        )
+      )
+    )
 
   private val retrieveMultipleLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None),Liability(Some(TaxPeriod("2017-1-1","2017-12-31")),"VAT",2.0,Some(1.0),None)))
+    LiabilityResponse(
+      liabilities = Seq(
+        Liability(
+          taxPeriod = None,
+          `type` = "VAT",
+          originalAmount = 1.0,
+          outstandingAmount = None,
+          due = None
+        ),
+        Liability(
+          taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
+          `type` = "VAT",
+          originalAmount = 2.0,
+          outstandingAmount = Some(1.0),
+          due = None
+        )
+      )
+    )
 
   class Test extends MockHttpClient with MockAppConfig {
 
@@ -55,6 +80,15 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
         "Authorization" -> s"Bearer des-token"
       )
 
+    val queryParams: Seq[(String, String)] = Seq(
+      ("dateFrom" , retrieveLiabilitiesRequest.from),
+      ("dateTo" , retrieveLiabilitiesRequest.to),
+      ("onlyOpenItems" , "false"),
+      ("includeLocks" , "false"),
+      ("calculateAccruedInterest" , "true"),
+      ("customerPaymentInformation" , "true")
+    )
+
     MockedAppConfig.desBaseUrl returns baseUrl
     MockedAppConfig.desToken returns "des-token"
     MockedAppConfig.desEnvironment returns "des-environment"
@@ -67,7 +101,8 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .get(
-            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
+            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
+            queryParams = queryParams,
             requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
@@ -80,7 +115,8 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .get(
-            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
+            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
+            queryParams = queryParams,
             requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))

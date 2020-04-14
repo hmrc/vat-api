@@ -31,31 +31,15 @@ class RetrievePaymentsConnectorSpec extends ConnectorSpec {
   private val vrn: String = "123456789"
 
   private val retrievePaymentsRequest: PaymentsRequest =
-    PaymentsRequest(
-      vrn = Vrn(vrn),
-      from = "2017-1-1",
-      to = "2017-12-31"
-    )
+    PaymentsRequest(vrn = Vrn(vrn), from = "2017-1-1", to = "2017-12-31")
 
   private val retrievePaymentsResponse: PaymentsResponse =
     PaymentsResponse(
       payments = Seq(
         Payment(
-          taxPeriod = Some(
-            TaxPeriod(
-              from = "2017-1-1",
-              to = "2017-12-31"
-            )
-          ),
+          taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
-          paymentItem = Some(
-            Seq(
-              PaymentItem(
-                amount = Some(200.00),
-                received = Some("2017-03-12")
-              )
-            )
-          )
+          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
         )
       )
     )
@@ -64,38 +48,14 @@ class RetrievePaymentsConnectorSpec extends ConnectorSpec {
     PaymentsResponse(
       payments = Seq(
         Payment(
-          taxPeriod = Some(
-            TaxPeriod(
-              from = "2017-1-1",
-              to = "2017-12-31"
-            )
-          ),
+          taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
-          paymentItem = Some(
-            Seq(
-              PaymentItem(
-                amount = Some(200.00),
-                received = Some("2017-03-12")
-              )
-            )
-          )
+          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
         ),
         Payment(
-          taxPeriod = Some(
-            TaxPeriod(
-              from = "2018-1-1",
-              to = "2018-12-31"
-            )
-          ),
+          taxPeriod = Some(TaxPeriod(from = "2018-1-1", to = "2018-12-31")),
           `type` = "VAT Return Debit Charge",
-          paymentItem = Some(
-            Seq(
-              PaymentItem(
-                amount = Some(2375.23),
-                received = Some("2018-03-12")
-              )
-            )
-          )
+          paymentItem = Some(Seq(PaymentItem(amount = Some(2375.23), received = Some("2018-03-12"))))
         )
       )
     )

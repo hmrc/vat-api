@@ -31,11 +31,22 @@ class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
 
   def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
                                                      ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
+
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestFromDate: String = request.from
-    val queryString = "&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true"
+
+    val queryParams: Seq[(String, String)] = Seq(
+      ("dateFrom" , request.from),
+      ("dateTo" , request.to),
+      ("onlyOpenItems" , "false"),
+      ("includeLocks" , "false"),
+      ("calculateAccruedInterest" , "true"),
+      ("customerPaymentInformation" , "true")
+    )
+
     get(
-      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC?dateFrom=${request.from}&dateTo=${request.to}$queryString")
+      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
+      queryParams = queryParams
     )
   }
 }
