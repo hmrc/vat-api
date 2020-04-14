@@ -29,7 +29,7 @@ object AuditDetailFixture {
   val correlationId = "a1e8057e-fbbc-47a8-a8b478d9f015c253"
   val userDetails = UserDetails("Agent", agentReferenceNumber, "id")
 
-  val genericAuditDetailModelSuccess: AuditDetail =
+  val auditDetailModelSuccess: AuditDetail =
     AuditDetail(
       userType = userType,
       agentReferenceNumber = agentReferenceNumber,
@@ -38,12 +38,12 @@ object AuditDetailFixture {
       `X-CorrelationId` = correlationId
     )
 
-  val genericAuditDetailModelError: AuditDetail =
-    genericAuditDetailModelSuccess.copy(
+  val auditDetailModelError: AuditDetail =
+    auditDetailModelSuccess.copy(
       response = auditResponseModelWithErrors
     )
 
-  val genericAuditDetailJsonSuccess: JsValue = Json.parse(
+  val auditDetailJsonSuccess: JsValue = Json.parse(
     s"""
        |{
        |   "userType" : "$userType",
@@ -57,7 +57,7 @@ object AuditDetailFixture {
     """.stripMargin
   )
 
-  val genericAuditDetailJsonError: JsValue = Json.parse(
+  val auditDetailJsonError: JsValue = Json.parse(
     s"""
        |{
        |   "userType" : "$userType",

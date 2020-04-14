@@ -52,7 +52,7 @@ class AuditServiceSpec extends ServiceSpec {
           .expects(*, *, *)
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, genericAuditDetailModelSuccess)
+        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
         target.auditEvent(event) shouldBe expected
       }
 
@@ -66,7 +66,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, genericAuditDetailModelSuccess)
+        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -81,7 +81,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, genericAuditDetailModelSuccess)
+        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -91,12 +91,12 @@ class AuditServiceSpec extends ServiceSpec {
           .expects(
             where {
               (eventArg: ExtendedDataEvent, _: HeaderCarrier, _: ExecutionContext) =>
-                eventArg.detail == Json.toJson(genericAuditDetailJsonSuccess) // <- assertion in mock
+                eventArg.detail == Json.toJson(auditDetailJsonSuccess) // <- assertion in mock
             }
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, genericAuditDetailModelSuccess)
+        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -111,7 +111,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, genericAuditDetailModelSuccess)
+        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
