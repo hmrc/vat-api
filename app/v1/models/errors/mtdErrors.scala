@@ -258,8 +258,11 @@ object ForbiddenDownstreamError extends MtdError(
 
 object LegacyUnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
 
-object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data")
+object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data.")
 
-object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
+object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid.")
 
-object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
+object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid.")
+
+object InvalidDesStatusError extends MtdError("INVALID_STATUS","The provided data is failed validation, invalid status.")
+
