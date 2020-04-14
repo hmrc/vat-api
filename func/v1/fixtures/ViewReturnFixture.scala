@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package v1.models.response
+package v1.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import support.UnitSpec
 import v1.models.response.viewReturn.ViewReturnResponse
 
-class ViewReturnResponseSpec extends UnitSpec {
+trait ViewReturnFixture {
 
-  val desJson: JsValue = Json.parse(
+  val viewReturnDesJson: JsValue = Json.parse(
     """
       |{
       |    "periodKey": "A001",
@@ -39,7 +38,7 @@ class ViewReturnResponseSpec extends UnitSpec {
     """.stripMargin
   )
 
-  val mtdJson: JsValue = Json.parse(
+  val viewReturnMtdJson: JsValue = Json.parse(
     """
       |{
       |    "periodKey": "A001",
@@ -69,18 +68,4 @@ class ViewReturnResponseSpec extends UnitSpec {
       totalValueGoodsSuppliedExVAT = 1234567890123.00,
       totalAcquisitionsExVAT = -1234567890123.00
     )
-
-  "ViewReturnResponse" when {
-    "read from valid JSON" should {
-      "produce the expected ViewReturnResponse object for a return" in {
-        desJson.as[ViewReturnResponse] shouldBe viewReturnResponse
-      }
-    }
-
-    "written to JSON" should {
-      "produce the expected JsObject" in {
-        Json.toJson(viewReturnResponse) shouldBe mtdJson
-      }
-    }
-  }
 }

@@ -58,7 +58,7 @@ class ErrorHandler @Inject()(
         Future.successful(NotFound(Json.toJson(NotFoundError)))
       case _ =>
         val errorCode = statusCode match {
-          case UNAUTHORIZED => UnauthorisedError
+          case UNAUTHORIZED => LegacyUnauthorisedError
           case UNSUPPORTED_MEDIA_TYPE => InvalidBodyTypeError
           case _ => MtdError("INVALID_REQUEST", message)
         }
@@ -83,7 +83,7 @@ class ErrorHandler @Inject()(
 
     val (status, errorCode, eventType) = ex match {
       case _: NotFoundException => (NOT_FOUND, NotFoundError, "ResourceNotFound")
-      case _: AuthorisationException => (UNAUTHORIZED, UnauthorisedError, "ClientError")
+      case _: AuthorisationException => (UNAUTHORIZED, LegacyUnauthorisedError, "ClientError")
       case _: JsValidationException => (BAD_REQUEST, BadRequestError, "ServerValidationError")
       case e: HttpException => (e.responseCode, BadRequestError, "ServerValidationError")
       case e: Upstream4xxResponse => (e.reportAs, BadRequestError, "ServerValidationError")

@@ -26,7 +26,7 @@ class MockViewReturnValidator extends MockFactory {
 
   val mockValidator: ViewReturnValidator = mock[ViewReturnValidator]
 
-  object MockVrnValidator {
+  object MockViewReturnValidator {
 
     def validate(data: ViewRawData): CallHandler1[ViewRawData, List[MtdError]] = {
       (mockValidator

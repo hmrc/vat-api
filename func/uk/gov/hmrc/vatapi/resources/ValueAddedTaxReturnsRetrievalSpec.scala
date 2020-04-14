@@ -1,7 +1,7 @@
 package uk.gov.hmrc.vatapi.resources
 
-import play.api.http.Status._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.assets.des.VatReturns
@@ -578,7 +578,7 @@ class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
       override def setupStubs(): StubMapping = {
         AuditStub.audit()
         AuthStub.authorised()
-        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, "NOT_FOUND")
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, errorBody("NOT_FOUND"))
       }
 
       val response: WSResponse = await(request().
@@ -593,7 +593,7 @@ class ValueAddedTaxReturnsRetrievalSpec extends BaseFunctionalSpec {
       override def setupStubs(): StubMapping = {
         AuditStub.audit()
         AuthStub.authorised()
-        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, "NOT_FOUND")
+        DesStub.onError(DesStub.GET, retrieveDesUrl(vrn), Map("period-key" -> "0001"), NOT_FOUND, errorBody("NOT_FOUND"))
       }
 
       val response: WSResponse = await(request().

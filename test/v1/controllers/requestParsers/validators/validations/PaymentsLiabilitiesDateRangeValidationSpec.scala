@@ -17,27 +17,30 @@
 package v1.controllers.requestParsers.validators.validations
 
 import support.UnitSpec
-import v1.models.errors.PeriodKeyFormatError
-import v1.models.utils.JsonErrorValidators
+import v1.models.errors.RuleDateRangeInvalidError
 
-class PeriodKeyValidationSpec extends UnitSpec with JsonErrorValidators {
+class PaymentsLiabilitiesDateRangeValidationSpec extends UnitSpec {
+
+  val from2020 = "2020-01-01"
+  val to2021 = "2020-12-31"
+  val to2021Plus1Day = "2021-01-01"
+  val from2018 = "2018-04-05"
+  val to2019 = "2019-02-20"
 
   "validate" should {
-    "return no errors" when {
-      "when a valid period key is supplied" in {
-        val validationResult = PeriodKeyValidation.validate("AB12")
-        validationResult.isEmpty shouldBe true
-      }
-    }
+    "return an empty list" when {
 
-    "return an error" when {
-      "when an invalid Period Key is supplied" in {
-        val validationResult = PeriodKeyValidation.validate("thisIsNotAPeriodKey")
-        validationResult.isEmpty shouldBe false
-        validationResult.length shouldBe 1
-        validationResult.head shouldBe PeriodKeyFormatError
+      "passed valid from and to dates" in {
+        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021) shouldBe List()
       }
-    }
 
+    }
+    "return a list containing an error" when {
+      "passed an invalid date range" in {
+        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(RuleDateRangeInvalidError)
+      }
+
+    }
   }
+
 }

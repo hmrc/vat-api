@@ -18,20 +18,19 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.ObligationsValidator
+import v1.controllers.requestParsers.validators.PaymentsValidator
 import v1.models.errors.MtdError
-import v1.models.request.obligations.ObligationsRawData
+import v1.models.request.payments.PaymentsRawData
 
-class MockObligationsValidator extends MockFactory{
+class MockPaymentsValidator extends MockFactory {
+    val mockValidator: PaymentsValidator = mock[PaymentsValidator]
 
-  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
+    object MockVrnValidator {
 
-  object MockVrnValidator {
-
-    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
-      (mockValidator
-        .validate(_: ObligationsRawData))
-        .expects(data)
+      def validate(data: PaymentsRawData): CallHandler1[PaymentsRawData, List[MtdError]] = {
+        (mockValidator
+          .validate(_: PaymentsRawData))
+          .expects(data)
+      }
     }
-  }
 }

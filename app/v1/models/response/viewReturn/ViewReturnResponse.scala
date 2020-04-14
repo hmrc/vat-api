@@ -24,13 +24,13 @@ case class ViewReturnResponse(periodKey: String,
                               vatDueAcquisitions: BigDecimal,
                               totalVatDue: BigDecimal,
                               vatReclaimedCurrPeriod: BigDecimal,
-                              vatDueNet: BigDecimal,
+                              netVatDue: BigDecimal,
                               totalValueSalesExVAT: BigDecimal,
                               totalValuePurchasesExVAT: BigDecimal,
                               totalValueGoodsSuppliedExVAT: BigDecimal,
                               totalAcquisitionsExVAT: BigDecimal)
-object ViewReturnResponse {
 
+object ViewReturnResponse {
   implicit val writes: OWrites[ViewReturnResponse] = Json.writes[ViewReturnResponse]
   implicit val reads: Reads[ViewReturnResponse] = (
     (JsPath \ "periodKey").read[String] and
@@ -44,5 +44,4 @@ object ViewReturnResponse {
       (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
       (JsPath \ "totalAllAcquisitionsExVAT").read[BigDecimal]
     )(ViewReturnResponse.apply _)
-
 }

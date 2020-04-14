@@ -46,11 +46,12 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
 
   private def desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN" -> VrnFormatError,
-      "INVALID_PERIODKEY" -> FormatPeriodKeyError,
-      "INVALID_IDENTIFIER" -> DownstreamError,
+      "INVALID_VRN" -> VrnFormatErrorDes,
+      "INVALID_PERIODKEY" -> PeriodKeyFormatErrorDes,
+      "INVALID_IDENTIFIER" -> PeriodKeyFormatErrorDesNotFound,
       "NOT_FOUND_VRN" -> DownstreamError,
-      "INVALID_INPUTDATA" -> NestedRuleDateRangeTooLargeError,
+      "DATE_RANGE_TOO_LARGE" -> RuleDateRangeTooLargeError,
+      "INVALID_INPUTDATA" -> InvalidInputDataError,
       "NOT_FOUND" -> EmptyNotFoundError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError

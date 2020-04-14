@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package v1.mocks.validators
+package v1.controllers.requestParsers
 
-import org.scalamock.handlers.CallHandler1
-import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.ObligationsValidator
-import v1.models.errors.MtdError
-import v1.models.request.obligations.ObligationsRawData
+import javax.inject.Inject
+import uk.gov.hmrc.domain.Vrn
+import v1.controllers.requestParsers.validators.LiabilitiesValidator
+import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
 
-class MockObligationsValidator extends MockFactory{
+class LiabilitiesRequestParser @Inject()(val validator: LiabilitiesValidator)
+  extends RequestParser[LiabilityRawData, LiabilityRequest] {
 
-  val mockValidator: ObligationsValidator = mock[ObligationsValidator]
-
-  object MockVrnValidator {
-
-    def validate(data: ObligationsRawData): CallHandler1[ObligationsRawData, List[MtdError]] = {
-      (mockValidator
-        .validate(_: ObligationsRawData))
-        .expects(data)
-    }
+  override protected def requestFor(data: LiabilityRawData): LiabilityRequest = {
+    LiabilityRequest(Vrn(data.vrn), data.from.get, data.to.get)
   }
 }
