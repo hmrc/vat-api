@@ -35,7 +35,7 @@ class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
     implicit val requestFromDate: String = request.from
     val queryString = "&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true"
     get(
-      uri = DesUri[LiabilityResponse](s"VRN/${request.vrn.vrn}/VATC?dateFrom=${request.from}&dateTo=${request.to}$queryString")
+      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC?dateFrom=${request.from}&dateTo=${request.to}$queryString")
     )
   }
 }
