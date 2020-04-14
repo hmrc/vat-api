@@ -67,7 +67,7 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .get(
-            url = s"$baseUrl/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
+            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
             requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
@@ -80,7 +80,7 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .get(
-            url = s"$baseUrl/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
+            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC?dateFrom=${retrieveLiabilitiesRequest.from}&dateTo=${retrieveLiabilitiesRequest.to}&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true",
             requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
