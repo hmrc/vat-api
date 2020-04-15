@@ -31,22 +31,32 @@ class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
 
   def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
                                                      ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
-
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
-
-    val queryParams: Seq[(String, String)] = Seq(
-      ("dateFrom" , request.from),
-      ("dateTo" , request.to),
-      ("onlyOpenItems" , "false"),
-      ("includeLocks" , "false"),
-      ("calculateAccruedInterest" , "true"),
-      ("customerPaymentInformation" , "true")
-    )
-
+    val queryString = "&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true"
     get(
-      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
-      queryParams = queryParams
+      uri = DesUri[LiabilityResponse](s"VRN/${request.vrn.vrn}/VATC?dateFrom=${request.from}&dateTo=${request.to}$queryString")
     )
   }
+
+//  def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
+//                                                     ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
+//
+//    import v1.connectors.httpparsers.StandardDesHttpParser._
+//    implicit val requestToDate: String = request.to
+//
+//    val queryParams: Seq[(String, String)] = Seq(
+//      ("dateFrom" , request.from),
+//      ("dateTo" , request.to),
+//      ("onlyOpenItems" , "false"),
+//      ("includeLocks" , "false"),
+//      ("calculateAccruedInterest" , "true"),
+//      ("customerPaymentInformation" , "true")
+//    )
+//
+//    get(
+//      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
+//      queryParams = queryParams
+//    )
+//  }
 }
