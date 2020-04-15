@@ -74,6 +74,8 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         response.status shouldBe OK
         response.json shouldBe mtdJson
         response.header("Content-Type") shouldBe Some("application/json")
+
+
       }
     }
 

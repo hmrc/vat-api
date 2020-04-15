@@ -21,7 +21,6 @@ import v1.models.auth.UserDetails
 
 case class AuditDetail(userType: String,
                        agentReferenceNumber: Option[String],
-                       nino: String,
                        response: AuditResponse,
                        `X-CorrelationId`: String)
 
@@ -30,14 +29,12 @@ object AuditDetail {
   implicit val writes: OWrites[AuditDetail] = Json.writes[AuditDetail]
 
   def apply(userDetails: UserDetails,
-            nino: String,
             `X-CorrelationId`: String,
             response: AuditResponse): AuditDetail = {
 
     AuditDetail(
       userType = userDetails.userType,
       agentReferenceNumber = userDetails.agentReferenceNumber,
-      nino = nino,
       `X-CorrelationId` = `X-CorrelationId`,
       response = response
     )

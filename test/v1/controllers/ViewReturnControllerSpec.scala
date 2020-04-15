@@ -20,8 +20,11 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.audit.AuditEvents
 import v1.mocks.requestParsers.MockViewReturnRequestParser
-import v1.mocks.services.{MockEnrolmentsAuthService, MockViewReturnService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockViewReturnService}
+import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.{ViewRawData, ViewRequest}
@@ -34,7 +37,8 @@ class ViewReturnControllerSpec
   extends ControllerBaseSpec
     with MockEnrolmentsAuthService
     with MockViewReturnService
-    with MockViewReturnRequestParser {
+    with MockViewReturnRequestParser
+    with MockAuditService {
 
 
   trait Test {
@@ -44,6 +48,7 @@ class ViewReturnControllerSpec
       mockEnrolmentsAuthService,
       mockViewReturnRequestParser,
       mockViewReturnService,
+      mockAuditService,
       cc
     )
 
@@ -131,6 +136,10 @@ class ViewReturnControllerSpec
         status(result) shouldBe OK
         contentAsJson(result) shouldBe mtdJson
         header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+        val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+          UserDetails("Individual", None, "client-Id"), auditResponse)).once
       }
     }
 
@@ -148,6 +157,10 @@ class ViewReturnControllerSpec
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(error)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(error.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
@@ -177,6 +190,10 @@ class ViewReturnControllerSpec
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(mtdError)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(mtdError.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
@@ -208,6 +225,10 @@ class ViewReturnControllerSpec
             status(result) shouldBe NOT_FOUND
             contentAsString(result) shouldBe ""
             header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(EmptyNotFoundError.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
     }
