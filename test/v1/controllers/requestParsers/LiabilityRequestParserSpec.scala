@@ -19,7 +19,7 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockLiabilityValidator
-import v1.models.errors.{ErrorWrapper, InvalidDateFromError, InvalidDateToError, VrnFormatError}
+import v1.models.errors.{ErrorWrapper, FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, VrnFormatError}
 import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
 
 class LiabilityRequestParserSpec extends UnitSpec {
@@ -57,18 +57,18 @@ class LiabilityRequestParserSpec extends UnitSpec {
 
       "invalid from date is provided" in new Test {
         MockVrnValidator.validate(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate)))
-          .returns(List(InvalidDateFromError))
+          .returns(List(FinancialDataInvalidDateFromError))
 
         parser.parseRequest(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
-          Left(ErrorWrapper(None, InvalidDateFromError, None))
+          Left(ErrorWrapper(None, FinancialDataInvalidDateFromError, None))
       }
 
       "invalid to date is provided" in new Test {
         MockVrnValidator.validate(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo)))
-          .returns(List(InvalidDateToError))
+          .returns(List(FinancialDataInvalidDateToError))
 
         parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
-          Left(ErrorWrapper(None, InvalidDateToError, None))
+          Left(ErrorWrapper(None, FinancialDataInvalidDateToError, None))
       }
     }
   }

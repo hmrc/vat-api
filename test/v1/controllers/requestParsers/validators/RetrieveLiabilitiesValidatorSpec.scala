@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators
 
 import support.UnitSpec
-import v1.models.errors.{InvalidDateFromError, InvalidDateToError, RuleDateRangeInvalidError, VrnFormatError}
+import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, RuleDateRangeInvalidError, VrnFormatError}
 import v1.models.request.liability.LiabilityRawData
 
 class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
@@ -27,7 +27,7 @@ class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
   private val validVrn = "123456789"
   private val invalidVrn = "thisIsNotAVrn"
   private val validFrom = "2020-01-01"
-  private val validTo =  "2020-02-31"
+  private val validTo =  "2020-12-31"
 
   "running a validation" should {
     "return no errors" when {
@@ -49,28 +49,24 @@ class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
 
     "return only FromDateFormatError error" when {
       "an invalid from date format is supplied" in {
-        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some(validTo))) shouldBe List(InvalidDateFromError)
+        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some(validTo))) shouldBe List(FinancialDataInvalidDateFromError)
       }
 
       //maintain order of preference to match legacy validation
       "an invalid from date and invalid to date are supplied" in {
-        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some("invalidDateTo"))) shouldBe List(InvalidDateFromError)
+        validator.validate(LiabilityRawData(validVrn, Some("12-31-2020"), Some("invalidDateTo"))) shouldBe List(FinancialDataInvalidDateFromError)
       }
     }
 
     "return only ToDateFormatError error" when {
       "an invalid to date format is supplied" in {
-        validator.validate(LiabilityRawData(validVrn, Some(validFrom), Some("12-31-2020"))) shouldBe List(InvalidDateToError)
+        validator.validate(LiabilityRawData(validVrn, Some(validFrom), Some("12-31-2020"))) shouldBe List(FinancialDataInvalidDateToError)
       }
     }
 
     "return RuleDateRangeError error" when {
       "invalid date range is supplied" in {
         validator.validate(LiabilityRawData(validVrn, Some("2018-01-01"), Some("2019-01-01"))) shouldBe List(RuleDateRangeInvalidError)
-      }
-
-      "two same dates are supplied" in {
-        validator.validate(LiabilityRawData(validVrn, Some(validTo), Some(validTo))) shouldBe List(RuleDateRangeInvalidError)
       }
     }
   }

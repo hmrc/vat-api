@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{MtdError, InvalidStatusError}
+import v1.models.errors.{InvalidStatusError, MtdError}
 
 object StatusValidation {
   private val statusRegex = "^(O|F)$"

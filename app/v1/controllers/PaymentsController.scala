@@ -26,7 +26,7 @@ import utils.{EndpointLogContext, Logging}
 import v1.controllers.requestParsers.PaymentsRequestParser
 import v1.models.errors._
 import v1.models.request.payments.PaymentsRawData
-import v1.services.EnrolmentsAuthService
+import v1.services.{EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -77,8 +77,9 @@ extends AuthorisedController(cc) with BaseController with Logging {
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError | VrnFormatErrorDes |
-           InvalidDateFromError |
-           InvalidDateToError |
+           FinancialDataInvalidDateFromError | InvalidDateFromErrorDes |
+           FinancialDataInvalidDateToError | InvalidDateToErrorDes |
+           LegacyInvalidDateRangeError | InvalidDataError
       => BadRequest(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))

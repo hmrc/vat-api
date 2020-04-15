@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators
 
 import support.UnitSpec
-import v1.models.errors.{InvalidFromError, InvalidToError, RuleDateRangeInvalidError, VrnFormatError}
+import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, RuleDateRangeInvalidError, VrnFormatError}
 import v1.models.request.payments.PaymentsRawData
 
 class RetrievePaymentsValidatorSpec extends UnitSpec  {
@@ -49,18 +49,18 @@ class RetrievePaymentsValidatorSpec extends UnitSpec  {
 
     "return only FromDateFormatError error" when {
       "an invalid from date format is supplied" in {
-        validator.validate(PaymentsRawData(validVrn, Some("12-31-2020"), Some(validTo))) shouldBe List(InvalidFromError)
+        validator.validate(PaymentsRawData(validVrn, Some("12-31-2020"), Some(validTo))) shouldBe List(FinancialDataInvalidDateFromError)
       }
 
       //maintain order of preference to match legacy validation
       "an invalid from date and invalid to date are supplied" in {
-        validator.validate(PaymentsRawData(validVrn, Some("12-31-2020"), Some("invalidDateTo"))) shouldBe List(InvalidFromError)
+        validator.validate(PaymentsRawData(validVrn, Some("12-31-2020"), Some("invalidDateTo"))) shouldBe List(FinancialDataInvalidDateFromError)
       }
     }
 
     "return only ToDateFormatError error" when {
       "an invalid to date format is supplied" in {
-        validator.validate(PaymentsRawData(validVrn, Some(validFrom), Some("12-31-2020"))) shouldBe List(InvalidToError)
+        validator.validate(PaymentsRawData(validVrn, Some(validFrom), Some("12-31-2020"))) shouldBe List(FinancialDataInvalidDateToError)
       }
     }
 

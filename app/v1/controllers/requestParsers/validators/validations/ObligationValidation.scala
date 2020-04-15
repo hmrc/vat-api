@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{InvalidFromError, InvalidStatusError, InvalidToError, MtdError, RuleMissingDateRangeError}
+import v1.models.errors._
 import v1.models.request.obligations.ObligationsRawData
 
 object ObligationValidation {
@@ -28,7 +28,7 @@ object ObligationValidation {
     case ObligationsRawData(_, None, None, Some(_)) => List(InvalidStatusError)
     case ObligationsRawData(_, Some(_), None, _) => List(InvalidToError)
     case ObligationsRawData(_, None, Some(_), _) => List(InvalidFromError)
-    case ObligationsRawData(_, Some(from), Some(to), Some(status)) => {
+    case ObligationsRawData(_, Some(from), Some(to), Some(status)) =>
 
       val validList = List(
         DateFormatValidation.validate(from, InvalidFromError),
@@ -36,6 +36,5 @@ object ObligationValidation {
         StatusValidation.validate(status)
       ).filter(_.nonEmpty)
       if (validList.isEmpty) List.empty[MtdError] else validList.head
-    }
   }
 }
