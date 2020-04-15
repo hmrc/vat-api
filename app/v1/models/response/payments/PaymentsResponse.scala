@@ -28,7 +28,7 @@ object PaymentsResponse {
   implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) => Json.obj("payments" -> {
     for (
       payment <- paymentsResponse.payments
-      if payment.paymentItem.nonEmpty;
+      if payment.paymentItem.isDefined;
       item <- payment.paymentItem.get
     ) yield Json.obj(
       "amount" -> item.amount,
