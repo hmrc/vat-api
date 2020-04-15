@@ -19,28 +19,28 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
-import v1.connectors.ObligationsConnector
+import v1.connectors.RetrievePaymentsConnector
 import v1.models.errors._
-import v1.models.request.obligations.ObligationsRequest
-import v1.models.response.obligations.ObligationsResponse
+import v1.models.request.payments.PaymentsRequest
+import v1.models.response.payments.PaymentsResponse
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ObligationsService @Inject()(connector: ObligationsConnector) extends DesResponseMappingSupport with Logging {
+class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
 
-  def retrieveObligations(request: ObligationsRequest)(
+  def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[ObligationsResponse]] = {
+    logContext: EndpointLogContext): Future[ServiceOutcome[PaymentsResponse]] = {
 
     val result = for {
-      desResponseWrapper <- EitherT(connector.retrieveObligations(request)).leftMap(mapDesErrors(desErrorMap))
-    } yield desResponseWrapper
+      desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))
+      mtdResponseWrapper <- EitherT.fromEither[Future](validatePaymentsSuccessResponse(desResponseWrapper))
+    } yield mtdResponseWrapper
 
     result.value
   }
@@ -49,17 +49,16 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
     Map(
       "INVALID_IDTYPE" -> DownstreamError,
       "INVALID_IDNUMBER" -> VrnFormatErrorDes,
-      "INVALID_STATUS" -> InvalidDesStatusError,
-      "INVALID_REGIME" -> DownstreamError,
-      "INVALID_DATE_FROM" -> InvalidDateFromError,
-      "INVALID_DATE_TO" -> InvalidDateToError,
-      "INVALID_DATE_RANGE" -> RuleDateRangeTooLargeError,
-      "NOT_FOUND_BP_KEY" -> {
-        Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BPKEY error")
-        DownstreamError
-      },
+      "INVALID_REGIMETYPE" -> DownstreamError,
+      "INVALID_ONLYOPENITEMS" -> DownstreamError,
+      "INVALID_INCLUDELOCKS" -> DownstreamError,
+      "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
+      "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
+      "INVALID_DATEFROM" -> InvalidDateFromError,
+      "INVALID_DATETO" -> InvalidDateToError,
+      "INVALID_DATA" -> InvalidDataError,
       "NOT_FOUND" -> LegacyNotFoundError,
-      "SERVICE_ERROR" -> DownstreamError,
+      "SERVER_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )
 }

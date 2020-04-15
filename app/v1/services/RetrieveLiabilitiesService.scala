@@ -39,7 +39,8 @@ class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnect
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrieveLiabilities(request)).leftMap(mapDesErrors(desErrorMap))
-    } yield desResponseWrapper
+      mtdResponseWrapper <- EitherT.fromEither[Future](validateLiabilitiesSuccessResponse(desResponseWrapper))
+    } yield mtdResponseWrapper
 
     result.value
   }
@@ -47,7 +48,7 @@ class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnect
   private def desErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_IDTYPE" -> DownstreamError,
-      "INVALID_IDNUMBER" -> VrnFormatError,
+      "INVALID_IDNUMBER" -> VrnFormatErrorDes,
       "INVALID_REGIMETYPE" -> DownstreamError,
       "INVALID_ONLYOPENITEMS" -> DownstreamError,
       "INVALID_INCLUDELOCKS" -> DownstreamError,

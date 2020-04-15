@@ -228,7 +228,7 @@ class PaymentsResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.asOpt[PaymentsResponse] shouldBe None
+        desJson.as[PaymentsResponse] shouldBe PaymentsResponse(Seq.empty[Payment])
       }
     }
 
@@ -272,7 +272,7 @@ class PaymentsResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.asOpt[PaymentsResponse] shouldBe None
+        desJson.as[PaymentsResponse] shouldBe PaymentsResponse(Seq.empty[Payment])
       }
     }
 

@@ -20,39 +20,44 @@ import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
-import v1.mocks.connectors.MockRetrieveLiabilitiesConnector
+import v1.mocks.connectors.MockRetrievePaymentsConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.request.payments.PaymentsRequest
+import v1.models.response.common.TaxPeriod
+import v1.models.response.payments.{Payment, PaymentItem, PaymentsResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RetrieveLiabilitiesServiceSpec extends UnitSpec {
+class RetrievePaymentsServiceSpec extends UnitSpec {
 
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
   private val to: String = "2017-12-31"
   private val correlationId = "X-123"
 
-  private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(
-      vrn = Vrn(vrn),
-      from = from,
-      to = to
+  private val retrievePaymentsRequest: PaymentsRequest =
+    PaymentsRequest(vrn = Vrn(vrn), from = from, to = to)
+
+  private val retrievePaymentsResponse: PaymentsResponse =
+    PaymentsResponse(
+      payments = Seq(
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
+          `type` = "VAT Return Debit Charge",
+          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
+        )
+      )
     )
 
-  private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None)))
-
-  trait Test extends MockRetrieveLiabilitiesConnector {
+  trait Test extends MockRetrievePaymentsConnector {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
-    val service = new RetrieveLiabilitiesService(
-      connector = mockRetrieveLiabilitiesConnector
+    val service = new RetrievePaymentsService(
+      connector = mockRetrievePaymentsConnector
     )
   }
 
@@ -60,18 +65,18 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
     "service call successful" must {
       "return the mapped result" in new Test {
 
-        MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))))
+        MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, retrievePaymentsResponse))))
 
-        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
+        await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Right(ResponseWrapper(correlationId, retrievePaymentsResponse))
       }
 
-      "return a 404 Not Found for an empty liabilities response" in new Test {
+      "return a 404 Not Found for an empty payments response" in new Test {
 
-        MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilityResponse(Seq.empty[Liability])))))
+        MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, PaymentsResponse(Seq.empty[Payment])))))
 
-        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), NotFoundError))
+        await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), NotFoundError))
       }
     }
 
@@ -81,10 +86,10 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
         def serviceError(desErrorCode: String, error: MtdError): Unit =
           s"a $desErrorCode error is returned from the service" in new Test {
 
-            MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
+            MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(

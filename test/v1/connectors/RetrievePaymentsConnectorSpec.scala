@@ -20,56 +20,50 @@ import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.liability.LiabilityRequest
+import v1.models.request.payments.PaymentsRequest
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.response.payments.{Payment, PaymentItem, PaymentsResponse}
 
 import scala.concurrent.Future
 
-class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
+class RetrievePaymentsConnectorSpec extends ConnectorSpec {
 
   private val vrn: String = "123456789"
 
-  private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(vrn = Vrn(vrn),from = "2017-1-1",to = "2017-12-31")
+  private val retrievePaymentsRequest: PaymentsRequest =
+    PaymentsRequest(vrn = Vrn(vrn), from = "2017-1-1", to = "2017-12-31")
 
-  private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(
-      liabilities = Seq(
-        Liability(
-          taxPeriod = None,
-          `type` = "VAT",
-          originalAmount = 1.0,
-          outstandingAmount = None,
-          due = None
+  private val retrievePaymentsResponse: PaymentsResponse =
+    PaymentsResponse(
+      payments = Seq(
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
+          `type` = "VAT Return Debit Charge",
+          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
         )
       )
     )
 
-  private val retrieveMultipleLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(
-      liabilities = Seq(
-        Liability(
-          taxPeriod = None,
-          `type` = "VAT",
-          originalAmount = 1.0,
-          outstandingAmount = None,
-          due = None
-        ),
-        Liability(
+  private val retrieveMultipleLiabilitiesResponse: PaymentsResponse =
+    PaymentsResponse(
+      payments = Seq(
+        Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
-          `type` = "VAT",
-          originalAmount = 2.0,
-          outstandingAmount = Some(1.0),
-          due = None
+          `type` = "VAT Return Debit Charge",
+          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
+        ),
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2018-1-1", to = "2018-12-31")),
+          `type` = "VAT Return Debit Charge",
+          paymentItem = Some(Seq(PaymentItem(amount = Some(2375.23), received = Some("2018-03-12"))))
         )
       )
     )
 
   class Test extends MockHttpClient with MockAppConfig {
 
-    val connector: RetrieveLiabilitiesConnector =
-      new RetrieveLiabilitiesConnector(
+    val connector: RetrievePaymentsConnector =
+      new RetrievePaymentsConnector(
         http = mockHttpClient,
         appConfig = mockAppConfig
       )
@@ -81,8 +75,8 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
       )
 
     val queryParams: Seq[(String, String)] = Seq(
-      ("dateFrom" , retrieveLiabilitiesRequest.from),
-      ("dateTo" , retrieveLiabilitiesRequest.to),
+      ("dateFrom" , retrievePaymentsRequest.from),
+      ("dateTo" , retrievePaymentsRequest.to),
       ("onlyOpenItems" , "false"),
       ("includeLocks" , "false"),
       ("calculateAccruedInterest" , "true"),
@@ -94,20 +88,20 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
     MockedAppConfig.desEnvironment returns "des-environment"
   }
 
-  "RetrieveLiabilitiesConnector" when {
-    "retrieving liabilities" must {
+  "RetrievePaymentsConnector" when {
+    "retrieving payments" must {
       "return a valid response" in new Test {
-        val outcome = Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
+        val outcome = Right(ResponseWrapper(correlationId, retrievePaymentsResponse))
 
         MockedHttpClient
           .get(
             url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
+            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token",
           )
           .returns(Future.successful(outcome))
 
-        await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe outcome
+        await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
       }
 
       "return a valid response for multiple results" in new Test {
@@ -121,7 +115,7 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
           )
           .returns(Future.successful(outcome))
 
-        await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe outcome
+        await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
       }
     }
   }

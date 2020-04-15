@@ -678,7 +678,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.asOpt[LiabilityResponse] shouldBe None
+        desJson.as[LiabilityResponse] shouldBe LiabilityResponse(Seq.empty[Liability])
       }
     }
 
@@ -721,7 +721,7 @@ class LiabilityResponseSpec extends UnitSpec {
            |}
            |""".stripMargin)
 
-      desJson.asOpt[LiabilityResponse] shouldBe None
+      desJson.as[LiabilityResponse] shouldBe LiabilityResponse(Seq.empty[Liability])
     }
 
     "use the writes format correctly" in {
