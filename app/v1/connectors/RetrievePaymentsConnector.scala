@@ -33,7 +33,7 @@ class RetrievePaymentsConnector @Inject()(val http: HttpClient,
                                                  ec: ExecutionContext): Future[DesOutcome[PaymentsResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
-    implicit val requestFromDate: String = request.from
+    implicit val requestToDate: String = request.to
 
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom" , request.from),
