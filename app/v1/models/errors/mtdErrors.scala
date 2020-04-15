@@ -144,14 +144,14 @@ object PeriodKeyFormatErrorDesNotFound extends MtdError(
 object EmptyNotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "", None)
 
 object FinancialDataInvalidDateFromError extends MtdError(
-  code = "INVALID_DATE_FROM",
+  code = "DATE_FROM_INVALID",
   message = "Invalid date from",
   customJson = Some(
     Json.parse(
       """
         |{
         |  "statusCode": 400,
-        |  "message": "INVALID_DATE_FROM"
+        |  "message": "DATE_FROM_INVALID"
         |}
         |""".stripMargin
     )
@@ -159,14 +159,14 @@ object FinancialDataInvalidDateFromError extends MtdError(
 )
 
 object FinancialDataInvalidDateToError extends MtdError(
-  code = "INVALID_DATE_TO",
+  code = "DATE_TO_INVALID",
   message = "Invalid date to",
   customJson = Some(
     Json.parse(
       """
         |{
         |  "statusCode": 400,
-        |  "message": "INVALID_DATE_TO"
+        |  "message": "DATE_TO_INVALID"
         |}
         |""".stripMargin
     )
