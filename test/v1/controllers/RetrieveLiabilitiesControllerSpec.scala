@@ -166,7 +166,7 @@ class RetrieveLiabilitiesControllerSpec
           (BadRequestError, BAD_REQUEST),
           (LegacyUnauthorisedError, FORBIDDEN),
           (LegacyNotFoundError, NOT_FOUND),
-          (InvalidDataError, NOT_FOUND),
+          (InvalidDataError, BAD_REQUEST),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

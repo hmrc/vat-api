@@ -71,9 +71,9 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
   private def errorResult(errorWrapper: ErrorWrapper) = {
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError | InvalidDateFromError | InvalidDateToError |
-           RuleDateRangeInvalidError | BadRequestError => BadRequest(Json.toJson(errorWrapper))
+           RuleDateRangeInvalidError | BadRequestError | InvalidDataError => BadRequest(Json.toJson(errorWrapper))
       case LegacyUnauthorisedError => Forbidden(Json.toJson(errorWrapper))
-      case LegacyNotFoundError | InvalidDataError => NotFound(Json.toJson(errorWrapper))
+      case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }
   }
