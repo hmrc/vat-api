@@ -45,7 +45,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
 
   def retrievePayments(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async{ implicit request =>
-      //Some logging
+      logger.info(s"[PaymentsController][retrievePayments] Successfully retrieved Payments from DES")
 
       val rawRequest: PaymentsRawData =
         PaymentsRawData(
@@ -59,7 +59,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrievePayments(parsedRequest))
         } yield {
-          //Some logging
+          logger.debug(s"[PaymentsController][retrievePayments] Successfully retrieved Payments from DES")
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
