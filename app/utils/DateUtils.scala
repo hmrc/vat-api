@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
-package v1.models.request.submit
+package utils
 
-import play.api.mvc.AnyContentAsJson
-import v1.models.request.RawData
+import org.joda.time.DateTime
+import play.api.libs.json.{Format, JodaReads, JodaWrites}
 
-case class SubmitRawData(vrn: String, body: AnyContentAsJson) extends RawData
+object DateUtils {
+
+  val isoInstantDatePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+  val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
+  val dateTimeFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.jodaDateReads(dateTimePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
+  )
+
+  val defaultDateTimeFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.jodaDateReads(isoInstantDatePattern),
+    JodaWrites.jodaDateWrites(dateTimePattern)
+  )
+}
