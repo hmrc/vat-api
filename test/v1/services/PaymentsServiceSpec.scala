@@ -30,7 +30,7 @@ import v1.models.response.payments.{Payment, PaymentItem, PaymentsResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RetrievePaymentsServiceSpec extends UnitSpec {
+class PaymentsServiceSpec extends UnitSpec {
 
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
@@ -56,7 +56,7 @@ class RetrievePaymentsServiceSpec extends UnitSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
-    val service = new RetrievePaymentsService(
+    val service = new PaymentsService(
       connector = mockRetrievePaymentsConnector
     )
   }
@@ -100,8 +100,8 @@ class RetrievePaymentsServiceSpec extends UnitSpec {
           "INVALID_INCLUDELOCKS" -> DownstreamError,
           "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
           "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
-          "INVALID_DATEFROM" -> InvalidDateFromError,
-          "INVALID_DATETO" -> InvalidDateToError,
+          "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
+          "INVALID_DATETO" -> InvalidDateToErrorDes,
           "NOT_FOUND" -> LegacyNotFoundError,
           "INVALID_DATA" -> InvalidDataError,
           "SERVER_ERROR" -> DownstreamError,

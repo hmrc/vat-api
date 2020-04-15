@@ -51,8 +51,8 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
       "INVALID_IDNUMBER" -> VrnFormatErrorDes,
       "INVALID_STATUS" -> InvalidDesStatusError,
       "INVALID_REGIME" -> DownstreamError,
-      "INVALID_DATE_FROM" -> InvalidDateFromError,
-      "INVALID_DATE_TO" -> InvalidDateToError,
+      "INVALID_DATE_FROM" -> InvalidDateFromErrorDes,
+      "INVALID_DATE_TO" -> InvalidDateToErrorDes,
       "INVALID_DATE_RANGE" -> RuleDateRangeTooLargeError,
       "NOT_FOUND_BP_KEY" -> {
         Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BPKEY error")

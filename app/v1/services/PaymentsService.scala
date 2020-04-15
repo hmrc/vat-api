@@ -30,7 +30,7 @@ import v1.support.DesResponseMappingSupport
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
+class PaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
 
   def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,
@@ -54,8 +54,8 @@ class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) ex
       "INVALID_INCLUDELOCKS" -> DownstreamError,
       "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
       "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
-      "INVALID_DATEFROM" -> InvalidDateFromError,
-      "INVALID_DATETO" -> InvalidDateToError,
+      "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
+      "INVALID_DATETO" -> InvalidDateToErrorDes,
       "INVALID_DATA" -> InvalidDataError,
       "NOT_FOUND" -> LegacyNotFoundError,
       "SERVER_ERROR" -> DownstreamError,
