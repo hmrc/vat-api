@@ -39,13 +39,13 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "VatReturnsResource",
-      endpointName = "RetrieveLiabilitiesController"
+      controllerName = "FinancialDataResource",
+      endpointName = "retrieveLiabilities"
     )
 
   def retrieveLiabilities(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
-      logger.info(message = s"[VatReturnsResource][retrieveLiabilities] Retrieving Liabilities from DES")
+      logger.info(message = s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
 
       val rawRequest: LiabilityRawData = LiabilityRawData(vrn, from, to)
 
@@ -53,7 +53,7 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
         serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
-        logger.info(message = s"[VatReturnsResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+        logger.info(message = s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
 
         Ok(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId)
