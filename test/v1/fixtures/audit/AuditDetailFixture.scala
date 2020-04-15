@@ -23,7 +23,6 @@ import v1.models.auth.UserDetails
 
 object AuditDetailFixture {
 
-  val nino: String = "ZG903729C"
   val userType: String = "Agent"
   val agentReferenceNumber: Option[String] = Some("012345678")
   val correlationId = "a1e8057e-fbbc-47a8-a8b478d9f015c253"
@@ -33,7 +32,6 @@ object AuditDetailFixture {
     AuditDetail(
       userType = userType,
       agentReferenceNumber = agentReferenceNumber,
-      nino = nino,
       response = auditResponseModelWithoutBody,
       `X-CorrelationId` = correlationId
     )
@@ -48,7 +46,6 @@ object AuditDetailFixture {
        |{
        |   "userType" : "$userType",
        |   "agentReferenceNumber" : "${agentReferenceNumber.get}",
-       |   "nino" : "$nino",
        |   "response":{
        |     "httpStatus": ${auditResponseModelWithoutBody.httpStatus}
        |   },
@@ -62,7 +59,6 @@ object AuditDetailFixture {
        |{
        |   "userType" : "$userType",
        |   "agentReferenceNumber" : "${agentReferenceNumber.get}",
-       |   "nino": "$nino",
        |   "response": $auditResponseJsonWithErrors,
        |   "X-CorrelationId": "$correlationId"
        |}

@@ -18,7 +18,6 @@ package v1.controllers.requestParsers.validators.validations
 
 import java.time.LocalDate
 
-import play.api.Logger
 import v1.models.errors.{MtdError, RuleDateRangeInvalidError}
 
 object PaymentsLiabilitiesDateRangeValidation {

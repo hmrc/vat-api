@@ -23,10 +23,12 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
+import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ViewReturnRequestParser
+import v1.models.audit.AuditResponse
 import v1.models.errors._
 import v1.models.request.viewReturn.ViewRawData
-import v1.services.{EnrolmentsAuthService, ViewReturnService}
+import v1.services.{AuditService, EnrolmentsAuthService, ViewReturnService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
                                     requestParser: ViewReturnRequestParser,
                                     service: ViewReturnService,
+                                    auditService: AuditService,
                                     cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
@@ -60,6 +63,9 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
         } yield {
           logger.info(message = s"[ViewReturnController] [viewReturn] Successfully retrieved Vat Return from DES")
 
+          auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
+            request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
+
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
             .as(MimeTypes.JSON)
@@ -68,6 +74,10 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+
+        auditService.auditEvent(AuditEvents.auditReturns(correlationId,
+          request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
+
         result
       }.merge
 

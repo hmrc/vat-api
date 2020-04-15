@@ -21,28 +21,28 @@ import v1.models.auth.UserDetails
 
 object AuditEvents {
 
-  def auditReturns(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditReturns(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
     AuditEvent("retrieveVatReturns","retrieve-vat-returns",
-      AuditDetail(userDetails, nino, correlationId, auditResponse))
+      AuditDetail(userDetails, correlationId, auditResponse))
   }
 
   def auditLiability(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
     AuditEvent("retrieveVatLiabilities","retrieve-vat-liabilities",
-      AuditDetail(userDetails, nino, correlationId, auditResponse))
+      AuditDetail(userDetails, correlationId, auditResponse))
   }
 
   def auditPayments(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
     AuditEvent("retrieveVatPayments","retrieve-vat-payments",
-      AuditDetail(userDetails, nino, correlationId, auditResponse))
+      AuditDetail(userDetails, correlationId, auditResponse))
   }
 
   def auditObligations(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
     AuditEvent("retrieveVatObligations","retrieve-vat-obligations",
-      AuditDetail(userDetails, nino, correlationId, auditResponse))
+      AuditDetail(userDetails, correlationId, auditResponse))
   }
 
   def auditSubmit(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
     AuditEvent("submitVatReturn","submit-vat-return",
-      AuditDetail(userDetails, nino, correlationId, auditResponse))
+      AuditDetail(userDetails, correlationId, auditResponse))
   }
 }

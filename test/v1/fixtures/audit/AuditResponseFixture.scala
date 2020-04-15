@@ -27,13 +27,13 @@ object AuditResponseFixture {
   val auditResponseModelWithoutBody: AuditResponse =
     AuditResponse(
       httpStatus = OK,
-      response = Right(None)
+      payload = Right(None)
     )
 
   val auditResponseModelWithBody: AuditResponse =
     AuditResponse(
       httpStatus = OK,
-      response = Right(Some(Json.parse(
+      payload = Right(Some(Json.parse(
         """
           |{
           | "response":"success"
@@ -44,7 +44,7 @@ object AuditResponseFixture {
   val auditResponseModelWithErrors: AuditResponse =
     AuditResponse(
       httpStatus = BAD_REQUEST,
-      response = Left(auditErrors)
+      payload = Left(auditErrors)
     )
 
   val successAuditResponse: JsValue = Json.parse(
@@ -59,7 +59,7 @@ object AuditResponseFixture {
     s"""
        |{
        |  "httpStatus": $OK,
-       |  "body":{
+       |  "payload":{
        |    "response": "success"
        |  }
        |}
