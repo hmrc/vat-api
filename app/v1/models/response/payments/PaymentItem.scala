@@ -20,9 +20,11 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class PaymentItem(amount: Option[BigDecimal],
-                     received: Option[String])
+                       received: Option[String])
 
   object PaymentItem {
+
+    val empty: PaymentItem = PaymentItem(None, None)
 
     implicit val writes: Writes[PaymentItem] = Json.writes[PaymentItem]
 
