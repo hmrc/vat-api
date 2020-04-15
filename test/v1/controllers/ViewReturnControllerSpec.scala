@@ -45,11 +45,11 @@ class ViewReturnControllerSpec
     val hc: HeaderCarrier = HeaderCarrier()
 
     val controller: ViewReturnController = new ViewReturnController(
-      mockEnrolmentsAuthService,
-      mockViewReturnRequestParser,
-      mockViewReturnService,
-      mockAuditService,
-      cc
+      authService = mockEnrolmentsAuthService,
+      requestParser = mockViewReturnRequestParser,
+      service = mockViewReturnService,
+      auditService = mockAuditService,
+      cc = cc
     )
 
     MockEnrolmentsAuthService.authoriseUser()
