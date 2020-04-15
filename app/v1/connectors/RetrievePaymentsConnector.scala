@@ -20,17 +20,17 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.LiabilityResponse
+import v1.models.request.payments.PaymentsRequest
+import v1.models.response.payments.PaymentsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
-                                    val appConfig: AppConfig) extends BaseDesConnector {
+class RetrievePaymentsConnector @Inject()(val http: HttpClient,
+                                          val appConfig: AppConfig) extends BaseDesConnector {
 
-  def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
-                                                     ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
+  def retrievePayments(request: PaymentsRequest)(implicit hc: HeaderCarrier,
+                                                 ec: ExecutionContext): Future[DesOutcome[PaymentsResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
@@ -45,7 +45,7 @@ class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
     )
 
     get(
-      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
+      uri = DesUri[PaymentsResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
       queryParams = queryParams
     )
   }

@@ -34,16 +34,16 @@ object LiabilityResponse {
         paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
       }
     }
-  }.filter(_.nonEmpty).map(LiabilityResponse(_))
+  }.map(LiabilityResponse(_))
 
   //filter particular payments
-  private def paymentCheck(liability: Liability) = {
+  private def paymentCheck(liability: Liability): Boolean = {
     val liabilityType = liability.`type`.toLowerCase
     liabilityType != "payment on account" && liabilityType != "hybrid payments"
   }
 
   //filter the payments that have response to date beyond the request to date
-  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String) = {
+  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String): Boolean = {
     val toDate = taxPeriod.fold(None: Option[LocalDate]){l => Some(LocalDate.parse(l.to))}
     toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }

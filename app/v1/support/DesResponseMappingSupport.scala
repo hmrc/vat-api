@@ -19,9 +19,27 @@ package v1.support
 import utils.{EndpointLogContext, Logging}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
+import v1.models.response.liability.LiabilityResponse
+import v1.models.response.payments.PaymentsResponse
 
 trait DesResponseMappingSupport {
   self: Logging =>
+
+  final def validatePaymentsSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
+    desResponseWrapper.responseData match {
+      case paymentsResponse: PaymentsResponse if paymentsResponse.payments.isEmpty =>
+        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), NotFoundError, None))
+      case _ => Right(desResponseWrapper)
+    }
+  }
+
+  final def validateLiabilitiesSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
+    desResponseWrapper.responseData match {
+      case liabilityResponse: LiabilityResponse if liabilityResponse.liabilities.isEmpty =>
+        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), NotFoundError, None))
+      case _ => Right(desResponseWrapper)
+    }
+  }
 
   final def mapDesErrors[D](errorCodeMap: PartialFunction[String, MtdError])(desResponseWrapper: ResponseWrapper[DesError])(
     implicit logContext: EndpointLogContext): ErrorWrapper = {

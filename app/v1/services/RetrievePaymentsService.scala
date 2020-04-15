@@ -21,25 +21,25 @@ import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
-import v1.connectors.RetrieveLiabilitiesConnector
+import v1.connectors.RetrievePaymentsConnector
 import v1.models.errors._
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.LiabilityResponse
+import v1.models.request.payments.PaymentsRequest
+import v1.models.response.payments.PaymentsResponse
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnector) extends DesResponseMappingSupport with Logging {
+class RetrievePaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
 
-  def retrieveLiabilities(request: LiabilityRequest)(
+  def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[LiabilityResponse]] = {
+    logContext: EndpointLogContext): Future[ServiceOutcome[PaymentsResponse]] = {
 
     val result = for {
-      desResponseWrapper <- EitherT(connector.retrieveLiabilities(request)).leftMap(mapDesErrors(desErrorMap))
-      mtdResponseWrapper <- EitherT.fromEither[Future](validateLiabilitiesSuccessResponse(desResponseWrapper))
+      desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))
+      mtdResponseWrapper <- EitherT.fromEither[Future](validatePaymentsSuccessResponse(desResponseWrapper))
     } yield mtdResponseWrapper
 
     result.value
@@ -56,8 +56,8 @@ class RetrieveLiabilitiesService @Inject()(connector: RetrieveLiabilitiesConnect
       "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
       "INVALID_DATEFROM" -> InvalidDateFromError,
       "INVALID_DATETO" -> InvalidDateToError,
-      "NOT_FOUND" -> LegacyNotFoundError,
       "INVALID_DATA" -> InvalidDataError,
+      "NOT_FOUND" -> LegacyNotFoundError,
       "SERVER_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )

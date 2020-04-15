@@ -44,10 +44,10 @@ object PaymentsResponse {
         paymentCheck(payment) && dateCheck(payment.taxPeriod, to)
       }
     }
-  }.filter(_.nonEmpty).map(PaymentsResponse(_))
+  }.map(PaymentsResponse(_))
 
   //filter particular payments
-  private def paymentCheck(payment: Payment) = {
+  private def paymentCheck(payment: Payment): Boolean = {
     val paymentType = payment.`type`.toLowerCase
     paymentType != "payment on account"
   }
