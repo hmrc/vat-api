@@ -16,7 +16,7 @@
 
 package v1.models.response.payments
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
 import v1.models.response.payments.PaymentsResponse.Payment
@@ -25,8 +25,126 @@ class PaymentsResponseSpec extends UnitSpec {
 
   implicit val to: String = "2017-12-01"
 
+  val desJson: JsValue = Json.parse(
+    """
+      |{
+      |   "idType":"VRN",
+      |   "idNumber":"100062914",
+      |   "regimeType":"VATC",
+      |   "processingDate":"2017-05-13T09:30:00.000Z",
+      |   "financialTransactions":[
+      |      {
+      |         "chargeType":"VAT Return Debit Charge",
+      |         "taxPeriodFrom":"2017-02-01",
+      |         "taxPeriodTo":"2017-02-28",
+      |         "items":[
+      |            {
+      |               "clearingDate":"2017-02-11",
+      |               "paymentAmount":5.0
+      |            },
+      |            {
+      |               "clearingDate":"2017-04-11",
+      |               "paymentAmount":10.0
+      |            },
+      |         ]
+      |      },
+      |      {
+      |         "chargeType":"VAT Return Debit Charge",
+      |         "mainType":"VAT Return Charge",
+      |         "periodKey":"15AD",
+      |         "periodKeyDescription":"February 2018",
+      |         "taxPeriodFrom":"2017-04-20",
+      |         "taxPeriodTo":"2017-09-28",
+      |      }
+      |   ]
+      |}
+    """.stripMargin
+  )
+
+  val mtdJson: JsValue = Json.parse(
+    """
+       |{
+       |   "payments":[
+       |      {
+       |         "amount":5,
+       |         "received":"2017-02-11"
+       |      },
+       |      {
+       |         "amount":10,
+       |         "received":"2017-04-11"
+       |      }
+       |   ]
+       |}
+    """.stripMargin
+  )
+
+  val paymentsResponse: PaymentsResponse =
+    PaymentsResponse(
+      Seq(
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
+          `type` = "VAT Return Debit Charge",
+          paymentItems = Some(Seq(
+            PaymentItem(amount = Some(5.00), received = Some("2017-02-11")),
+            PaymentItem(amount = Some(10.00), received = Some("2017-04-11"))
+          ))
+        ),
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-04-20", to = "2017-09-28")),
+          `type` = "VAT Return Debit Charge",
+          paymentItems = None
+        )
+      )
+    )
+
+  "PaymentResponse" when {
+    "read from valid JSON" should {
+      "produce the expected PaymentResponse object" in {
+        desJson.as[PaymentsResponse] shouldBe paymentsResponse
+      }
+    }
+
+    "read from valid JSON with some unsupported items" should {
+      "filter away any payments with an unsupported `type`" in {
+
+      }
+
+      "filter away any payments with an unsupported date" in {
+
+      }
+
+      "filter away any payments without paymentItems" in {
+
+      }
+
+      "apply all three filters correctly" in {
+
+      }
+    }
+
+    "read from valid JSON with only unsupported items" should {
+      "return an empty sequence of payments" in {
+
+      }
+    }
+
+    "read from invalid JSON" should {
+      "produce a JsError" in {
+
+      }
+    }
+
+    "written to JSON" should {
+      "produce the expected JsObject" in {
+        Json.toJson(paymentsResponse) shouldBe mtdJson
+      }
+    }
+  }
+
+
+
   "PaymentResponse" should {
-    "return payments for all charge types other than `Payment on account` " when {
+    "return payments for all charge types other than `Payment on account`" when {
 
       "multiple financialTransaction types received" in {
         val desJson = Json.parse(

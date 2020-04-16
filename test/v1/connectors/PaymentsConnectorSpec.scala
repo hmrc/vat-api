@@ -27,7 +27,7 @@ import v1.models.response.payments.{PaymentItem, PaymentsResponse}
 
 import scala.concurrent.Future
 
-class RetrievePaymentsConnectorSpec extends ConnectorSpec {
+class PaymentsConnectorSpec extends ConnectorSpec {
 
   private val vrn: String = "123456789"
 
@@ -69,8 +69,8 @@ class RetrievePaymentsConnectorSpec extends ConnectorSpec {
 
   class Test extends MockHttpClient with MockAppConfig {
 
-    val connector: RetrievePaymentsConnector =
-      new RetrievePaymentsConnector(
+    val connector: PaymentsConnector =
+      new PaymentsConnector(
         http = mockHttpClient,
         appConfig = mockAppConfig
       )

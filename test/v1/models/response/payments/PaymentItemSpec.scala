@@ -48,13 +48,13 @@ class PaymentItemSpec extends UnitSpec {
     """.stripMargin
   )
 
-  val paymentItemResponse: PaymentItem =
+  val paymentItemModel: PaymentItem =
     PaymentItem(amount = Some(100.2), received = Some("2017-01-01"))
 
   "PaymentItem" when {
     "read from valid JSON" should {
       "produce the expected PaymentItem object" in {
-        desJson.as[PaymentItem] shouldBe paymentItemResponse
+        desJson.as[PaymentItem] shouldBe paymentItemModel
       }
 
       "handle missing optional fields" in {
@@ -68,15 +68,15 @@ class PaymentItemSpec extends UnitSpec {
 
     "written to JSON" should {
       "produce the expected Js Object" in {
-        Json.toJson(paymentItemResponse) shouldBe mtdJson
+        Json.toJson(paymentItemModel) shouldBe mtdJson
       }
 
       "not write empty fields" in {
 
-        val emptyPaymentItemResponse: PaymentItem =
+        val emptyPaymentItemModel: PaymentItem =
           PaymentItem(amount = None, received = None)
 
-        Json.toJson(emptyPaymentItemResponse) shouldBe JsObject.empty
+        Json.toJson(emptyPaymentItemModel) shouldBe JsObject.empty
       }
     }
   }

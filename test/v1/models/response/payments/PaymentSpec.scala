@@ -140,7 +140,7 @@ class PaymentSpec extends UnitSpec {
       |}
     """.stripMargin)
 
-  private val paymentResponse = Payment(
+  private val paymentModel = Payment(
     taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
     `type` = "VAT Return Debit Charge",
     paymentItems = Some(Seq(
@@ -148,7 +148,7 @@ class PaymentSpec extends UnitSpec {
     ))
   )
 
-  private val multipleItemPaymentResponse =
+  private val multipleItemPaymentModel =
     Payment(
       taxPeriod = Some(TaxPeriod("2017-03-01", "2017-03-25")),
       `type` = "VAT Return Debit Charge",
@@ -161,13 +161,13 @@ class PaymentSpec extends UnitSpec {
   "Payment" when {
     "read from valid JSON" should {
       "produce the expected Payment object" in {
-        desJson.as[Payment] shouldBe paymentResponse
+        desJson.as[Payment] shouldBe paymentModel
       }
     }
 
     "read from valid JSON with multiple payment items" should {
       "produce the expected Payment object" in {
-        multipleItemDesJson.as[Payment] shouldBe multipleItemPaymentResponse
+        multipleItemDesJson.as[Payment] shouldBe multipleItemPaymentModel
       }
     }
 
@@ -182,14 +182,14 @@ class PaymentSpec extends UnitSpec {
             """.stripMargin
         )
 
-        val mandatoryOnlyPaymentResponse: Payment =
+        val mandatoryOnlyPaymentModel: Payment =
           Payment(
             taxPeriod = None,
             `type` = "VAT Return Debit Charge",
             paymentItems = None
           )
 
-        mandatoryOnlyDesJson.as[Payment] shouldBe mandatoryOnlyPaymentResponse
+        mandatoryOnlyDesJson.as[Payment] shouldBe mandatoryOnlyPaymentModel
       }
     }
 
@@ -221,7 +221,7 @@ class PaymentSpec extends UnitSpec {
             """.stripMargin
         )
 
-        val invalidItemsPaymentResponse: Payment =
+        val invalidItemsPaymentModel: Payment =
           Payment(
             taxPeriod = Some(TaxPeriod("2017-02-01", "2017-02-28")),
             `type` = "VAT Return Debit Charge",
@@ -231,7 +231,7 @@ class PaymentSpec extends UnitSpec {
             ))
           )
 
-        invalidItemsDesJson.as[Payment] shouldBe invalidItemsPaymentResponse
+        invalidItemsDesJson.as[Payment] shouldBe invalidItemsPaymentModel
       }
     }
 
@@ -266,14 +266,14 @@ class PaymentSpec extends UnitSpec {
             """.stripMargin
         )
 
-        val noValidItemsPaymentResponse: Payment =
+        val noValidItemsPaymentModel: Payment =
           Payment(
             taxPeriod = Some(TaxPeriod("2017-02-01", "2017-02-28")),
             `type` = "VAT Return Debit Charge",
             paymentItems = None
           )
 
-        noValidItemsDesJson.as[Payment] shouldBe noValidItemsPaymentResponse
+        noValidItemsDesJson.as[Payment] shouldBe noValidItemsPaymentModel
       }
     }
 

@@ -21,7 +21,7 @@ import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
-import v1.connectors.RetrievePaymentsConnector
+import v1.connectors.PaymentsConnector
 import v1.models.errors._
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
@@ -30,7 +30,7 @@ import v1.support.DesResponseMappingSupport
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PaymentsService @Inject()(connector: RetrievePaymentsConnector) extends DesResponseMappingSupport with Logging {
+class PaymentsService @Inject()(connector: PaymentsConnector) extends DesResponseMappingSupport with Logging {
 
   def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,

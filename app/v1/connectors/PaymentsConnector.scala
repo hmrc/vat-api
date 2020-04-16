@@ -26,8 +26,8 @@ import v1.models.response.payments.PaymentsResponse
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrievePaymentsConnector @Inject()(val http: HttpClient,
-                                          val appConfig: AppConfig) extends BaseDesConnector {
+class PaymentsConnector @Inject()(val http: HttpClient,
+                                  val appConfig: AppConfig) extends BaseDesConnector {
 
   def retrievePayments(request: PaymentsRequest)(implicit hc: HeaderCarrier,
                                                  ec: ExecutionContext): Future[DesOutcome[PaymentsResponse]] = {

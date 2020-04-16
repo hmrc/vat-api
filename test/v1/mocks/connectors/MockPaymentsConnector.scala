@@ -19,15 +19,15 @@ package v1.mocks.connectors
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{DesOutcome, RetrievePaymentsConnector}
+import v1.connectors.{DesOutcome, PaymentsConnector}
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockRetrievePaymentsConnector extends MockFactory {
+trait MockPaymentsConnector extends MockFactory {
 
-  val mockRetrievePaymentsConnector: RetrievePaymentsConnector = mock[RetrievePaymentsConnector]
+  val mockRetrievePaymentsConnector: PaymentsConnector = mock[PaymentsConnector]
 
   object MockRetrievePaymentsConnector {
 

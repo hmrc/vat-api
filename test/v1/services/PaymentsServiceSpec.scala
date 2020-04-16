@@ -20,7 +20,7 @@ import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
-import v1.mocks.connectors.MockRetrievePaymentsConnector
+import v1.mocks.connectors.MockPaymentsConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest
@@ -54,7 +54,7 @@ class PaymentsServiceSpec extends UnitSpec {
       )
     )
 
-  trait Test extends MockRetrievePaymentsConnector {
+  trait Test extends MockPaymentsConnector {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
