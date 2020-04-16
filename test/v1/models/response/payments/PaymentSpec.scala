@@ -19,6 +19,7 @@ package v1.models.response.payments
 import play.api.libs.json.{JsError, Json}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
+import v1.models.response.payments.PaymentsResponse.Payment
 
 class PaymentSpec extends UnitSpec {
 

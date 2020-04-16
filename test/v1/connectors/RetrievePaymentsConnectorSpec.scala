@@ -22,7 +22,8 @@ import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.common.TaxPeriod
-import v1.models.response.payments.{Payment, PaymentItem, PaymentsResponse}
+import v1.models.response.payments.PaymentsResponse.Payment
+import v1.models.response.payments.{PaymentItem, PaymentsResponse}
 
 import scala.concurrent.Future
 
