@@ -27,36 +27,26 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RetrieveLiabilitiesConnector @Inject()(val http: HttpClient,
-                                    val appConfig: AppConfig) extends BaseDesConnector {
+                                             val appConfig: AppConfig) extends BaseDesConnector {
 
   def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
                                                      ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
+
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
-    val queryString = "&onlyOpenItems=false&includeLocks=false&calculateAccruedInterest=true&customerPaymentInformation=true"
+
+    val queryParams: Seq[(String, String)] = Seq(
+      ("dateFrom" , request.from),
+      ("dateTo" , request.to),
+      ("onlyOpenItems" , "false"),
+      ("includeLocks" , "false"),
+      ("calculateAccruedInterest" , "true"),
+      ("customerPaymentInformation" , "true")
+    )
+
     get(
-      uri = DesUri[LiabilityResponse](s"VRN/${request.vrn.vrn}/VATC?dateFrom=${request.from}&dateTo=${request.to}$queryString")
+      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
+      queryParams = queryParams
     )
   }
-
-//  def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
-//                                                     ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
-//
-//    import v1.connectors.httpparsers.StandardDesHttpParser._
-//    implicit val requestToDate: String = request.to
-//
-//    val queryParams: Seq[(String, String)] = Seq(
-//      ("dateFrom" , request.from),
-//      ("dateTo" , request.to),
-//      ("onlyOpenItems" , "false"),
-//      ("includeLocks" , "false"),
-//      ("calculateAccruedInterest" , "true"),
-//      ("customerPaymentInformation" , "true")
-//    )
-//
-//    get(
-//      uri = DesUri[LiabilityResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
-//      queryParams = queryParams
-//    )
-//  }
 }

@@ -39,13 +39,13 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "FinancialDataResource",
+      controllerName = "RetrieveLiabilitiesController",
       endpointName = "retrieveLiabilities"
     )
 
   def retrieveLiabilities(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
-      logger.info(message = s"[FinancialDataResource][retrieveLiabilities] Retrieving Liabilities from DES")
+      logger.info(message = s"[RetrieveLiabilitiesController][retrieveLiabilities] Retrieving Liabilities from DES")
 
       val rawRequest: LiabilityRawData = LiabilityRawData(vrn, from, to)
 
@@ -53,7 +53,7 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
         serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
-        logger.info(message = s"[FinancialDataResource][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+        logger.info(message = s"[RetrieveLiabilitiesController][retrieveLiabilities] Successfully retrieved Liabilities from DES")
 
         Ok(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId)
@@ -74,6 +74,7 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
            RuleDateRangeInvalidError | BadRequestError | InvalidDataError => BadRequest(Json.toJson(errorWrapper))
       case LegacyUnauthorisedError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
+      case NotFoundError => NotFound
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }
   }
