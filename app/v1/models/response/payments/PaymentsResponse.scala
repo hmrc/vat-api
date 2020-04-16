@@ -62,7 +62,7 @@ object PaymentsResponse {
   implicit def reads(implicit to: String): Reads[PaymentsResponse] = {
     (JsPath \ "financialTransactions").read[Seq[Payment]].map { payments =>
       payments.filter { payment =>
-        paymentCheck(payment) && dateCheck(payment.taxPeriod, to)
+        paymentCheck(payment) && dateCheck(payment.taxPeriod, to) && itemsCheck(payment.paymentItems)
       }
     }
     }.map(PaymentsResponse(_))
@@ -74,9 +74,15 @@ object PaymentsResponse {
   }
 
   //filter the payments that have response to date beyond the request to date
-  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String) = {
+  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String): Boolean = {
     val toDate = taxPeriod.fold(None: Option[LocalDate]) { l => Some(LocalDate.parse(l.to)) }
     toDate.fold(true) { desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }
+  }
+
+  //filter the payments which do not have any payment items
+  private def itemsCheck (items : Option[Seq[PaymentItem]]): Boolean = items match {
+    case Some(_) => true
+    case None => false
   }
 }
