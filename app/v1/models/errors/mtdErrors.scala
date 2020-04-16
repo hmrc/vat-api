@@ -63,11 +63,11 @@ object InvalidStatusError extends MtdError("INVALID_STATUS", "Invalid status", S
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
 
-object RuleDateRangeInvalidError extends MtdError("INVALID_DATE_RANGE", "Invalid date range, must be 366 days or less", Some(Json.parse(
+object RuleDateRangeInvalidError extends MtdError("INVALID_DATE_RANGE", "Invalid date range, must be 365 days or less", Some(Json.parse(
   """
     |{
     |    "statusCode": 400,
-    |    "message": "INVALID_DATE_RANGE"
+    |    "message": "DATE_RANGE_INVALID"
     |}
     |""".stripMargin)))
 
@@ -260,9 +260,35 @@ object LegacyUnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED"
 
 object InvalidDataError extends MtdError("INVALID_DATA", "The provided data has failed validation, contains invalid data.")
 
-object InvalidDateToError extends MtdError("DATE_TO_INVALID", "The provided to date is invalid.")
+object InvalidDateToError extends MtdError(
+  code = "DATE_TO_INVALID",
+  message = "Invalid date to",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "DATE_TO_INVALID"
+        |}
+        |""".stripMargin
+    )
+  )
+)
 
-object InvalidDateFromError extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid.")
+object InvalidDateFromError extends MtdError(
+  code = "DATE_FROM_INVALID",
+  message = "Invalid date from",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "statusCode": 400,
+        |  "message": "DATE_FROM_INVALID"
+        |}
+        |""".stripMargin
+    )
+  )
+)
 
 object InvalidDesStatusError extends MtdError("INVALID_STATUS","The provided data is failed validation, invalid status.")
 

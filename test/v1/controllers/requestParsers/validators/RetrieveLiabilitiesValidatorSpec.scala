@@ -27,7 +27,7 @@ class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
   private val validVrn = "123456789"
   private val invalidVrn = "thisIsNotAVrn"
   private val validFrom = "2020-01-01"
-  private val validTo =  "2020-12-31"
+  private val validTo =  "2020-02-31"
 
   "running a validation" should {
     "return no errors" when {
