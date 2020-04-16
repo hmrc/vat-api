@@ -42,7 +42,7 @@ object InvalidFromError extends MtdError("INVALID_DATE_FROM", "Invalid date from
     |   "statusCode": 400,
     |   "message": "INVALID_DATE_FROM"
     |}
-    |""".stripMargin)))
+  """.stripMargin)))
 
 object InvalidToError extends MtdError("INVALID_DATE_TO", "Invalid date to", Some(Json.parse(
   """
@@ -50,7 +50,7 @@ object InvalidToError extends MtdError("INVALID_DATE_TO", "Invalid date to", Som
     |   "statusCode": 400,
     |   "message": "INVALID_DATE_TO"
     |}
-    |""".stripMargin)))
+  """.stripMargin)))
 
 object InvalidStatusError extends MtdError("INVALID_STATUS", "Invalid status", Some(Json.parse(
   """
@@ -58,7 +58,7 @@ object InvalidStatusError extends MtdError("INVALID_STATUS", "Invalid status", S
     |   "statusCode": 400,
     |   "message": "INVALID_STATUS"
     |}
-    |""".stripMargin)))
+  """.stripMargin)))
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
@@ -77,7 +77,7 @@ object RuleMissingDateRangeError extends MtdError("MISSING_DATE_RANGE", "Missing
     |    "statusCode": 400,
     |    "message": "MISSING_DATE_RANGE"
     |}
-    |""".stripMargin)))
+  """.stripMargin)))
 
 // Standard Errors
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
@@ -153,7 +153,7 @@ object FinancialDataInvalidDateFromError extends MtdError(
         |  "statusCode": 400,
         |  "message": "DATE_FROM_INVALID"
         |}
-        |""".stripMargin
+      """.stripMargin
     )
   )
 )
@@ -168,7 +168,7 @@ object FinancialDataInvalidDateToError extends MtdError(
         |  "statusCode": 400,
         |  "message": "DATE_TO_INVALID"
         |}
-        |""".stripMargin
+      """.stripMargin
     )
   )
 )
@@ -183,7 +183,7 @@ object FinancialDataInvalidDateRangeError extends MtdError(
         |    "statusCode": 400,
         |    "message": "DATE_RANGE_INVALID"
         |}
-        |""".stripMargin
+      """.stripMargin
     )
   )
 )
@@ -198,7 +198,7 @@ object LegacyInvalidStatusError extends MtdError(
         |  "statusCode": 400,
         |  "message": "INVALID_STATUS"
         |}
-        |""".stripMargin
+      """.stripMargin
     )
   )
 )

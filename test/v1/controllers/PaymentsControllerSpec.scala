@@ -194,10 +194,10 @@ class PaymentsControllerSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
-          (PeriodKeyFormatErrorDes, BAD_REQUEST),
-          (PeriodKeyFormatErrorDesNotFound, NOT_FOUND),
-          (RuleDateRangeTooLargeError, FORBIDDEN),
-          (InvalidInputDataError, FORBIDDEN),
+          (InvalidDateFromErrorDes, BAD_REQUEST),
+          (InvalidDateToErrorDes, BAD_REQUEST),
+          (InvalidDataError, BAD_REQUEST),
+          (LegacyNotFoundError, NOT_FOUND),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
