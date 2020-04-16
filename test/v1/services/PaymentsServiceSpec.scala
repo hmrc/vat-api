@@ -46,7 +46,9 @@ class PaymentsServiceSpec extends UnitSpec {
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
-          paymentItem = Some(Seq(PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))))
+          paymentItems = Some(Seq(
+            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
+          ))
         )
       )
     )

@@ -25,16 +25,13 @@ case class PaymentsResponse(payments: Seq[Payment])
 
 object PaymentsResponse {
 
-  implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) => Json.obj("payments" -> {
-    for (
-      payment <- paymentsResponse.payments
-      if payment.paymentItem.isDefined;
-      item <- payment.paymentItem.get
-    ) yield Json.obj(
-      "amount" -> item.amount,
-      "received" -> item.received
-    )
-  }
+  implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) =>
+    Json.obj("payments" -> {
+      for {
+        payment <- paymentsResponse.payments
+        item <- payment.paymentItems.getOrElse(Seq.empty[PaymentItem])
+      } yield Json.toJson(item)
+    }
   )
 
   //retrieve all transactions, filter out any particular payments, then return a model only if there's data
@@ -58,7 +55,4 @@ object PaymentsResponse {
     toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }
   }
-
-
-
 }
