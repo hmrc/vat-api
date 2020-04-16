@@ -22,16 +22,21 @@ import v1.models.response.common.TaxPeriod
 
 case class Payment(taxPeriod: Option[TaxPeriod],
                    `type`: String,
-                   paymentItem: Option[Seq[PaymentItem]])
+                   paymentItems: Option[Seq[PaymentItem]])
 
 object Payment {
-
-  implicit val writes: Writes[Payment] = Json.writes[Payment]
 
   implicit val reads: Reads[Payment] = (
     TaxPeriod.reads and
       (JsPath \ "chargeType").read[String] and
-      (JsPath \ "items").readNullable[Seq[PaymentItem]]
+      (JsPath \ "items").readNullable[Seq[PaymentItem]].map(filterNotEmpty)
     )(Payment.apply _)
 
+  def filterNotEmpty(items: Option[Seq[PaymentItem]]): Option[Seq[PaymentItem]] = {
+    items.map(_.filterNot(_ == PaymentItem.empty)) match {
+      case None => None
+      case Some(Nil) => None
+      case nonEmpty => nonEmpty
+    }
+  }
 }
