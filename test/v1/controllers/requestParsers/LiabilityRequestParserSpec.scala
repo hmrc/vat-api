@@ -19,7 +19,7 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockLiabilityValidator
-import v1.models.errors.{ErrorWrapper, FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, VrnFormatError}
+import v1.models.errors._
 import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
 
 class LiabilityRequestParserSpec extends UnitSpec {
@@ -69,6 +69,14 @@ class LiabilityRequestParserSpec extends UnitSpec {
 
         parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
           Left(ErrorWrapper(None, FinancialDataInvalidDateToError, None))
+      }
+
+      "invalid date range is provided" in new Test {
+        MockVrnValidator.validate(LiabilityRawData(validVrn, Some("2017-01-01"), Some("2019-01-01")))
+          .returns(List(FinancialDataInvalidDateRangeError))
+
+        parser.parseRequest(LiabilityRawData(validVrn, Some("2017-01-01"), Some("2019-01-01"))) shouldBe
+          Left(ErrorWrapper(None, FinancialDataInvalidDateRangeError, None))
       }
     }
   }

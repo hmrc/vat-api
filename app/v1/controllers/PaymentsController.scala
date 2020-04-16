@@ -79,7 +79,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
       case VrnFormatError | VrnFormatErrorDes |
            FinancialDataInvalidDateFromError | InvalidDateFromErrorDes |
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |
-           LegacyInvalidDateRangeError | InvalidDataError
+           FinancialDataInvalidDateRangeError | InvalidDataError
       => BadRequest(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))

@@ -17,14 +17,20 @@
 package v1.controllers
 
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.requestParsers.MockPaymentsRequestParser
 import v1.mocks.services.{MockEnrolmentsAuthService, MockPaymentsService}
+import v1.models.errors.{ErrorWrapper, MtdError, _}
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.{PaymentsRawData, PaymentsRequest}
-import v1.models.response.payments.PaymentsResponse
+import v1.models.response.common.TaxPeriod
+import v1.models.response.payments.PaymentsResponse.Payment
+import v1.models.response.payments.{PaymentItem, PaymentsResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class PaymentsControllerSpec
  extends ControllerBaseSpec
@@ -46,28 +52,43 @@ class PaymentsControllerSpec
   }
 
   val vrn: String = "123456789"
-  val toDate: String = ""
-  val fromDate: String = ""
+  val toDate: String = "2017-01-01"
+  val fromDate: String = "2018-01-01"
+
+  val correlationId: String = "X-ID"
 
   val rawData: PaymentsRawData =
-    PaymentsRawData(
-      vrn = vrn,
-      from = Some(fromDate),
-      to = Some(toDate)
-    )
+    PaymentsRawData(vrn = vrn, from = Some(fromDate), to = Some(toDate))
 
   val request: PaymentsRequest =
-    PaymentsRequest(
-      vrn = Vrn(vrn),
-      from = fromDate,
-      to = toDate
-    )
+    PaymentsRequest(vrn = Vrn(vrn), from = fromDate, to = toDate)
 
   val paymentsResponse: PaymentsResponse =
     PaymentsResponse(
       payments = Seq(
         Payment(
-
+          taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
+          `type` = "VAT Return Debit Charge",
+          paymentItems = Some(Seq(
+            PaymentItem(amount = Some(15.0), received = Some("2017-02-11"))
+          ))
+        ),
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-03-01", to = "2017-03-25")),
+          `type` = "VAT Return Debit Charge",
+          paymentItems = Some(Seq(
+            PaymentItem(amount = Some(40.00), received = Some("2017-03-11")),
+            PaymentItem(amount = Some(1001.00), received = Some("2017-03-12"))
+          ))
+        ),
+        Payment(
+          taxPeriod = Some(TaxPeriod(from = "2017-08-01", to = "2017-12-20")),
+          `type` = "VAT Return Debit Charge",
+          paymentItems = Some(Seq(
+            PaymentItem(Some(322.00), Some("2017-08-05")),
+            PaymentItem(Some(90.00), None),
+            PaymentItem(Some(6.00), Some("2017-09-12"))
+          ))
         )
       )
     )
@@ -77,30 +98,111 @@ class PaymentsControllerSpec
       |{
       |   "payments":[
       |      {
-      |         "amount":5,
+      |         "amount":15,
       |         "received":"2017-02-11"
       |      },
       |      {
-      |         "amount":50,
+      |         "amount":40,
       |         "received":"2017-03-11"
       |      },
       |      {
-      |         "amount":1000,
+      |         "amount":1001,
       |         "received":"2017-03-12"
       |      },
       |      {
-      |         "amount":321,
+      |         "amount":322,
       |         "received":"2017-08-05"
       |      },
       |      {
-      |         "amount":91
+      |         "amount":90
       |      },
       |      {
-      |         "amount":5,
+      |         "amount":6,
       |         "received":"2017-09-12"
       |      }
       |   ]
       |}
     """.stripMargin
   )
+
+  "retrievePayments" when {
+    "a valid request is supplied" should {
+      "return the expected data on a successful service call" in new Test{
+
+        MockPaymentsRequestParser
+          .parse(rawData)
+          .returns(Right(request))
+
+        MockPaymentsService
+          .retrievePayments(request)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, paymentsResponse))))
+
+        private val result = controller.retrievePayments(vrn, Some(fromDate), Some(toDate))(fakeGetRequest)
+
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe mtdJson
+        header("X-CorrelationId", result) shouldBe Some(correlationId)
+      }
+    }
+
+    "return the error as per spec" when {
+      "parser errors occur" must {
+        def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
+          s"a ${error.code} error is returned from the parser" in new Test {
+
+            MockPaymentsRequestParser
+              .parse(rawData)
+              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+
+            val result: Future[Result] = controller.retrievePayments(vrn, Some(fromDate), Some(toDate))(fakeGetRequest)
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(error)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+          }
+        }
+
+        val input = Seq(
+          (VrnFormatError, BAD_REQUEST),
+          (FinancialDataInvalidDateToError, BAD_REQUEST),
+          (FinancialDataInvalidDateFromError, BAD_REQUEST),
+          (FinancialDataInvalidDateRangeError, BAD_REQUEST)
+        )
+
+        input.foreach(args => (errorsFromParserTester _).tupled(args))
+      }
+
+      "service errors occur" must {
+        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
+          s"a $mtdError error is returned from the service" in new Test {
+
+            MockPaymentsRequestParser
+              .parse(rawData)
+              .returns(Right(request))
+
+            MockPaymentsService
+              .retrievePayments(request)
+              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+
+            val result: Future[Result] = controller.retrievePayments(vrn, Some(fromDate), Some(toDate))(fakeGetRequest)
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(mtdError)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+          }
+        }
+
+        val input = Seq(
+          (VrnFormatErrorDes, BAD_REQUEST),
+          (PeriodKeyFormatErrorDes, BAD_REQUEST),
+          (PeriodKeyFormatErrorDesNotFound, NOT_FOUND),
+          (RuleDateRangeTooLargeError, FORBIDDEN),
+          (InvalidInputDataError, FORBIDDEN),
+          (DownstreamError, INTERNAL_SERVER_ERROR)
+        )
+
+        input.foreach(args => (serviceErrors _).tupled(args))
+      }
+    }
+  }
 }

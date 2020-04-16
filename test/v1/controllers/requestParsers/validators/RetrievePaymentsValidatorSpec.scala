@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators
 
 import support.UnitSpec
-import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, RuleDateRangeInvalidError, VrnFormatError}
+import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateRangeError, FinancialDataInvalidDateToError, VrnFormatError}
 import v1.models.request.payments.PaymentsRawData
 
 class RetrievePaymentsValidatorSpec extends UnitSpec  {
@@ -66,7 +66,7 @@ class RetrievePaymentsValidatorSpec extends UnitSpec  {
 
     "return RuleDateRangeError error" when {
       "invalid date range is supplied" in {
-        validator.validate(PaymentsRawData(validVrn, Some("2018-01-01"), Some("2019-01-01"))) shouldBe List(RuleDateRangeInvalidError)
+        validator.validate(PaymentsRawData(validVrn, Some("2018-01-01"), Some("2019-01-01"))) shouldBe List(FinancialDataInvalidDateRangeError)
       }
     }
   }

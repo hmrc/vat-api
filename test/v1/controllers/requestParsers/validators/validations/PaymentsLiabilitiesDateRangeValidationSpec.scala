@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 import support.UnitSpec
-import v1.models.errors.RuleDateRangeInvalidError
+import v1.models.errors.FinancialDataInvalidDateRangeError
 
 class PaymentsLiabilitiesDateRangeValidationSpec extends UnitSpec {
 
@@ -37,7 +37,7 @@ class PaymentsLiabilitiesDateRangeValidationSpec extends UnitSpec {
     }
     "return a list containing an error" when {
       "passed an invalid date range" in {
-        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(RuleDateRangeInvalidError)
+        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(FinancialDataInvalidDateRangeError)
       }
 
     }
