@@ -16,8 +16,8 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
-import v1.models.errors.{InvalidFromError, InvalidToError, MtdError}
+import v1.controllers.requestParsers.validators.validations.{LiabilityDateValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
+import v1.models.errors.{InvalidDateFromError, InvalidDateToError, MtdError}
 import v1.models.request.liability.LiabilityRawData
 
 class LiabilitiesValidator extends Validator[LiabilityRawData]  {
@@ -33,8 +33,8 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
   private def fromDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
       data.from match {
-        case None => List(InvalidFromError)
-        case Some(from) => DateFormatValidation.validate(from, InvalidFromError)
+        case None => List(InvalidDateFromError)
+        case Some(from) => LiabilityDateValidation.validate(from, InvalidDateFromError)
       }
     )
   }
@@ -42,8 +42,8 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
   private def toDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
       data.to match {
-        case None => List(InvalidToError)
-        case Some(to) => DateFormatValidation.validate(to, InvalidToError)
+        case None => List(InvalidDateToError)
+        case Some(to) => LiabilityDateValidation.validate(to, InvalidDateToError)
       }
     )
   }
