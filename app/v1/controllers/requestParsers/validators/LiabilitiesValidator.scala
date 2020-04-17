@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, DateRangeValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
+import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
 import v1.models.errors.{InvalidFromError, InvalidToError, MtdError}
 import v1.models.request.liability.LiabilityRawData
 
