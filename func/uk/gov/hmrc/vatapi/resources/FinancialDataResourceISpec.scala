@@ -239,7 +239,6 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        AuthStub.authorised()
         DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidOnlyOpenItems)
       }
 
