@@ -84,7 +84,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         response.json shouldBe Jsons.FinancialData.oneLiability
       }
 
-      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date before period to date " in new Test {
+      "retrieve a single liability where multiple liabilities exist with only one within the specific period to date - Param to date before period to date" in new Test {
 
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-03-30"
 

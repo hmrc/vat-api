@@ -36,7 +36,7 @@ trait DesResponseMappingSupport {
   final def validateLiabilitiesSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
     desResponseWrapper.responseData match {
       case liabilityResponse: LiabilityResponse if liabilityResponse.liabilities.isEmpty =>
-        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), NotFoundError, None))
+        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), LegacyNotFoundError, None))
       case _ => Right(desResponseWrapper)
     }
   }
