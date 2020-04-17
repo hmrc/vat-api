@@ -43,7 +43,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
       "reject client with no authorization" in new Test {
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.unauthorisedNotLoggedIn()
         }
 
@@ -59,7 +59,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.oneLiability)
         }
@@ -74,7 +74,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.oneLiability)
         }
@@ -89,7 +89,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-03-30"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-03-30"), OK, FinancialData.oneLiability)
         }
@@ -119,7 +119,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.minLiability)
         }
@@ -134,7 +134,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-06-02"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.liabilitiesOverlapping)
         }
@@ -149,7 +149,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multipleLiabilities)
         }
@@ -164,7 +164,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multipleLiabilitiesWithPaymentOnAccount)
         }
@@ -179,7 +179,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidIdNumber)
         }
@@ -195,7 +195,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.emptyLiabilities)
         }
@@ -210,7 +210,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
       override def setupStubs(): StubMapping = {
-        //AuditStub.audit()
+        AuditStub.audit()
         AuthStub.authorised()
         DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidIdType)
       }
@@ -224,7 +224,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
       override def setupStubs(): StubMapping = {
-        //AuditStub.audit()
+        AuditStub.audit()
         AuthStub.authorised()
         DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidRegimeType)
       }
@@ -312,7 +312,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
 
        override def setupStubs(): StubMapping = {
-         //AuditStub.audit()
+         AuditStub.audit()
          AuthStub.authorised()
          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.onePayment)
        }
@@ -327,7 +327,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
 
        override def setupStubs(): StubMapping = {
-         //AuditStub.audit()
+         AuditStub.audit()
          AuthStub.authorised()
          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.minPayment)
        }
@@ -345,7 +345,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
 
        override def setupStubs(): StubMapping = {
-         //AuditStub.audit()
+         AuditStub.audit()
          AuthStub.authorised()
          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-06-02"), OK, FinancialData.overlappingPayment)
        }
@@ -363,7 +363,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-12-31"
 
        override def setupStubs(): StubMapping = {
-         //AuditStub.audit()
+         AuditStub.audit()
          AuthStub.authorised()
          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.multiplePayments)
        }
@@ -378,7 +378,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-12-31"
 
        override def setupStubs(): StubMapping = {
-         //AuditStub.audit()
+         AuditStub.audit()
          AuthStub.authorised()
          DesStub.onSuccess(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), OK, FinancialData.noPayment)
        }

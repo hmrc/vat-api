@@ -68,6 +68,10 @@ class RetrieveLiabilitiesValidatorSpec extends UnitSpec  {
       "invalid date range is supplied" in {
         validator.validate(LiabilityRawData(validVrn, Some("2018-01-01"), Some("2019-01-01"))) shouldBe List(RuleDateRangeInvalidError)
       }
+
+      "two same dates are supplied" in {
+        validator.validate(LiabilityRawData(validVrn, Some(validTo), Some(validTo))) shouldBe List(RuleDateRangeInvalidError)
+      }
     }
   }
 }

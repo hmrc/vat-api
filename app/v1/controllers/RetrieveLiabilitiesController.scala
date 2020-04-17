@@ -39,7 +39,7 @@ class RetrieveLiabilitiesController @Inject()(val authService: EnrolmentsAuthSer
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "FinancialDataResource",
+      controllerName = "RetrieveLiabilitiesController",
       endpointName = "retrieveLiabilities"
     )
 

@@ -18,15 +18,23 @@ package v1.controllers.requestParsers.validators.validations
 
 import java.time.LocalDate
 
-import v1.models.errors.MtdError
+import v1.models.errors.{InvalidDateToError, MtdError}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
-object DateToValidation {
+object LiabilityDateValidation {
+
   def validate(toDate: String, error: MtdError): List[MtdError] = Try {
     LocalDate.parse(toDate, dateFormat)
   } match {
-    case Success(date) if !date.isAfter(LocalDate.now()) => NoValidationErrors
+    case Success(date) if extraDateValidation(error,date) => NoValidationErrors
     case _ => List(error)
+  }
+
+  private def extraDateValidation(error: MtdError, date: LocalDate) = {
+    error match {
+      case InvalidDateToError => !date.isAfter(LocalDate.now())
+      case invalidDateFromError@_ => date.isAfter(LocalDate.parse("2016-04-06"))
+    }
   }
 }

@@ -65,7 +65,7 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
       "a valid request is made" in new Test{
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams, OK, desJson)
         }
@@ -97,7 +97,7 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
           """.stripMargin
 
         override def setupStubs(): StubMapping = {
-          //AuditStub.audit()
+          AuditStub.audit()
           AuthStub.authorised()
           DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
         }
@@ -120,7 +120,7 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
           override val to: String = toDate
 
           override def setupStubs(): StubMapping = {
-            //AuditStub.audit()
+            AuditStub.audit()
             AuthStub.authorised()
           }
 
@@ -145,7 +145,7 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
         s"des returns an $desCode error and status $desStatus" in new Test {
 
           override def setupStubs(): StubMapping = {
-            //AuditStub.audit()
+            AuditStub.audit()
             AuthStub.authorised()
             DesStub.onError(DesStub.GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
           }
