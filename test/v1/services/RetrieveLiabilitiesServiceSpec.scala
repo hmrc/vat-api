@@ -71,7 +71,7 @@ class RetrieveLiabilitiesServiceSpec extends UnitSpec {
         MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilityResponse(Seq.empty[Liability])))))
 
-        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), NotFoundError))
+        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), LegacyNotFoundError))
       }
     }
 
