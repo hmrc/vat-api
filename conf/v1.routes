@@ -8,7 +8,7 @@ POST        /:vrn/returns                   @uk.gov.hmrc.vatapi.resources.VatRet
 GET         /:vrn/returns/:periodKey        v1.controllers.ViewReturnController.viewReturn(vrn, periodKey)
 
 # VAT Liabilities
-GET         /:vrn/liabilities               v1.controllers.RetrieveLiabilitiesController.retrieveLiabilities(vrn, from: Option[String], to: Option[String])
+GET         /:vrn/liabilities               v1.controllers.LiabilitiesController.retrieveLiabilities(vrn, from: Option[String], to: Option[String])
 
 # VAT Payments
 GET         /:vrn/payments                  v1.controllers.PaymentsController.retrievePayments(vrn, from: Option[String], to: Option[String])

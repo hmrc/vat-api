@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package v1.mocks.services
+package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
+import v1.connectors.{DesOutcome, LiabilitiesConnector}
 import v1.models.request.liability.LiabilityRequest
 import v1.models.response.liability.LiabilityResponse
-import v1.services.{RetrieveLiabilitiesService, ServiceOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockRetrieveLiabilitiesService extends MockFactory {
+trait MockLiabilitiesConnector extends MockFactory {
 
-  val mockRetrieveLiabilitiesService: RetrieveLiabilitiesService = mock[RetrieveLiabilitiesService]
+  val mockRetrieveLiabilitiesConnector: LiabilitiesConnector = mock[LiabilitiesConnector]
 
-  object MockRetrieveLiabilitiesService {
+  object MockRetrieveLiabilitiesConnector {
 
-    def retrieveLiabilities(request: LiabilityRequest): CallHandler[Future[ServiceOutcome[LiabilityResponse]]] = {
-      (mockRetrieveLiabilitiesService
-        .retrieveLiabilities(_ : LiabilityRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext))
-        .expects(request, *, *, *)
+    def retrieveLiabilities(requestData: LiabilityRequest): CallHandler[Future[DesOutcome[LiabilityResponse]]] = {
+      (mockRetrieveLiabilitiesConnector
+        .retrieveLiabilities(_: LiabilityRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(requestData, *, *)
     }
   }
 

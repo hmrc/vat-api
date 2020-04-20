@@ -19,7 +19,7 @@ package v1.controllers.requestParsers.validators.validations
 import support.UnitSpec
 import v1.models.errors.FinancialDataInvalidDateRangeError
 
-class PaymentsLiabilitiesDateRangeValidationSpec extends UnitSpec {
+class FinancialDataDateRangeValidationSpec extends UnitSpec {
 
   val from2020 = "2020-01-01"
   val to2021 = "2020-12-31"
@@ -31,13 +31,13 @@ class PaymentsLiabilitiesDateRangeValidationSpec extends UnitSpec {
     "return an empty list" when {
 
       "passed valid from and to dates" in {
-        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021) shouldBe List()
+        FinancialDataDateRangeValidation.validate(from2020, to2021) shouldBe List()
       }
 
     }
     "return a list containing an error" when {
       "passed an invalid date range" in {
-        PaymentsLiabilitiesDateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(FinancialDataInvalidDateRangeError)
+        FinancialDataDateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(FinancialDataInvalidDateRangeError)
       }
 
     }

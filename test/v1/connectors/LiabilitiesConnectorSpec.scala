@@ -26,7 +26,7 @@ import v1.models.response.liability.{Liability, LiabilityResponse}
 
 import scala.concurrent.Future
 
-class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
+class LiabilitiesConnectorSpec extends ConnectorSpec {
 
   private val vrn: String = "123456789"
 
@@ -68,8 +68,8 @@ class RetrieveLiabilitiesConnectorSpec extends ConnectorSpec {
 
   class Test extends MockHttpClient with MockAppConfig {
 
-    val connector: RetrieveLiabilitiesConnector =
-      new RetrieveLiabilitiesConnector(
+    val connector: LiabilitiesConnector =
+      new LiabilitiesConnector(
         http = mockHttpClient,
         appConfig = mockAppConfig
       )

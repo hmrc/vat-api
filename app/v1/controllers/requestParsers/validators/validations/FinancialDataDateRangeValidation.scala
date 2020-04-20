@@ -18,23 +18,22 @@ package v1.controllers.requestParsers.validators.validations
 
 import java.time.LocalDate
 
-import v1.models.errors.{InvalidDateToError, MtdError}
+import v1.models.errors.{FinancialDataInvalidDateRangeError, MtdError}
 
-import scala.util.{Success, Try}
+object FinancialDataDateRangeValidation {
 
-object LiabilityDateValidation {
-
-  def validate(toDate: String, error: MtdError): List[MtdError] = Try {
-    LocalDate.parse(toDate, dateFormat)
-  } match {
-    case Success(date) if extraDateValidation(error,date) => NoValidationErrors
-    case _ => List(error)
+  def validate(from: String, to: String): List[MtdError] = {
+    val fmtFrom = LocalDate.parse(from, dateFormat)
+    val fmtTo = LocalDate.parse(to, dateFormat)
+    List(
+      checkIfDateRangeIsIncorrect(fmtFrom, fmtTo)
+    ).flatten
   }
 
-  private def extraDateValidation(error: MtdError, date: LocalDate) = {
-    error match {
-      case InvalidDateToError => !date.isAfter(LocalDate.now())
-      case invalidDateFromError@_ => date.isAfter(LocalDate.parse("2016-04-06"))
-    }
+  private def checkIfDateRangeIsIncorrect(from: LocalDate, to: LocalDate): List[MtdError] = {
+
+    if(!from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to)) {
+      List(FinancialDataInvalidDateRangeError)
+    } else Nil
   }
 }

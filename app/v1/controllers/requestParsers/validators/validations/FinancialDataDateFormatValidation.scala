@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
 
-object FinancialDataDateValidation {
+object FinancialDataDateFormatValidation {
 
   private def parseDate(date: String): LocalDate = LocalDate.parse(date, dateFormat)
   private val minimumSupportedDate: String = "2016-04-06"

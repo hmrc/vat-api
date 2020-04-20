@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{FinancialDataDateValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
+import v1.controllers.requestParsers.validators.validations.{FinancialDataDateFormatValidation, FinancialDataDateRangeValidation, VrnValidation}
 import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
 import v1.models.request.liability.LiabilityRawData
 
@@ -34,7 +34,7 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
     List(
       data.from match {
         case None => List(FinancialDataInvalidDateFromError)
-        case Some(from) => FinancialDataDateValidation.validate(from, FinancialDataInvalidDateFromError)
+        case Some(from) => FinancialDataDateFormatValidation.validate(from, FinancialDataInvalidDateFromError)
       }
     )
   }
@@ -43,14 +43,14 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
     List(
       data.to match {
         case None => List(FinancialDataInvalidDateToError)
-        case Some(to) => FinancialDataDateValidation.validate(to, FinancialDataInvalidDateToError)
+        case Some(to) => FinancialDataDateFormatValidation.validate(to, FinancialDataInvalidDateToError)
       }
     )
   }
 
   private def dateRangeValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
     List(
-      PaymentsLiabilitiesDateRangeValidation.validate(data.from.get, data.to.get)
+      FinancialDataDateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 

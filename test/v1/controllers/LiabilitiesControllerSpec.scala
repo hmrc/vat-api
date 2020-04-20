@@ -21,7 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.requestParsers.MockLiabilitiesRequestParser
-import v1.mocks.services.{MockEnrolmentsAuthService, MockRetrieveLiabilitiesService}
+import v1.mocks.services.{MockEnrolmentsAuthService, MockLiabilitiesService}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
@@ -31,16 +31,16 @@ import v1.models.response.liability.{Liability, LiabilityResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RetrieveLiabilitiesControllerSpec
+class LiabilitiesControllerSpec
   extends ControllerBaseSpec
     with MockEnrolmentsAuthService
-    with MockRetrieveLiabilitiesService
+    with MockLiabilitiesService
     with MockLiabilitiesRequestParser{
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
-    val controller: RetrieveLiabilitiesController = new RetrieveLiabilitiesController(
+    val controller: LiabilitiesController = new LiabilitiesController(
       mockEnrolmentsAuthService,
       mockLiabilitiesRequestParser,
       mockRetrieveLiabilitiesService,
@@ -134,9 +134,9 @@ class RetrieveLiabilitiesControllerSpec
 
         val input = Seq(
           (VrnFormatError, BAD_REQUEST),
-          (InvalidDateFromError, BAD_REQUEST),
-          (InvalidDateToError, BAD_REQUEST),
-          (RuleDateRangeInvalidError, BAD_REQUEST)
+          (FinancialDataInvalidDateToError, BAD_REQUEST),
+          (FinancialDataInvalidDateFromError, BAD_REQUEST),
+          (FinancialDataInvalidDateRangeError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
@@ -163,8 +163,8 @@ class RetrieveLiabilitiesControllerSpec
         }
 
         val input = Seq(
-          (BadRequestError, BAD_REQUEST),
-          (LegacyUnauthorisedError, FORBIDDEN),
+          (InvalidDateFromErrorDes, BAD_REQUEST),
+          (InvalidDateToErrorDes, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
           (InvalidDataError, BAD_REQUEST),
           (DownstreamError, INTERNAL_SERVER_ERROR)

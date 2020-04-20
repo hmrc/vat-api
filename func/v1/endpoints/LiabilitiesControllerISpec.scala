@@ -16,6 +16,9 @@
 
 package v1.endpoints
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
@@ -26,29 +29,42 @@ import v1.fixtures.RetrieveLiabilitiesFixture
 import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub}
 
-class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabilitiesFixture {
+class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabilitiesFixture {
 
   private trait Test {
 
     val vrn: String = "123456789"
-    val from: String = "2017-01-01"
-    val to: String = "2017-12-01"
+    val fromDate: String = "2017-01-01"
+    val toDate: String = "2017-12-01"
     val correlationId: String = "X-ID"
 
-    def uri: String = s"/$vrn/liabilities?from=$from&to=$to"
+    def uri: String = s"/$vrn/liabilities?from=$fromDate&to=$toDate"
     def desUrl: String = s"/enterprise/financial-data/VRN/$vrn/VATC"
 
-    val queryParams: Map[String, String] = Map("from" -> from, "to" -> to)
+    def mtdQueryParams: Seq[(String, String)] =
+      Seq(
+        ("from", fromDate),
+        ("to" , toDate)
+      )
 
-    val desQueryParams: Map[String, String] = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false","includeLocks" -> "false","calculateAccruedInterest" -> "true","customerPaymentInformation" -> "true")
+    val desQueryParams: Map[String, String] =
+      Map(
+        "dateFrom" -> fromDate,
+        "dateTo" -> toDate,
+        "onlyOpenItems" -> "false",
+        "includeLocks" -> "false",
+        "calculateAccruedInterest" -> "true",
+        "customerPaymentInformation" -> "true"
+      )
 
     def setupStubs(): StubMapping
 
     def request: WSRequest = {
       setupStubs()
       buildRequest(uri)
+        .addQueryStringParameters(mtdQueryParams: _*)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
-        .withQueryStringParameters(queryParams.head)
+
     }
 
     def errorBody(code: String): String =
@@ -111,13 +127,21 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
 
     "return error according to spec" when {
 
-      def validationErrorTest(requestVrn: String, fromDate: String, toDate: String,
-                              expectedStatus: Int, expectedBody: MtdError): Unit = {
-        s"validation fails with ${expectedBody.code} error" in new Test {
+      def validationErrorTest(requestVrn: String, requestFromDate: Option[String], requestToDate: Option[String],
+                              expectedStatus: Int, expectedBody: MtdError, scenario: String): Unit = {
+        s"validation fails with ${expectedBody.code} error in scenario: $scenario" in new Test {
 
           override val vrn: String = requestVrn
-          override val from: String = fromDate
-          override val to: String = toDate
+          override val fromDate: String = requestFromDate.getOrElse("")
+          override val toDate: String = requestToDate.getOrElse("")
+
+          override val mtdQueryParams: Seq[(String, String)] =
+            Map(
+              "from" -> requestFromDate,
+              "to" -> requestToDate
+            ).collect {
+              case (k: String, Some(v: String)) => (k, v)
+            }.toSeq
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
@@ -131,10 +155,36 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
         }
       }
 
+      def futureFrom(plusDays: Int = 1): String = {
+        val fromDate = LocalDateTime.now().plusDays(plusDays)
+        DateTimeFormatter.ofPattern("yyyy-MM-dd").format(fromDate)
+      }
+
+      def futureTo(plusDays: Int = 2): String = {
+        val toDate = LocalDateTime.now().plusDays(plusDays)
+        DateTimeFormatter.ofPattern("yyyy-MM-dd").format(toDate)
+      }
+
       val input = Seq(
-        ("badVrn", "2017-01-01", "2017-12-01", BAD_REQUEST, VrnFormatError),
-        ("123456789", "111111", "2017-12-01", BAD_REQUEST, InvalidDateFromError),
-        ("123456789", "2017-01-01", "11111", BAD_REQUEST, InvalidDateToError)
+        ("badVrn", Some("2017-01-02"), Some("2018-01-01"), BAD_REQUEST, VrnFormatError, "invalid VRN"),
+        ("badVrn", None, Some(futureTo()), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
+
+        ("123456789", Some("notADate"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "invalid 'from' date"),
+        ("123456789", Some("2017-13-01"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "not a real 'from' date"),
+        ("123456789", Some("notADate"), Some("notADate"), BAD_REQUEST, FinancialDataInvalidDateFromError, "both dates invalid"),
+        ("123456789", None, Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "missing 'from' date"),
+        ("123456789", None, None, BAD_REQUEST, FinancialDataInvalidDateFromError, "missing both dates"),
+        ("123456789", Some("2016-04-05"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "'from' date unsupported'"),
+
+        ("123456789", Some("2017-01-02"), Some("notADate"), BAD_REQUEST, FinancialDataInvalidDateToError, "invalid 'to' date"),
+        ("123456789", Some("2017-01-02"), Some("2017-01-32"), BAD_REQUEST, FinancialDataInvalidDateToError, "not a real 'to' date"),
+        ("123456789", Some("2017-01-02"), Some(futureTo(plusDays = 1)), BAD_REQUEST, FinancialDataInvalidDateToError, "future 'to' date"),
+        ("123456789", Some(futureFrom()), Some(futureTo()), BAD_REQUEST, FinancialDataInvalidDateToError, "future both dates"),
+        ("123456789", Some("2017-01-02"), None, BAD_REQUEST, FinancialDataInvalidDateToError, "missing 'to' date"),
+
+        ("123456789", Some("2017-01-01"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "date range too long"),
+        ("123456789", Some("2017-01-01"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "dates are the same"),
+        ("123456789", Some("2018-01-01"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "'from' date after 'to' date")
       )
 
       input.foreach(args => (validationErrorTest _).tupled(args))
@@ -165,8 +215,8 @@ class RetrieveLiabilitiesControllerISpec extends IntegrationBaseSpec with Retrie
         (BAD_REQUEST, "INVALID_INCLUDELOCKS", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_CALCULATEACCRUEDINTEREST", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_CUSTOMERPAYMENTINFORMATION", INTERNAL_SERVER_ERROR, DownstreamError),
-        (BAD_REQUEST, "INVALID_DATEFROM", BAD_REQUEST, InvalidDateFromError),
-        (BAD_REQUEST, "INVALID_DATETO", BAD_REQUEST, InvalidDateToError),
+        (BAD_REQUEST, "INVALID_DATEFROM", BAD_REQUEST, InvalidDateFromErrorDes),
+        (BAD_REQUEST, "INVALID_DATETO", BAD_REQUEST, InvalidDateToErrorDes),
         (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (UNPROCESSABLE_ENTITY, "INVALID_DATA", BAD_REQUEST, InvalidDataError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
