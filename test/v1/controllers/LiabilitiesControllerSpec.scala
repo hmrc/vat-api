@@ -26,7 +26,7 @@ import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liabilities.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -82,8 +82,8 @@ class LiabilitiesControllerSpec
     """.stripMargin
   )
 
-  val liabilityResponse: LiabilityResponse =
-    LiabilityResponse(
+  val liabilityResponse: LiabilitiesResponse =
+    LiabilitiesResponse(
       Seq(
         Liability(
           Some(TaxPeriod(from, to)),

@@ -18,7 +18,7 @@ package v1.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liabilities.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
 
 trait RetrieveLiabilitiesFixture {
 
@@ -77,8 +77,8 @@ trait RetrieveLiabilitiesFixture {
     """.stripMargin
   )
 
-  val liabilityResponse: LiabilityResponse =
-    LiabilityResponse(
+  val liabilityResponse: LiabilitiesResponse =
+    LiabilitiesResponse(
       Seq(
         Liability(
           Some(TaxPeriod("2017-01-01", "2017-12-01")),

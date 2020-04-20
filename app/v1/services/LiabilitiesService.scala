@@ -24,7 +24,7 @@ import utils.{EndpointLogContext, Logging}
 import v1.connectors.LiabilitiesConnector
 import v1.models.errors._
 import v1.models.request.liabilities.LiabilitiesRequest
-import v1.models.response.liabilities.LiabilityResponse
+import v1.models.response.liabilities.LiabilitiesResponse
 import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +35,7 @@ class LiabilitiesService @Inject()(connector: LiabilitiesConnector) extends DesR
   def retrieveLiabilities(request: LiabilitiesRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[LiabilityResponse]] = {
+    logContext: EndpointLogContext): Future[ServiceOutcome[LiabilitiesResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrieveLiabilities(request)).leftMap(mapDesErrors(desErrorMap))

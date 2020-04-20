@@ -19,7 +19,7 @@ package v1.support
 import utils.{EndpointLogContext, Logging}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.liabilities.LiabilityResponse
+import v1.models.response.liabilities.LiabilitiesResponse
 import v1.models.response.payments.PaymentsResponse
 
 trait DesResponseMappingSupport {
@@ -35,7 +35,7 @@ trait DesResponseMappingSupport {
 
   final def validateLiabilitiesSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
     desResponseWrapper.responseData match {
-      case liabilityResponse: LiabilityResponse if liabilityResponse.liabilities.isEmpty =>
+      case liabilityResponse: LiabilitiesResponse if liabilityResponse.liabilities.isEmpty =>
         Left(ErrorWrapper(Some(desResponseWrapper.correlationId), LegacyNotFoundError, None))
       case _ => Right(desResponseWrapper)
     }

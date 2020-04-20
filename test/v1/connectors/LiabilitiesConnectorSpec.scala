@@ -22,7 +22,7 @@ import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liabilities.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
 
 import scala.concurrent.Future
 
@@ -33,8 +33,8 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
   private val retrieveLiabilitiesRequest: LiabilitiesRequest =
     LiabilitiesRequest(vrn = Vrn(vrn),from = "2017-1-1",to = "2017-12-31")
 
-  private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(
+  private val retrieveLiabilitiesResponse: LiabilitiesResponse =
+    LiabilitiesResponse(
       liabilities = Seq(
         Liability(
           taxPeriod = None,
@@ -46,8 +46,8 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
       )
     )
 
-  private val retrieveMultipleLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(
+  private val retrieveMultipleLiabilitiesResponse: LiabilitiesResponse =
+    LiabilitiesResponse(
       liabilities = Seq(
         Liability(
           taxPeriod = None,

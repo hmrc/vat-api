@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
 
-class LiabilityResponseSpec extends UnitSpec {
+class LiabilitiesResponseSpec extends UnitSpec {
 
   implicit val to: String = "2017-12-01"
 
@@ -66,7 +66,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -81,7 +81,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned" in {
@@ -149,7 +149,7 @@ class LiabilityResponseSpec extends UnitSpec {
                    |}
                    |""".stripMargin)
 
-              val liabilityResponse = LiabilityResponse(Seq(
+              val liabilityResponse = LiabilitiesResponse(Seq(
                 Liability(
                   taxPeriod = Some(
                     TaxPeriod(
@@ -176,7 +176,7 @@ class LiabilityResponseSpec extends UnitSpec {
                 )
               ))
 
-              desJson.as[LiabilityResponse] shouldBe liabilityResponse
+              desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
             }
 
       "one liability is returned without items:dueDate" in {
@@ -213,7 +213,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -228,7 +228,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned with the minimum amount of optional fields" in {
@@ -280,7 +280,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = None,
             `type` = "VAT",
@@ -297,7 +297,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "not parse incorrect json" in {
@@ -309,7 +309,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.asOpt[LiabilityResponse] shouldBe None
+        desJson.asOpt[LiabilitiesResponse] shouldBe None
       }
 
       "multiple liabilities are returned, but 'payment on account' should be filtered out" in {
@@ -377,7 +377,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -392,7 +392,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned, but 'Hybrid Payments' should be filtered out" in {
@@ -460,7 +460,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -475,7 +475,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "multiple liabilities are returned, but 'Payment on account' and 'Hybrid Payments' should be filtered out" in {
@@ -569,7 +569,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        val liabilityResponse = LiabilityResponse(Seq(
+        val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
             taxPeriod = Some(
               TaxPeriod(
@@ -584,7 +584,7 @@ class LiabilityResponseSpec extends UnitSpec {
           )
         ))
 
-        desJson.as[LiabilityResponse] shouldBe liabilityResponse
+        desJson.as[LiabilitiesResponse] shouldBe liabilityResponse
       }
 
       "filter out all transactions and return None if they only consist of un-allowed charge types" in {
@@ -678,7 +678,7 @@ class LiabilityResponseSpec extends UnitSpec {
              |}
              |""".stripMargin)
 
-        desJson.as[LiabilityResponse] shouldBe LiabilityResponse(Seq.empty[Liability])
+        desJson.as[LiabilitiesResponse] shouldBe LiabilitiesResponse(Seq.empty[Liability])
       }
     }
 
@@ -721,7 +721,7 @@ class LiabilityResponseSpec extends UnitSpec {
            |}
            |""".stripMargin)
 
-      desJson.as[LiabilityResponse] shouldBe LiabilityResponse(Seq.empty[Liability])
+      desJson.as[LiabilitiesResponse] shouldBe LiabilitiesResponse(Seq.empty[Liability])
     }
 
     "use the writes format correctly" in {
@@ -743,7 +743,7 @@ class LiabilityResponseSpec extends UnitSpec {
            |}
            |""".stripMargin)
 
-      val liabilityResponse = LiabilityResponse(Seq(
+      val liabilityResponse = LiabilitiesResponse(Seq(
         Liability(
           taxPeriod = Some(
             TaxPeriod(

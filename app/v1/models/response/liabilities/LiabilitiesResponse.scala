@@ -18,23 +18,30 @@ package v1.models.response.liabilities
 
 import java.time.LocalDate
 
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json._
 import v1.models.response.common.TaxPeriod
 
-case class LiabilityResponse(liabilities: Seq[Liability])
+case class LiabilitiesResponse(liabilities: Seq[Liability])
 
-object LiabilityResponse {
+object LiabilitiesResponse {
 
-  implicit val writes: OWrites[LiabilityResponse] = Json.writes[LiabilityResponse]
+  implicit val writes: OWrites[LiabilitiesResponse] = Json.writes[LiabilitiesResponse]
 
   //retrieve all transactions, filter out any particular payments, then return a model only if there's data
-  implicit def reads(implicit to: String): Reads[LiabilityResponse] = {
-    (JsPath \ "financialTransactions").read[Seq[Liability]].map { liabilities =>
-      liabilities.filter { liability =>
-        paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
+  implicit def reads(implicit to: String): Reads[LiabilitiesResponse] = {
+    (JsPath \ "financialTransactions").read[Seq[JsValue]]
+      .map(_.filter(json => {
+        json.validate[ChargeTypeWrapper].isSuccess &&
+          json.as[ChargeTypeWrapper].chargeType.toLowerCase != "hybrid payments" &&
+          json.as[ChargeTypeWrapper].chargeType.toLowerCase != "payment on account"
+        }
+      ).map(_.as[Liability]))
+      .map { liabilities =>
+        liabilities.filter { liability =>
+          paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
+        }
       }
-    }
-  }.map(LiabilityResponse(_))
+    }.map(LiabilitiesResponse(_))
 
   //filter particular payments
   private def paymentCheck(liability: Liability): Boolean = {
@@ -47,5 +54,10 @@ object LiabilityResponse {
     val toDate = taxPeriod.fold(None: Option[LocalDate]){l => Some(LocalDate.parse(l.to))}
     toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }
+  }
+
+  case class ChargeTypeWrapper(chargeType: String)
+  object ChargeTypeWrapper{
+    implicit val reads: Reads[ChargeTypeWrapper] = Json.reads[ChargeTypeWrapper]
   }
 }

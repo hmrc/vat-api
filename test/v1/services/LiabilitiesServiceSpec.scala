@@ -24,7 +24,7 @@ import v1.mocks.connectors.MockLiabilitiesConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
-import v1.models.response.liabilities.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,8 +43,8 @@ class LiabilitiesServiceSpec extends UnitSpec {
       to = to
     )
 
-  private val retrieveLiabilitiesResponse: LiabilityResponse =
-    LiabilityResponse(Seq(Liability(None,"VAT",1.0,None,None)))
+  private val retrieveLiabilitiesResponse: LiabilitiesResponse =
+    LiabilitiesResponse(Seq(Liability(None,"VAT",1.0,None,None)))
 
   trait Test extends MockLiabilitiesConnector {
 
@@ -69,7 +69,7 @@ class LiabilitiesServiceSpec extends UnitSpec {
       "return a 404 Not Found for an empty liabilities response" in new Test {
 
         MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilityResponse(Seq.empty[Liability])))))
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilitiesResponse(Seq.empty[Liability])))))
 
         await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), LegacyNotFoundError))
       }
