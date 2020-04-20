@@ -16,13 +16,13 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
+import v1.controllers.requestParsers.validators.validations.{FinancialDataDateValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
 import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
 import v1.models.request.payments.PaymentsRawData
 
 class PaymentsValidator extends Validator[PaymentsRawData]  {
 
-  private val validationSet = List(vrnFormatValidation, fromDateFormatValidation, toDateFormatValidation, dateRangeValidation)
+  private val validationSet = List(vrnFormatValidation, fromDateValidation, toDateValidation, dateRangeValidation)
 
   private def vrnFormatValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
@@ -30,20 +30,20 @@ class PaymentsValidator extends Validator[PaymentsRawData]  {
     )
   }
 
-  private def fromDateFormatValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
+  private def fromDateValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
       data.from match {
         case None => List(FinancialDataInvalidDateFromError)
-        case Some(from) => DateFormatValidation.validate(from, FinancialDataInvalidDateFromError)
+        case Some(from) => FinancialDataDateValidation.validate(from, FinancialDataInvalidDateFromError)
       }
     )
   }
 
-  private def toDateFormatValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
+  private def toDateValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
       data.to match {
         case None => List(FinancialDataInvalidDateToError)
-        case Some(to) => DateFormatValidation.validate(to, FinancialDataInvalidDateToError)
+        case Some(to) => FinancialDataDateValidation.validate(to, FinancialDataInvalidDateToError)
       }
     )
   }
