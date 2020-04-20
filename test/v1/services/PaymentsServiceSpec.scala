@@ -79,7 +79,7 @@ class PaymentsServiceSpec extends UnitSpec {
         MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, PaymentsResponse(Seq.empty[Payment])))))
 
-        await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), NotFoundError))
+        await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), LegacyNotFoundError))
       }
     }
 

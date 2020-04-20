@@ -28,7 +28,7 @@ trait DesResponseMappingSupport {
   final def validatePaymentsSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
     desResponseWrapper.responseData match {
       case paymentsResponse: PaymentsResponse if paymentsResponse.payments.isEmpty =>
-        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), NotFoundError, None))
+        Left(ErrorWrapper(Some(desResponseWrapper.correlationId), LegacyNotFoundError, None))
       case _ => Right(desResponseWrapper)
     }
   }
