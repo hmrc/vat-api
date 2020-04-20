@@ -19,7 +19,7 @@ package v1.support
 import utils.{EndpointLogContext, Logging}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.liability.LiabilityResponse
+import v1.models.response.liabilities.LiabilityResponse
 import v1.models.response.payments.PaymentsResponse
 
 trait DesResponseMappingSupport {

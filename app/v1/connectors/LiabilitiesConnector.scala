@@ -20,8 +20,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.LiabilityResponse
+import v1.models.request.liabilities.LiabilitiesRequest
+import v1.models.response.liabilities.LiabilityResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,8 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class LiabilitiesConnector @Inject()(val http: HttpClient,
                                      val appConfig: AppConfig) extends BaseDesConnector {
 
-  def retrieveLiabilities(request: LiabilityRequest)(implicit hc: HeaderCarrier,
-                                                     ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
+  def retrieveLiabilities(request: LiabilitiesRequest)(implicit hc: HeaderCarrier,
+                                                       ec: ExecutionContext): Future[DesOutcome[LiabilityResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to

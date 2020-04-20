@@ -23,8 +23,8 @@ import utils.EndpointLogContext
 import v1.mocks.connectors.MockLiabilitiesConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.request.liabilities.LiabilitiesRequest
+import v1.models.response.liabilities.{Liability, LiabilityResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,8 +36,8 @@ class LiabilitiesServiceSpec extends UnitSpec {
   private val to: String = "2017-12-31"
   private val correlationId = "X-123"
 
-  private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(
+  private val retrieveLiabilitiesRequest: LiabilitiesRequest =
+    LiabilitiesRequest(
       vrn = Vrn(vrn),
       from = from,
       to = to

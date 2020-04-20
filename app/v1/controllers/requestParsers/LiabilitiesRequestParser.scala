@@ -19,12 +19,12 @@ package v1.controllers.requestParsers
 import javax.inject.Inject
 import uk.gov.hmrc.domain.Vrn
 import v1.controllers.requestParsers.validators.LiabilitiesValidator
-import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
+import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 
 class LiabilitiesRequestParser @Inject()(val validator: LiabilitiesValidator)
-  extends RequestParser[LiabilityRawData, LiabilityRequest] {
+  extends RequestParser[LiabilitiesRawData, LiabilitiesRequest] {
 
-  override protected def requestFor(data: LiabilityRawData): LiabilityRequest = {
-    LiabilityRequest(Vrn(data.vrn), data.from.get, data.to.get)
+  override protected def requestFor(data: LiabilitiesRawData): LiabilitiesRequest = {
+    LiabilitiesRequest(Vrn(data.vrn), data.from.get, data.to.get)
   }
 }

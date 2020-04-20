@@ -18,13 +18,13 @@ package v1.controllers.requestParsers
 
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import v1.mocks.validators.MockLiabilityValidator
+import v1.mocks.validators.MockLiabilitiesValidator
 import v1.models.errors._
-import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
+import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 
-class LiabilityRequestParserSpec extends UnitSpec {
+class LiabilitiesRequestParserSpec extends UnitSpec {
 
-  trait Test extends MockLiabilityValidator {
+  trait Test extends MockLiabilitiesValidator {
     lazy val parser = new LiabilitiesRequestParser(mockValidator)
   }
 
@@ -40,42 +40,42 @@ class LiabilityRequestParserSpec extends UnitSpec {
     "return a retrieve Liability request" when {
       "valid data is provided" in new Test {
 
-        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(validFromDate), Some(validToDate))).returns(Nil)
+        MockVrnValidator.validate(LiabilitiesRawData(validVrn, Some(validFromDate), Some(validToDate))).returns(Nil)
 
-        parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(validToDate))) shouldBe
-          Right(LiabilityRequest(Vrn(validVrn), validFromDate, validToDate))
+        parser.parseRequest(LiabilitiesRawData(validVrn, Some(validFromDate), Some(validToDate))) shouldBe
+          Right(LiabilitiesRequest(Vrn(validVrn), validFromDate, validToDate))
       }
     }
 
     "return an error" when {
       "invalid VRN is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(invalidVrn, Some(validFromDate), Some(validToDate))).returns(List(VrnFormatError))
+        MockVrnValidator.validate(LiabilitiesRawData(invalidVrn, Some(validFromDate), Some(validToDate))).returns(List(VrnFormatError))
 
-        parser.parseRequest(LiabilityRawData(invalidVrn, Some(validFromDate), Some(validToDate))) shouldBe
+        parser.parseRequest(LiabilitiesRawData(invalidVrn, Some(validFromDate), Some(validToDate))) shouldBe
           Left(ErrorWrapper(None, VrnFormatError, None))
       }
 
       "invalid from date is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate)))
+        MockVrnValidator.validate(LiabilitiesRawData(validVrn, Some(invalidFrom), Some(validToDate)))
           .returns(List(FinancialDataInvalidDateFromError))
 
-        parser.parseRequest(LiabilityRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
+        parser.parseRequest(LiabilitiesRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
           Left(ErrorWrapper(None, FinancialDataInvalidDateFromError, None))
       }
 
       "invalid to date is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo)))
+        MockVrnValidator.validate(LiabilitiesRawData(validVrn, Some(validFromDate), Some(invalidTo)))
           .returns(List(FinancialDataInvalidDateToError))
 
-        parser.parseRequest(LiabilityRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
+        parser.parseRequest(LiabilitiesRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
           Left(ErrorWrapper(None, FinancialDataInvalidDateToError, None))
       }
 
       "invalid date range is provided" in new Test {
-        MockVrnValidator.validate(LiabilityRawData(validVrn, Some("2017-01-01"), Some("2019-01-01")))
+        MockVrnValidator.validate(LiabilitiesRawData(validVrn, Some("2017-01-01"), Some("2019-01-01")))
           .returns(List(FinancialDataInvalidDateRangeError))
 
-        parser.parseRequest(LiabilityRawData(validVrn, Some("2017-01-01"), Some("2019-01-01"))) shouldBe
+        parser.parseRequest(LiabilitiesRawData(validVrn, Some("2017-01-01"), Some("2019-01-01"))) shouldBe
           Left(ErrorWrapper(None, FinancialDataInvalidDateRangeError, None))
       }
     }

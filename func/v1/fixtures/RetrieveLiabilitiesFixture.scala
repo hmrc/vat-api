@@ -18,7 +18,7 @@ package v1.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{Liability, LiabilityResponse}
 
 trait RetrieveLiabilitiesFixture {
 

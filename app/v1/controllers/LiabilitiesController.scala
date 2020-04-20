@@ -25,7 +25,7 @@ import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
 import v1.controllers.requestParsers.LiabilitiesRequestParser
 import v1.models.errors._
-import v1.models.request.liability.LiabilityRawData
+import v1.models.request.liabilities.LiabilitiesRawData
 import v1.services.{EnrolmentsAuthService, LiabilitiesService}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +47,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
     authorisedAction(vrn).async { implicit request =>
       logger.info(message = s"[LiabilitiesController][retrieveLiabilities] Retrieving Liabilities from DES")
 
-      val rawRequest: LiabilityRawData = LiabilityRawData(vrn, from, to)
+      val rawRequest: LiabilitiesRawData = LiabilitiesRawData(vrn, from, to)
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))

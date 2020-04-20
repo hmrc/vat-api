@@ -18,19 +18,19 @@ package v1.controllers.requestParsers.validators
 
 import v1.controllers.requestParsers.validators.validations.{FinancialDataDateFormatValidation, FinancialDataDateRangeValidation, VrnValidation}
 import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
-import v1.models.request.liability.LiabilityRawData
+import v1.models.request.liabilities.LiabilitiesRawData
 
-class LiabilitiesValidator extends Validator[LiabilityRawData]  {
+class LiabilitiesValidator extends Validator[LiabilitiesRawData]  {
 
   private val validationSet = List(vrnFormatValidation, fromDateFormatValidation, toDateFormatValidation, dateRangeValidation)
 
-  private def vrnFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def vrnFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       VrnValidation.validate(data.vrn)
     )
   }
 
-  private def fromDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def fromDateFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       data.from match {
         case None => List(FinancialDataInvalidDateFromError)
@@ -39,7 +39,7 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
     )
   }
 
-  private def toDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def toDateFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       data.to match {
         case None => List(FinancialDataInvalidDateToError)
@@ -48,13 +48,13 @@ class LiabilitiesValidator extends Validator[LiabilityRawData]  {
     )
   }
 
-  private def dateRangeValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def dateRangeValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       FinancialDataDateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 
-  override def validate(data: LiabilityRawData): List[MtdError] = {
+  override def validate(data: LiabilitiesRawData): List[MtdError] = {
     run(validationSet, data).distinct
   }
 }

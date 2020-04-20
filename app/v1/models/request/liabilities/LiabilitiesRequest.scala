@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package v1.models.request.liability
+package v1.models.request.liabilities
 
+import uk.gov.hmrc.domain.Vrn
 import v1.models.request.RawData
 
-case class LiabilityRawData(vrn: String,
-                            from: Option[String],
-                            to: Option[String]) extends RawData
+case class LiabilitiesRequest(vrn: Vrn,
+                              from: String,
+                              to: String) extends RawData

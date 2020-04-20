@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.LiabilitiesRequestParser
 import v1.models.errors.ErrorWrapper
-import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
+import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 
 trait MockLiabilitiesRequestParser extends MockFactory {
 
@@ -28,8 +28,8 @@ trait MockLiabilitiesRequestParser extends MockFactory {
 
   object MockLiabilitiesRequestParser{
 
-    def parse(rawData: LiabilityRawData): CallHandler[Either[ErrorWrapper, LiabilityRequest]] = {
-      (mockLiabilitiesRequestParser.parseRequest(_: LiabilityRawData)).expects(rawData)
+    def parse(rawData: LiabilitiesRawData): CallHandler[Either[ErrorWrapper, LiabilitiesRequest]] = {
+      (mockLiabilitiesRequestParser.parseRequest(_: LiabilitiesRawData)).expects(rawData)
     }
   }
 

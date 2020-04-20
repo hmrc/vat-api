@@ -20,17 +20,18 @@ import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.validators.LiabilitiesValidator
 import v1.models.errors.MtdError
-import v1.models.request.liability.LiabilityRawData
+import v1.models.request.liabilities.LiabilitiesRawData
 
-class MockLiabilityValidator extends MockFactory {
-    val mockValidator: LiabilitiesValidator = mock[LiabilitiesValidator]
+class MockLiabilitiesValidator extends MockFactory {
 
-    object MockVrnValidator {
+  val mockValidator: LiabilitiesValidator = mock[LiabilitiesValidator]
 
-      def validate(data: LiabilityRawData): CallHandler1[LiabilityRawData, List[MtdError]] = {
-        (mockValidator
-          .validate(_: LiabilityRawData))
-          .expects(data)
-      }
+  object MockVrnValidator {
+
+    def validate(data: LiabilitiesRawData): CallHandler1[LiabilitiesRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: LiabilitiesRawData))
+        .expects(data)
     }
+  }
 }

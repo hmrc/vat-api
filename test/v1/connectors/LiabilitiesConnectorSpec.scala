@@ -20,9 +20,9 @@ import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.liability.LiabilityRequest
+import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{Liability, LiabilityResponse}
 
 import scala.concurrent.Future
 
@@ -30,8 +30,8 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
 
   private val vrn: String = "123456789"
 
-  private val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(vrn = Vrn(vrn),from = "2017-1-1",to = "2017-12-31")
+  private val retrieveLiabilitiesRequest: LiabilitiesRequest =
+    LiabilitiesRequest(vrn = Vrn(vrn),from = "2017-1-1",to = "2017-12-31")
 
   private val retrieveLiabilitiesResponse: LiabilityResponse =
     LiabilityResponse(

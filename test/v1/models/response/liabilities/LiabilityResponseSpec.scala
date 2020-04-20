@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.response.liability
+package v1.models.response.liabilities
 
 import play.api.libs.json.Json
 import support.UnitSpec

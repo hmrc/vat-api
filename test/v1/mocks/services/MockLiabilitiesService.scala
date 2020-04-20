@@ -20,8 +20,8 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
-import v1.models.request.liability.LiabilityRequest
-import v1.models.response.liability.LiabilityResponse
+import v1.models.request.liabilities.LiabilitiesRequest
+import v1.models.response.liabilities.LiabilityResponse
 import v1.services.{LiabilitiesService, ServiceOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,9 +32,9 @@ trait MockLiabilitiesService extends MockFactory {
 
   object MockRetrieveLiabilitiesService {
 
-    def retrieveLiabilities(request: LiabilityRequest): CallHandler[Future[ServiceOutcome[LiabilityResponse]]] = {
+    def retrieveLiabilities(request: LiabilitiesRequest): CallHandler[Future[ServiceOutcome[LiabilityResponse]]] = {
       (mockRetrieveLiabilitiesService
-        .retrieveLiabilities(_ : LiabilityRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext))
+        .retrieveLiabilities(_ : LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext))
         .expects(request, *, *, *)
     }
   }

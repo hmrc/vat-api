@@ -24,9 +24,9 @@ import v1.mocks.requestParsers.MockLiabilitiesRequestParser
 import v1.mocks.services.{MockEnrolmentsAuthService, MockLiabilitiesService}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.liability.{LiabilityRawData, LiabilityRequest}
+import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 import v1.models.response.common.TaxPeriod
-import v1.models.response.liability.{Liability, LiabilityResponse}
+import v1.models.response.liabilities.{Liability, LiabilityResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -55,13 +55,13 @@ class LiabilitiesControllerSpec
   val to: String = "01-12-2017"
   val correlationId: String = "X-ID"
 
-  val retrieveLiabilitiesRawData: LiabilityRawData =
-    LiabilityRawData(
+  val retrieveLiabilitiesRawData: LiabilitiesRawData =
+    LiabilitiesRawData(
       vrn, Some(from), Some(to)
     )
 
-  val retrieveLiabilitiesRequest: LiabilityRequest =
-    LiabilityRequest(
+  val retrieveLiabilitiesRequest: LiabilitiesRequest =
+    LiabilitiesRequest(
       vrn = Vrn(vrn),  from, to
     )
 
