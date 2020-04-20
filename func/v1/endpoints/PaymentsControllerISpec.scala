@@ -16,6 +16,9 @@
 
 package v1.endpoints
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
@@ -92,6 +95,25 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
       }
     }
 
+    "return a 404 NOT_FOUND" when {
+      "all payment items are filtered away" in new Test{
+
+        override val fromDate = "2019-02-02"
+        override val toDate = "2019-02-28"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams,  OK, unsupportedPaymentsDesJson)
+        }
+
+        private val response = await(request.get())
+        response.status shouldBe NOT_FOUND
+        response.json shouldBe Json.toJson(LegacyNotFoundError)
+        response.header("Content-Type")  shouldBe Some("application/json")
+      }
+    }
+
     "return a 500 status code with expected body" when {
       "des returns multiple errors" in new Test{
 
@@ -126,13 +148,21 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
 
     "return error according to spec" when {
 
-      def validationErrorTest(requestVrn: String, requestFromDate: String, requestToDate: String,
-                              expectedStatus: Int, expectedBody: MtdError): Unit = {
-        s"validation fails with ${expectedBody.code} error" in new Test {
+      def validationErrorTest(requestVrn: String, requestFromDate: Option[String], requestToDate: Option[String],
+                              expectedStatus: Int, expectedBody: MtdError, scenario: String): Unit = {
+        s"validation fails with ${expectedBody.code} error in scenario: $scenario" in new Test {
 
           override val vrn: String = requestVrn
-          override val fromDate: String = requestFromDate
-          override val toDate: String = requestToDate
+          override val fromDate: String = requestFromDate.getOrElse("")
+          override val toDate: String = requestToDate.getOrElse("")
+
+          override val mtdQueryParams: Seq[(String, String)] =
+            Map(
+              "from" -> requestFromDate,
+              "to" -> requestToDate
+            ).collect {
+              case (k: String, Some(v: String)) => (k, v)
+            }.toSeq
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
@@ -146,11 +176,36 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
         }
       }
 
+      def futureFrom(plusDays: Int = 1): String = {
+        val fromDate = LocalDateTime.now().plusDays(plusDays)
+        DateTimeFormatter.ofPattern("yyyy-MM-dd").format(fromDate)
+      }
+
+      def futureTo(plusDays: Int = 2): String = {
+        val toDate = LocalDateTime.now().plusDays(plusDays)
+        DateTimeFormatter.ofPattern("yyyy-MM-dd").format(toDate)
+      }
+
       val input = Seq(
-        ("badVrn", "2017-01-02", "2018-01-01", BAD_REQUEST, VrnFormatError),
-        ("123456789", "notADate", "2018-01-01", BAD_REQUEST, FinancialDataInvalidDateFromError),
-        ("123456789", "2017-01-02", "notADate", BAD_REQUEST, FinancialDataInvalidDateToError),
-        ("123456789", "2017-01-01", "2018-01-01", BAD_REQUEST, FinancialDataInvalidDateRangeError)
+        ("badVrn", Some("2017-01-02"), Some("2018-01-01"), BAD_REQUEST, VrnFormatError, "invalid VRN"),
+        ("badVrn", None, Some(futureTo()), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
+
+        ("123456789", Some("notADate"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "invalid 'from' date"),
+        ("123456789", Some("2017-13-01"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "not a real 'from' date"),
+        ("123456789", Some("notADate"), Some("notADate"), BAD_REQUEST, FinancialDataInvalidDateFromError, "both dates invalid"),
+        ("123456789", None, Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "missing 'from' date"),
+        ("123456789", None, None, BAD_REQUEST, FinancialDataInvalidDateFromError, "missing both dates"),
+        ("123456789", Some("2016-04-05"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "'from' date unsupported'"),
+
+        ("123456789", Some("2017-01-02"), Some("notADate"), BAD_REQUEST, FinancialDataInvalidDateToError, "invalid 'to' date"),
+        ("123456789", Some("2017-01-02"), Some("2017-01-32"), BAD_REQUEST, FinancialDataInvalidDateToError, "not a real 'to' date"),
+        ("123456789", Some("2017-01-02"), Some(futureTo(plusDays = 1)), BAD_REQUEST, FinancialDataInvalidDateToError, "future 'to' date"),
+        ("123456789", Some(futureFrom()), Some(futureTo()), BAD_REQUEST, FinancialDataInvalidDateToError, "future both dates"),
+        ("123456789", Some("2017-01-02"), None, BAD_REQUEST, FinancialDataInvalidDateToError, "missing 'to' date"),
+
+        ("123456789", Some("2017-01-01"), Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "date range too long"),
+        ("123456789", Some("2017-01-01"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "dates are the same"),
+        ("123456789", Some("2018-01-01"), Some("2017-01-01"), BAD_REQUEST, FinancialDataInvalidDateRangeError, "'from' date after 'to' date")
       )
 
       input.foreach(args => (validationErrorTest _).tupled(args))
@@ -191,40 +246,5 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
 
       input.foreach(args => (serviceErrorTest _).tupled(args))
     }
-
-    "date parameters are not supplied" must {
-      def validationErrorTest(requestFromDate: Option[String], requestToDate: Option[String],
-                              expectedStatus: Int, expectedBody: MtdError, scenario: String): Unit = {
-        s"validation fails with ${expectedBody.code} error in scenario: $scenario" in new Test {
-
-          override val mtdQueryParams: Seq[(String, String)] =
-            Map(
-              "from" -> requestFromDate,
-              "to" -> requestFromDate
-            ).collect {
-              case (k: String, Some(v: String)) => (k, v)
-            }.toSeq
-
-          override def setupStubs(): StubMapping = {
-            AuditStub.audit()
-            AuthStub.authorised()
-          }
-
-          private val response = await(request.get)
-          response.status shouldBe expectedStatus
-          response.json shouldBe Json.toJson(expectedBody)
-          response.header("Content-Type") shouldBe Some("application/json")
-        }
-      }
-
-      val input = Seq(
-        (None, Some("2018-01-01"), BAD_REQUEST, FinancialDataInvalidDateFromError, "missing from date"),
-        (Some("2017-01-02"), None, BAD_REQUEST, FinancialDataInvalidDateToError, "missing to date"),
-        (None, None, BAD_REQUEST, FinancialDataInvalidDateFromError, "both dates missing")
-      )
-
-      input.foreach(args => (validationErrorTest _).tupled(args))
-    }
   }
-
 }

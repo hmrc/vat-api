@@ -174,8 +174,8 @@ object FinancialDataInvalidDateToError extends MtdError(
 )
 
 object FinancialDataInvalidDateRangeError extends MtdError(
-  code = "INVALID_DATE_RANGE",
-  message = "Invalid date range, must be 366 days or less",
+  code = "DATE_RANGE_INVALID",
+  message = "Invalid date range, must be 365 days or less",
   customJson = Some(
     Json.parse(
       """

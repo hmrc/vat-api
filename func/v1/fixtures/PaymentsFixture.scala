@@ -321,4 +321,198 @@ trait PaymentsFixture {
     """.stripMargin
   )
 
+  val unsupportedPaymentsDesJson: JsValue = Json.parse(
+    """
+      |{
+      |   "idType":"VRN",
+      |   "idNumber":"100062914",
+      |   "regimeType":"VATC",
+      |   "processingDate":"2017-05-13T09:30:00.000Z",
+      |   "financialTransactions":[
+      |      {
+      |         "chargeType":"VAT Return Debit Charge",
+      |         "mainType":"VAT Return Charge",
+      |         "periodKey":"15AD",
+      |         "periodKeyDescription":"February 2018",
+      |         "taxPeriodFrom":"2019-01-01",
+      |         "taxPeriodTo":"2019-02-01",
+      |         "businessPartner":"0100062914",
+      |         "contractAccountCategory":"33",
+      |         "contractAccount":"000917000429",
+      |         "contractObjectType":"ZVAT",
+      |         "contractObject":"00000018000000000104",
+      |         "sapDocumentNumber":"003390002284",
+      |         "sapDocumentNumberItem":"0001",
+      |         "chargeReference":"XQ002750002150",
+      |         "mainTransaction":"4700",
+      |         "subTransaction":"1174",
+      |         "originalAmount":15.65,
+      |         "outstandingAmount":10.65,
+      |         "clearedAmount":5.0,
+      |         "accruedInterest":0
+      |      },
+      |      {
+      |         "chargeType":"VAT Return Debit Charge",
+      |         "mainType":"VAT Return Charge",
+      |         "periodKey":"15AC",
+      |         "periodKeyDescription":"March 2018",
+      |         "taxPeriodFrom":"2019-02-02",
+      |         "taxPeriodTo":"2019-03-01",
+      |         "businessPartner":"0100062914",
+      |         "contractAccountCategory":"33",
+      |         "contractAccount":"000917000429",
+      |         "contractObjectType":"ZVAT",
+      |         "contractObject":"00000018000000000105",
+      |         "sapDocumentNumber":"003390002284",
+      |         "sapDocumentNumberItem":"0001",
+      |         "chargeReference":"XQ002750002151",
+      |         "mainTransaction":"4700",
+      |         "subTransaction":"1174",
+      |         "originalAmount":1050.00,
+      |         "outstandingAmount":0,
+      |         "clearedAmount":1050.00,
+      |         "accruedInterest":0,
+      |         "items":[
+      |            {
+      |               "subItem":"000",
+      |               "dueDate":"2017-03-01",
+      |               "amount":40.00,
+      |               "clearingDate":"2017-03-11",
+      |               "clearingReason":"01",
+      |               "outgoingPaymentMethod":"A",
+      |               "paymentLock":"a",
+      |               "clearingLock":"A",
+      |               "interestLock":"C",
+      |               "dunningLock":"1",
+      |               "returnFlag":true,
+      |               "paymentReference":"a",
+      |               "paymentAmount":40.00,
+      |               "paymentMethod":"A",
+      |               "paymentLot":"081203010024",
+      |               "paymentLotItem":"000001",
+      |               "clearingSAPDocument":"3350000241",
+      |               "statisticalDocument":"A"
+      |            },
+      |            {
+      |               "subItem":"001",
+      |               "dueDate":"2017-03-02",
+      |               "amount":1001.00,
+      |               "clearingDate":"2017-03-12",
+      |               "clearingReason":"01",
+      |               "outgoingPaymentMethod":"A",
+      |               "paymentLock":"a",
+      |               "clearingLock":"A",
+      |               "interestLock":"C",
+      |               "dunningLock":"1",
+      |               "returnFlag":true,
+      |               "paymentReference":"a",
+      |               "paymentAmount":1001.00,
+      |               "paymentMethod":"A",
+      |               "paymentLot":"081203010024",
+      |               "paymentLotItem":"000001",
+      |               "clearingSAPDocument":"3350000242",
+      |               "statisticalDocument":"A"
+      |            }
+      |         ]
+      |      },
+      |      {
+      |         "chargeType":"VAT Return Debit Charge",
+      |         "mainType":"VAT Return Charge",
+      |         "periodKey":"15AD",
+      |         "periodKeyDescription":"August 2017",
+      |         "taxPeriodFrom":"2019-03-02",
+      |         "taxPeriodTo":"2019-04-01",
+      |         "businessPartner":"0100062914",
+      |         "contractAccountCategory":"33",
+      |         "contractAccount":"000917000429",
+      |         "contractObjectType":"ZVAT",
+      |         "contractObject":"00000018000000000106",
+      |         "sapDocumentNumber":"003390002284",
+      |         "sapDocumentNumberItem":"0001",
+      |         "chargeReference":"XQ002750002152",
+      |         "mainTransaction":"4700",
+      |         "subTransaction":"1174",
+      |         "originalAmount":4000.0,
+      |         "accruedInterest":10.0,
+      |         "items":[
+      |            {
+      |               "subItem":"000",
+      |               "dueDate":"2017-08-05",
+      |               "amount":322.00,
+      |               "clearingReason":"01",
+      |               "outgoingPaymentMethod":"A",
+      |               "paymentLock":"a",
+      |               "clearingLock":"A",
+      |               "interestLock":"C",
+      |               "dunningLock":"1",
+      |               "returnFlag":true,
+      |               "paymentReference":"a",
+      |               "paymentMethod":"A",
+      |               "paymentLot":"081203010024",
+      |               "paymentLotItem":"000001",
+      |               "clearingSAPDocument":"3350000254",
+      |               "statisticalDocument":"A"
+      |            },
+      |            {
+      |               "subItem":"001",
+      |               "dueDate":"2017-04-02",
+      |               "amount":90.00,
+      |               "clearingReason":"01",
+      |               "outgoingPaymentMethod":"A",
+      |               "paymentLock":"a",
+      |               "clearingLock":"A",
+      |               "interestLock":"C",
+      |               "dunningLock":"1",
+      |               "returnFlag":true,
+      |               "paymentReference":"a",
+      |               "paymentMethod":"A",
+      |               "paymentLot":"081203010024",
+      |               "paymentLotItem":"000002",
+      |               "clearingSAPDocument":"3350000255",
+      |               "statisticalDocument":"A"
+      |            },
+      |            {
+      |               "subItem":"002",
+      |               "dueDate":"2017-09-01",
+      |               "amount":6.00,
+      |               "clearingReason":"01",
+      |               "outgoingPaymentMethod":"A",
+      |               "paymentLock":"a",
+      |               "clearingLock":"A",
+      |               "interestLock":"C",
+      |               "dunningLock":"1",
+      |               "returnFlag":true,
+      |               "paymentReference":"a",
+      |               "paymentMethod":"A",
+      |               "paymentLot":"081203010024",
+      |               "paymentLotItem":"000003",
+      |               "clearingSAPDocument":"3350000256",
+      |               "statisticalDocument":"A"
+      |            }
+      |         ]
+      |      },
+      |      {
+      |         "chargeType":"Payment on account",
+      |         "periodKey":"0318",
+      |         "taxPeriodFrom":"2019-04-02",
+      |         "taxPeriodTo":"2019-05-01",
+      |         "items":[
+      |            {
+      |               "subItem":"000",
+      |               "amount":-10
+      |            },
+      |            {
+      |               "subItem":"001",
+      |               "dueDate":"2017-04-01",
+      |               "amount":-10,
+      |               "clearingDate":"2017-11-27",
+      |               "paymentAmount":-10,
+      |               "paymentMethod":"DIRECT DEBIT"
+      |            }
+      |         ]
+      |      }
+      |   ]
+      |}
+    """.stripMargin
+  )
 }
