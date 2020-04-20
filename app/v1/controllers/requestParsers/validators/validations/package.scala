@@ -16,11 +16,11 @@
 
 package v1.controllers.requestParsers.validators
 
-import java.time.format.DateTimeFormatter
+import java.time.format.{DateTimeFormatter, ResolverStyle}
 
 package object validations {
 
-  val dateFormat: DateTimeFormatter = DateTimeFormatter ofPattern "yyyy-MM-dd"
+  val dateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT)
   val maxDateRange = 365
   val maxDateRangeForObligations = 366
   //val earliestDate: LocalDate = LocalDate.parse("2018-04-06", dateFormat)
