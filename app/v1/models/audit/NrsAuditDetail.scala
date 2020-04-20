@@ -16,4 +16,15 @@
 
 package v1.models.audit
 
-case class AuditEvent[T](auditType: String, transactionName: String, detail: T)
+import play.api.libs.json.{JsValue, Json, OWrites}
+
+case class NrsAuditDetail(vrn: String,
+                          authorization: String,
+                          nrSubmissionID: Option[String],
+                          request: Option[JsValue],
+                          correlationId: String)
+
+object NrsAuditDetail {
+
+  implicit val writes: OWrites[NrsAuditDetail] = Json.writes[NrsAuditDetail]
+}

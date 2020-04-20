@@ -16,33 +16,31 @@
 
 package v1.audit
 
-import v1.models.audit.{AuditDetail, AuditEvent, AuditResponse}
+import v1.models.audit.{AuditDetail, AuditEvent, AuditResponse, NrsAuditDetail}
 import v1.models.auth.UserDetails
 
 object AuditEvents {
 
-  def auditReturns(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditReturns(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("retrieveVatReturns","retrieve-vat-returns",
       AuditDetail(userDetails, correlationId, auditResponse))
-  }
 
-  def auditLiability(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditLiability(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("retrieveVatLiabilities","retrieve-vat-liabilities",
       AuditDetail(userDetails, correlationId, auditResponse))
-  }
 
-  def auditPayments(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditPayments(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("retrieveVatPayments","retrieve-vat-payments",
       AuditDetail(userDetails, correlationId, auditResponse))
-  }
 
-  def auditObligations(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditObligations(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("retrieveVatObligations","retrieve-vat-obligations",
       AuditDetail(userDetails, correlationId, auditResponse))
-  }
 
-  def auditSubmit(nino: String, correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent = {
+  def auditSubmit(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("submitVatReturn","submit-vat-return",
       AuditDetail(userDetails, correlationId, auditResponse))
-  }
+
+  def auditNrsSubmit(auditType: String, nrsAuditDetail: NrsAuditDetail): AuditEvent[NrsAuditDetail] =
+    AuditEvent(auditType,"submit-vat-return",nrsAuditDetail)
 }

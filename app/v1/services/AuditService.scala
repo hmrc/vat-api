@@ -17,7 +17,7 @@
 package v1.services
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
@@ -34,7 +34,7 @@ class AuditService @Inject()(auditConnector: AuditConnector,
 
   val logger: Logger = Logger(this.getClass)
 
-  def auditEvent(event: AuditEvent)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuditResult] = {
+  def auditEvent[T](event: AuditEvent[T])(implicit hc: HeaderCarrier, ec: ExecutionContext, writer: Writes[T]): Future[AuditResult] = {
 
     val eventTags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags() +
       ("transactionName" -> event.transactionName)
