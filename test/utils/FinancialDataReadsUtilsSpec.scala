@@ -39,12 +39,12 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
 
   "itemsCheck" when {
     "provided with 'None" should {
-      "return false" in {
+      "return 'false'" in {
         itemsCheck(None) shouldBe false
       }
     }
     "provided with a non-empty optional sequence" should {
-      "return true" in {
+      "return 'true'" in {
         itemsCheck(Some(Seq("item"))) shouldBe true
       }
     }
@@ -60,7 +60,7 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
     }
 
     "an invalid date is supplied" should {
-      "return 'true'" in {
+      "return 'false'" in {
         dateCheck(Some(TaxPeriod("", "2019-01-02")), toDate) shouldBe false
       }
     }
@@ -111,6 +111,4 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
       }
     }
   }
-
-
 }

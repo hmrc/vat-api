@@ -18,7 +18,7 @@ package v1.models.nrs
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import NrsTestData.MetadataTestData._
+import v1.models.nrs.NrsTestData.MetadataTestData._
 
 class MetadataSpec extends UnitSpec {
 

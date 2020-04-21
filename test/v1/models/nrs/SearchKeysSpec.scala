@@ -16,9 +16,9 @@
 
 package v1.models.nrs
 
+import org.joda.time.LocalDate
 import play.api.libs.json.{JsObject, Json}
 import support.UnitSpec
-import org.joda.time.LocalDate
 
 class SearchKeysSpec extends UnitSpec {
 
