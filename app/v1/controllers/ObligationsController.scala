@@ -7,12 +7,10 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
-import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ObligationsRequestParser
-import v1.models.audit.AuditResponse
-import v1.models.errors.{BadRequestError, DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{BadRequestError, DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidDesStatusError, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
 import v1.models.request.obligations.ObligationsRawData
-import v1.services.{AuditService, EnrolmentsAuthService, ObligationsService}
+import v1.services.{EnrolmentsAuthService, ObligationsService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -66,7 +64,8 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError | VrnFormatErrorDes |
            InvalidFromError | InvalidToError |
-           InvalidStatusError | BadRequestError => BadRequest(Json.toJson(errorWrapper))
+           InvalidStatusError | InvalidDateFromErrorDes |
+           InvalidDateToErrorDes | InvalidDesStatusError | BadRequestError => BadRequest(Json.toJson(errorWrapper))
 
       case RuleDateRangeTooLargeError | InvalidInputDataError => Forbidden(Json.toJson(errorWrapper))
       case EmptyNotFoundError => NotFound

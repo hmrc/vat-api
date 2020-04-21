@@ -8,7 +8,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
 
-import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromError, InvalidDateToError, InvalidDesStatusError, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidDesStatusError, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -65,7 +65,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
        |               "status":"F",
        |               "inboundCorrespondenceFromDate":"2017-01-01",
        |               "inboundCorrespondenceToDate":"2017-03-31",
-       |               "inboundCorrespondenceDateReceived":"2017-05-06"
+       |               "inboundCorrespondenceDateReceived":"2017-05-06",
        |               "inboundCorrespondenceDueDate":"2017-05-07",
        |               "periodKey":"18A1"
        |            },
@@ -143,7 +143,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
         status(result) shouldBe OK
         contentAsJson(result) shouldBe mtdJson
-        header("X-CorrelatioId", result) shouldBe Some(correlationId)
+        header("X-CorrelationId", result) shouldBe Some(correlationId)
 
       }
     }
@@ -200,8 +200,8 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
-          (InvalidDateFromError, BAD_REQUEST),
-          (InvalidDateToError, BAD_REQUEST),
+          (InvalidDateFromErrorDes, BAD_REQUEST),
+          (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidDesStatusError, BAD_REQUEST),
           (RuleDateRangeTooLargeError, FORBIDDEN),
           (InvalidInputDataError, FORBIDDEN),
