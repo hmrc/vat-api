@@ -16,7 +16,7 @@
 
 package v1.models.response.liabilities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
 
@@ -64,7 +64,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -147,7 +148,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
                    |        }
                    |    ]
                    |}
-                   |""".stripMargin)
+                  """.stripMargin
+              )
 
               val liabilityResponse = LiabilitiesResponse(Seq(
                 Liability(
@@ -211,7 +213,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -278,7 +281,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -307,9 +311,32 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |{
              |    "idType": "VRN"
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         desJson.asOpt[LiabilitiesResponse] shouldBe None
+      }
+
+      "error when 'chargeType' is missing in an item" in {
+
+        val desJson = Json.parse(
+          s"""
+             |{
+             |    "idType": "VRN",
+             |    "idNumber": "XQIT00000000001",
+             |    "regimeType": "VATC",
+             |    "processingDate": "2017-03-07T09:30:00.000Z",
+             |    "financialTransactions": [
+             |       {
+             |            "taxPeriodFrom": "2017-01-01",
+             |            "taxPeriodTo": "2017-04-05"
+             |        }
+             |    ]
+             |}
+            """.stripMargin
+        )
+
+        desJson.validate[LiabilitiesResponse] shouldBe a[JsError]
       }
 
       "multiple liabilities are returned, but 'payment on account' should be filtered out" in {
@@ -375,7 +402,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -458,7 +486,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -567,7 +596,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         val liabilityResponse = LiabilitiesResponse(Seq(
           Liability(
@@ -676,7 +706,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
              |        }
              |    ]
              |}
-             |""".stripMargin)
+            """.stripMargin
+        )
 
         desJson.as[LiabilitiesResponse] shouldBe LiabilitiesResponse(Seq.empty[Liability])
       }
@@ -719,7 +750,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
            |        }
            |    ]
            |}
-           |""".stripMargin)
+          """.stripMargin
+      )
 
       desJson.as[LiabilitiesResponse] shouldBe LiabilitiesResponse(Seq.empty[Liability])
     }
@@ -727,7 +759,6 @@ class LiabilitiesResponseSpec extends UnitSpec {
     "use the writes format correctly" in {
 
       val liabilitiesJson = Json.parse(
-
         s"""
            |{
            |	"liabilities": [{
@@ -741,7 +772,8 @@ class LiabilitiesResponseSpec extends UnitSpec {
            |		"due": "2017-03-08"
            |	}]
            |}
-           |""".stripMargin)
+          """.stripMargin
+      )
 
       val liabilityResponse = LiabilitiesResponse(Seq(
         Liability(

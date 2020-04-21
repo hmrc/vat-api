@@ -45,7 +45,8 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
 
   def retrieveLiabilities(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
-      logger.info(message = s"[LiabilitiesController][retrieveLiabilities] Retrieving Liabilities from DES")
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"Retrieving Liabilities from DES")
 
       val rawRequest: LiabilitiesRawData = LiabilitiesRawData(vrn, from, to)
 
@@ -53,7 +54,8 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
         serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
-        logger.info(message = s"[LiabilitiesController][retrieveLiabilities] Successfully retrieved Liabilities from DES")
+        logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+          s"Successfully retrieved Liabilities from DES")
 
         Ok(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId)
@@ -76,7 +78,6 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
            FinancialDataInvalidDateRangeError | InvalidDataError
       => BadRequest(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
-      case NotFoundError => NotFound
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }
   }

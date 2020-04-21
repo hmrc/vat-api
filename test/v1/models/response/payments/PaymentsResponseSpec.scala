@@ -324,6 +324,28 @@ class PaymentsResponseSpec extends UnitSpec {
       }
     }
 
+    "read from JSON where 'chargeType' is missing in an item" in {
+
+      val desJson = Json.parse(
+        s"""
+           |{
+           |    "idType": "VRN",
+           |    "idNumber": "XQIT00000000001",
+           |    "regimeType": "VATC",
+           |    "processingDate": "2017-03-07T09:30:00.000Z",
+           |    "financialTransactions": [
+           |       {
+           |            "taxPeriodFrom": "2017-01-01",
+           |            "taxPeriodTo": "2017-04-05"
+           |        }
+           |    ]
+           |}
+            """.stripMargin
+      )
+
+      desJson.validate[PaymentsResponse] shouldBe a[JsError]
+    }
+
     "written to JSON" should {
       "produce the expected JsObject" in {
         Json.toJson(paymentsResponseModel) shouldBe mtdJson

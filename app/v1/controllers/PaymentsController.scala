@@ -39,13 +39,14 @@ extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "FinancialDataResource",
+      controllerName = "PaymentsController",
       endpointName = "retrievePayments"
     )
 
   def retrievePayments(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async{ implicit request =>
-      logger.info(s"[PaymentsController][retrievePayments] Successfully retrieved Payments from DES")
+      logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"Successfully retrieved Payments from DES")
 
       val rawRequest: PaymentsRawData =
         PaymentsRawData(
@@ -59,7 +60,8 @@ extends AuthorisedController(cc) with BaseController with Logging {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrievePayments(parsedRequest))
         } yield {
-          logger.debug(s"[PaymentsController][retrievePayments] Successfully retrieved Payments from DES")
+          logger.debug(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+            s"Successfully retrieved Payments from DES")
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
