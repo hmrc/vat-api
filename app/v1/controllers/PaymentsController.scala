@@ -60,7 +60,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrievePayments(parsedRequest))
         } yield {
-          logger.debug(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+          logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
             s"Successfully retrieved Payments from DES")
 
           Ok(Json.toJson(serviceResponse.responseData))
