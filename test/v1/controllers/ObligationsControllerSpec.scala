@@ -1,10 +1,15 @@
 package v1.controllers
 
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+
 import v1.mocks.requestParsers.MockObligationRequestParser
-import v1.mocks.services.{MockEnrolmentsAuthService, MockObligationService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
+
+import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromError, InvalidDateToError, InvalidDesStatusError, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
 
@@ -14,7 +19,8 @@ import scala.concurrent.Future
 class ObligationsControllerSpec extends ControllerBaseSpec
   with MockEnrolmentsAuthService
   with MockObligationService
-  with MockObligationRequestParser{
+  with MockObligationRequestParser
+  with MockAuditService {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -32,17 +38,17 @@ class ObligationsControllerSpec extends ControllerBaseSpec
   val vrn: String = "123456789"
   val from: String = "2017-01-01"
   val to: String = "2017-03-31"
-  val status: String = "F"
+  val obligationStatus: String = "F"
   val correlationId: String = "X-ID"
 
   val retrieveObligationsRawData: ObligationsRawData =
     ObligationsRawData(
-      vrn, Some(from), Some(to), Some(status)
+      vrn, Some(from), Some(to), Some(obligationStatus)
     )
 
   val retrieveObligationsRequest: ObligationsRequest =
     ObligationsRequest(
-      vrn = Vrn(vrn),  Some(from), Some(to), Some(status)
+      vrn = Vrn(vrn),  Some(from), Some(to), Some(obligationStatus)
     )
 
   val desJson: JsValue = Json.parse(
@@ -125,6 +131,104 @@ class ObligationsControllerSpec extends ControllerBaseSpec
     "a valid request is supplied" should {
       "return the expected data on a successful service call" in new Test {
 
+        MockObligationRequestParser
+          .parse(retrieveObligationsRawData)
+          .returns(Right(retrieveObligationsRequest))
+
+        MockObligationService
+          .receiveObligations(retrieveObligationsRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, obligationsResponse))))
+
+        private val result = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
+
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe mtdJson
+        header("X-CorrelatioId", result) shouldBe Some(correlationId)
+
+      }
+    }
+
+    "return the error as per spec" when {
+      "parser errors occur" must {
+        def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
+          s"a ${error.code} error is returned from the parser" in new Test {
+
+            MockObligationRequestParser
+              .parse(retrieveObligationsRawData)
+              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+
+            val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(error)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+          }
+        }
+
+        val input = Seq(
+          (VrnFormatError, BAD_REQUEST),
+          (InvalidFromError, BAD_REQUEST),
+          (InvalidToError, BAD_REQUEST),
+          (InvalidStatusError, BAD_REQUEST),
+          (RuleDateRangeTooLargeError, FORBIDDEN)
+        )
+
+        input.foreach(args => (errorsFromParserTester _).tupled(args))
+      }
+
+      "service errors occur" must {
+        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
+          s"a $mtdError error is returned from the service" in new Test {
+
+            MockObligationRequestParser
+              .parse(retrieveObligationsRawData)
+              .returns(Right(retrieveObligationsRequest))
+
+            MockObligationService
+              .receiveObligations(retrieveObligationsRequest)
+              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+
+            val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(mtdError)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+          }
+        }
+
+        val input = Seq(
+          (VrnFormatErrorDes, BAD_REQUEST),
+          (InvalidDateFromError, BAD_REQUEST),
+          (InvalidDateToError, BAD_REQUEST),
+          (InvalidDesStatusError, BAD_REQUEST),
+          (RuleDateRangeTooLargeError, FORBIDDEN),
+          (InvalidInputDataError, FORBIDDEN),
+          (DownstreamError, INTERNAL_SERVER_ERROR)
+        )
+
+        input.foreach(args => (serviceErrors _).tupled(args))
+      }
+
+      "a NOT_FOUND error is returned from the service" must {
+        s"return a 404 status with an empty body" in new Test {
+
+          MockObligationRequestParser
+            .parse(retrieveObligationsRawData)
+            .returns(Right(retrieveObligationsRequest))
+
+          MockObligationService
+            .receiveObligations(retrieveObligationsRequest)
+            .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), EmptyNotFoundError))))
+
+          val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
+
+          status(result) shouldBe NOT_FOUND
+          contentAsString(result) shouldBe ""
+          header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+        }
       }
     }
   }

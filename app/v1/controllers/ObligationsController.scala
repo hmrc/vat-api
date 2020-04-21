@@ -1,20 +1,18 @@
 package v1.controllers
 
-
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
+import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ObligationsRequestParser
-import v1.models.errors.{BadRequestError, DownstreamError, EmptyNotFoundError, ErrorWrapper,
-  InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError,
-  RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
-
+import v1.models.audit.AuditResponse
+import v1.models.errors.{BadRequestError, DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
 import v1.models.request.obligations.ObligationsRawData
-import v1.services.{EnrolmentsAuthService, ObligationsService}
+import v1.services.{AuditService, EnrolmentsAuthService, ObligationsService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,6 +56,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+
         result
       }.merge
 
