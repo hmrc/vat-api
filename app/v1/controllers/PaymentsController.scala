@@ -66,7 +66,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
           logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
             s"Successfully retrieved Payments from DES")
 
-          auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
+          auditService.auditEvent(AuditEvents.auditPayments(serviceResponse.correlationId,
             request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
           Ok(Json.toJson(serviceResponse.responseData))
@@ -78,7 +78,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
 
-        auditService.auditEvent(AuditEvents.auditReturns(correlationId,
+        auditService.auditEvent(AuditEvents.auditPayments(correlationId,
           request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
 
         result

@@ -149,7 +149,7 @@ class PaymentsControllerSpec
         header("X-CorrelationId", result) shouldBe Some(correlationId)
 
         val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
-        MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
           UserDetails("Individual", None, "client-Id"), auditResponse)).once
       }
     }
@@ -170,7 +170,7 @@ class PaymentsControllerSpec
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
             val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(error.code))), None)
-            MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
               UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
@@ -204,7 +204,7 @@ class PaymentsControllerSpec
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
             val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(mtdError.code))), None)
-            MockedAuditService.verifyAuditEvent(AuditEvents.auditReturns(correlationId,
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
               UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }

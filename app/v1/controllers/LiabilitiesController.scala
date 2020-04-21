@@ -60,7 +60,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"Successfully retrieved Liabilities from DES")
 
-        auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
+        auditService.auditEvent(AuditEvents.auditLiabilities(serviceResponse.correlationId,
           request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
         Ok(Json.toJson(serviceResponse.responseData))
@@ -72,7 +72,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
 
-        auditService.auditEvent(AuditEvents.auditReturns(correlationId,
+        auditService.auditEvent(AuditEvents.auditLiabilities(correlationId,
           request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
 
         result

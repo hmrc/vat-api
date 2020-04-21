@@ -25,7 +25,7 @@ object AuditEvents {
     AuditEvent("retrieveVatReturns","retrieve-vat-returns",
       AuditDetail(userDetails, correlationId, auditResponse))
 
-  def auditLiability(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
+  def auditLiabilities(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent("retrieveVatLiabilities","retrieve-vat-liabilities",
       AuditDetail(userDetails, correlationId, auditResponse))
 
