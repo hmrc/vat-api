@@ -23,10 +23,12 @@ import play.api.http.MimeTypes
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import utils.{EndpointLogContext, Logging}
+import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PaymentsRequestParser
+import v1.models.audit.AuditResponse
 import v1.models.errors._
 import v1.models.request.payments.PaymentsRawData
-import v1.services.{EnrolmentsAuthService, PaymentsService}
+import v1.services.{AuditService, EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class PaymentsController @Inject()(val authService: EnrolmentsAuthService,
                                    requestParser: PaymentsRequestParser,
                                    service: PaymentsService,
+                                   auditService: AuditService,
                                    cc: ControllerComponents)(implicit ec: ExecutionContext)
 extends AuthorisedController(cc) with BaseController with Logging {
 
@@ -63,6 +66,9 @@ extends AuthorisedController(cc) with BaseController with Logging {
           logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
             s"Successfully retrieved Payments from DES")
 
+          auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
+            request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
+
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
             .as(MimeTypes.JSON)
@@ -71,6 +77,10 @@ extends AuthorisedController(cc) with BaseController with Logging {
       result.leftMap{errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+
+        auditService.auditEvent(AuditEvents.auditReturns(correlationId,
+          request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
+
         result
       }.merge
 
