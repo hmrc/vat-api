@@ -16,23 +16,58 @@
 
 package v1.models.request.submit
 
-import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
-case class SubmitRequestBody(periodKey: String,
-                             vatDueSales: BigDecimal,
-                             vatDueAcquisitions: BigDecimal,
-                             totalVatDue: BigDecimal,
-                             vatReclaimedCurrPeriod: BigDecimal,
-                             netVatDue: BigDecimal,
-                             totalValueSalesExVAT: BigDecimal,
-                             totalValuePurchasesExVAT: BigDecimal,
-                             totalValueGoodsSuppliedExVAT: BigDecimal,
-                             totalAcquisitionsExVAT: BigDecimal,
-                             finalised: Boolean)
+case class SubmitRequestBody(periodKey: Option[String],
+                             vatDueSales: Option[BigDecimal],
+                             vatDueAcquisitions: Option[BigDecimal],
+                             vatDueTotal: Option[BigDecimal],
+                             vatReclaimedCurrPeriod: Option[BigDecimal],
+                             vatDueNet: Option[BigDecimal],
+                             totalValueSalesExVAT: Option[BigDecimal],
+                             totalValuePurchasesExVAT: Option[BigDecimal],
+                             totalValueGoodsSuppliedExVAT: Option[BigDecimal],
+                             totalAllAcquisitionsExVAT: Option[BigDecimal],
+                             finalised: Option[Boolean],
+                             receivedAt: Option[String],
+                             agentReference: Option[String]) {
+}
+
 
 object SubmitRequestBody {
 
-  implicit val reads: Reads[SubmitRequestBody] = Json.reads[SubmitRequestBody]
-  implicit val writes: OWrites[SubmitRequestBody] = Json.writes[SubmitRequestBody]
+  implicit val reads: Reads[SubmitRequestBody] = (
+    (JsPath \ "periodKey").readNullable[String] and
+      (JsPath \ "vatDueSales").readNullable[BigDecimal] and
+      (JsPath \ "vatDueAcquisitions").readNullable[BigDecimal] and
+      (JsPath \ "totalVatDue").readNullable[BigDecimal] and
+      (JsPath \ "vatReclaimedCurrPeriod").readNullable[BigDecimal] and
+      (JsPath \ "netVatDue").readNullable[BigDecimal] and
+      (JsPath \ "totalValueSalesExVAT").readNullable[BigDecimal] and
+      (JsPath \ "totalValuePurchasesExVAT").readNullable[BigDecimal] and
+      (JsPath \ "totalValueGoodsSuppliedExVAT").readNullable[BigDecimal] and
+      (JsPath \ "totalAcquisitionsExVAT").readNullable[BigDecimal] and
+      (JsPath \ "finalised").readNullable[Boolean] and
+      Reads.pure(None) and
+      Reads.pure(None)
+    ) (SubmitRequestBody.apply _)
 
+  implicit val writes: OWrites[SubmitRequestBody] = new OWrites[SubmitRequestBody] {
+    def writes(response: SubmitRequestBody): JsObject = {
+
+      response.periodKey.fold(Json.obj())(value => Json.obj("periodKey" -> value)) ++
+        response.vatDueSales.fold(Json.obj())(value => Json.obj("vatDueSales" -> value)) ++
+        response.vatDueAcquisitions.fold(Json.obj())(value => Json.obj("vatDueAcquisitions" -> value)) ++
+        response.vatDueTotal.fold(Json.obj())(value => Json.obj("vatDueTotal" -> value)) ++
+        response.vatReclaimedCurrPeriod.fold(Json.obj())(value => Json.obj("vatReclaimedCurrPeriod" -> value)) ++
+        response.vatDueNet.fold(Json.obj())(value => Json.obj("vatDueNet" -> value)) ++
+        response.totalValueSalesExVAT.fold(Json.obj())(value => Json.obj("totalValueSalesExVAT" -> value)) ++
+        response.totalValuePurchasesExVAT.fold(Json.obj())(value => Json.obj("totalValuePurchasesExVAT" -> value)) ++
+        response.totalValueGoodsSuppliedExVAT.fold(Json.obj())(value => Json.obj("totalValueGoodsSuppliedExVAT" -> value)) ++
+        response.totalAllAcquisitionsExVAT.fold(Json.obj())(value => Json.obj("totalAllAcquisitionsExVAT" -> value)) ++
+        response.agentReference.fold(Json.obj())(value => Json.obj("agentReference" -> value)) ++
+        response.receivedAt.fold(Json.obj())(value => Json.obj("receivedAt" -> value))
+    }
+  }
 }
