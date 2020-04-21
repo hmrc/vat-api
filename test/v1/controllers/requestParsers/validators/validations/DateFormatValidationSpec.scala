@@ -17,30 +17,35 @@
 package v1.controllers.requestParsers.validators.validations
 
 import support.UnitSpec
-import v1.models.errors.InvalidFromError
+import v1.models.errors.FinancialDataInvalidDateFromError
 
 class DateFormatValidationSpec extends UnitSpec{
   "validate" should {
     "return an empty list" when {
       "passed a valid date" in {
-        DateFormatValidation.validate("2019-02-02", InvalidFromError) shouldBe List()
+        DateFormatValidation.validate("2019-02-02", FinancialDataInvalidDateFromError) shouldBe List()
       }
     }
     "return a list containing an error" when {
       "passed a date with an invalid month" in {
-        DateFormatValidation.validate("2019-13-02", InvalidFromError) shouldBe List(InvalidFromError)
+        DateFormatValidation.validate("2019-13-02", FinancialDataInvalidDateFromError) shouldBe
+          List(FinancialDataInvalidDateFromError)
       }
       "passed a date with an invalid day" in {
-        DateFormatValidation.validate("2019-02-32", InvalidFromError) shouldBe List(InvalidFromError)
+        DateFormatValidation.validate("2019-02-32", FinancialDataInvalidDateFromError) shouldBe
+          List(FinancialDataInvalidDateFromError)
       }
       "passed a date with an invalid year" in {
-        DateFormatValidation.validate("201-02-02", InvalidFromError) shouldBe List(InvalidFromError)
+        DateFormatValidation.validate("201-02-02", FinancialDataInvalidDateFromError) shouldBe
+          List(FinancialDataInvalidDateFromError)
       }
       "passed a date with an invalid separator" in {
-        DateFormatValidation.validate("2012.02-02", InvalidFromError) shouldBe List(InvalidFromError)
+        DateFormatValidation.validate("2012.02-02", FinancialDataInvalidDateFromError) shouldBe
+          List(FinancialDataInvalidDateFromError)
       }
       "passed a date written as text" in {
-        DateFormatValidation.validate("2nd Feb 2012", InvalidFromError) shouldBe List(InvalidFromError)
+        DateFormatValidation.validate("2nd Feb 2012", FinancialDataInvalidDateFromError) shouldBe
+          List(FinancialDataInvalidDateFromError)
       }
     }
   }

@@ -16,49 +16,51 @@
 
 package v1.models.response.payments
 
-import java.time.LocalDate
-
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utils.FinancialDataReadsUtils
 import v1.models.response.common.TaxPeriod
+import v1.models.response.payments.PaymentsResponse.Payment
 
 case class PaymentsResponse(payments: Seq[Payment])
 
-object PaymentsResponse {
+object PaymentsResponse extends FinancialDataReadsUtils {
 
-  implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) => Json.obj("payments" -> {
-    for (
-      payment <- paymentsResponse.payments
-      if payment.paymentItem.isDefined;
-      item <- payment.paymentItem.get
-    ) yield Json.obj(
-      "amount" -> item.amount,
-      "received" -> item.received
-    )
-  }
-  )
+  private val unsupportedChargeTypes: Seq[String] = Seq("payment on account")
 
-  //retrieve all transactions, filter out any particular payments, then return a model only if there's data
-  implicit def reads(implicit to: String): Reads[PaymentsResponse] = {
-    (JsPath \ "financialTransactions").read[Seq[Payment]].map { payments =>
-      payments.filter { payment =>
-        paymentCheck(payment) && dateCheck(payment.taxPeriod, to)
+  implicit val writes: Writes[PaymentsResponse] = (paymentsResponse: PaymentsResponse) =>
+    Json.obj("payments" -> {
+      for {
+        payment <- paymentsResponse.payments
+        item <- payment.paymentItems.getOrElse(Seq.empty[PaymentItem])
+      } yield Json.toJson(item)
+    })
+
+  implicit def reads(implicit to: String): Reads[PaymentsResponse] =
+    (JsPath \ "financialTransactions")
+      .read(filterNotArrayReads[Payment]("chargeType", unsupportedChargeTypes))
+      .map(_.filter(payment => dateCheck(payment.taxPeriod, to) && itemsCheck(payment.paymentItems)))
+      .map(PaymentsResponse(_))
+
+  //intermediary case class for reading in data before filtering
+  case class Payment(taxPeriod: Option[TaxPeriod],
+                     `type`: String,
+                     paymentItems: Option[Seq[PaymentItem]])
+
+  object Payment {
+
+    implicit val reads: Reads[Payment] = (
+      TaxPeriod.reads and
+        (JsPath \ "chargeType").read[String] and
+        (JsPath \ "items").readNullable[Seq[PaymentItem]].map(filterNotEmpty)
+      ) (Payment.apply _)
+
+    def filterNotEmpty(items: Option[Seq[PaymentItem]]): Option[Seq[PaymentItem]] = {
+      items.map(_.filterNot(_ == PaymentItem.empty)) match {
+        case None => None
+        case Some(Nil) => None
+        case nonEmpty => nonEmpty
       }
     }
-  }.map(PaymentsResponse(_))
-
-  //filter particular payments
-  private def paymentCheck(payment: Payment): Boolean = {
-    val paymentType = payment.`type`.toLowerCase
-    paymentType != "payment on account"
   }
-
-  //filter the payments that have response to date beyond the request to date
-  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String) = {
-    val toDate = taxPeriod.fold(None: Option[LocalDate]){l => Some(LocalDate.parse(l.to))}
-    toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
-    }
-  }
-
-
-
 }

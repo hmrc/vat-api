@@ -42,13 +42,14 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "VatReturnsResource",
-      endpointName = "retrieveVatReturns"
+      controllerName = "ViewReturnController",
+      endpointName = "viewReturn"
     )
 
   def viewReturn(vrn: String, periodKey: String): Action[AnyContent] =
     authorisedAction(vrn).async{ implicit request =>
-      logger.info(message = s"[ViewReturnController] [viewReturn] Retrieve VAT returns for VRN : $vrn")
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"Retrieve VAT returns for VRN : $vrn")
 
       val rawRequest: ViewRawData =
         ViewRawData(
@@ -61,7 +62,8 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.viewReturn(parsedRequest))
         } yield {
-          logger.info(message = s"[ViewReturnController] [viewReturn] Successfully retrieved Vat Return from DES")
+          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+            s"Successfully retrieved Vat Return from DES")
 
           auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
             request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))

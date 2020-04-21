@@ -18,8 +18,8 @@ package v1.models.audit
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import v1.fixtures.audit.AuditResponseFixture._
 import v1.fixtures.audit.AuditDetailFixture._
+import v1.fixtures.audit.AuditResponseFixture._
 
 class AuditDetailSpec extends UnitSpec {
 

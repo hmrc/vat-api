@@ -16,45 +16,45 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{LiabilityDateValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
-import v1.models.errors.{InvalidDateFromError, InvalidDateToError, MtdError}
-import v1.models.request.liability.LiabilityRawData
+import v1.controllers.requestParsers.validators.validations.{FinancialDataDateFormatValidation, FinancialDataDateRangeValidation, VrnValidation}
+import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
+import v1.models.request.liabilities.LiabilitiesRawData
 
-class LiabilitiesValidator extends Validator[LiabilityRawData]  {
+class LiabilitiesValidator extends Validator[LiabilitiesRawData]  {
 
   private val validationSet = List(vrnFormatValidation, fromDateFormatValidation, toDateFormatValidation, dateRangeValidation)
 
-  private def vrnFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def vrnFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       VrnValidation.validate(data.vrn)
     )
   }
 
-  private def fromDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def fromDateFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       data.from match {
-        case None => List(InvalidDateFromError)
-        case Some(from) => LiabilityDateValidation.validate(from, InvalidDateFromError)
+        case None => List(FinancialDataInvalidDateFromError)
+        case Some(from) => FinancialDataDateFormatValidation.validate(from, FinancialDataInvalidDateFromError)
       }
     )
   }
 
-  private def toDateFormatValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def toDateFormatValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
       data.to match {
-        case None => List(InvalidDateToError)
-        case Some(to) => LiabilityDateValidation.validate(to, InvalidDateToError)
+        case None => List(FinancialDataInvalidDateToError)
+        case Some(to) => FinancialDataDateFormatValidation.validate(to, FinancialDataInvalidDateToError)
       }
     )
   }
 
-  private def dateRangeValidation: LiabilityRawData => List[List[MtdError]] = (data: LiabilityRawData) => {
+  private def dateRangeValidation: LiabilitiesRawData => List[List[MtdError]] = (data: LiabilitiesRawData) => {
     List(
-      PaymentsLiabilitiesDateRangeValidation.validate(data.from.get, data.to.get)
+      FinancialDataDateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 
-  override def validate(data: LiabilityRawData): List[MtdError] = {
+  override def validate(data: LiabilitiesRawData): List[MtdError] = {
     run(validationSet, data).distinct
   }
 }

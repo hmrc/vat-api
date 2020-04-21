@@ -16,8 +16,8 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{DateFormatValidation, PaymentsLiabilitiesDateRangeValidation, VrnValidation}
-import v1.models.errors.{InvalidFromError, InvalidToError, MtdError}
+import v1.controllers.requestParsers.validators.validations.{FinancialDataDateFormatValidation, FinancialDataDateRangeValidation, VrnValidation}
+import v1.models.errors.{FinancialDataInvalidDateFromError, FinancialDataInvalidDateToError, MtdError}
 import v1.models.request.payments.PaymentsRawData
 
 class PaymentsValidator extends Validator[PaymentsRawData]  {
@@ -33,8 +33,8 @@ class PaymentsValidator extends Validator[PaymentsRawData]  {
   private def fromDateFormatValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
       data.from match {
-        case None => List(InvalidFromError)
-        case Some(from) => DateFormatValidation.validate(from, InvalidFromError)
+        case None => List(FinancialDataInvalidDateFromError)
+        case Some(from) => FinancialDataDateFormatValidation.validate(from, FinancialDataInvalidDateFromError)
       }
     )
   }
@@ -42,15 +42,15 @@ class PaymentsValidator extends Validator[PaymentsRawData]  {
   private def toDateFormatValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
       data.to match {
-        case None => List(InvalidToError)
-        case Some(to) => DateFormatValidation.validate(to, InvalidToError)
+        case None => List(FinancialDataInvalidDateToError)
+        case Some(to) => FinancialDataDateFormatValidation.validate(to, FinancialDataInvalidDateToError)
       }
     )
   }
 
   private def dateRangeValidation: PaymentsRawData => List[List[MtdError]] = (data: PaymentsRawData) => {
     List(
-      PaymentsLiabilitiesDateRangeValidation.validate(data.from.get, data.to.get)
+      FinancialDataDateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 

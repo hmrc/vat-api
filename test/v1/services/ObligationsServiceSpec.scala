@@ -94,8 +94,8 @@ class ObligationsServiceSpec extends UnitSpec {
           ("NOT_FOUND_BPKEY", DownstreamError),
           ("NOT_FOUND", LegacyNotFoundError),
           ("INVALID_STATUS", InvalidDesStatusError),
-          ("INVALID_DATE_FROM", InvalidDateFromError),
-          ("INVALID_DATE_TO", InvalidDateToError),
+          ("INVALID_DATE_FROM", InvalidDateFromErrorDes),
+          ("INVALID_DATE_TO", InvalidDateToErrorDes),
           ("INVALID_DATE_RANGE", RuleDateRangeTooLargeError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)

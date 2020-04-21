@@ -19,7 +19,7 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockPaymentsValidator
-import v1.models.errors.{ErrorWrapper, InvalidFromError, InvalidToError, VrnFormatError}
+import v1.models.errors._
 import v1.models.request.payments.{PaymentsRawData, PaymentsRequest}
 
 class PaymentsRequestParserSpec extends UnitSpec {
@@ -57,18 +57,26 @@ class PaymentsRequestParserSpec extends UnitSpec {
 
       "invalid from date is provided" in new Test {
         MockVrnValidator.validate(PaymentsRawData(validVrn, Some(invalidFrom), Some(validToDate)))
-          .returns(List(InvalidFromError))
+          .returns(List(FinancialDataInvalidDateFromError))
 
         parser.parseRequest(PaymentsRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
-          Left(ErrorWrapper(None, InvalidFromError, None))
+          Left(ErrorWrapper(None, FinancialDataInvalidDateFromError, None))
       }
 
       "invalid to date is provided" in new Test {
         MockVrnValidator.validate(PaymentsRawData(validVrn, Some(validFromDate), Some(invalidTo)))
-          .returns(List(InvalidToError))
+          .returns(List(FinancialDataInvalidDateToError))
 
         parser.parseRequest(PaymentsRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
-          Left(ErrorWrapper(None, InvalidToError, None))
+          Left(ErrorWrapper(None, FinancialDataInvalidDateToError, None))
+      }
+
+      "invalid date range is provided" in new Test {
+        MockVrnValidator.validate(PaymentsRawData(validVrn, Some("2017-01-01"), Some("2019-01-01")))
+          .returns(List(FinancialDataInvalidDateRangeError))
+
+        parser.parseRequest(PaymentsRawData(validVrn, Some("2017-01-01"), Some("2019-01-01"))) shouldBe
+          Left(ErrorWrapper(None, FinancialDataInvalidDateRangeError, None))
       }
     }
   }

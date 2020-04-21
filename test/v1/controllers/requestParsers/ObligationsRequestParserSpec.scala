@@ -19,7 +19,7 @@ package v1.controllers.requestParsers
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockObligationsValidator
-import v1.models.errors.{ErrorWrapper, InvalidFromError, InvalidStatusError, InvalidToError, RuleMissingDateRangeError, VrnFormatError}
+import v1.models.errors._
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 
 class ObligationsRequestParserSpec extends UnitSpec {

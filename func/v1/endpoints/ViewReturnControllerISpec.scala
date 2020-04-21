@@ -48,7 +48,6 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
       setupStubs()
       buildRequest(uri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
-        .withQueryStringParameters(queryParams.head)
     }
 
     def errorBody(code: String): String =
@@ -119,6 +118,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
 
           override val vrn: String = requestVrn
           override val periodKey: String = requestPeriodKey
+          println(request.url)
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()

@@ -13,8 +13,13 @@ import uk.gov.hmrc.vatapi.stubs.{AuditStub, AuthStub, DesStub}
 
 class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
-  def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
-    "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
+  def queryString(from: String, to: String): Map[String, String] =
+    Map(
+      "dateFrom" -> from, "dateTo" -> to,
+      "onlyOpenItems" -> "false", "includeLocks" -> "false",
+      "calculateAccruedInterest" -> "true",
+      "customerPaymentInformation" -> "true"
+    )
 
   private trait Test {
 
@@ -238,6 +243,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2017-12-31"
 
       override def setupStubs(): StubMapping = {
+        AuditStub.audit()
         AuthStub.authorised()
         DesStub.onError(DesStub.GET, desUrl(vrn), queryString("2017-01-01", "2017-12-31"), BAD_REQUEST, DesErrors.invalidOnlyOpenItems)
       }
@@ -250,6 +256,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       "return an INVALID_DATE_RANGE error" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
+          AuditStub.audit()
         }
 
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=2019-01-01"
@@ -264,6 +271,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       "return an INVALID_DATE_TO error" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
+          AuditStub.audit()
         }
 
         override def uri: String = s"/$vrn/liabilities?from=2017-01-01&to=3017-12-31"
@@ -278,6 +286,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       "return and INVALID_DATE_FROM error" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
+          AuditStub.audit()
         }
 
         override def uri: String = s"/$vrn/liabilities?from=2001-01-01&to=2017-12-31"
@@ -292,6 +301,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
       "return an VRN_INVALID error" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
+          AuditStub.audit()
         }
 
         override def uri: String = s"/invalidvrn/liabilities?from=2015-01-01&to=2017-12-31"
@@ -338,8 +348,15 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
      "return only those payments belonging to a liability that falls before the 'to' date" in new Test {
 
-       def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
-         "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
+       def queryString(from: String, to: String): Map[String, String] =
+         Map(
+           "dateFrom" -> from,
+           "dateTo" -> to,
+           "onlyOpenItems" -> "false",
+           "includeLocks" -> "false",
+           "calculateAccruedInterest" -> "true",
+           "customerPaymentInformation" -> "true"
+         )
 
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-06-02"
 
@@ -356,8 +373,15 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
 
      "retrieve multiple payments where they exist" in new Test {
 
-       def queryString(from: String, to: String) = Map("dateFrom" -> from, "dateTo" -> to, "onlyOpenItems" -> "false", "includeLocks" -> "false",
-         "calculateAccruedInterest" -> "true", "customerPaymentInformation" -> "true")
+       def queryString(from: String, to: String): Map[String, String] =
+         Map(
+           "dateFrom" -> from,
+           "dateTo" -> to,
+           "onlyOpenItems" -> "false",
+           "includeLocks" -> "false",
+           "calculateAccruedInterest" -> "true",
+           "customerPaymentInformation" -> "true"
+         )
 
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2017-12-31"
 
@@ -391,6 +415,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
      "return an INVALID_DATE_RANGE error" in new Test {
        override def setupStubs(): StubMapping = {
          AuthStub.authorised()
+         AuditStub.audit()
        }
 
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=2019-01-01"
@@ -405,6 +430,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
      "return an INVALID_DATE_TO error" in new Test {
        override def setupStubs(): StubMapping = {
          AuthStub.authorised()
+         AuditStub.audit()
        }
 
        override def uri: String = s"/$vrn/payments?from=2017-01-01&to=3017-12-31"
@@ -419,6 +445,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
      "return and INVALID_DATE_FROM error" in new Test {
        override def setupStubs(): StubMapping = {
          AuthStub.authorised()
+         AuditStub.audit()
        }
 
        override def uri: String = s"/$vrn/payments?from=2001-01-01&to=2017-12-31"
@@ -433,6 +460,7 @@ class FinancialDataResourceISpec extends BaseFunctionalSpec {
      "return an VRN_INVALID error" in new Test {
        override def setupStubs(): StubMapping = {
          AuthStub.authorised()
+         AuditStub.audit()
        }
 
        override def uri: String = s"/invalidvrn/payments?from=2015-01-01&to=2017-12-31"
