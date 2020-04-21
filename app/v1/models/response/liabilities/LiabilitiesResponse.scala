@@ -16,48 +16,20 @@
 
 package v1.models.response.liabilities
 
-import java.time.LocalDate
-
 import play.api.libs.json._
-import v1.models.response.common.TaxPeriod
+import utils.FinancialDataReadsUtils
 
 case class LiabilitiesResponse(liabilities: Seq[Liability])
 
-object LiabilitiesResponse {
+object LiabilitiesResponse extends FinancialDataReadsUtils {
+
+  private val unsupportedChargeTypes: Seq[String] = Seq("hybrid payments", "payment on account")
 
   implicit val writes: OWrites[LiabilitiesResponse] = Json.writes[LiabilitiesResponse]
 
-  //retrieve all transactions, filter out any particular payments, then return a model only if there's data
-  implicit def reads(implicit to: String): Reads[LiabilitiesResponse] = {
-    (JsPath \ "financialTransactions").read[Seq[JsValue]]
-      .map(_.filter(json => {
-        json.validate[ChargeTypeWrapper].isSuccess &&
-          json.as[ChargeTypeWrapper].chargeType.toLowerCase != "hybrid payments" &&
-          json.as[ChargeTypeWrapper].chargeType.toLowerCase != "payment on account"
-        }
-      ).map(_.as[Liability]))
-      .map { liabilities =>
-        liabilities.filter { liability =>
-          paymentCheck(liability) && dateCheck(liability.taxPeriod, to)
-        }
-      }
-    }.map(LiabilitiesResponse(_))
-
-  //filter particular payments
-  private def paymentCheck(liability: Liability): Boolean = {
-    val liabilityType = liability.`type`.toLowerCase
-    liabilityType != "payment on account" && liabilityType != "hybrid payments"
-  }
-
-  //filter the payments that have response to date beyond the request to date
-  private def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String): Boolean = {
-    val toDate = taxPeriod.fold(None: Option[LocalDate]){l => Some(LocalDate.parse(l.to))}
-    toDate.fold(true){ desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
-    }
-  }
-
-  case class ChargeTypeWrapper(chargeType: String)
-  object ChargeTypeWrapper{
-    implicit val reads: Reads[ChargeTypeWrapper] = Json.reads[ChargeTypeWrapper]
-  }
+  implicit def reads(implicit to: String): Reads[LiabilitiesResponse] =
+    (JsPath \ "financialTransactions")
+      .read(filterNotArrayReads[Liability](filterName = "chargeType", notMatching = unsupportedChargeTypes))
+      .map(_.filter(liability => dateCheck(liability.taxPeriod, to)))
+      .map(LiabilitiesResponse(_))
 }
