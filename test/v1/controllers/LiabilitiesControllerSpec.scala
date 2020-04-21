@@ -20,8 +20,11 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.audit.AuditEvents
 import v1.mocks.requestParsers.MockLiabilitiesRequestParser
-import v1.mocks.services.{MockEnrolmentsAuthService, MockLiabilitiesService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockLiabilitiesService}
+import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
@@ -35,7 +38,8 @@ class LiabilitiesControllerSpec
   extends ControllerBaseSpec
     with MockEnrolmentsAuthService
     with MockLiabilitiesService
-    with MockLiabilitiesRequestParser{
+    with MockLiabilitiesRequestParser
+    with MockAuditService {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -44,6 +48,7 @@ class LiabilitiesControllerSpec
       mockEnrolmentsAuthService,
       mockLiabilitiesRequestParser,
       mockRetrieveLiabilitiesService,
+      auditService = mockAuditService,
       cc
     )
 
@@ -112,6 +117,10 @@ class LiabilitiesControllerSpec
         status(result) shouldBe OK
         contentAsJson(result) shouldBe mtdJson
         header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+        val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditLiabilities(correlationId,
+          UserDetails("Individual", None, "client-Id"), auditResponse)).once
       }
     }
 
@@ -129,6 +138,10 @@ class LiabilitiesControllerSpec
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(error)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(error.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditLiabilities(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
@@ -159,6 +172,10 @@ class LiabilitiesControllerSpec
             status(result) shouldBe expectedStatus
             contentAsJson(result) shouldBe Json.toJson(mtdError)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(mtdError.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditLiabilities(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
