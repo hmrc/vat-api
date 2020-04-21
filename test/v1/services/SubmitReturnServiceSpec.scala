@@ -37,17 +37,19 @@ class SubmitReturnServiceSpec extends UnitSpec {
 
   private val submitRequestBody: SubmitRequestBody =
     SubmitRequestBody(
-      periodKey = "F034",
-      vatDueSales = 4567.23,
-      vatDueAcquisitions = -456675.5,
-      totalVatDue = 7756.65,
-      vatReclaimedCurrPeriod = -756822354.64,
-      netVatDue = 8956743245.12,
-      totalValueSalesExVAT = 43556767890.00,
-      totalValuePurchasesExVAT = 34556790.00,
-      totalValueGoodsSuppliedExVAT = 34556.00,
-      totalAcquisitionsExVAT = -68978.00,
-      finalised = true
+      periodKey = Some("F034"),
+      vatDueSales = Some(4567.23),
+      vatDueAcquisitions = Some(-456675.5),
+      vatDueTotal = Some(7756.65),
+      vatReclaimedCurrPeriod = Some(-756822354.64),
+      vatDueNet = Some(8956743245.12),
+      totalValueSalesExVAT = Some(43556767890.00),
+      totalValuePurchasesExVAT = Some(34556790.00),
+      totalValueGoodsSuppliedExVAT = Some(34556.00),
+      totalAllAcquisitionsExVAT = Some(-68978.00),
+      finalised = Some(true),
+      receivedAt = None,
+      agentReference = None
     )
 
   private val submitReturnRequest: SubmitRequest =

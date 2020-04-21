@@ -16,7 +16,7 @@
 
 package v1.models.request.submit
 
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.AnyContent
 import v1.models.request.RawData
 
-case class SubmitRawData(vrn: String, body: AnyContentAsJson) extends RawData
+case class SubmitRawData(vrn: String, body: AnyContent) extends RawData

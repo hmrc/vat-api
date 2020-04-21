@@ -33,9 +33,17 @@ class JsonFormatValidationSpec extends UnitSpec with JsonErrorValidators {
     "return no errors" when {
       "when a valid JSON object with all the necessary fields is supplied" in {
 
-        val validJson = Json.parse("""{ "fieldOne" : "Something", "fieldTwo" : "SomethingElse" }""")
+        val validJson = Json.parse(
+          """
+            |{
+            | "testDataObject" : {
+            |     "fieldOne" : "Something",
+            |     "fieldTwo" : "SomethingElse"
+            | }
+            |}
+            |""".stripMargin)
 
-        val validationResult = JsonFormatValidation.validate[TestDataObject](validJson, someError)
+        val validationResult = JsonFormatValidation.validate[TestDataObject](validJson \ "testDataObject", someError)
         validationResult shouldBe empty
       }
     }
@@ -43,9 +51,15 @@ class JsonFormatValidationSpec extends UnitSpec with JsonErrorValidators {
     "return an error " when {
       "when a required field is missing" in {
 
-        val json = Json.parse("""{ "fieldOne" : "Something" }""")
+        val json = Json.parse(
+          """
+            |{
+            | "testDataObject": {
+            |   "fieldOne" : "Something"
+            | }
+            |}""".stripMargin)
 
-        val validationResult = JsonFormatValidation.validate[TestDataObject](json, someError)
+        val validationResult = JsonFormatValidation.validate[TestDataObject](json \ "testDataObject", someError)
         validationResult shouldBe List(someError)
       }
 
