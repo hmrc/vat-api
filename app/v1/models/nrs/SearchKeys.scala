@@ -19,7 +19,6 @@ package v1.models.nrs
 import org.joda.time.LocalDate
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.http.controllers.RestFormats
-import utils.DateTimeUtil
 
 case class SearchKeys(vrn: Option[String],
                       companyName: Option[String] = None,
