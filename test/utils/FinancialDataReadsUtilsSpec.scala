@@ -37,19 +37,6 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
         .map(TestWrapper(_))
   }
 
-  "itemsCheck" when {
-    "provided with 'None" should {
-      "return 'false'" in {
-        itemsCheck(None) shouldBe false
-      }
-    }
-    "provided with a non-empty optional sequence" should {
-      "return 'true'" in {
-        itemsCheck(Some(Seq("item"))) shouldBe true
-      }
-    }
-  }
-
   "dateCheck" when {
     val toDate = "2019-01-01"
 
@@ -62,6 +49,12 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
     "an invalid date is supplied" should {
       "return 'false'" in {
         dateCheck(Some(TaxPeriod("", "2019-01-02")), toDate) shouldBe false
+      }
+    }
+
+    "no date is supplied" should {
+      "return 'true'" in {
+        dateCheck(None, toDate) shouldBe true
       }
     }
   }
@@ -89,8 +82,24 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
       }
     }
 
+    "read from JSON with an empty array of items" should {
+      "produce an empty sequence of objects" in {
+
+        val json = Json.parse(
+          """
+            |{
+            |   "array": [
+            |   ]
+            |}
+          """.stripMargin
+        )
+
+        json.as[TestWrapper] shouldBe TestWrapper(Seq.empty[TestItem])
+      }
+    }
+
     "read from invalid JSON" should {
-      "produce a JsError" in {
+      "produce a JsError when mandatory fields are missing" in {
 
         val json = Json.parse(
           """
@@ -103,6 +112,19 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
             |      "aField": "notAValue"
             |      }
             |   ]
+            |}
+          """.stripMargin
+        )
+
+        json.validate[TestWrapper] shouldBe a[JsError]
+      }
+
+      "produce a JsError when array is missing" in {
+
+        val json = Json.parse(
+          """
+            |{
+            |   "notArray": []
             |}
           """.stripMargin
         )
