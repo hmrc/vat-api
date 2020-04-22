@@ -42,9 +42,4 @@ trait FinancialDataReadsUtils {
     toDate.fold(true) { desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
     }
   }
-
-  def itemsCheck[A](items : Option[Seq[A]]): Boolean = items match {
-    case Some(_) => true
-    case None => false
-  }
 }

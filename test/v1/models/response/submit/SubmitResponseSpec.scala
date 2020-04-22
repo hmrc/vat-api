@@ -17,12 +17,12 @@
 package v1.models.response.submit
 
 import org.joda.time.DateTime
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 
 class SubmitResponseSpec extends UnitSpec {
 
-  val minmiumDesJson = Json.parse(
+  val minmiumDesJson: JsValue = Json.parse(
     """
       |{
       | "processingDate": "2018-01-16T08:20:27.895Z",
@@ -30,7 +30,7 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val maximiumDesJson = Json.parse(
+  val maximiumDesJson: JsValue = Json.parse(
     """
       |{
       | "processingDate": "2018-01-16T08:20:27.895Z",
@@ -40,7 +40,7 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val noMilliDesJson = Json.parse(
+  val noMilliDesJson: JsValue = Json.parse(
     """
       |{
       | "processingDate": "2018-01-16T08:20:27.89Z",
@@ -48,7 +48,7 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val minimiumMtdJson = Json.parse(
+  val minimiumMtdJson: JsValue = Json.parse(
     """
       |{
       | "processingDate": "2018-01-16T08:20:27.895Z",
@@ -56,7 +56,7 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val maximiumMtdJson = Json.parse(
+  val maximiumMtdJson: JsValue = Json.parse(
     """
       |{
       |  "processingDate": "2018-01-16T08:20:27.895Z",
@@ -66,7 +66,7 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val noMilliMtdJson = Json.parse(
+  val noMilliMtdJson: JsValue = Json.parse(
     """
       |{
       | "processingDate": "2018-01-16T08:20:27.890Z",

@@ -39,7 +39,7 @@ object PaymentsResponse extends FinancialDataReadsUtils {
   implicit def reads(implicit to: String): Reads[PaymentsResponse] =
     (JsPath \ "financialTransactions")
       .read(filterNotArrayReads[Payment]("chargeType", unsupportedChargeTypes))
-      .map(_.filter(payment => dateCheck(payment.taxPeriod, to) && itemsCheck(payment.paymentItems)))
+      .map(_.filter(payment => dateCheck(payment.taxPeriod, to) && payment.paymentItems.isDefined))
       .map(PaymentsResponse(_))
 
   //intermediary case class for reading in data before filtering

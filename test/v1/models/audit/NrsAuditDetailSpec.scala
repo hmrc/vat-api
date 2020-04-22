@@ -16,7 +16,7 @@
 
 package v1.models.audit
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 
 class NrsAuditDetailSpec extends UnitSpec {
@@ -28,7 +28,7 @@ class NrsAuditDetailSpec extends UnitSpec {
       |"test":"test"
       |}""".stripMargin)), "")
 
-  val jsonSuccess = Json.parse(
+  val jsonSuccess: JsValue = Json.parse(
     """{
       |"vrn":"1234567",
       | "authorization":"Bearer test",
@@ -36,7 +36,7 @@ class NrsAuditDetailSpec extends UnitSpec {
       | "correlationId":""
       |}""".stripMargin)
 
-  val jsonError = Json.parse(
+  val jsonError: JsValue = Json.parse(
     """
       |{"vrn":"1234567","authorization":"Bearer test","request":{"test":"test"},"correlationId":""}
       |""".stripMargin)

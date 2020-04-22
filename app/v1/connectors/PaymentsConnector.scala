@@ -36,12 +36,12 @@ class PaymentsConnector @Inject()(val http: HttpClient,
     implicit val requestToDate: String = request.to
 
     val queryParams: Seq[(String, String)] = Seq(
-      ("dateFrom" , request.from),
-      ("dateTo" , request.to),
-      ("onlyOpenItems" , "false"),
-      ("includeLocks" , "false"),
-      ("calculateAccruedInterest" , "true"),
-      ("customerPaymentInformation" , "true")
+      ("dateFrom", request.from),
+      ("dateTo", request.to),
+      ("onlyOpenItems", "false"),
+      ("includeLocks", "false"),
+      ("calculateAccruedInterest", "true"),
+      ("customerPaymentInformation", "true")
     )
 
     get(

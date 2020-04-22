@@ -37,7 +37,7 @@ class ViewReturnConnector @Inject()(val http: HttpClient,
 
     val vrn = request.vrn.vrn
 
-    val queryParams: Seq[(String,String)] =
+    val queryParams: Seq[(String, String)] =
       Seq(
         "period-key" -> request.periodKey
       )

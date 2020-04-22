@@ -18,7 +18,7 @@ package v1.models.nrs
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import NrsTestData.FullRequestTestData._
+import v1.models.nrs.NrsTestData.FullRequestTestData._
 
 class NRSSubmissionSpec extends UnitSpec {
 

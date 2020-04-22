@@ -37,7 +37,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
         end = "2017-06-30",
         due = "2017-08-07",
         status = "O",
-        received  = None
+        received = None
       )
     ))
 
@@ -77,7 +77,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders ="Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
+            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
 
@@ -94,7 +94,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders ="Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
+            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
 
@@ -111,7 +111,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders ="Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
+            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
           )
           .returns(Future.successful(outcome))
 

@@ -16,8 +16,8 @@
 
 package v1.models.nrs
 
-import java.time.{Instant, LocalDateTime, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime, ZoneId}
 
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
