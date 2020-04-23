@@ -21,13 +21,11 @@ import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
-import v1.mocks.connectors.{MockSubmitReturnConnector, MockViewReturnConnector}
+import v1.mocks.connectors.MockSubmitReturnConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
-import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.submit.SubmitResponse
-import v1.models.response.viewReturn.ViewReturnResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,7 +33,6 @@ import scala.concurrent.Future
 class SubmitReturnServiceSpec extends UnitSpec {
 
   private val vrn: String = "123456789"
-  private val periodKey: String = "F034"
   private val correlationId = "X-123"
 
   private val submitRequestBody: SubmitRequestBody =
