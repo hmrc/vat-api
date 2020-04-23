@@ -16,12 +16,12 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{ObligationValidation, VrnValidation}
+import v1.controllers.requestParsers.validators.validations.{DateRangeValidation, ObligationValidation, VrnValidation}
 import v1.models.errors.MtdError
 import v1.models.request.obligations.ObligationsRawData
 
 class ObligationsValidator extends Validator[ObligationsRawData]{
-  private val validationSet = List(vrnFormatValidation, obligationFormatValidation)
+  private val validationSet = List(vrnFormatValidation, obligationFormatValidation, dateRangeValidation)
 
   private def vrnFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
@@ -32,6 +32,12 @@ class ObligationsValidator extends Validator[ObligationsRawData]{
   private def obligationFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
       ObligationValidation.validate(data)
+    )
+  }
+
+  private def dateRangeValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
+    List(
+      DateRangeValidation.validate(data.from.get, data.to.get)
     )
   }
 

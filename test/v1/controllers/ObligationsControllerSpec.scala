@@ -8,7 +8,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
 
-import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidDesStatusError, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidStatusErrorDes, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -202,7 +202,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (VrnFormatErrorDes, BAD_REQUEST),
           (InvalidDateFromErrorDes, BAD_REQUEST),
           (InvalidDateToErrorDes, BAD_REQUEST),
-          (InvalidDesStatusError, BAD_REQUEST),
+          (InvalidStatusErrorDes, BAD_REQUEST),
           (RuleDateRangeTooLargeError, FORBIDDEN),
           (InvalidInputDataError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
