@@ -35,6 +35,12 @@ trait BaseDesConnector {
     hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
       .withExtraHeaders("Environment" -> appConfig.desEnv)
 
+  private[connectors] def desPostHeaderCarrier(implicit hc: HeaderCarrier): HeaderCarrier =
+    hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+      .withExtraHeaders("Environment" -> appConfig.desEnv,
+        "Accept" -> "application/json",
+        "OriginatorID" -> "MDTP")
+
   def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
                                                               httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
@@ -43,7 +49,7 @@ trait BaseDesConnector {
       http.POST(s"${appConfig.desBaseUrl}/${uri.value}", body)
     }
 
-    doPost(desHeaderCarrier(hc))
+    doPost(desPostHeaderCarrier(hc))
   }
 
   def get[Resp](uri: DesUri[Resp])(implicit ec: ExecutionContext,

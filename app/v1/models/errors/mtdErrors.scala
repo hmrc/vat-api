@@ -108,3 +108,7 @@ object RuleDateRangeTooLargeError extends MtdError(
 object InvalidDateToErrorDes extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
 
 object InvalidDateFromErrorDes extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
+
+object TaxPeriodNotEnded extends MtdError("TAX_PERIOD_NOT_ENDED", "The remote endpoint has indicated that the submission is for a tax period that has not ended")
+
+object DuplicateVatSubmission extends MtdError("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.")
