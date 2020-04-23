@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.models.nrs.NrsTestData.MetadataTestData._
+import org.joda.time.LocalDate
+import play.api.libs.json.{Json, OWrites}
 
-class MetadataSpec extends UnitSpec {
+case class SearchKeys(vrn: Option[String],
+                      companyName: Option[String],
+                      taxPeriodEndDate: Option[LocalDate],
+                      periodKey: Option[String])
 
-  "Formats" should {
-
-    "parse correctly from json" in {
-      correctJson.as[Metadata] shouldBe correctModel
-    }
-
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
-  }
+object SearchKeys {
+  implicit val writes: OWrites[SearchKeys] = Json.writes[SearchKeys]
 }

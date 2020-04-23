@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
-import org.joda.time.LocalDate
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
 import support.UnitSpec
+import v1.models.nrs.NrsTestData.MetadataTestData._
 
-class SearchKeysSpec extends UnitSpec {
+class MetadataSpec extends UnitSpec {
 
-  val correctJson: JsObject = Json.obj(
-    "vrn" -> "vrn",
-    "companyName" -> "Good, Bad & Ugly Ltd",
-    "taxPeriodEndDate" -> "2018-06-04",
-    "periodKey" -> "period key"
-  )
-
-  val correctModel: SearchKeys = SearchKeys(Some("vrn"), Some("Good, Bad & Ugly Ltd"), Some(LocalDate.parse("2018-06-04")), Some("period key"))
-
-  "Formats" should {
-
-    "parse correctly from json" in {
-      correctJson.as[SearchKeys] shouldBe correctModel
-    }
-
+  "writes" should {
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson
     }

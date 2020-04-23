@@ -20,6 +20,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import scala.concurrent.duration._
+
 trait AppConfig {
 
   def desBaseUrl: String
@@ -35,6 +37,15 @@ trait AppConfig {
   def featureSwitch: Option[Configuration]
 
   def endpointsEnabled(version: String): Boolean
+
+  // NRS config items
+  def nrsApiKey: String
+
+  def nrsMaxTimeout: Duration
+
+  def appName: String
+
+  def nrsBaseUrl: String
 }
 
 @Singleton
@@ -44,6 +55,12 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   val desEnv: String = config.getString("microservice.services.des.env")
   val desToken: String = config.getString("microservice.services.des.token")
   val apiGatewayContext: String = config.getString("api.gateway.context")
+
+  // NRS config items
+  val nrsApiKey: String = config.getString("access-keys.xApiKey")
+  val appName: String = config.getString("appName")
+  val nrsMaxTimeout: Duration = config.getInt("microservice.services.non-repudiation.maxTimeout").milliseconds
+  val nrsBaseUrl: String = config.baseUrl("non-repudiation")
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status")
 

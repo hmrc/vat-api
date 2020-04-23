@@ -16,20 +16,16 @@
 
 package v1.services
 
-import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.mocks.connectors.MockLiabilitiesConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LiabilitiesServiceSpec extends UnitSpec {
+class LiabilitiesServiceSpec extends ServiceSpec {
 
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
@@ -47,9 +43,6 @@ class LiabilitiesServiceSpec extends UnitSpec {
     LiabilitiesResponse(Seq(Liability(None,"VAT",1.0,None,None)))
 
   trait Test extends MockLiabilitiesConnector {
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
     val service = new LiabilitiesService(
       connector = mockRetrieveLiabilitiesConnector

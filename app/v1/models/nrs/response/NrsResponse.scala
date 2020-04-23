@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package v1.models.nrs.response
 
-import v1.models.nrs.request.IdentityData
+import play.api.libs.json.{JsPath, Reads}
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case class NrsResponse(nrSubmissionId: String, cadesTSignature: String, timestamp: String)
+
+object NrsResponse {
+
+  val deprecatedString: String = "This has been deprecated - DO NOT USE"
+  val empty = NrsResponse("", deprecatedString, "")
+
+  implicit val reads: Reads[NrsResponse] = (
+    (JsPath \ "nrSubmissionId").read[String].map(NrsResponse(_, deprecatedString, ""))
+  )
+}

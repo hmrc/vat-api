@@ -26,9 +26,9 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, _}
 import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.models.nrs.IdentityData
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
+import v1.models.nrs.request.IdentityData
 import v1.models.outcomes.AuthOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,7 +74,8 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
               confLevel, ni, saRef, nme, dob,
               eml, agInfo, groupId,
               credRole, mdtpInfo, dummyItmpName, dummyItmpDob,
-              dummyItmpAddress, affGroup, credStrength, logins)
+              dummyItmpAddress, affGroup, credStrength, logins
+            )
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
         case _ =>

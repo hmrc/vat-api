@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
-import org.joda.time.LocalDate
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.http.controllers.RestFormats
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.models.nrs.NrsTestData.SearchKeysTestData._
 
-case class SearchKeys(vrn: Option[String],
-                      companyName: Option[String] = None,
-                      taxPeriodEndDate: Option[LocalDate] = None,
-                      periodKey: Option[String] = None
-                     )
+class SearchKeysSpec extends UnitSpec {
 
-object SearchKeys {
-  implicit val dateFormats: Format[LocalDate] = RestFormats.localDateFormats
-  implicit val format: OFormat[SearchKeys] = Json.format[SearchKeys]
+  "writes" should {
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
 }

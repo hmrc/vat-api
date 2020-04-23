@@ -16,20 +16,16 @@
 
 package v1.services
 
-import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.mocks.connectors.MockObligationsConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ObligationsServiceSpec extends UnitSpec {
+class ObligationsServiceSpec extends ServiceSpec {
 
   private val vrn: String = "123456789"
   private val correlationId = "X-123"
@@ -55,9 +51,6 @@ class ObligationsServiceSpec extends UnitSpec {
     ))
 
   trait Test extends MockObligationsConnector {
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
     val service = new ObligationsService(
       connector = mockObligationsConnector

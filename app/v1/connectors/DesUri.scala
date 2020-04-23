@@ -17,3 +17,4 @@
 package v1.connectors
 
 case class DesUri[Resp](value: String)
+case class NrsUri[Resp](value: String)

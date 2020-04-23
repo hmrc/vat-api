@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
 import play.api.libs.json.Json
 import support.UnitSpec
@@ -22,11 +22,7 @@ import v1.models.nrs.NrsTestData.IdentityDataTestData._
 
 class IdentityDataSpec extends UnitSpec {
 
-  "Formats" should {
-
-    "parse correctly from json" in {
-      correctJson.as[IdentityData] shouldBe correctModel
-    }
+  "writes" should {
     "parse correctly to json" in {
       Json.toJson(correctModel) shouldBe correctJson
     }
