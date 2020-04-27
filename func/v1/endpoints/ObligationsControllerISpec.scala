@@ -26,8 +26,6 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
     val desJson: JsValue = obligationsDesJson
     val mtdJson: JsValue = obligationsMtdJson
 
-
-
     def uri: String = s"/$vrn/obligations?from=$fromDate&to=$toDate&status=$oblStatus"
     def mtdQueryParams: Seq[(String, String)] =
       Seq(
@@ -81,6 +79,50 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
       }
     }
 
+    "return a 500 status code with expected body" when {
+      "des returns multiple errors" in new Test{
+
+        val multipleErrors: String =
+          """
+            |{
+            |    "failures": [
+            |        {
+            |            "code": "INVALID_IDNUMBER",
+            |            "reason": "Submission has not passed validation. Invalid parameter idNumber."
+            |        },
+            |        {
+            |            "code": "INVALID_REGIME",
+            |            "reason": "Submission has not passed validation.  Invalid parameter regimeType."
+            |        },
+            |        {
+            |            "code": "INVALID_DATE_FROM",
+            |            "reason": "Submission has not passed validation. Invalid parameter from."
+            |        },
+            |        {
+            |            "code": "INVALID_DATE_TO",
+            |            "reason": "Submission has not passed validation. Invalid parameter to."
+            |        },
+            |        {
+            |            "code": "INVALID_STATUS",
+            |            "reason": "Submission has not passed validation. Invalid parameter status."
+            |        }
+            |    ]
+            |}
+          """.stripMargin
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
+        }
+
+        private val response = await(request.get)
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe Json.toJson(DownstreamError)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
+
     "return error according to spec" when {
 
       def validationErrorTest(requestVrn: String, requestFromDate: Option[String], requestToDate: Option[String], requestStatus: Option[String],
@@ -123,25 +165,23 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
       }
 
       val input = Seq(
-        ("badVrn", Some("2017-01-02"), Some("2018-01-01"), Some("F") ,BAD_REQUEST, VrnFormatError, "invalid VRN"),
-        ("badVrn", None, Some(futureTo()), Some("O"), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
+
+        ("NotAVrn", Some("2017-01-02"), Some("2018-01-01"), Some("F") ,BAD_REQUEST, VrnFormatError, "invalid VRN"),
+        ("NotAVrn", None, Some(futureTo()), Some("O"), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
 
         ("123456789", Some("notADate"), Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "invalid 'from' date"),
         ("123456789", Some("2017-13-01"), Some("2018-01-01"), Some("F"),BAD_REQUEST, InvalidFromError, "not a real 'from' date"),
         ("123456789", Some("notADate"), Some("notADate"), Some("F"),BAD_REQUEST, InvalidFromError, "both dates invalid"),
         ("123456789", None, Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "missing 'from' date"),
         ("123456789", None, None, Some("F"), BAD_REQUEST, InvalidFromError, "missing both dates"),
-        ("123456789", Some("2016-04-05"), Some("2017-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "'from' date unsupported'"),
 
         ("123456789", Some("2017-01-02"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidToError, "invalid 'to' date"),
         ("123456789", Some("2017-01-02"), Some("2017-01-32"), Some("F"), BAD_REQUEST, InvalidToError, "not a real 'to' date"),
-        ("123456789", Some("2017-01-02"), Some(futureTo(plusDays = 1)), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "future 'to' date"),
-        ("123456789", Some(futureFrom()), Some(futureTo()), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "future both dates"),
-        ("123456789", Some("2017-01-02"), None, Some("F"), BAD_REQUEST, InvalidToError, "missing 'to' date"),
 
-        ("123456789", Some("2017-01-01"), Some("2017-12-01"), None, BAD_REQUEST, InvalidStatusError, "invalid Status"),
+        ("123456789", Some("2017-01-01"), Some("2017-05-01"), Some("NotAStatus"), BAD_REQUEST, InvalidStatusError, "invalid status"),
+        ("123456789", Some("2017-01-01"), Some("2017-05-01"), None, BAD_REQUEST, InvalidStatusError, "missing status"),
 
-        ("123456789", Some("2017-01-01"), Some("2018-01-01"), Some("F"), BAD_REQUEST, RuleDateRangeTooLargeError, "date range too long"),
+        ("123456789", Some("2017-01-01"), Some("2018-01-02"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "date range too long"),
         ("123456789", Some("2017-01-01"), Some("2017-01-01"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "dates are the same"),
         ("123456789", Some("2018-01-01"), Some("2017-01-01"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "'from' date after 'to' date")
       )

@@ -37,7 +37,11 @@ class ObligationsValidator extends Validator[ObligationsRawData]{
 
   private def dateRangeValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
-      DateRangeValidation.validate(data.from.get, data.to.get)
+      data match {
+        case ObligationsRawData(_, None, Some(_), Some("O")) => Nil
+        case ObligationsRawData(_, Some(_), None, Some("O")) => Nil
+        case ObligationsRawData(_, Some(_), Some(_), Some("F")) => DateRangeValidation.validate(data.from.get, data.to.get)
+      }
     )
   }
 
