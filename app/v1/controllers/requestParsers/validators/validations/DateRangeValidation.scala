@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 
-import java.time.{Duration, LocalDate}
+import java.time.{LocalDate}
 
 import v1.models.errors.{MtdError, RuleDateRangeInvalidError}
 
@@ -32,9 +32,12 @@ object DateRangeValidation {
   }
 
   private def checkIfDateRangeIsIncorrect(from: LocalDate, to: LocalDate): List[MtdError] = {
-    val start = from.atStartOfDay()
-    val end = to.atStartOfDay()
-    val daysRange = Duration.between(start, end.plusDays(1) /* add day to make inclusive */).toDays
-    if(daysRange > maxDateRangeForObligations || daysRange < 1) List(RuleDateRangeInvalidError) else Nil
+//    val start = from.atStartOfDay()
+//    val end = to.atStartOfDay()
+//    val daysRange = Duration.between(start, end.plusDays(1) /* add day to make inclusive */).toDays
+//    if(daysRange > maxDateRangeForObligations || daysRange < 1) List(RuleDateRangeInvalidError) else Nil
+    if(!from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to)) {
+      List(RuleDateRangeInvalidError)
+    } else Nil
   }
 }

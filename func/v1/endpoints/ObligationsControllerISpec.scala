@@ -26,7 +26,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
 import v1.fixtures.ObligationsFixture
-import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, LegacyNotFoundError, MtdError, RuleDateRangeInvalidError, RuleDateRangeTooLargeError, RuleDateRangeTooLargeErrorDes, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{DownstreamError, EmptyNotFoundError, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, LegacyNotFoundError, MtdError, NotFoundError, RuleDateRangeInvalidError, RuleDateRangeTooLargeError, RuleDateRangeTooLargeErrorDes, VrnFormatError, VrnFormatErrorDes}
 import v1.stubs.{AuditStub, AuthStub, DesStub}
 
 
@@ -230,9 +230,9 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         (BAD_REQUEST, "INVALID_REGIME", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_DATE_FROM", BAD_REQUEST, InvalidDateFromErrorDes),
         (BAD_REQUEST, "INVALID_DATE_TO", BAD_REQUEST, InvalidDateToErrorDes),
-        (BAD_REQUEST, "INVALID_DATE_RANGE", BAD_REQUEST, RuleDateRangeTooLargeErrorDes),
+        (BAD_REQUEST, "INVALID_DATE_RANGE", BAD_REQUEST, RuleDateRangeTooLargeError),
         (FORBIDDEN, "NOT_FOUND_BKEY", INTERNAL_SERVER_ERROR, DownstreamError),
-        (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
+        (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
         (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError)
       )
