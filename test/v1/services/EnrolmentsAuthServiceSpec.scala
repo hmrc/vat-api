@@ -16,11 +16,13 @@
 
 package v1.services
 
+import org.joda.time.LocalDate
 import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, agentCode, allEnrolments}
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import v1.fixtures.auth.AuthFixture._
 import v1.mocks.connectors.MockAuthConnector
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
@@ -37,6 +39,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
     val authRetrievalsAffinity: Retrieval[Option[AffinityGroup] ~ Enrolments] = affinityGroup and allEnrolments
     val authRetrievalsAgentCode: Retrieval[Option[String] ~ Enrolments] = agentCode and allEnrolments
 
+    val authRetrievalsAffinityWithNrs:
+      Retrieval[Option[AffinityGroup] ~ Enrolments ~ Option[String] ~ Option[String] ~ Option[String] ~ Option[Credentials] ~ ConfidenceLevel ~ Option[String] ~ Option[String] ~ Option[Name] ~ Option[LocalDate] ~ Option[String] ~ AgentInformation ~ Option[String] ~ Option[CredentialRole] ~ Option[MdtpInformation] ~ Option[String] ~ LoginTimes] =
+      affinityGroup and allEnrolments and internalId and externalId and agentCode and credentials and confidenceLevel and nino and saUtr and name and dateOfBirth and email and agentInformation and groupIdentifier and credentialRole and mdtpInformation and credentialStrength and loginTimes
+
     val predicate: Enrolment = Enrolment("HMRC-MTD-VAT")
       .withIdentifier("VRN", "123456789")
       .withDelegatedAuthRule("mtd-vat-auth")
@@ -44,71 +50,81 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
 
   "authorised" when {
 
-    val enrolments: Enrolments =
-      Enrolments(
-        enrolments = Set(
-          Enrolment(
-            key = "HMRC-MTD-VAT",
-            identifiers = Seq(
-              EnrolmentIdentifier("VRN", "123456789")
-            ),
-            state = "Active"
-          ),
-          Enrolment(
-            key = "HMRC-AS-AGENT",
-            identifiers = Seq(
-              EnrolmentIdentifier("AgentReferenceNumber", "987654321")
-            ),
-            state = "Active"
-          )
-        )
-      )
-
-    "the user is an authorised individual" should {
+    "the user is an authorised individual and nrs check is not required" should {
       "return the 'Individual' user type in the user details" in new Test {
 
-        val retrievalsResultAffinity = new ~(Some(Individual), enrolments)
-        val retrievalsResultAgentCode = new ~(Some("agentCode"), enrolments)
+        val retrievalsResultAffinity = new ~(Some(Individual), vatEnrolments)
 
         val expected = Right(UserDetails("Individual", None, ""))
 
         MockAuthConnector.authorised(predicate, authRetrievalsAffinity)
           .returns(Future.successful(retrievalsResultAffinity))
 
-        MockAuthConnector.authorised(AffinityGroup.Individual and Enrolment("HMRC-MTD-VAT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
-
         private val result = await(service.authorised(predicate))
 
         result shouldBe expected
       }
     }
 
-    "the user is an authorised organisation" should {
+    "the user is an authorised individual and nrs check is required" should {
+      "return the 'Individual' user type in the user details" in new Test {
+
+        private val retrievalsResultAffinity = individualResponse
+
+        val expected = Right(userDetails(Individual, AgentInformation(
+          agentId = None,
+          agentCode = None,
+          agentFriendlyName = None)))
+
+        MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+          .returns(Future.successful(retrievalsResultAffinity))
+
+        private val result = await(service.authorised(predicate, nrsRequired = true))
+
+        result shouldBe expected
+      }
+    }
+
+    "the user is an authorised organisation and nrs check is not required" should {
       "return the 'Organisation' user type in the user details" in new Test {
 
-        val retrievalsResultAffinity = new ~(Some(Organisation), enrolments)
-        val retrievalsResultAgentCode = new ~(Some("agentCode"), enrolments)
+        val retrievalsResultAffinity = new ~(Some(Organisation), vatEnrolments)
 
         val expected = Right(UserDetails("Organisation", None, ""))
 
         MockAuthConnector.authorised(predicate, authRetrievalsAffinity)
           .returns(Future.successful(retrievalsResultAffinity))
 
-        MockAuthConnector.authorised(AffinityGroup.Organisation and Enrolment("HMRC-MTD-VAT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
-
         private val result = await(service.authorised(predicate))
 
         result shouldBe expected
       }
     }
 
-    "the user is an authorised agent" should {
+    "the user is an authorised organisation and nrs check is required" should {
+      "return the 'Organisation' user type in the user details" in new Test {
+
+        private val retrievalsResultAffinity = organisationResponse
+
+        val expected = Right(userDetails(Organisation, AgentInformation(
+          agentId = None,
+          agentCode = None,
+          agentFriendlyName = None)))
+
+        MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+          .returns(Future.successful(retrievalsResultAffinity))
+
+        private val result = await(service.authorised(predicate, nrsRequired = true))
+
+        result shouldBe expected
+      }
+    }
+
+    "the user is an authorised agent and nrs check is not required" should {
       "return the 'Agent' user type in the user details" in new Test {
 
-        val retrievalsResultAffinity = new ~(Some(Agent), enrolments)
-        val retrievalsResultAgentCode = new ~(Some("agentCode"), enrolments)
+        val retrievalsResultAffinity = new ~(Some(Agent), agentEnrolments)
+        val retrievalsResultAgentCode = new ~(Some("agentCode"), agentEnrolments)
 
         val expected = Right(UserDetails("Agent", Some("987654321"), ""))
 
@@ -127,12 +143,31 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
+    "the user is an authorised agent and nrs check is required" should {
+      "return the 'Agent' user type in the user details" in new Test {
+
+        private val retrievalsResultAffinity = agentResponse
+
+        val expected = Right(userDetails(Agent, AgentInformation(
+          agentCode = Some("AGENT007"),
+          agentFriendlyName = Some("James"),
+          agentId = Some("987654321"))))
+
+        MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+          .returns(Future.successful(retrievalsResultAffinity))
+
+        private val result = await(service.authorised(predicate, nrsRequired = true))
+
+        result shouldBe expected
+      }
+    }
+
     "the user belongs to an unsupported affinity group" should {
       "return an unauthorised error" in new Test {
 
         case object OtherAffinity extends AffinityGroup
 
-        val retrievalsResultAffinity = new ~(Some(OtherAffinity), enrolments)
+        val retrievalsResultAffinity = new ~(Some(OtherAffinity), vatEnrolments)
 
         MockAuthConnector.authorised(predicate, authRetrievalsAffinity)
           .returns(Future.successful(retrievalsResultAffinity))

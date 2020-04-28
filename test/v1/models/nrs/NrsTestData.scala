@@ -18,7 +18,7 @@ package v1.models.nrs
 
 import java.time.{Instant, LocalDateTime, ZoneId}
 
-import org.joda.time.LocalDate
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve._
@@ -80,9 +80,9 @@ object NrsTestData {
       itmpAddress = ItmpAddress(None, None, None, None, None, None, None, None),
       affinityGroup = Some(Agent),
       credentialStrength = Some("strong"),
-      loginTimes = IdentityLoginTimes(
-        LocalDateTime.ofInstant(Instant.parse("2016-11-27T09:00:00.000Z"), ZoneId.of("UTC")),
-        Some(LocalDateTime.ofInstant(Instant.parse("2016-11-01T12:00:00.000Z"), ZoneId.of("UTC")))
+      loginTimes = LoginTimes(
+        DateTime.parse("2016-11-27T09:00:00.000Z").withZone(DateTimeZone.UTC),
+        Some(DateTime.parse("2016-11-01T12:00:00.000Z").withZone(DateTimeZone.UTC))
       )
     )
   }
