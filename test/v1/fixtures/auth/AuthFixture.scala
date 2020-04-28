@@ -59,7 +59,7 @@ object AuthFixture {
       )
     )
 
-  val identityData: IdentityData = IdentityData(
+  val orgIdentityData: IdentityData = IdentityData(
     internalId = Some("Int-a7688cda-d983-472d-9971-ddca5f124641"),
     externalId = Some("Ext-c4ebc935-ac7a-4cc2-950a-19e6fac91f2a"),
     agentCode = None,
@@ -103,78 +103,34 @@ object AuthFixture {
     )
   )
 
-  val indIdentityData: IdentityData = identityData.copy(affinityGroup = Some(AffinityGroup.Individual))
+  val indIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Individual))
 
-  val agentIdentityData: IdentityData = identityData.copy(affinityGroup = Some(AffinityGroup.Agent)).copy(agentInformation = AgentInformation(
+  val agentIdentityData: IdentityData = orgIdentityData.copy(affinityGroup = Some(AffinityGroup.Agent), agentCode = Some("AGENT007"), agentInformation = AgentInformation(
     agentCode = Some("AGENT007"),
     agentFriendlyName = Some("James"),
     agentId = Some("987654321")
   ))
 
-  val organisationResponse =
-    new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Organisation),
-      vatEnrolments),
-      identityData.internalId),
-      identityData.externalId),
+  val authResponse: (IdentityData, Enrolments) => Option[AffinityGroup] ~ Enrolments ~ Option[String] ~ Option[String] ~ Option[String] ~ Option[Credentials] ~ ConfidenceLevel ~ None.type ~ None.type ~ Option[Name] ~ None.type ~ Option[String] ~ AgentInformation ~ Option[String] ~ Option[CredentialRole] ~ None.type ~ Option[String] ~ LoginTimes =
+    (data, enrolments) => new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+      data.affinityGroup,
+      enrolments),
+      data.internalId),
+      data.externalId),
+      data.agentCode),
+      data.credentials),
+      data.confidenceLevel),
       None),
-      identityData.credentials),
-      identityData.confidenceLevel),
       None),
-      None),
-      identityData.name)
+      data.name)
       , None),
-      identityData.email),
-      identityData.agentInformation),
-      identityData.groupIdentifier),
-      identityData.credentialRole),
+      data.email),
+      data.agentInformation),
+      data.groupIdentifier),
+      data.credentialRole),
       None),
-      identityData.credentialStrength),
-      identityData.loginTimes
-    )
-
-  val individualResponse =
-    new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Individual),
-      vatEnrolments),
-      identityData.internalId),
-      identityData.externalId),
-      None),
-      identityData.credentials),
-      identityData.confidenceLevel),
-      None),
-      None),
-      identityData.name)
-      , None),
-      identityData.email),
-      identityData.agentInformation),
-      identityData.groupIdentifier),
-      identityData.credentialRole),
-      None),
-      identityData.credentialStrength),
-      identityData.loginTimes
-    )
-
-  val agentResponse =
-    new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
-      Option(AffinityGroup.Agent),
-      agentEnrolments),
-      agentIdentityData.internalId),
-      agentIdentityData.externalId),
-      Some("AGENT007")),
-      agentIdentityData.credentials),
-      agentIdentityData.confidenceLevel),
-      None),
-      None),
-      agentIdentityData.name)
-      , None),
-      agentIdentityData.email),
-      agentIdentityData.agentInformation),
-      agentIdentityData.groupIdentifier),
-      agentIdentityData.credentialRole),
-      None),
-      agentIdentityData.credentialStrength),
-      agentIdentityData.loginTimes
+      data.credentialStrength),
+      data.loginTimes
     )
 
   val userDetails: (AffinityGroup, AgentInformation) => UserDetails = (Individual, agentInformation) => UserDetails(userType = Individual.toString,

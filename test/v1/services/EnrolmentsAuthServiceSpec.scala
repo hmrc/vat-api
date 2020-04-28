@@ -69,7 +69,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
     "the user is an authorised individual and nrs check is required" should {
       "return the 'Individual' user type in the user details" in new Test {
 
-        private val retrievalsResultAffinity = individualResponse
+        private val retrievalsResultAffinity = authResponse(indIdentityData, vatEnrolments)
 
         val expected = Right(userDetails(Individual, AgentInformation(
           agentId = None,
@@ -104,7 +104,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
     "the user is an authorised organisation and nrs check is required" should {
       "return the 'Organisation' user type in the user details" in new Test {
 
-        private val retrievalsResultAffinity = organisationResponse
+        private val retrievalsResultAffinity = authResponse(orgIdentityData, vatEnrolments)
 
         val expected = Right(userDetails(Organisation, AgentInformation(
           agentId = None,
@@ -124,18 +124,11 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       "return the 'Agent' user type in the user details" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Agent), agentEnrolments)
-        val retrievalsResultAgentCode = new ~(Some("agentCode"), agentEnrolments)
 
         val expected = Right(UserDetails("Agent", Some("987654321"), ""))
 
         MockAuthConnector.authorised(predicate, authRetrievalsAffinity)
           .returns(Future.successful(retrievalsResultAffinity))
-
-        MockAuthConnector.authorised(AffinityGroup.Agent and Enrolment("HMRC-MTD-VAT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
-
-        MockAuthConnector.authorised(AffinityGroup.Agent and Enrolment("HMRC-AS-AGENT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
 
         private val result = await(service.authorised(predicate))
 
@@ -146,7 +139,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
     "the user is an authorised agent and nrs check is required" should {
       "return the 'Agent' user type in the user details" in new Test {
 
-        private val retrievalsResultAffinity = agentResponse
+        private val retrievalsResultAffinity = authResponse(agentIdentityData, agentEnrolments)
 
         val expected = Right(userDetails(Agent, AgentInformation(
           agentCode = Some("AGENT007"),
@@ -162,7 +155,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user belongs to an unsupported affinity group" should {
+    "the user belongs to an unsupported affinity group and nrs check is not required" should {
       "return an unauthorised error" in new Test {
 
         case object OtherAffinity extends AffinityGroup
@@ -178,7 +171,23 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "an exception occurs during enrolment authorisation" must {
+    "the user belongs to an unsupported affinity group and nrs check is required" should {
+      "return an unauthorised error" in new Test {
+
+        case object OtherAffinity extends AffinityGroup
+
+        private val retrievalsResultAffinity = authResponse(orgIdentityData.copy(affinityGroup = Some(OtherAffinity)), vatEnrolments)
+
+        MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+          .returns(Future.successful(retrievalsResultAffinity))
+
+        private val result = await(service.authorised(predicate, nrsRequired = true))
+
+        result shouldBe Left(LegacyUnauthorisedError)
+      }
+    }
+
+    "an exception occurs during enrolment authorisation and nrs check is not required" must {
       "map the exceptions correctly" when {
 
         def serviceException(exception: RuntimeException, mtdError: MtdError): Unit = {
@@ -209,24 +218,67 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the arn and vrn are missing from the authorisation response" should {
+    "an exception occurs during enrolment authorisation and nrs check is required" must {
+      "map the exceptions correctly" when {
+
+        def serviceException(exception: RuntimeException, mtdError: MtdError): Unit = {
+          s"the exception '${exception.getClass.getSimpleName}' occurs" should {
+            s"return the MtdError '${mtdError.getClass.getSimpleName}'" in new Test {
+
+              MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+                .returns(Future.failed(exception))
+
+              private val result = await(service.authorised(predicate, nrsRequired = true))
+
+              result shouldBe Left(mtdError)
+            }
+          }
+        }
+
+        case class UnmappedException(msg: String = "Some text") extends AuthorisationException(msg)
+
+        val authServiceErrorMap: Seq[(RuntimeException, MtdError)] =
+          Seq(
+            (InsufficientEnrolments(), LegacyUnauthorisedError),
+            (InsufficientConfidenceLevel(), LegacyUnauthorisedError),
+            (JsResultException(Seq.empty), ForbiddenDownstreamError),
+            (UnmappedException(), DownstreamError)
+          )
+
+        authServiceErrorMap.foreach(args => (serviceException _).tupled(args))
+      }
+    }
+
+    "the arn and vrn are missing from the authorisation response and nrs check is not required" should {
       "not throw an error" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Agent), Enrolments(Set.empty[Enrolment]))
-        val retrievalsResultAgentCode = new ~(Some("agentCode"), Enrolments(Set.empty[Enrolment]))
 
         val expected = Right(UserDetails("Agent", None, ""))
 
         MockAuthConnector.authorised(predicate, authRetrievalsAffinity)
           .returns(Future.successful(retrievalsResultAffinity))
 
-        MockAuthConnector.authorised(AffinityGroup.Agent and Enrolment("HMRC-MTD-VAT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
-
-        MockAuthConnector.authorised(AffinityGroup.Agent and Enrolment("HMRC-AS-AGENT"), authRetrievalsAgentCode)
-          .returns(Future.successful(retrievalsResultAgentCode))
-
         private val result = await(service.authorised(predicate))
+
+        result shouldBe expected
+      }
+    }
+
+    "the arn and vrn are missing from the authorisation response and nrs check is required" should {
+      "not throw an error" in new Test {
+
+        private val retrievalsResultAffinity = authResponse(orgIdentityData.copy(affinityGroup = Some(Agent)), vatEnrolments)
+
+        val expected = Right(userDetails(Agent, AgentInformation(
+          agentCode = None,
+          agentFriendlyName = None,
+          agentId = None)))
+
+        MockAuthConnector.authorised(predicate, authRetrievalsAffinityWithNrs)
+          .returns(Future.successful(retrievalsResultAffinity))
+
+        private val result = await(service.authorised(predicate, nrsRequired = true))
 
         result shouldBe expected
       }
