@@ -20,11 +20,9 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
-
-import v1.models.errors.{DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidStatusErrorDes, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidToError, MtdError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{DownstreamError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, MtdError, NotFoundError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -220,31 +218,12 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidStatusErrorDes, BAD_REQUEST),
           (RuleDateRangeTooLargeError, BAD_REQUEST),
+          (NotFoundError, NOT_FOUND),
           (InvalidInputDataError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
         input.foreach(args => (serviceErrors _).tupled(args))
-      }
-
-      "a NOT_FOUND error is returned from the service" must {
-        s"return a 404 status with an empty body" in new Test {
-
-          MockObligationRequestParser
-            .parse(retrieveObligationsRawData)
-            .returns(Right(retrieveObligationsRequest))
-
-          MockObligationService
-            .receiveObligations(retrieveObligationsRequest)
-            .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), EmptyNotFoundError))))
-
-          val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
-
-          status(result) shouldBe NOT_FOUND
-          contentAsString(result) shouldBe ""
-          header("X-CorrelationId", result) shouldBe Some(correlationId)
-
-        }
       }
     }
   }

@@ -26,7 +26,12 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
 import v1.fixtures.ObligationsFixture
-import v1.models.errors.{DownstreamError, EmptyNotFoundError, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, LegacyNotFoundError, MtdError, NotFoundError, RuleDateRangeInvalidError, RuleDateRangeTooLargeError, RuleDateRangeTooLargeErrorDes, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes,
+  InvalidFromError, InvalidStatusError,
+  InvalidStatusErrorDes, InvalidToError, MtdError, NotFoundError,
+  RuleDateRangeInvalidError, RuleDateRangeTooLargeError,
+  VrnFormatError, VrnFormatErrorDes}
+
 import v1.stubs.{AuditStub, AuthStub, DesStub}
 
 
@@ -169,11 +174,6 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
           response.json shouldBe Json.toJson(expectedBody)
           response.header("Content-Type") shouldBe Some("application/json")
         }
-      }
-
-      def futureFrom(plusDays: Int = 1): String = {
-        val fromDate = LocalDateTime.now().plusDays(plusDays)
-        DateTimeFormatter.ofPattern("yyyy-MM-dd").format(fromDate)
       }
 
       def futureTo(plusDays: Int = 2): String = {

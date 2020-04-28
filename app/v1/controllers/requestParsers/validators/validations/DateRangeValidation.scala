@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 
-import java.time.{LocalDate}
+import java.time.{Duration, LocalDate}
 
 import v1.models.errors.{MtdError, RuleDateRangeInvalidError}
 
@@ -32,7 +32,7 @@ object DateRangeValidation {
   }
 
   private def checkIfDateRangeIsIncorrect(from: LocalDate, to: LocalDate): List[MtdError] = {
-    if(!from.isBefore(to) || from.plusYears(1).minusDays(1).isBefore(to)) {
+    if(!from.isBefore(to) || from.plusYears(1).isBefore(to)) {
       List(RuleDateRangeInvalidError)
     } else Nil
   }
