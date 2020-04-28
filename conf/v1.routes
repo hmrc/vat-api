@@ -1,8 +1,7 @@
 # microservice specific routes
 
-# Obligations
-GET         /:vrn/obligations               @uk.gov.hmrc.vatapi.resources.ObligationsResource.retrieveObligations(vrn: uk.gov.hmrc.domain.Vrn, queryParams: uk.gov.hmrc.vatapi.models.ObligationsQueryParams)
-#GET         /:vrn/obligations               v1.controllers.ObligationsController.retrieveObligations(vrn, from: Option[String], to: Option[String], status: Option[String])
+# VAT Obligations
+GET         /:vrn/obligations               v1.controllers.ObligationsController.retrieveObligations(vrn, from: Option[String], to: Option[String], status: Option[String])
 
 # VAT Returns
 POST        /:vrn/returns                   @uk.gov.hmrc.vatapi.resources.VatReturnsResource.submitVatReturn(vrn: uk.gov.hmrc.domain.Vrn)

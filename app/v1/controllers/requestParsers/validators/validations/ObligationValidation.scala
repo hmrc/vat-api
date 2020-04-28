@@ -28,8 +28,9 @@ object ObligationValidation {
     case ObligationsRawData(_, Some(_), None, Some("O")) => List.empty[MtdError]
     case ObligationsRawData(_, None, None, Some("F")) => List(RuleMissingDateRangeError)
     case ObligationsRawData(_, Some(_), Some(_), None) => List(InvalidStatusError)
-    case ObligationsRawData(_, Some(_), None, _) => List(InvalidToError)
-    case ObligationsRawData(_, None, Some(_), _) => List(InvalidFromError)
+    case ObligationsRawData(_, None, None, Some(_)) => List(InvalidStatusError)
+    case ObligationsRawData(_, Some(_), None, Some(_)) => List(InvalidToError)
+    case ObligationsRawData(_, None, Some(_), Some(_)) => List(InvalidFromError)
     case ObligationsRawData(_, Some(from), Some(to), Some(status)) =>
 
       val validList = List(
