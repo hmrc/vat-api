@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.assets.des.{Errors => DesError}
 import uk.gov.hmrc.assets.des.Obligations.{Obligations, ObligationsWithNoIncomeSourceType, ObligationsWithoutIdentification}
+import uk.gov.hmrc.assets.des.{Errors => DesError}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.support.BaseFunctionalSpec
 import uk.gov.hmrc.vatapi.models.Errors
@@ -63,6 +63,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when status is A" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -74,6 +75,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when from is missing" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -85,6 +87,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when from is invalid" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -96,6 +99,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when to is missing" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -107,6 +111,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when to is invalid" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -118,6 +123,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when status is invalid" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -129,6 +135,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when from is after to" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
@@ -140,6 +147,7 @@ class ObligationsResourceISpec extends BaseFunctionalSpec {
 
     "return code 400 when date range between from and to is more than 366 days" in new Test {
       override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
         AuditStub.audit()
       }
 
