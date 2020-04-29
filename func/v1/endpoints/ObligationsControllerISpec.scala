@@ -26,16 +26,12 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
 import v1.fixtures.ObligationsFixture
-import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes,
-  InvalidFromError, InvalidStatusError,
-  InvalidStatusErrorDes, InvalidToError, MtdError, NotFoundError,
-  RuleDateRangeInvalidError, RuleDateRangeTooLargeError,
-  VrnFormatError, VrnFormatErrorDes}
-
+import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub}
 
 
 class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFixture {
+
   private trait Test {
 
     val vrn: String = "123456789"
@@ -186,17 +182,21 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         ("NotAVrn", Some("2017-01-02"), Some("2018-01-01"), Some("F") ,BAD_REQUEST, VrnFormatError, "invalid VRN"),
         ("NotAVrn", None, Some(futureTo()), Some("O"), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
 
-        ("123456789", Some("notADate"), Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "invalid 'from' date"),
-        ("123456789", Some("2017-13-01"), Some("2018-01-01"), Some("F"),BAD_REQUEST, InvalidFromError, "not a real 'from' date"),
-        ("123456789", Some("notADate"), Some("notADate"), Some("F"),BAD_REQUEST, InvalidFromError, "both dates invalid"),
+        ("123456789", Some("notADate"), Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "invalid 'from' date with valid status"),
+        ("123456789", Some("notADate"), Some("2018-01-01"), Some("whatisthis"), BAD_REQUEST, InvalidFromError, "invalid 'from' date with invalid status"),
+        ("123456789", Some("2017-13-01"), Some("2018-01-01"), None , BAD_REQUEST, InvalidFromError, "invalid 'from' date with no status"),
+        ("123456789", Some("notADate"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidFromError, "both dates invalid"),
         ("123456789", None, Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "missing 'from' date"),
-        ("123456789", None, None, Some("F"), BAD_REQUEST, InvalidFromError, "missing both dates"),
+        ("123456789", None, None, Some("F"), BAD_REQUEST, InvalidFromError, "missing both dates and status is not O"),
+        ("123456789", None, None, None, BAD_REQUEST, InvalidFromError, "no parameters supplied"),
 
         ("123456789", Some("2017-01-02"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidToError, "invalid 'to' date"),
+        ("123456789", Some("2017-01-02"), Some("notADate"), None, BAD_REQUEST, InvalidToError, "invalid 'to' date with no status"),
         ("123456789", Some("2017-01-02"), Some("2017-01-32"), Some("F"), BAD_REQUEST, InvalidToError, "not a real 'to' date"),
 
         ("123456789", Some("2017-01-01"), Some("2017-05-01"), Some("NotAStatus"), BAD_REQUEST, InvalidStatusError, "invalid status"),
         ("123456789", Some("2017-01-01"), Some("2017-05-01"), None, BAD_REQUEST, InvalidStatusError, "missing status"),
+
 
         ("123456789", Some("2017-01-01"), Some("2018-01-02"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "date range too long"),
         ("123456789", Some("2017-01-01"), Some("2017-01-01"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "dates are the same"),
@@ -232,7 +232,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         (BAD_REQUEST, "INVALID_DATE_TO", BAD_REQUEST, InvalidDateToErrorDes),
         (BAD_REQUEST, "INVALID_DATE_RANGE", BAD_REQUEST, RuleDateRangeTooLargeError),
         (FORBIDDEN, "NOT_FOUND_BKEY", INTERNAL_SERVER_ERROR, DownstreamError),
-        (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
+        (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
         (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError)
       )

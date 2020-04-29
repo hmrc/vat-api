@@ -58,7 +58,7 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
         Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BPKEY error")
         DownstreamError
       },
-      "NOT_FOUND" -> NotFoundError,
+      "NOT_FOUND" -> LegacyNotFoundError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )

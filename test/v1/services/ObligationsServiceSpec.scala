@@ -92,7 +92,7 @@ class ObligationsServiceSpec extends UnitSpec {
           ("INVALID_IDNUMBER", VrnFormatErrorDes),
           ("INVALID_REGIME", DownstreamError),
           ("NOT_FOUND_BPKEY", DownstreamError),
-          ("NOT_FOUND", NotFoundError),
+          ("NOT_FOUND", LegacyNotFoundError),
           ("INVALID_STATUS", InvalidStatusErrorDes),
           ("INVALID_DATE_FROM", InvalidDateFromErrorDes),
           ("INVALID_DATE_TO", InvalidDateToErrorDes),

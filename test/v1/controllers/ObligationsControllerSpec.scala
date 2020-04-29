@@ -22,7 +22,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
-import v1.models.errors.{DownstreamError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, MtdError, NotFoundError, RuleDateRangeTooLargeError, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -218,7 +218,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidStatusErrorDes, BAD_REQUEST),
           (RuleDateRangeTooLargeError, BAD_REQUEST),
-          (NotFoundError, NOT_FOUND),
+          (LegacyNotFoundError, NOT_FOUND),
           (InvalidInputDataError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )

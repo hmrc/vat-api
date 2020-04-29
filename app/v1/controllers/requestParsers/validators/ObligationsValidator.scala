@@ -16,12 +16,13 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.{DateRangeValidation, ObligationValidation, VrnValidation}
+import play.api.Logger
+import v1.controllers.requestParsers.validators.validations.{DateRangeValidation, ObligationParameterFormatValidation, VrnValidation}
 import v1.models.errors.MtdError
 import v1.models.request.obligations.ObligationsRawData
 
 class ObligationsValidator extends Validator[ObligationsRawData]{
-  private val validationSet = List(vrnFormatValidation, obligationFormatValidation, dateRangeValidation)
+  private val validationSet = List(vrnFormatValidation, obligationRequestFormatValidation, dateRangeValidation)
 
   private def vrnFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
@@ -29,18 +30,19 @@ class ObligationsValidator extends Validator[ObligationsRawData]{
     )
   }
 
-  private def obligationFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
+  private def obligationRequestFormatValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
-      ObligationValidation.validate(data)
+      ObligationParameterFormatValidation.validate(data)
     )
   }
 
   private def dateRangeValidation: ObligationsRawData => List[List[MtdError]] = (data: ObligationsRawData) => {
     List(
       data match {
-        case ObligationsRawData(_, None, Some(_), Some("O")) => Nil
-        case ObligationsRawData(_, Some(_), None, Some("O")) => Nil
-        case ObligationsRawData(_, Some(_), Some(_), Some("F")) => DateRangeValidation.validate(data.from.get, data.to.get)
+        case ObligationsRawData(_, Some(fromDate), Some(toDate), _) =>
+          Logger.error("\nDate Range Validation\n")
+          DateRangeValidation.validate(fromDate, toDate)
+        case _ => Nil
       }
     )
   }

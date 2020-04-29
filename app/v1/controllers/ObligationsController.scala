@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
 import v1.controllers.requestParsers.ObligationsRequestParser
-import v1.models.errors.{BadRequestError, DownstreamError, EmptyNotFoundError, ErrorWrapper, InvalidDateFromErrorDes, InvalidDateToErrorDes, InvalidFromError, InvalidInputDataError, InvalidStatusError, InvalidStatusErrorDes, InvalidToError, LegacyNotFoundError, NotFoundError, RuleDateRangeInvalidError, RuleDateRangeTooLargeError, RuleDateRangeTooLargeErrorDes, VrnFormatError, VrnFormatErrorDes}
+import v1.models.errors._
 import v1.models.request.obligations.ObligationsRawData
 import v1.services.{EnrolmentsAuthService, ObligationsService}
 
@@ -85,7 +85,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
            RuleDateRangeInvalidError | RuleDateRangeTooLargeError |
            BadRequestError => BadRequest(Json.toJson(errorWrapper))
       case InvalidInputDataError => Forbidden(Json.toJson(errorWrapper))
-      case NotFoundError => NotFound(Json.toJson(errorWrapper))
+      case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }
   }
