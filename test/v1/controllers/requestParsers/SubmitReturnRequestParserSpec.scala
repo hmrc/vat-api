@@ -21,7 +21,7 @@ import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
 import v1.mocks.validators.MockSubmitReturnValidator
-import v1.models.errors._
+import v1.models.errors.{ErrorWrapper, InvalidMonetaryValueError, PeriodKeyFormatError, VrnFormatError}
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 
 class SubmitReturnRequestParserSpec extends UnitSpec {
@@ -104,13 +104,13 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
   val validBodyModel: SubmitRequestBody = SubmitRequestBody(periodKey = Some("AB12"),
                                                             vatDueSales = Some(9999999999999.99),
                                                             vatDueAcquisitions = Some(9999999999999.99),
-                                                            vatDueTotal = Some(9999999999999.99),
+                                                            totalVatDue = Some(9999999999999.99),
                                                             vatReclaimedCurrPeriod = Some(9999999999999.99),
-                                                            vatDueNet = Some(999999999999.99),
+                                                            netVatDue = Some(999999999999.99),
                                                             totalValueSalesExVAT = Some(9999999999999.99),
                                                             totalValuePurchasesExVAT = Some(9999999999999.99),
                                                             totalValueGoodsSuppliedExVAT = Some(9999999999999.99),
-                                                            totalAllAcquisitionsExVAT = Some(9999999999999.99),
+                                                            totalAcquisitionsExVAT = Some(9999999999999.99),
                                                             finalised = Some(true),
                                                             receivedAt = None,
                                                             agentReference = None)
@@ -180,77 +180,6 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(invalidMonetaryRangeJson))) shouldBe
           Left(ErrorWrapper(None, VrnFormatError, None))
-      }
-    }
-
-    "return multiple errors" when {
-      "invalid period key and monetary field are provided" in new Test {
-
-        val jsonBody: JsValue = Json.parse(
-          """
-            |{
-            |   "periodKey": "ABABABABABABABA",
-            |   "vatDueSales": 	9999999999999.999,
-            |   "vatDueAcquisitions": 	9999999999999.99,
-            |   "totalVatDue": 	9999999999999.99,
-            |   "vatReclaimedCurrPeriod": 	9999999999999.99,
-            |   "netVatDue": 	99999999999.99,
-            |   "totalValueSalesExVAT": 	9999999999999,
-            |   "totalValuePurchasesExVAT": 	9999999999999,
-            |   "totalValueGoodsSuppliedExVAT": 	9999999999999,
-            |   "totalAcquisitionsExVAT": 	9999999999999,
-            |   "finalised": false
-            |}
-          """.stripMargin
-        )
-
-        MockSubmitReturnsValidator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody)))
-          .returns(List(
-            BodyPeriodKeyFormatError,
-            InvalidMonetaryValueError.withFieldName(
-              fieldName = "vatDueSales",
-              minValue = -9999999999999.99,
-              maxValue = 9999999999999.99
-            )))
-
-        parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe
-          Left(ErrorWrapper(None,  BadRequestError, Some(
-            List(
-              BodyPeriodKeyFormatError,
-              InvalidMonetaryValueError.withFieldName(
-                fieldName = "vatDueSales",
-                minValue = -9999999999999.99,
-                maxValue = 9999999999999.99
-              )
-            )
-          )))
-      }
-
-      "invalid totalVatDue and netVatDue fields are provided" in new Test {
-
-        val jsonBody: JsValue = Json.parse(
-          """
-            |{
-            |   "periodKey": "AB12",
-            |   "vatDueSales": 	9999999999999.99,
-            |   "vatDueAcquisitions": 	9999999999999.99,
-            |   "totalVatDue": 	100.00,
-            |   "vatReclaimedCurrPeriod": 	1.00,
-            |   "netVatDue": 	100.00,
-            |   "totalValueSalesExVAT": 	9999999999999,
-            |   "totalValuePurchasesExVAT": 	9999999999999,
-            |   "totalValueGoodsSuppliedExVAT": 	9999999999999,
-            |   "totalAcquisitionsExVAT": 	9999999999999,
-            |   "finalised": true
-            |}
-            |""".stripMargin
-        )
-
-        MockSubmitReturnsValidator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody)))
-          .returns(List(VATNetValueRuleError, VATTotalValueRuleError))
-
-        parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe
-          Left(ErrorWrapper(None,  BadRequestError, Some(List(VATNetValueRuleError, VATTotalValueRuleError))))
       }
     }
   }

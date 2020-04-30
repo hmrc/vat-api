@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.json.{JsObject, JsValue, Json, Writes}
 import v1.models.audit.AuditError
 
 case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: Option[Seq[MtdError]] = None) {
@@ -31,15 +31,33 @@ case class ErrorWrapper(correlationId: Option[String], error: MtdError, errors: 
 }
 
 object ErrorWrapper {
+
+  val allErrors: Seq[MtdError] => Seq[JsValue] = {
+    case mtdError :: Nil => mtdErrors(mtdError)
+    case mtdError :: rest => mtdErrors(mtdError) ++ allErrors(rest)
+  }
+
+  private val mtdErrors : MtdError => Seq[JsValue] = {
+    case MtdError(_, _, Some(customJson)) =>
+      customJson.asOpt[MtdErrorWrapper] match {
+        case Some(e) => mtdErrorWrapper(e)
+        case _ => Seq(customJson)
+      }
+    case _@o => Seq(Json.toJson(o))
+  }
+
+  private val mtdErrorWrapper: MtdErrorWrapper => Seq[JsValue]= wrapper => wrapper.errors match {
+    case Some(errors) if errors.nonEmpty => errors.map(error => Json.toJson(error))
+    case _ => Seq(Json.toJson(wrapper))
+  }
+
   implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
 
     val singleJson: JsObject = Json.toJson(errorResponse.error).as[JsObject]
 
-    errorResponse match {
-      case ErrorWrapper(_, _, Some(errors)) if errors.nonEmpty => singleJson ++ Json.obj("errors" -> errors.map(_.toJson))
+    errorResponse.errors match {
+      case Some(errors) if errors.nonEmpty => singleJson + ("errors" -> Json.toJson(allErrors(errors)))
       case _ => singleJson
     }
-
   }
-
 }

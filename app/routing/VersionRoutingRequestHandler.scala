@@ -23,7 +23,8 @@ import play.api.http.{DefaultHttpRequestHandler, HttpConfiguration, HttpErrorHan
 import play.api.libs.json.Json
 import play.api.mvc.{DefaultActionBuilder, Handler, RequestHeader, Results}
 import play.api.routing.Router
-import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError}
+import v1.controllers.requestParsers.validators.validations.VrnValidation
+import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError, VrnFormatError}
 
 @Singleton
 class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMap,
@@ -47,7 +48,8 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
     def apiHandler = Versions.getFromRequest(request) match {
       case Some(version) =>
         versionRoutingMap.versionRouter(version) match {
-          case Some(versionRouter) if featureSwitch.isVersionEnabled(version) => routeWith(versionRouter)(request)
+          case Some(versionRouter) if featureSwitch.isVersionEnabled(version) =>
+            routeWith(versionRouter)(request)
           case Some(_) => Some(unsupportedVersionAction)
           case None => Some(unsupportedVersionAction)
         }
@@ -61,13 +63,23 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
     router
       .handlerFor(request)
       .orElse {
-        if (request.path.endsWith("/")) {
-          val pathWithoutSlash        = request.path.dropRight(1)
-          val requestWithModifiedPath = request.withTarget(request.target.withPath(pathWithoutSlash))
-          router.handlerFor(requestWithModifiedPath)
-        } else {
-          None
+        if (validatePath(request.path)) {
+          if (request.path.endsWith("/")) {
+            val pathWithoutSlash = request.path.dropRight(1)
+            val requestWithModifiedPath = request.withTarget(request.target.withPath(pathWithoutSlash))
+            router.handlerFor(requestWithModifiedPath)
+          }
+          else None
+        }
+        else {
+          Some(action(Results.BadRequest(Json.toJson(VrnFormatError))))
         }
       }
 
+  private def validatePath(path: String) = {
+    val vrn = path.split("/")(1)
+    if(VrnValidation.validate(vrn) == Nil)
+      true
+    else false
+  }
 }

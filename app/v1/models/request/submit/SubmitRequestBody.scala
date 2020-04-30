@@ -22,16 +22,16 @@ import play.api.libs.json._
 case class SubmitRequestBody(periodKey: Option[String],
                              vatDueSales: Option[BigDecimal],
                              vatDueAcquisitions: Option[BigDecimal],
-                             vatDueTotal: Option[BigDecimal],
+                             totalVatDue: Option[BigDecimal],
                              vatReclaimedCurrPeriod: Option[BigDecimal],
-                             vatDueNet: Option[BigDecimal],
+                             netVatDue: Option[BigDecimal],
                              totalValueSalesExVAT: Option[BigDecimal],
                              totalValuePurchasesExVAT: Option[BigDecimal],
                              totalValueGoodsSuppliedExVAT: Option[BigDecimal],
-                             totalAllAcquisitionsExVAT: Option[BigDecimal],
+                             totalAcquisitionsExVAT: Option[BigDecimal],
                              finalised: Option[Boolean],
-                             receivedAt: Option[String],
-                             agentReference: Option[String]) {
+                             receivedAt: Option[String] = None,
+                             agentReference: Option[String] = None) {
 }
 
 
@@ -59,13 +59,13 @@ object SubmitRequestBody {
       response.periodKey.fold(Json.obj())(value => Json.obj("periodKey" -> value)) ++
         response.vatDueSales.fold(Json.obj())(value => Json.obj("vatDueSales" -> value)) ++
         response.vatDueAcquisitions.fold(Json.obj())(value => Json.obj("vatDueAcquisitions" -> value)) ++
-        response.vatDueTotal.fold(Json.obj())(value => Json.obj("vatDueTotal" -> value)) ++
+        response.totalVatDue.fold(Json.obj())(value => Json.obj("vatDueTotal" -> value)) ++
         response.vatReclaimedCurrPeriod.fold(Json.obj())(value => Json.obj("vatReclaimedCurrPeriod" -> value)) ++
-        response.vatDueNet.fold(Json.obj())(value => Json.obj("vatDueNet" -> value)) ++
+        response.netVatDue.fold(Json.obj())(value => Json.obj("vatDueNet" -> value)) ++
         response.totalValueSalesExVAT.fold(Json.obj())(value => Json.obj("totalValueSalesExVAT" -> value)) ++
         response.totalValuePurchasesExVAT.fold(Json.obj())(value => Json.obj("totalValuePurchasesExVAT" -> value)) ++
         response.totalValueGoodsSuppliedExVAT.fold(Json.obj())(value => Json.obj("totalValueGoodsSuppliedExVAT" -> value)) ++
-        response.totalAllAcquisitionsExVAT.fold(Json.obj())(value => Json.obj("totalAllAcquisitionsExVAT" -> value)) ++
+        response.totalAcquisitionsExVAT.fold(Json.obj())(value => Json.obj("totalAllAcquisitionsExVAT" -> value)) ++
         response.agentReference.fold(Json.obj())(value => Json.obj("agentReference" -> value)) ++
         response.receivedAt.fold(Json.obj())(value => Json.obj("receivedAt" -> value))
     }

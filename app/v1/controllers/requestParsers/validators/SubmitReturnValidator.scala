@@ -61,7 +61,7 @@ class SubmitReturnValidator extends Validator[SubmitRawData] {
       DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "vatDueAcquisitions"), "vatDueAcquisitions", minRegularValue, maxRegularValue),
       DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalVatDue"), "totalVatDue", minRegularValue, maxRegularValue),
       DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "vatReclaimedCurrPeriod"), "vatReclaimedCurrPeriod", minRegularValue, maxRegularValue),
-      DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "netVatDue"), "netVatDue", minNetVatDue, maxNetVatDue),
+      NonNegativeDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "netVatDue"), "netVatDue", minNetVatDue, maxNetVatDue),
       NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueSalesExVAT"), "totalValueSalesExVAT", minNonDecRegularValue, maxNonDecRegularValue),
       NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValuePurchasesExVAT"), "totalValuePurchasesExVAT", minNonDecRegularValue, maxNonDecRegularValue),
       NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueGoodsSuppliedExVAT"), "totalValueGoodsSuppliedExVAT", minNonDecRegularValue, maxNonDecRegularValue),
@@ -70,17 +70,17 @@ class SubmitReturnValidator extends Validator[SubmitRawData] {
 
       //type Validation
 
-      JsonFormatValidation.validate[String]((body \ "periodKey"), StringFormatRuleError),
-      JsonFormatValidation.validate[BigDecimal]((body \ "vatDueSales"), NumericFormatRuleError.withFieldName("vatDueSales")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "vatDueAcquisitions"), NumericFormatRuleError.withFieldName("vatDueAcquisitions")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "totalVatDue"), NumericFormatRuleError.withFieldName("totalVatDue")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "vatReclaimedCurrPeriod"), NumericFormatRuleError.withFieldName("vatReclaimedCurrPeriod")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "netVatDue"), NumericFormatRuleError.withFieldName("netVatDue")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "totalValueSalesExVAT"), NumericFormatRuleError.withFieldName("totalValueSalesExVAT")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "totalValuePurchasesExVAT"), NumericFormatRuleError.withFieldName("totalValuePurchasesExVAT")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "totalValueGoodsSuppliedExVAT"), NumericFormatRuleError.withFieldName("totalValueGoodsSuppliedExVAT")),
-      JsonFormatValidation.validate[BigDecimal]((body \ "totalAcquisitionsExVAT"), NumericFormatRuleError.withFieldName("totalAcquisitionsExVAT")),
-      JsonFormatValidation.validate[Boolean]((body \ "finalised"), UnMappedPlayRuleError),
+      JsonFormatValidation.validate[String](body \ "periodKey", StringFormatRuleError),
+      JsonFormatValidation.validate[BigDecimal](body \ "vatDueSales", NumericFormatRuleError.withFieldName("vatDueSales")),
+      JsonFormatValidation.validate[BigDecimal](body \ "vatDueAcquisitions", NumericFormatRuleError.withFieldName("vatDueAcquisitions")),
+      JsonFormatValidation.validate[BigDecimal](body \ "totalVatDue", NumericFormatRuleError.withFieldName("totalVatDue")),
+      JsonFormatValidation.validate[BigDecimal](body \ "vatReclaimedCurrPeriod", NumericFormatRuleError.withFieldName("vatReclaimedCurrPeriod")),
+      JsonFormatValidation.validate[BigDecimal](body \ "netVatDue", NumericFormatRuleError.withFieldName("netVatDue")),
+      JsonFormatValidation.validate[BigDecimal](body \ "totalValueSalesExVAT", NumericFormatRuleError.withFieldName("totalValueSalesExVAT")),
+      JsonFormatValidation.validate[BigDecimal](body \ "totalValuePurchasesExVAT", NumericFormatRuleError.withFieldName("totalValuePurchasesExVAT")),
+      JsonFormatValidation.validate[BigDecimal](body \ "totalValueGoodsSuppliedExVAT", NumericFormatRuleError.withFieldName("totalValueGoodsSuppliedExVAT")),
+      JsonFormatValidation.validate[BigDecimal](body \ "totalAcquisitionsExVAT", NumericFormatRuleError.withFieldName("totalAcquisitionsExVAT")),
+      JsonFormatValidation.validate[Boolean](body \ "finalised", UnMappedPlayRuleError),
 
       //periodKey format validation
 
@@ -88,11 +88,11 @@ class SubmitReturnValidator extends Validator[SubmitRawData] {
 
       //MonetaryValue Validation
 
-      DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal]((body \ "vatDueSales")), "vatDueSales", minRegularValue, maxRegularValue),
+      DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "vatDueSales"), "vatDueSales", minRegularValue, maxRegularValue),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "vatDueAcquisitions"), "vatDueAcquisitions", minRegularValue, maxRegularValue),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "totalVatDue"), "totalVatDue", minRegularValue, maxRegularValue),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "vatReclaimedCurrPeriod"), "vatReclaimedCurrPeriod", minRegularValue, maxRegularValue),
-      DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "netVatDue"), "netVatDue", minNetVatDue, maxNetVatDue),
+      DecimalMonetaryValueRangeValidation.validateNonNegative(getFieldFromBody[BigDecimal](body \ "netVatDue"), "netVatDue", minNetVatDue, maxNetVatDue),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueSalesExVAT"), "totalValueSalesExVAT", BigInt(-9999999999999L), BigInt(9999999999999L)),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValuePurchasesExVAT"), "totalValuePurchasesExVAT", BigInt(-9999999999999L), BigInt(9999999999999L)),
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueGoodsSuppliedExVAT"), "totalValueGoodsSuppliedExVAT", BigInt(-9999999999999L), BigInt(9999999999999L)),
@@ -105,8 +105,8 @@ class SubmitReturnValidator extends Validator[SubmitRawData] {
     val body = data.body.asJson.get.as[SubmitRequestBody]
 
     List(
-      VATNetValueValidation.validate(body.vatDueTotal, body.vatReclaimedCurrPeriod, body.vatDueNet),
-      VATTotalValueValidation.validate(body.vatDueSales, body.vatDueAcquisitions, body.vatDueTotal)
+      VATNetValueValidation.validate(body.totalVatDue, body.vatReclaimedCurrPeriod, body.netVatDue),
+      VATTotalValueValidation.validate(body.vatDueSales, body.vatDueAcquisitions, body.totalVatDue)
     )
   }
 

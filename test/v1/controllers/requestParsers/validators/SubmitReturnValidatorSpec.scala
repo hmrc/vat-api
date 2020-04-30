@@ -199,7 +199,7 @@ class SubmitReturnValidatorSpec extends UnitSpec {
       "multiple field ranges are invalid including netVatDue" in {
         validator.validate(SubmitRawData(validVrn, inValidMultipleFieldRangeBody)) shouldBe
           List(InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)),
-            InvalidMonetaryValueError.withFieldName("netVatDue", BigDecimal(0.0), BigDecimal(99999999999.99)))
+            InvalidMonetaryValueError.withFieldNameAndNonNegative("netVatDue"))
       }
     }
 
@@ -301,7 +301,8 @@ class SubmitReturnValidatorSpec extends UnitSpec {
             |""".stripMargin
         )
 
-        validator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe List(UnMappedPlayRuleError)
+        validator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe
+          List(UnMappedPlayRuleError)
       }
     }
 
@@ -352,6 +353,7 @@ class SubmitReturnValidatorSpec extends UnitSpec {
         validator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe List(VATNetValueRuleError)
       }
     }
+
 
     "return NOT_FINALISED error" when {
       "the finalised is not true" in {
@@ -466,59 +468,6 @@ class SubmitReturnValidatorSpec extends UnitSpec {
         )
 
         validator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe List(VATTotalValueRuleError)
-      }
-
-      "totalVatDue and netVatDue are both incorrect" in {
-        val jsonBody: JsValue = Json.parse(
-          """
-            |{
-            |   "periodKey": "AB12",
-            |   "vatDueSales": 	9999999999999.99,
-            |   "vatDueAcquisitions": 	9999999999999.99,
-            |   "totalVatDue": 	100.00,
-            |   "vatReclaimedCurrPeriod": 	1.00,
-            |   "netVatDue": 	100.00,
-            |   "totalValueSalesExVAT": 	9999999999999,
-            |   "totalValuePurchasesExVAT": 	9999999999999,
-            |   "totalValueGoodsSuppliedExVAT": 	9999999999999,
-            |   "totalAcquisitionsExVAT": 	9999999999999,
-            |   "finalised": true
-            |}
-            |""".stripMargin
-        )
-
-        validator.validate(SubmitRawData(validVrn, AnyContentAsJson(jsonBody))) shouldBe List(VATNetValueRuleError, VATTotalValueRuleError)
-      }
-
-      "period key format is invalid,and monetary format violation" in {
-        val jsonBody: JsValue = Json.parse(
-          """
-            |{
-            |   "periodKey": "ABABABABABABABA",
-            |   "vatDueSales": 	9999999999999.999,
-            |   "vatDueAcquisitions": 	9999999999999.99,
-            |   "totalVatDue": 	9999999999999.99,
-            |   "vatReclaimedCurrPeriod": 	9999999999999.99,
-            |   "netVatDue": 	99999999999.99,
-            |   "totalValueSalesExVAT": 	9999999999999,
-            |   "totalValuePurchasesExVAT": 	9999999999999,
-            |   "totalValueGoodsSuppliedExVAT": 	9999999999999,
-            |   "totalAcquisitionsExVAT": 	9999999999999,
-            |   "finalised": false
-            |}
-          """.stripMargin
-        )
-
-        val result = validator.validate(SubmitRawData(validVrn, AnyContent(jsonBody)))
-
-        result shouldBe List(
-          InvalidMonetaryValueError.withFieldName(
-            fieldName = "vatDueSales",
-            minValue = -9999999999999.99,
-            maxValue = 9999999999999.99
-          ),
-          BodyPeriodKeyFormatError
-        )
       }
     }
   }

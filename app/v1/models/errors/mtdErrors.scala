@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes}
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -28,8 +28,19 @@ case class MtdError(code: String, message: String, customJson: Option[JsValue] =
 object MtdError {
   implicit val writes: Writes[MtdError] = {
     case o@MtdError(_, _, None) => o.toJson
+    case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> customJson)
     case MtdError(_, _, Some(customJson)) => customJson
   }
+
+  implicit val reads: Reads[MtdError] = Json.reads[MtdError]
+}
+
+case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
+
+object MtdErrorWrapper {
+  implicit val writes: Writes[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
+
+  implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
 
 // Format Errors
@@ -113,4 +124,22 @@ object InvalidDateFromErrorDes extends MtdError("DATE_FROM_INVALID", "The provid
 
 object TaxPeriodNotEnded extends MtdError("TAX_PERIOD_NOT_ENDED", "The remote endpoint has indicated that the submission is for a tax period that has not ended")
 
-object DuplicateVatSubmission extends MtdError("DUPLICATE_SUBMISSION", "The VAT return was already submitted for the given period.")
+object DuplicateVatSubmission extends MtdError(
+  code = "DUPLICATE_SUBMISSION",
+  message = "The VAT return was already submitted for the given period.",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "code": "BUSINESS_ERROR",
+        |  "message": "Business validation error",
+        |  "errors": [
+        |      {
+        |        "code": "DUPLICATE_SUBMISSION",
+        |        "message": "The VAT return was already submitted for the given period."
+        |      }
+        |  ]
+        |}
+      """.stripMargin
+    )
+  ))

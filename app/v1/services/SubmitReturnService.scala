@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends DesResponseMappingSupport with Logging {
 
-  def viewReturn(request: SubmitRequest)(
+  def submitReturn(request: SubmitRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext): Future[ServiceOutcome[SubmitResponse]] = {

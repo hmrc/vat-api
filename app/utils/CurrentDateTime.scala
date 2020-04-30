@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package utils
 
-import v1.models.errors.{InvalidMonetaryValueError, MtdError}
+import javax.inject.{Inject, Singleton}
+import org.joda.time.DateTime
 
-object DecimalMonetaryValueFormatValidation {
+@Singleton
+class CurrentDateTime @Inject()() {
 
-  def validate(field: Option[BigDecimal], fieldName: String, minValue: BigDecimal, maxValue: BigDecimal): List[MtdError] = {
-
-    lazy val error = InvalidMonetaryValueError.withFieldName(fieldName, minValue, maxValue)
-
-    field match {
-      case Some(amount) if amount.scale > 2 => List(error)
-      case _ => NoValidationErrors
-    }
-  }
+  def getDateTime: DateTime = DateTime.now()
 }
