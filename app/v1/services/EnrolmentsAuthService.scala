@@ -78,7 +78,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
         case _ =>
-          Logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
+          Logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(LegacyUnauthorisedError))
 
       }recoverWith unauthorisedError
