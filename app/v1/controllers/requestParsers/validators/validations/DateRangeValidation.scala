@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 
-import java.time.{Duration, LocalDate}
+import java.time.{LocalDate}
 
 import v1.models.errors.{MtdError, RuleDateRangeInvalidError}
 

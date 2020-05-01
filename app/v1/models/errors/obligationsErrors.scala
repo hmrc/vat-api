@@ -98,17 +98,3 @@ object RuleMissingDateRangeError extends MtdError(
 // Service Errors
 object InvalidStatusErrorDes extends MtdError("INVALID_STATUS","The provided data is failed validation, invalid status")
 
-object RuleDateRangeTooLargeErrorDes extends MtdError(
-  code = "DATE_RANGE_TOO_LARGE",
-  message = "The date of the requested return cannot be further than four years from the current date.",
-  customJson = Some(
-    Json.parse(
-      """
-        |{
-        |   "code": "DATE_RANGE_TOO_LARGE",
-        |   "message": "The date of the requested return cannot be further than four years from the current date."
-        |}
-      """.stripMargin
-    )
-  )
-)

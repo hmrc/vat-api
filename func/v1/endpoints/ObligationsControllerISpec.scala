@@ -37,18 +37,24 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
     val vrn: String = "123456789"
     val fromDate: String = "2017-01-01"
     val toDate: String = "2017-12-01"
-    val oblStatus: String = "F"
+    val emptyDate = ""
+
+    val oblStatus: String = ""
+    val oblStatusF: String = "F"
+    val oblStatusO: String = "O"
+
     val correlationId: String = "X-ID"
 
     val desJson: JsValue = obligationsDesJson
     val mtdJson: JsValue = obligationsMtdJson
 
-    def uri: String = s"/$vrn/obligations?from=$fromDate&to=$toDate&status=$oblStatus"
+    //Obligation with status = "F"
+    def uri: String = s"/$vrn/obligations?from=$fromDate&to=$toDate&status=$oblStatusF"
     def mtdQueryParams: Seq[(String, String)] =
       Seq(
         ("from", fromDate),
         ("to", toDate),
-        ("status", oblStatus)
+        ("status", oblStatusF)
       )
 
     def desUrl: String = s"/enterprise/obligation-data/vrn/$vrn/VATC"
@@ -56,7 +62,24 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
       Map(
         "from" -> fromDate,
         "to" -> toDate,
-        "status" -> oblStatus,
+        "status" -> oblStatusF,
+      )
+
+    //With Status = "O"
+    def uriOmitted: String = s"/$vrn/obligations?from=$emptyDate&to=$emptyDate&status=$oblStatusO"
+    def mtdQueryParamsOmitted: Seq[(String, String)] =
+      Seq(
+        ("from", emptyDate),
+        ("to", emptyDate),
+        ("status", oblStatusO)
+      )
+
+    def desUrlOmitted: String = s"/enterprise/obligation-data/vrn/$vrn/VATC"
+    val desQueryParamsOmitted: Map[String, String] =
+      Map(
+        "from" -> emptyDate,
+        "to" -> emptyDate,
+        "status" -> oblStatusO,
       )
 
 
@@ -81,7 +104,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
 
   "Making a request to the 'Retrieve Obligations' endpoint" should {
     "return a 200 status code with expected body" when {
-      "a valid request is made" in new Test {
+      "a valid request is made with status = 'F'" in new Test {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
@@ -94,6 +117,21 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         response.json shouldBe mtdJson
         response.header("Content-Type") shouldBe Some("application/json")
       }
+
+      "a valid request is made with Status = 'O'" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrlOmitted, desQueryParamsOmitted, OK, desJson)
+        }
+
+        private val response = await(request.get())
+        response.status shouldBe OK
+        response.json shouldBe mtdJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
     }
 
     "return a 500 status code with expected body" when {
@@ -149,7 +187,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
           override val vrn: String = requestVrn
           override val fromDate: String = requestFromDate.getOrElse("")
           override val toDate: String = requestToDate.getOrElse("")
-          override val oblStatus: String = requestStatus.getOrElse("")
+          override val oblStatusF: String = requestStatus.getOrElse("")
 
           override val mtdQueryParams: Seq[(String, String)] =
             Map(
@@ -183,7 +221,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         ("NotAVrn", None, Some(futureTo()), Some("O"), BAD_REQUEST, VrnFormatError, "multiple errors (VRN)"),
 
         ("123456789", Some("notADate"), Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "invalid 'from' date with valid status"),
-        ("123456789", Some("notADate"), Some("2018-01-01"), Some("whatisthis"), BAD_REQUEST, InvalidFromError, "invalid 'from' date with invalid status"),
+        ("123456789", Some("notADate"), Some("2018-01-01"), Some("NotAStatus"), BAD_REQUEST, InvalidFromError, "invalid 'from' date with invalid status"),
         ("123456789", Some("2017-13-01"), Some("2018-01-01"), None , BAD_REQUEST, InvalidFromError, "invalid 'from' date with no status"),
         ("123456789", Some("notADate"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidFromError, "both dates invalid"),
         ("123456789", None, Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "missing 'from' date"),
@@ -196,7 +234,6 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
 
         ("123456789", Some("2017-01-01"), Some("2017-05-01"), Some("NotAStatus"), BAD_REQUEST, InvalidStatusError, "invalid status"),
         ("123456789", Some("2017-01-01"), Some("2017-05-01"), None, BAD_REQUEST, InvalidStatusError, "missing status"),
-
 
         ("123456789", Some("2017-01-01"), Some("2018-01-02"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "date range too long"),
         ("123456789", Some("2017-01-01"), Some("2017-01-01"), Some("F"), BAD_REQUEST, RuleDateRangeInvalidError, "dates are the same"),

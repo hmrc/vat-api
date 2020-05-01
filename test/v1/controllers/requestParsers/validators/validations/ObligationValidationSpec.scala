@@ -37,7 +37,7 @@ class ObligationValidationSpec extends UnitSpec {
       }
 
       "all parameters are supplied" in {
-        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("O")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("F")))
         validationResult.isEmpty shouldBe true
       }
     }
@@ -79,6 +79,12 @@ class ObligationValidationSpec extends UnitSpec {
         validationResult.head shouldBe InvalidFromError
       }
 
+      "Status is invalid" in {
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("NotAStatus")))
+        validationResult.isEmpty shouldBe false
+        validationResult.length shouldBe 1
+        validationResult.head shouldBe InvalidStatusError
+      }
     }
   }
 }

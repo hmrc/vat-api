@@ -165,7 +165,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
     "return the error as per spec" when {
       "parser errors occur" must {
         def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
-          s"a ${error.code} error is returned from the parser" in new Test {
+          s"return a ${error.code} error from the parser" in new Test {
 
             MockObligationRequestParser
               .parse(retrieveObligationsRawData)
@@ -193,7 +193,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
       "service errors occur" must {
         def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
-          s"a $mtdError error is returned from the service" in new Test {
+          s"return a $mtdError error from the service" in new Test {
 
             MockObligationRequestParser
               .parse(retrieveObligationsRawData)
@@ -219,7 +219,6 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidStatusErrorDes, BAD_REQUEST),
           (RuleDateRangeTooLargeError, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
-          (InvalidInputDataError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

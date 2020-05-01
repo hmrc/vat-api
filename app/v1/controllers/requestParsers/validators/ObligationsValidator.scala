@@ -16,7 +16,6 @@
 
 package v1.controllers.requestParsers.validators
 
-import play.api.Logger
 import v1.controllers.requestParsers.validators.validations.{DateRangeValidation, ObligationParameterFormatValidation, VrnValidation}
 import v1.models.errors.MtdError
 import v1.models.request.obligations.ObligationsRawData
@@ -40,7 +39,6 @@ class ObligationsValidator extends Validator[ObligationsRawData]{
     List(
       data match {
         case ObligationsRawData(_, Some(fromDate), Some(toDate), _) =>
-          Logger.error("\nDate Range Validation\n")
           DateRangeValidation.validate(fromDate, toDate)
         case _ => Nil
       }
