@@ -17,14 +17,16 @@
 package v1.services
 
 import javax.inject.{Inject, Singleton}
+import org.joda.time.LocalDate
 import play.api.Logger
 import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, _}
+import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.models.nrs.IdentityData
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import v1.models.outcomes.AuthOutcome
@@ -38,18 +40,55 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
     override def authConnector: AuthConnector = connector
   }
 
-  def authorised(predicate: Predicate)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
-    authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
-      case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
-      case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
-      case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
-      case _ =>
-        Logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
-        Future.successful(Left(LegacyUnauthorisedError))
-    } recoverWith unauthorisedError
+  def authorised(predicate: Predicate, nrsRequired: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
+    if(!nrsRequired){
+      authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
+        case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
+        case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
+        case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
+        case _ =>
+          Logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
+          Future.successful(Left(LegacyUnauthorisedError))
+      }recoverWith unauthorisedError
+    } else {
+      authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments
+        and internalId and externalId and agentCode and credentials
+        and confidenceLevel and nino and saUtr and name and dateOfBirth
+        and email and agentInformation and groupIdentifier and credentialRole
+        and mdtpInformation and credentialStrength and loginTimes
+      ) {
+        case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
+          ~ confLevel ~ ni ~ saRef ~ nme ~ dob
+          ~ eml ~ agInfo ~ groupId ~ credRole
+          ~ mdtpInfo ~ credStrength ~ logins
+          if affGroup.contains(AffinityGroup.Organisation) || affGroup.contains(AffinityGroup.Individual) || affGroup.contains(AffinityGroup.Agent) =>
+
+          // setup dummy data for ITMP data
+          val dummyItmpName: ItmpName = ItmpName(None, None, None)
+          val dummyItmpDob: Option[LocalDate] = None
+          val dummyItmpAddress: ItmpAddress = ItmpAddress(None, None, None, None, None, None, None, None)
+
+          val identityData =
+            IdentityData(
+              inId, exId, agCode, creds,
+              confLevel, ni, saRef, nme, dob,
+              eml, agInfo, groupId,
+              credRole, mdtpInfo, dummyItmpName, dummyItmpDob,
+              dummyItmpAddress, affGroup, credStrength, logins)
+
+          createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
+        case _ =>
+          Logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group.")
+          Future.successful(Left(LegacyUnauthorisedError))
+
+      }recoverWith unauthorisedError
+    }
+
   }
 
-  private def createUserDetailsWithLogging(affinityGroup: String, enrolments: Enrolments): Future[Right[MtdError, UserDetails]] = {
+  private def createUserDetailsWithLogging(affinityGroup: String,
+                                           enrolments: Enrolments,
+                                           identityData: Option[IdentityData] = None): Future[Right[MtdError, UserDetails]] = {
 
     val clientReference = getClientReferenceFromEnrolments(enrolments)
     Logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
@@ -58,7 +97,8 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
     val userDetails = UserDetails(
       userType = affinityGroup,
       agentReferenceNumber = None,
-      clientId = ""
+      clientId = "",
+      identityData
     )
 
     if (affinityGroup != "Agent") {

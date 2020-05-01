@@ -41,7 +41,7 @@ case class IdentityData(internalId: Option[String] = None,
                         itmpAddress: ItmpAddress,
                         affinityGroup: Option[AffinityGroup],
                         credentialStrength: Option[String] = None,
-                        loginTimes: IdentityLoginTimes)
+                        loginTimes: LoginTimes)
 
 object IdentityData {
   implicit val localDateFormat: Format[LocalDate] = RestFormats.localDateFormats
