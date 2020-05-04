@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators
 
 import support.UnitSpec
-import v1.models.errors.{InvalidFromError, InvalidToError, VrnFormatError}
+import v1.models.errors.{InvalidFromError, InvalidStatusError, InvalidToError, RuleDateRangeInvalidError, VrnFormatError}
 import v1.models.request.obligations.ObligationsRawData
 
 class ObligationsValidatorSpec extends  UnitSpec{
@@ -61,6 +61,14 @@ class ObligationsValidatorSpec extends  UnitSpec{
 
       "no parameters are provided" in {
         validator.validate(ObligationsRawData("", None, None, None)) shouldBe List(VrnFormatError)
+      }
+
+      "invalid status is provided" in {
+        validator.validate(ObligationsRawData(validVrn, Some(validFromDate), Some(validToDate), Some("NotAStatus"))) shouldBe List(InvalidStatusError)
+      }
+
+      "from' date after 'to' date" in {
+        validator.validate(ObligationsRawData(validVrn,Some("2018-01-01"), Some("2017-01-01"), Some("F"))) shouldBe List(RuleDateRangeInvalidError)
       }
     }
   }

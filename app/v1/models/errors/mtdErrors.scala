@@ -80,6 +80,8 @@ object UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested reso
 
 object InvalidBodyTypeError extends MtdError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
 
+
+
 // Custom VAT errors
 
 object LegacyNotFoundError extends MtdError("NOT_FOUND", "The remote endpoint has indicated that no data can be found")

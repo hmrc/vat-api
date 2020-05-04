@@ -27,7 +27,8 @@ trait BaseFunctionalSpec extends TestApplication with WireMockHelper with GuiceO
     "auditing.consumer.baseUri.port" -> mockPort,
     "access-keys.xApiKey" -> "dummy-api-key",
     "microservice.services.non-repudiation.host" -> mockHost,
-    "microservice.services.non-repudiation.port" -> mockPort
+    "microservice.services.non-repudiation.port" -> mockPort,
+    "feature-switch.refactor.enabled" -> false
   )).build()
 
   def when() = new HttpVerbs()(urlPathVariables, timeout)

@@ -32,12 +32,12 @@ class ObligationValidationSpec extends UnitSpec {
   "validate" should {
     "return no errors" when {
       "no from or to date is supplied but status is set to 'O'" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, None, None, Some("O")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, None, None, Some("O")))
         validationResult.isEmpty shouldBe true
       }
 
       "all parameters are supplied" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("O")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("F")))
         validationResult.isEmpty shouldBe true
       }
     }
@@ -45,40 +45,46 @@ class ObligationValidationSpec extends UnitSpec {
     "return an error" when {
 
       "invalid FROM and TO are supplied" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, Some(invalidFrom), Some(invalidTo), Some("O")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(invalidFrom), Some(invalidTo), Some("O")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe InvalidFromError
       }
 
       "no FROM or TO date is supplied but status is set to 'F'" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, None, None, Some("F")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, None, None, Some("F")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe RuleMissingDateRangeError
       }
 
       "no FROM or TO date is supplied and status is invalid" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, None, None, Some("NotAStatus")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, None, None, Some("NotAStatus")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe InvalidStatusError
       }
 
       "FROM date is supplied but no TO date" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), None, Some("F")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), None, Some("F")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe InvalidToError
       }
 
       "TO date is supplied but no FROM date" in {
-        val validationResult = ObligationValidation.validate(ObligationsRawData(validVRN, None, Some(validToDate), Some("F")))
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, None, Some(validToDate), Some("F")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe InvalidFromError
       }
 
+      "Status is invalid" in {
+        val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, Some(validFromDate), Some(validToDate), Some("NotAStatus")))
+        validationResult.isEmpty shouldBe false
+        validationResult.length shouldBe 1
+        validationResult.head shouldBe InvalidStatusError
+      }
     }
   }
 }

@@ -22,7 +22,7 @@ import v1.models.errors.RuleDateRangeInvalidError
 class DateRangeValidationSpec extends UnitSpec {
 
   val from2020 = "2020-01-01"
-  val to2021 = "2020-12-31"
+  val to2021 = "2021-01-01"
   val to2021Plus1Day = "2021-01-02"
   val from2018 = "2018-04-05"
   val to2019 = "2019-02-20"
@@ -38,7 +38,7 @@ class DateRangeValidationSpec extends UnitSpec {
     "return a list containing an error" when {
 
       "passed a from date which is the same as the to date" in {
-        DateRangeValidation.validate(to2021, to2021) shouldBe List()
+        DateRangeValidation.validate(to2021, to2021) shouldBe List(RuleDateRangeInvalidError)
       }
       "passed an invalid date range" in {
         DateRangeValidation.validate(from2020, to2021Plus1Day) shouldBe List(RuleDateRangeInvalidError)
