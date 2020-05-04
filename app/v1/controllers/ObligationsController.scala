@@ -60,7 +60,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrieveObligations(parsedRequest))
         } yield {
-          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Successfully retrieved Vat Obligations from DES")
+          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Successfully retrieved Obligations from DES")
 
 
           Ok(Json.toJson(serviceResponse.responseData))
