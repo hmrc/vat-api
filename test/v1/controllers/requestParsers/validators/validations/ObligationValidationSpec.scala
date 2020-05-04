@@ -55,7 +55,7 @@ class ObligationValidationSpec extends UnitSpec {
         val validationResult = ObligationParameterFormatValidation.validate(ObligationsRawData(validVRN, None, None, Some("F")))
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
-        validationResult.head shouldBe InvalidStatusError
+        validationResult.head shouldBe RuleMissingDateRangeError
       }
 
       "no FROM or TO date is supplied and status is invalid" in {
