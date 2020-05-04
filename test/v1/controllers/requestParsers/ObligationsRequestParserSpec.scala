@@ -100,11 +100,11 @@ class ObligationsRequestParserSpec extends UnitSpec {
       }
 
       "omissions are made without status('O')" in new Test {
-        MockVrnValidator.validate(ObligationsRawData(validVrn, None, None, Some("F")))
-          .returns(List(RuleMissingDateRangeError))
+        MockVrnValidator.validate(ObligationsRawData(validVrn, None, None, Some("NotAStatus")))
+          .returns(List(InvalidStatusError))
 
-        parser.parseRequest(ObligationsRawData(validVrn, None, None, Some("F"))) shouldBe
-        Left(ErrorWrapper(None, RuleMissingDateRangeError, None))
+        parser.parseRequest(ObligationsRawData(validVrn, None, None, Some("NotAStatus"))) shouldBe
+        Left(ErrorWrapper(None, InvalidStatusError, None))
       }
     }
   }

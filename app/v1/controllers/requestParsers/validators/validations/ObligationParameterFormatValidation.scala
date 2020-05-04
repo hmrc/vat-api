@@ -24,7 +24,7 @@ object ObligationParameterFormatValidation {
   def validate(data: ObligationsRawData): List[MtdError] = data match {
 
     case ObligationsRawData(_, None, None, Some(status)) =>
-      if (status == "O") Nil else List(RuleMissingDateRangeError)
+      if (status == "O") Nil else List(InvalidStatusError)
     case ObligationsRawData(_, None, None, None) => List(InvalidFromError)
     case ObligationsRawData(_, Some(_), None, _) => List(InvalidToError)
     case ObligationsRawData(_, None, Some(_), _) => List(InvalidFromError)

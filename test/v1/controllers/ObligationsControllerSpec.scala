@@ -185,7 +185,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidFromError, BAD_REQUEST),
           (InvalidToError, BAD_REQUEST),
           (InvalidStatusError, BAD_REQUEST),
-          (RuleDateRangeTooLargeError, BAD_REQUEST)
+          (RuleOBLDateRangeTooLargeError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
@@ -217,7 +217,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidDateFromErrorDes, BAD_REQUEST),
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidStatusErrorDes, BAD_REQUEST),
-          (RuleDateRangeTooLargeError, BAD_REQUEST),
+          (RuleOBLDateRangeTooLargeError, BAD_REQUEST),
           (RuleMissingDateRangeError, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
           (DownstreamError, INTERNAL_SERVER_ERROR)

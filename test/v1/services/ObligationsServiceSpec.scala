@@ -96,7 +96,7 @@ class ObligationsServiceSpec extends UnitSpec {
           ("INVALID_STATUS", InvalidStatusErrorDes),
           ("INVALID_DATE_FROM", InvalidDateFromErrorDes),
           ("INVALID_DATE_TO", InvalidDateToErrorDes),
-          ("INVALID_DATE_RANGE", RuleDateRangeTooLargeError),
+          ("INVALID_DATE_RANGE", RuleOBLDateRangeTooLargeError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
