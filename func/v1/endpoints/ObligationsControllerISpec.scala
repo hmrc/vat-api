@@ -225,7 +225,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         ("123456789", Some("2017-13-01"), Some("2018-01-01"), None , BAD_REQUEST, InvalidFromError, "invalid 'from' date with no status"),
         ("123456789", Some("notADate"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidFromError, "both dates invalid"),
         ("123456789", None, Some("2018-01-01"), Some("F"), BAD_REQUEST, InvalidFromError, "missing 'from' date"),
-        ("123456789", None, None, Some("F"), BAD_REQUEST, RuleMissingDateRangeError, "missing both dates and status is not O"),
+        ("123456789", None, None, Some("F"), BAD_REQUEST, InvalidFromError, "missing both dates and status is not O"),
         ("123456789", None, None, None, BAD_REQUEST, InvalidFromError, "no parameters supplied"),
 
         ("123456789", Some("2017-01-02"), Some("notADate"), Some("F"), BAD_REQUEST, InvalidToError, "invalid 'to' date"),
