@@ -73,7 +73,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
 
         auditService.auditEvent(AuditEvents.auditLiabilities(correlationId,
-          request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
+          request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge

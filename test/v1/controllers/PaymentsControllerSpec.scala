@@ -169,7 +169,7 @@ class PaymentsControllerSpec
             contentAsJson(result) shouldBe Json.toJson(error)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(error.code))), None)
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(error.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
               UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
@@ -203,7 +203,7 @@ class PaymentsControllerSpec
             contentAsJson(result) shouldBe Json.toJson(mtdError)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-            val auditResponse: AuditResponse = AuditResponse(OK, Some(Seq(AuditError(mtdError.code))), None)
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
               UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }

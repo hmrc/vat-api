@@ -20,8 +20,11 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.audit.AuditEvents
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
+import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.{ObligationsRawData, ObligationsRequest}
@@ -43,6 +46,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
       mockEnrolmentsAuthService,
       mockObligationRequestParser,
       mockObligationsService,
+      mockAuditService,
       cc
     )
 
@@ -159,6 +163,9 @@ class ObligationsControllerSpec extends ControllerBaseSpec
         contentAsJson(result) shouldBe mtdJson
         header("X-CorrelationId", result) shouldBe Some(correlationId)
 
+        val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
+          UserDetails("Individual", None, "client-Id"), auditResponse)).once
       }
     }
 
@@ -177,6 +184,9 @@ class ObligationsControllerSpec extends ControllerBaseSpec
             contentAsJson(result) shouldBe Json.toJson(error)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(error.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
@@ -209,6 +219,9 @@ class ObligationsControllerSpec extends ControllerBaseSpec
             contentAsJson(result) shouldBe Json.toJson(mtdError)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once
           }
         }
 
