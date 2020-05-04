@@ -39,13 +39,13 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
-      controllerName = "VatObligationsResource",
-      endpointName = "retrieveVatObligations"
+      controllerName = "ObligationsController",
+      endpointName = "retrieveObligations"
     )
 
   def retrieveObligations(vrn: String, from: Option[String], to: Option[String], status: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async{ implicit request =>
-      logger.info(message = s"[ObligationsController] [retrieveObligations] Retrieve VAT obligations for VRN : $vrn")
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Retrieve obligations for VRN : $vrn")
 
       val rawRequest: ObligationsRawData =
         ObligationsRawData(
@@ -60,7 +60,8 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrieveObligations(parsedRequest))
         } yield {
-          logger.info(message = s"[ObligationsController] [retrieveObligations] Successfully retrieved Vat Obligations from DES")
+          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Successfully retrieved Vat Obligations from DES")
+
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
