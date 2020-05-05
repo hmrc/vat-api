@@ -78,7 +78,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
 
         auditService.auditEvent(AuditEvents.auditReturns(correlationId,
-          request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
+          request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge

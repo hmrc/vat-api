@@ -23,10 +23,12 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, Logging}
+import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ObligationsRequestParser
+import v1.models.audit.AuditResponse
 import v1.models.errors._
 import v1.models.request.obligations.ObligationsRawData
-import v1.services.{EnrolmentsAuthService, ObligationsService}
+import v1.services.{AuditService, EnrolmentsAuthService, ObligationsService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
                                       requestParser: ObligationsRequestParser,
                                       service: ObligationsService,
+                                      auditService: AuditService,
                                       cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
@@ -62,6 +65,8 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
         } yield {
           logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Successfully retrieved Obligations from DES")
 
+          auditService.auditEvent(AuditEvents.auditObligations(serviceResponse.correlationId,
+            request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
@@ -71,6 +76,9 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+
+        auditService.auditEvent(AuditEvents.auditObligations(correlationId,
+          request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge

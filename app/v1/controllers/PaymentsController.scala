@@ -79,7 +79,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
 
         auditService.auditEvent(AuditEvents.auditPayments(correlationId,
-          request.userDetails, AuditResponse(OK, Left(errorWrapper.auditErrors))))
+          request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge
