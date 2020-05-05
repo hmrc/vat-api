@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package v1.models.nrs.response
 
-import v1.models.nrs.request.IdentityData
+sealed trait NrsError
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case object NrsError extends NrsError

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
 import java.time.LocalDateTime
 
-import play.api.libs.json.{Json, OFormat, Writes}
-import utils.DateTimeUtil
+import play.api.libs.json.{Json, OWrites}
 
-case class Metadata(businessId: String = "vat",
-                    notableEvent: String = "vat-return",
-                    payloadContentType: String = "application/json",
-                    payloadSha256Checksum: String,
+case class Metadata(businessId: String,
+                    notableEvent: String,
+                    payloadContentType: String,
+                    payloadSha256Checksum: Option[String],
                     userSubmissionTimestamp: LocalDateTime,
                     identityData: IdentityData,
                     userAuthToken: String,
@@ -32,12 +31,5 @@ case class Metadata(businessId: String = "vat",
                     searchKeys: SearchKeys)
 
 object Metadata {
-  implicit val dateToString: Writes[LocalDateTime] = Writes { date =>
-    Json.toJson(date.format(
-      DateTimeUtil.dateTimeFormatter
-    ))
-  }
-
-  implicit val format: OFormat[Metadata] = Json.format[Metadata]
+  implicit val writes: OWrites[Metadata] = Json.writes[Metadata]
 }
-

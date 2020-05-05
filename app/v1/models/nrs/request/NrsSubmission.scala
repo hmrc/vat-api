@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.request
 
 import play.api.libs.json._
 
-case class NRSSubmission(payload: String,
-                         metadata: Metadata)
+case class NrsSubmission(payload: String, metadata: Metadata)
 
-object NRSSubmission {
-  implicit val mdFormat: OFormat[Metadata] = Metadata.format
-  implicit val format: OFormat[NRSSubmission] = Json.format[NRSSubmission]
+object NrsSubmission {
+  implicit val writes: OWrites[NrsSubmission] = Json.writes[NrsSubmission]
 }

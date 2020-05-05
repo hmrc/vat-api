@@ -17,20 +17,16 @@
 package v1.services
 
 import org.joda.time.DateTime
-import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.mocks.connectors.MockSubmitReturnConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmitReturnServiceSpec extends UnitSpec {
+class SubmitReturnServiceSpec extends ServiceSpec {
 
   private val vrn: String = "123456789"
   private val correlationId = "X-123"
@@ -62,9 +58,6 @@ class SubmitReturnServiceSpec extends UnitSpec {
     chargeRefNumber = Some("aCxFaNx0FZsCvyWF"))
 
   trait Test extends MockSubmitReturnConnector {
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: EndpointLogContext = EndpointLogContext("SubmitReturnService", "submitReturn")
 
     val service = new SubmitReturnService(
       connector = mockSubmitReturnConnector

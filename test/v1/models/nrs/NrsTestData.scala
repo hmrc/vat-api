@@ -23,6 +23,8 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
+import v1.models.nrs.request._
+import v1.models.nrs.response.NrsResponse
 
 object NrsTestData {
 
@@ -58,9 +60,11 @@ object NrsTestData {
         |    "currentLogin": "2016-11-27T09:00:00.000Z",
         |    "previousLogin": "2016-11-01T12:00:00.000Z"
         |  }
-        |}""".stripMargin)
+        |}
+      """.stripMargin
+    )
 
-    val correctModel: IdentityData = IdentityData(
+    val correctModel: IdentityData = request.IdentityData(
       internalId = Some("some-id"),
       externalId = Some("some-id"),
       agentCode = Some("TZRXXV"),
@@ -94,7 +98,6 @@ object NrsTestData {
          |    "businessId": "vat",
          |    "notableEvent": "vat-return",
          |    "payloadContentType": "application/json",
-         |    "payloadSha256Checksum": "426a1c28<snip>d6d363",
          |    "userSubmissionTimestamp": "2018-04-07T12:13:25.156Z",
          |    "identityData": ${IdentityDataTestData.correctJson},
          |    "userAuthToken": "Bearer AbCdEf123456...",
@@ -114,10 +117,14 @@ object NrsTestData {
          |      "periodKey": "18AA"
          |    }
          |}
-      """.stripMargin)
+      """.stripMargin
+    )
 
     val correctModel: Metadata = Metadata(
-      payloadSha256Checksum = "426a1c28<snip>d6d363",
+      businessId = "vat",
+      notableEvent = "vat-return",
+      payloadContentType = "application/json",
+      payloadSha256Checksum = None,
       userSubmissionTimestamp = LocalDateTime.ofInstant(Instant.parse("2018-04-07T12:13:25.156Z"), ZoneId.of("UTC")),
       identityData = IdentityDataTestData.correctModel,
       userAuthToken = "Bearer AbCdEf123456...",
@@ -132,8 +139,31 @@ object NrsTestData {
         "Gov-Client-Window-Size" -> "1256x803",
         "Gov-Client-Colour-Depth" -> "24"
       ),
-      searchKeys = SearchKeys(vrn = Some("123456789"), periodKey = Some("18AA"))
+      searchKeys =
+        SearchKeys(
+          vrn = Some("123456789"),
+          companyName = None,
+          periodKey = Some("18AA"),
+          taxPeriodEndDate = None
+        )
     )
+  }
+
+  object SearchKeysTestData {
+    val correctJson: JsObject = Json.obj(
+      "vrn" -> "vrn",
+      "companyName" -> "Good, Bad & Ugly Ltd",
+      "taxPeriodEndDate" -> "2018-06-04",
+      "periodKey" -> "period key"
+    )
+
+    val correctModel: SearchKeys =
+      SearchKeys(
+        vrn = Some("vrn"),
+        companyName = Some("Good, Bad & Ugly Ltd"),
+        taxPeriodEndDate = Some(LocalDate.parse("2018-06-04")),
+        periodKey = Some("period key")
+      )
   }
 
   object FullRequestTestData {
@@ -142,9 +172,29 @@ object NrsTestData {
       "metadata" -> MetadataTestData.correctJson
     )
 
-    val correctModel: NRSSubmission = NRSSubmission(
+    val correctModel: NrsSubmission = NrsSubmission(
       "XXX-base64checksum-XXX", MetadataTestData.correctModel
     )
+  }
+
+  object NrsResponseTestData {
+
+    val correctJson: JsValue = Json.parse(
+      """
+        |{
+        |  "nrSubmissionId": "anID",
+        |  "cadesTSignature": "aSignature",
+        |  "timestamp": "aTimeStamp"
+        |}
+    """.stripMargin
+    )
+
+    val correctModel: NrsResponse =
+      NrsResponse(
+        nrSubmissionId = "anID",
+        cadesTSignature = "This has been deprecated - DO NOT USE",
+        timestamp = ""
+      )
   }
 
 }

@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package v1.models.nrs
 
-import v1.models.nrs.request.IdentityData
+import java.time.LocalDateTime
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+import org.joda.time.{DateTime, LocalDate}
+import play.api.libs.json.{Format, Json, Writes}
+import uk.gov.hmrc.http.controllers.RestFormats
+import utils.DateTimeUtil
+
+package object request {
+  implicit val dateFormats: Format[LocalDate] = RestFormats.localDateFormats
+  implicit val dateTimeFormat: Format[DateTime] = RestFormats.dateTimeFormats
+
+  implicit val dateToString: Writes[LocalDateTime] = Writes {
+    date => Json.toJson(date.format(DateTimeUtil.dateTimeFormatter))
+  }
+}

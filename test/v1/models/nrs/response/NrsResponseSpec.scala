@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.models.nrs.response
 
-import play.api.libs.json.Json
 import support.UnitSpec
-import v1.models.nrs.NrsTestData.FullRequestTestData._
+import v1.models.nrs.NrsTestData.NrsResponseTestData._
 
-class NRSSubmissionSpec extends UnitSpec {
+class NrsResponseSpec extends UnitSpec {
 
-  "Formats" should {
-
-    "parse correctly from json" in {
-      correctJson.as[NRSSubmission] shouldBe correctModel
-    }
-
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
+  "reads" should {
+    "parse correctly from JSON" in {
+      correctJson.as[NrsResponse] shouldBe correctModel
     }
   }
+
 }

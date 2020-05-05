@@ -16,10 +16,7 @@
 
 package v1.services
 
-import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.mocks.connectors.MockPaymentsConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
@@ -28,10 +25,9 @@ import v1.models.response.common.TaxPeriod
 import v1.models.response.payments.PaymentsResponse.Payment
 import v1.models.response.payments.{PaymentItem, PaymentsResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PaymentsServiceSpec extends UnitSpec {
+class PaymentsServiceSpec extends ServiceSpec {
 
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
@@ -55,9 +51,6 @@ class PaymentsServiceSpec extends UnitSpec {
     )
 
   trait Test extends MockPaymentsConnector {
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
     val service = new PaymentsService(
       connector = mockRetrievePaymentsConnector

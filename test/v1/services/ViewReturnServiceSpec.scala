@@ -16,20 +16,16 @@
 
 package v1.services
 
-import support.UnitSpec
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.mocks.connectors.MockViewReturnConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ViewReturnServiceSpec extends UnitSpec {
+class ViewReturnServiceSpec extends ServiceSpec {
 
   private val vrn: String = "123456789"
   private val periodKey: String = "F034"
@@ -56,9 +52,6 @@ class ViewReturnServiceSpec extends UnitSpec {
     )
 
   trait Test extends MockViewReturnConnector {
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: EndpointLogContext = EndpointLogContext("c", "ep")
 
     val service = new ViewReturnService(
       connector = mockViewReturnConnector

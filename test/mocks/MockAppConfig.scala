@@ -21,6 +21,8 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
 
+import scala.concurrent.duration.Duration
+
 trait MockAppConfig extends MockFactory {
 
   val mockAppConfig: AppConfig = mock[AppConfig]
@@ -33,5 +35,11 @@ trait MockAppConfig extends MockFactory {
     def apiGatewayContext: CallHandler[String]            = (mockAppConfig.apiGatewayContext _: () => String).expects()
     def apiStatus: CallHandler[String] = (mockAppConfig.apiStatus: String => String).expects("1.0")
     def endpointsEnabled: CallHandler[Boolean] = (mockAppConfig.endpointsEnabled: String => Boolean).expects("1.0")
+
+    // NRS config items
+    def nrsApiKey: CallHandler[String] = (mockAppConfig.nrsApiKey _).expects()
+    def nrsMaxTimeout: CallHandler[Duration] = (mockAppConfig.nrsMaxTimeout _).expects()
+    def appName: CallHandler[String] = (mockAppConfig.appName _).expects()
+    def nrsBaseUrl: CallHandler[String] = (mockAppConfig.nrsBaseUrl _).expects()
   }
 }
