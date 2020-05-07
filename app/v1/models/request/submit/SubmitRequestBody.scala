@@ -49,9 +49,25 @@ object SubmitRequestBody {
       (JsPath \ "totalValueGoodsSuppliedExVAT").readNullable[BigDecimal] and
       (JsPath \ "totalAcquisitionsExVAT").readNullable[BigDecimal] and
       (JsPath \ "finalised").readNullable[Boolean] and
-      (JsPath \ "receivedAt").readNullable[String] and
-      (JsPath \ "agentReference").readNullable[String]
+      Reads.pure(None) and
+      Reads.pure(None)
     ) (SubmitRequestBody.apply _)
 
-  implicit val writes: OWrites[SubmitRequestBody] = Json.writes[SubmitRequestBody]
+  implicit val writes: OWrites[SubmitRequestBody] = new OWrites[SubmitRequestBody] {
+    def writes(response: SubmitRequestBody): JsObject = {
+
+      response.periodKey.fold(Json.obj())(value => Json.obj("periodKey" -> value)) ++
+        response.vatDueSales.fold(Json.obj())(value => Json.obj("vatDueSales" -> value)) ++
+        response.vatDueAcquisitions.fold(Json.obj())(value => Json.obj("vatDueAcquisitions" -> value)) ++
+        response.vatDueTotal.fold(Json.obj())(value => Json.obj("vatDueTotal" -> value)) ++
+        response.vatReclaimedCurrPeriod.fold(Json.obj())(value => Json.obj("vatReclaimedCurrPeriod" -> value)) ++
+        response.vatDueNet.fold(Json.obj())(value => Json.obj("vatDueNet" -> value)) ++
+        response.totalValueSalesExVAT.fold(Json.obj())(value => Json.obj("totalValueSalesExVAT" -> value)) ++
+        response.totalValuePurchasesExVAT.fold(Json.obj())(value => Json.obj("totalValuePurchasesExVAT" -> value)) ++
+        response.totalValueGoodsSuppliedExVAT.fold(Json.obj())(value => Json.obj("totalValueGoodsSuppliedExVAT" -> value)) ++
+        response.totalAllAcquisitionsExVAT.fold(Json.obj())(value => Json.obj("totalAllAcquisitionsExVAT" -> value)) ++
+        response.agentReference.fold(Json.obj())(value => Json.obj("agentReference" -> value)) ++
+        response.receivedAt.fold(Json.obj())(value => Json.obj("receivedAt" -> value))
+    }
+  }
 }

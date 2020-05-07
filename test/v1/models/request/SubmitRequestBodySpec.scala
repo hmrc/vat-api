@@ -42,18 +42,18 @@ class SubmitRequestBodySpec extends UnitSpec {
   val toDesJson: JsValue = Json.parse(
     """
       |{
-      |   "periodKey": "AB12",
-      |   "vatDueSales": 	0.00,
-      |   "vatDueAcquisitions": 	0.00,
-      |   "vatDueTotal": 	0.00,
-      |   "vatReclaimedCurrPeriod": 	99999999999.99,
-      |   "vatDueNet": 	99999999999.99,
-      |   "totalValueSalesExVAT": 	9999999999999.0,
-      |   "totalValuePurchasesExVAT": 	9999999999999.0,
-      |   "totalValueGoodsSuppliedExVAT": 	9999999999999.0,
-      |   "totalAllAcquisitionsExVAT": 	9999999999999.0,
-      |   "finalised": true,
-      |   "receivedAt": "2020-05-05T12:00:00Z"
+      |   "vatDueAcquisitions":0,
+      |   "vatDueSales":0,
+      |   "totalValuePurchasesExVAT":9999999999999,
+      |   "agentReference":"LARN0085901",
+      |   "totalAllAcquisitionsExVAT":9999999999999,
+      |   "periodKey":"AB12",
+      |   "vatDueNet":99999999999.99,
+      |   "totalValueSalesExVAT":9999999999999,
+      |   "receivedAt":"2020-05-05T12:00:00Z",
+      |   "vatReclaimedCurrPeriod":99999999999.99,
+      |   "vatDueTotal":0,
+      |   "totalValueGoodsSuppliedExVAT":9999999999999
       |}
     """.stripMargin)
 
@@ -65,7 +65,7 @@ class SubmitRequestBodySpec extends UnitSpec {
   val submitRequestToDesBody: SubmitRequestBody = SubmitRequestBody(Some("AB12"), Some(BigDecimal(0.00)),
     Some(BigDecimal(0.00)), Some(BigDecimal(0.00)), Some(BigDecimal(99999999999.99)),
     Some(BigDecimal(99999999999.99)), Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)),
-    Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)), Some(true), Some("2020-05-05T12:00:00Z"), None)
+    Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)), Some(true), Some("2020-05-05T12:00:00Z"), Some("LARN0085901"))
 
   "Submit request body" should {
     "return a SubmitRequestBody model" when {
