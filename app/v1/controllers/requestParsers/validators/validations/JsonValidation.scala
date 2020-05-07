@@ -16,21 +16,15 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
-import v1.models.errors.MtdError
+import play.api.mvc.AnyContent
+import v1.models.errors.{InvalidJsonError, MtdError}
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
+object JsonValidation {
+  def validate(body: AnyContent): List[MtdError] = {
+    body.asJson match {
+      case None => List(InvalidJsonError)
+      case _ => List()
     }
   }
 
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
-  }
 }

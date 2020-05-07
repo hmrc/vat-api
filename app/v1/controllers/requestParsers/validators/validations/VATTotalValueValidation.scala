@@ -16,21 +16,15 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
-import v1.models.errors.MtdError
+import v1.models.errors.{MtdError, VATTotalValueRuleError}
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
+object VATTotalValueValidation {
 
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
+  def validate(vatDueSales: Option[BigDecimal], vatDueAcquistions: Option[BigDecimal], totalVatDue: Option[BigDecimal]): List[MtdError] = {
+
+    (vatDueSales, vatDueAcquistions, totalVatDue) match {
+      case(Some(vatDueSales), Some(vatDueAcquistions), Some(totalVatDue)) if !((vatDueSales + vatDueAcquistions) == totalVatDue)  => List(VATTotalValueRuleError)
+      case (_, _, _) => List()
     }
-  }
-
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
   }
 }

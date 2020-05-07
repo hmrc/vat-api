@@ -16,21 +16,17 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
-import v1.models.errors.MtdError
+import v1.models.errors.{InvalidMonetaryValueError, MtdError}
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
+object DecimalMonetaryValueFormatValidation {
 
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
+  def validate(field: Option[BigDecimal], fieldName: String, minValue: BigDecimal, maxValue: BigDecimal): List[MtdError] = {
+
+    lazy val error = InvalidMonetaryValueError.withFieldName(fieldName, minValue, maxValue)
+
+    field match {
+      case Some(amount) if amount.scale != 2 => List(error)
+      case _ => NoValidationErrors
     }
-  }
-
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
   }
 }

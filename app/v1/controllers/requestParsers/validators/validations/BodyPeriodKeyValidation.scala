@@ -16,21 +16,17 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
-import v1.models.errors.MtdError
+import v1.models.errors.{BodyPeriodKeyFormatError, MtdError}
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
+object BodyPeriodKeyValidation {
 
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
+  private val periodKeyRegex = "^[#0-9A-Z]{4}$"
+
+  def validate(periodKey: Option[String]): List[MtdError] = {
+
+    periodKey match {
+      case Some(periodKey) if !periodKey.matches(periodKeyRegex) => List(BodyPeriodKeyFormatError)
+      case _ => List()
     }
-  }
-
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
   }
 }

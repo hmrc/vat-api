@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.controllers.requestParsers
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
-import v1.models.errors.MtdError
+import javax.inject.Inject
+import uk.gov.hmrc.domain.Vrn
+import v1.controllers.requestParsers.validators.SubmitReturnValidator
+import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
+class SubmitReturnRequestParser @Inject()(val validator: SubmitReturnValidator)
+  extends RequestParser[SubmitRawData, SubmitRequest] {
 
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
-    }
-  }
-
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
+  override protected def requestFor(data: SubmitRawData): SubmitRequest = {
+    SubmitRequest(Vrn(data.vrn), data.body.asJson.get.as[SubmitRequestBody])
   }
 }

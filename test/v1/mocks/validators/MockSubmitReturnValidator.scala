@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.mocks.validators
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsValue, Reads}
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.validators.SubmitReturnValidator
 import v1.models.errors.MtdError
+import v1.models.request.submit.SubmitRawData
 
-object JsonFormatValidation {
-  private def validateType[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
+class MockSubmitReturnValidator extends MockFactory {
 
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _ => List(error)
+  val mockValidator: SubmitReturnValidator = mock[SubmitReturnValidator]
+
+  object MockSubmitReturnsValidator {
+
+    def validate(data: SubmitRawData): CallHandler1[SubmitRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: SubmitRawData))
+        .expects(data)
     }
-  }
-
-
-  def validate[A](data: JsLookupResult, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-
-    if (data.isDefined) validateType[A](data.get, error) else List()
   }
 }
