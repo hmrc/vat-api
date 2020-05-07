@@ -512,12 +512,12 @@ class SubmitReturnValidatorSpec extends UnitSpec {
         val result = validator.validate(SubmitRawData(validVrn, AnyContent(jsonBody)))
 
         result shouldBe List(
-          BodyPeriodKeyFormatError,
           InvalidMonetaryValueError.withFieldName(
             fieldName = "vatDueSales",
             minValue = -9999999999999.99,
             maxValue = 9999999999999.99
-          )
+          ),
+          BodyPeriodKeyFormatError
         )
       }
     }
