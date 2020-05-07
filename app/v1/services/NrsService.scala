@@ -77,7 +77,7 @@ class NrsService @Inject()(connector: NrsConnector) {
           SearchKeys(
             vrn = Some(vrn.vrn),
             companyName = None,
-            periodKey = Some(body.periodKey),
+            periodKey = body.periodKey,
             taxPeriodEndDate = None
           )
       )
