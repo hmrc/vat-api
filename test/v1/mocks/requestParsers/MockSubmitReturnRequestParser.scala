@@ -18,9 +18,9 @@ package v1.mocks.requestParsers
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.errors.ErrorWrapper
-import v1.models.request.submit.SubmitRawData
-import v1.models.request.submitReturn.{SubmitRawData, SubmitRequest}
+import v1.models.request.submit.{SubmitRawData, SubmitRequest}
 
 trait MockSubmitReturnRequestParser extends MockFactory {
 
