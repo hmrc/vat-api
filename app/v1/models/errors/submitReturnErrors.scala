@@ -23,7 +23,16 @@ object InvalidMonetaryValueError extends MtdError("INVALID_REQUEST", "Invalid re
     s"""
        |{
        |   "code": "INVALID_MONETARY_AMOUNT",
-       |   "message": "amount should be a monetary value (to 2 decimal places), between $minValue and $maxValue",
+       |   "message": "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
+       |   "path": "/$fieldName"
+       |}
+       |""".stripMargin)))
+
+  def withFieldNameAndNonNegative(fieldName: String): MtdError = this.copy(customJson = Some(Json.parse(
+    s"""
+       |{
+       |   "code": "INVALID_MONETARY_AMOUNT",
+       |   "message": "amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99",
        |   "path": "/$fieldName"
        |}
        |""".stripMargin)))
@@ -164,57 +173,48 @@ object StringFormatRuleError extends MtdError(
   )
 )
 
-object NumericFormatRuleError extends MtdError("INVALID_NUMERIC_VALUE", "Please provide a numeric field") {
+object UnMappedPlayRuleError extends MtdError(
+  code = "UNMAPPED_PLAY_ERROR",
+  message = "error.expected.jsboolean",
+  customJson = Some(
+    Json.parse(
+      """
+        |{
+        |  "code": "INVALID_REQUEST",
+        |  "message": "Invalid request",
+        |  "errors": [
+        |    {
+        |      "code": "UNMAPPED_PLAY_ERROR",
+        |      "message": "error.expected.jsboolean",
+        |      "path": "/finalised"
+        |    }
+        |  ]
+        |
+        |}
+      """.stripMargin
+    )
+  )
+)
+
+object NumericFormatRuleError extends MtdError("INVALID_REQUEST", "Invalid request") {
   def withFieldName(fieldName: String): MtdError = this.copy(customJson = Some(Json.parse(
     s"""
        |{
-       |    "code": "INVALID_REQUEST",
-       |    "message": "Invalid request",
-       |    "errors": [
-       |        {
-       |            "code": "INVALID_NUMERIC_VALUE",
-       |            "message": "please provide a numeric field",
-       |            "path": "/$fieldName"
-       |        }
-       |     ]
+       |    "code": "INVALID_NUMERIC_VALUE",
+       |    "message": "please provide a numeric field",
+       |    "path": "/$fieldName"
        |}
        |""".stripMargin)))
 }
 
-object UnMappedPlayRuleError extends MtdError(
-  code = "UNMAPPED_PLAY_ERROR",
-  message = "finalised field is not true or false, e.g. \"finalised\": null \"finalised\": 12.34 \"finalised\": \"a\"") {
+object MandatoryFieldRuleError extends MtdError("INVALID_REQUEST", "Invalid request") {
   def withFieldName(fieldName: String): MtdError = this.copy(customJson = Some(Json.parse(
     s"""
        |{
-       |  "code": "INVALID_REQUEST",
-       |  "message": "Invalid request",
-       |  "errors": [
-       |    {
-       |      "code": "UNMAPPED_PLAY_ERROR",
-       |      "message": "error.expected.jsboolean",
-       |      "path": "/$fieldName"
-       |    }
-       |  ]
-       |}
-      """.stripMargin)))
-}
-
-object MandatoryFieldRuleError extends MtdError(
-  code = "MANDATORY_FIELD_MISSING",
-  message = "Missing any field.") {
-  def withFieldName(fieldName: String): MtdError = this.copy(customJson = Some(Json.parse(
-    s"""
-       |{
-       |    "code": "INVALID_REQUEST",
-       |    "message": "Invalid request",
-       |    "errors": [
-       |        {
-       |            "code": "MANDATORY_FIELD_MISSING",
-       |            "message": "a mandatory field is missing",
-       |            "path": "/$fieldName"
-       |        }
-       |    ]
+       |    "code": "MANDATORY_FIELD_MISSING",
+       |    "message": "a mandatory field is missing",
+       |    "path": "/$fieldName"
+       |
        |}
       """.stripMargin)))
 }

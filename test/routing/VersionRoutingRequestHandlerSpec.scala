@@ -95,9 +95,9 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
     implicit val acceptHeader: None.type = None
 
     "return 406" in new Test {
-      stubHandling(defaultRouter, "path")(None)
+      stubHandling(defaultRouter, "/123456789/path")(None)
 
-      val request: RequestHeader = buildRequest("path")
+      val request: RequestHeader = buildRequest("/123456789/path")
       inside(requestHandler.routeRequest(request)) {
         case Some(a: EssentialAction) =>
           val result = a.apply(request)
@@ -123,9 +123,9 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
     implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.5.0+json")
 
     "return 404" in new Test {
-      stubHandling(defaultRouter, "path")(None)
+      stubHandling(defaultRouter, "/123456789/path")(None)
 
-      private val request = buildRequest("path")
+      private val request = buildRequest("/123456789/path")
 
       inside(requestHandler.routeRequest(request)) {
         case Some(a: EssentialAction) =>
@@ -142,9 +142,9 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
 
     "the version has a route for the resource" must {
       "return 404 Not Found" in new Test {
-        stubHandling(defaultRouter, "path")(None)
+        stubHandling(defaultRouter, "/123456789/path")(None)
 
-        private val request = buildRequest("path")
+        private val request = buildRequest("/123456789/path")
         inside(requestHandler.routeRequest(request)) {
           case Some(a:EssentialAction) =>
             val result = a.apply(request)
@@ -162,9 +162,9 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
       "handler found" should {
         "use it" in new Test {
           val handler: Handler = mock[Handler]
-          stubHandling(router, "path/")(Some(handler))
+          stubHandling(router, "/123456789/path/")(Some(handler))
 
-          requestHandler.routeRequest(buildRequest("path/")) shouldBe Some(handler)
+          requestHandler.routeRequest(buildRequest("/123456789/path/")) shouldBe Some(handler)
         }
       }
 
@@ -172,11 +172,11 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
         "try without the trailing slash" in new Test {
           val handler: Handler = mock[Handler]
           inSequence {
-            stubHandling(router, "path/")(None)
-            stubHandling(router, "path")(Some(handler))
+            stubHandling(router, "/123456789/path/")(None)
+            stubHandling(router, "/123456789/path")(Some(handler))
           }
 
-          requestHandler.routeRequest(buildRequest("path/")) shouldBe Some(handler)
+          requestHandler.routeRequest(buildRequest("/123456789/path/")) shouldBe Some(handler)
         }
       }
     }
@@ -188,11 +188,11 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
         "use it" in new Test {
           val handler: Handler = mock[Handler]
 
-          stubHandling(defaultRouter, "path/")(None)
-          stubHandling(defaultRouter, "path")(None)
-          stubHandling(router, "path/")(Some(handler))
+          stubHandling(defaultRouter, "/123456789/path/")(None)
+          stubHandling(defaultRouter, "/123456789/path")(None)
+          stubHandling(router, "/123456789/path/")(Some(handler))
 
-          requestHandler.routeRequest(buildRequest("path/")) shouldBe Some(handler)
+          requestHandler.routeRequest(buildRequest("/123456789/path/")) shouldBe Some(handler)
         }
       }
 
@@ -200,14 +200,14 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
         "try without the trailing slash" in new Test {
           val handler: Handler = mock[Handler]
 
-          stubHandling(defaultRouter, "path/")(None)
-          stubHandling(defaultRouter, "path")(None)
+          stubHandling(defaultRouter, "/123456789/path/")(None)
+          stubHandling(defaultRouter, "/123456789/path")(None)
           inSequence {
-            stubHandling(router, "path/")(None)
-            stubHandling(router, "path")(Some(handler))
+            stubHandling(router, "/123456789/path/")(None)
+            stubHandling(router, "/123456789/path")(Some(handler))
           }
 
-          requestHandler.routeRequest(buildRequest("path/")) shouldBe Some(handler)
+          requestHandler.routeRequest(buildRequest("/123456789/path/")) shouldBe Some(handler)
         }
       }
     }

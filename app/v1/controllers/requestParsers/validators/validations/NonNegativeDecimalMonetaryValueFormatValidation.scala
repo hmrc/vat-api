@@ -18,11 +18,11 @@ package v1.controllers.requestParsers.validators.validations
 
 import v1.models.errors.{InvalidMonetaryValueError, MtdError}
 
-object DecimalMonetaryValueFormatValidation {
+object NonNegativeDecimalMonetaryValueFormatValidation {
 
   def validate(field: Option[BigDecimal], fieldName: String, minValue: BigDecimal, maxValue: BigDecimal): List[MtdError] = {
 
-    lazy val error = InvalidMonetaryValueError.withFieldName(fieldName, minValue, maxValue)
+    lazy val error = InvalidMonetaryValueError.withFieldNameAndNonNegative(fieldName)
 
     field match {
       case Some(amount) if amount.scale > 2 => List(error)

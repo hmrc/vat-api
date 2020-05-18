@@ -36,13 +36,13 @@ class SubmitReturnServiceSpec extends ServiceSpec {
       periodKey = Some("F034"),
       vatDueSales = Some(4567.23),
       vatDueAcquisitions = Some(-456675.5),
-      vatDueTotal = Some(7756.65),
+      totalVatDue = Some(7756.65),
       vatReclaimedCurrPeriod = Some(-756822354.64),
-      vatDueNet = Some(8956743245.12),
+      netVatDue = Some(8956743245.12),
       totalValueSalesExVAT = Some(43556767890.00),
       totalValuePurchasesExVAT = Some(34556790.00),
       totalValueGoodsSuppliedExVAT = Some(34556.00),
-      totalAllAcquisitionsExVAT = Some(-68978.00),
+      totalAcquisitionsExVAT = Some(-68978.00),
       finalised = Some(true),
       receivedAt = None,
       agentReference = None
@@ -73,7 +73,7 @@ class SubmitReturnServiceSpec extends ServiceSpec {
         MockSubmitReturnConnector.submitReturn(submitReturnRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, submitReturnResponse))))
 
-        await(service.viewReturn(submitReturnRequest)) shouldBe Right(ResponseWrapper(correlationId, submitReturnResponse))
+        await(service.submitReturn(submitReturnRequest)) shouldBe Right(ResponseWrapper(correlationId, submitReturnResponse))
       }
     }
 
@@ -86,7 +86,7 @@ class SubmitReturnServiceSpec extends ServiceSpec {
             MockSubmitReturnConnector.submitReturn(submitReturnRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.viewReturn(submitReturnRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.submitReturn(submitReturnRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(

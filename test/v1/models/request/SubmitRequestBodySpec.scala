@@ -26,9 +26,9 @@ class SubmitRequestBodySpec extends UnitSpec {
     """
       |{
       |   "periodKey": "AB12",
-      |   "vatDueSales": 	0.00,
-      |   "vatDueAcquisitions": 	0.00,
-      |   "totalVatDue": 	0.00,
+      |   "vatDueSales": 	1000.00,
+      |   "vatDueAcquisitions": 	2000.00,
+      |   "totalVatDue": 	3000.00,
       |   "vatReclaimedCurrPeriod": 	99999999999.99,
       |   "netVatDue": 	99999999999.99,
       |   "totalValueSalesExVAT": 	9999999999999,
@@ -42,8 +42,8 @@ class SubmitRequestBodySpec extends UnitSpec {
   val toDesJson: JsValue = Json.parse(
     """
       |{
-      |   "vatDueAcquisitions":0,
-      |   "vatDueSales":0,
+      |   "vatDueAcquisitions":2000,
+      |   "vatDueSales":1000,
       |   "totalValuePurchasesExVAT":9999999999999,
       |   "agentReference":"LARN0085901",
       |   "totalAllAcquisitionsExVAT":9999999999999,
@@ -52,18 +52,18 @@ class SubmitRequestBodySpec extends UnitSpec {
       |   "totalValueSalesExVAT":9999999999999,
       |   "receivedAt":"2020-05-05T12:00:00Z",
       |   "vatReclaimedCurrPeriod":99999999999.99,
-      |   "vatDueTotal":0,
+      |   "vatDueTotal":3000,
       |   "totalValueGoodsSuppliedExVAT":9999999999999
       |}
     """.stripMargin)
 
-  val submitRequestBody: SubmitRequestBody = SubmitRequestBody(Some("AB12"), Some(BigDecimal(0.00)),
-    Some(BigDecimal(0.00)), Some(BigDecimal(0.00)), Some(BigDecimal(99999999999.99)),
+  val submitRequestBody: SubmitRequestBody = SubmitRequestBody(Some("AB12"), Some(BigDecimal(1000.00)),
+    Some(BigDecimal(2000.00)), Some(BigDecimal(3000.00)), Some(BigDecimal(99999999999.99)),
     Some(BigDecimal(99999999999.99)), Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)),
     Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)), Some(true), None, None)
 
-  val submitRequestToDesBody: SubmitRequestBody = SubmitRequestBody(Some("AB12"), Some(BigDecimal(0.00)),
-    Some(BigDecimal(0.00)), Some(BigDecimal(0.00)), Some(BigDecimal(99999999999.99)),
+  val submitRequestToDesBody: SubmitRequestBody = SubmitRequestBody(Some("AB12"), Some(BigDecimal(1000.00)),
+    Some(BigDecimal(2000.00)), Some(BigDecimal(3000.00)), Some(BigDecimal(99999999999.99)),
     Some(BigDecimal(99999999999.99)), Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)),
     Some(BigDecimal(9999999999999.0)), Some(BigDecimal(9999999999999.0)), Some(true), Some("2020-05-05T12:00:00Z"), Some("LARN0085901"))
 

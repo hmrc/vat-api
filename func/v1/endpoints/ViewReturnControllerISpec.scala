@@ -118,7 +118,6 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
 
           override val vrn: String = requestVrn
           override val periodKey: String = requestPeriodKey
-          println(request.url)
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()

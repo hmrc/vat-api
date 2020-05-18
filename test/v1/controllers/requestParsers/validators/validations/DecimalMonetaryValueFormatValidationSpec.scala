@@ -26,18 +26,16 @@ class DecimalMonetaryValueFormatValidationSpec extends UnitSpec {
       "passed a valid field" in {
         val result = DecimalMonetaryValueFormatValidation.validate(Some(BigDecimal(9999999999999.99)), "vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))
         result shouldBe List()
-
+      }
+      "a field contains a single decimal places" in {
+        val result = DecimalMonetaryValueFormatValidation.validate(Some(BigDecimal(9999999999999.9)), "vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))
+        result shouldBe List()
       }
     }
 
     "return a list of errors" when {
       "a field contains too many decimal places" in {
         val result = DecimalMonetaryValueFormatValidation.validate(Some(BigDecimal(9999999999999.999)), "vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))
-        result shouldBe List(InvalidMonetaryValueError.withFieldName("vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)))
-      }
-
-      "a field contains a single decimal places" in {
-        val result = DecimalMonetaryValueFormatValidation.validate(Some(BigDecimal(9999999999999.9)), "vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))
         result shouldBe List(InvalidMonetaryValueError.withFieldName("vatDueSales", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)))
       }
     }

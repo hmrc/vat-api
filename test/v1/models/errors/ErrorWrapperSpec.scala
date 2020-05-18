@@ -85,7 +85,7 @@ class ErrorWrapperSpec extends UnitSpec {
       Some (
         Seq(
           VrnFormatError,
-          PeriodKeyFormatError
+          PeriodKeyFormatErrorDes
         )
       )
     )
@@ -106,6 +106,39 @@ class ErrorWrapperSpec extends UnitSpec {
         |       }
         |   ]
         |}
+      """.stripMargin
+    )
+
+    "generate the correct JSON" in {
+      Json.toJson(error) shouldBe json
+    }
+  }
+
+  "Rendering rule based multiple errors including a custom error" should {
+    val error = ErrorWrapper(None, BadRequestError,
+      Some (
+        Seq(
+          VATTotalValueRuleError,
+          VATNetValueRuleError
+        )
+      )
+    )
+
+    val json = Json.parse(
+      """
+        |{
+        |        "code" : "INVALID_REQUEST",
+        |        "message" : "Invalid request",
+        |        "errors" : [ {
+        |          "code" : "VAT_TOTAL_VALUE",
+        |          "message" : "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
+        |          "path" : "/totalVatDue"
+        |        }, {
+        |          "code" : "VAT_NET_VALUE",
+        |          "message" : "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
+        |          "path" : "/netVatDue"
+        |        } ]
+        |      }
       """.stripMargin
     )
 

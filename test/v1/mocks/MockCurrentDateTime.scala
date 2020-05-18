@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.mocks
 
-import v1.models.errors.{InvalidMonetaryValueError, MtdError}
+import org.joda.time.DateTime
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
+import utils.CurrentDateTime
 
-object DecimalMonetaryValueFormatValidation {
 
-  def validate(field: Option[BigDecimal], fieldName: String, minValue: BigDecimal, maxValue: BigDecimal): List[MtdError] = {
+trait MockCurrentDateTime extends MockFactory {
 
-    lazy val error = InvalidMonetaryValueError.withFieldName(fieldName, minValue, maxValue)
+  val mockCurrentDateTime: CurrentDateTime = mock[CurrentDateTime]
 
-    field match {
-      case Some(amount) if amount.scale > 2 => List(error)
-      case _ => NoValidationErrors
-    }
+  object MockCurrentDateTime {
+    def getCurrentDate: CallHandler[DateTime] = (mockCurrentDateTime.getDateTime _).expects()
   }
 }

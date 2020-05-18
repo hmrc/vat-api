@@ -4,7 +4,7 @@
 GET         /:vrn/obligations               v1.controllers.ObligationsController.retrieveObligations(vrn, from: Option[String], to: Option[String], status: Option[String])
 
 # VAT Returns
-POST        /:vrn/returns                   @uk.gov.hmrc.vatapi.resources.VatReturnsResource.submitVatReturn(vrn: uk.gov.hmrc.domain.Vrn)
+POST        /:vrn/returns                   v1.controllers.SubmitReturnController.submitReturn(vrn)
 GET         /:vrn/returns/:periodKey        v1.controllers.ViewReturnController.viewReturn(vrn, periodKey)
 
 # VAT Liabilities

@@ -31,6 +31,17 @@ object DecimalMonetaryValueRangeValidation {
     }
   }
 
+  def validateNonNegative(field: Option[BigDecimal], fieldName: String, minValue: BigDecimal, maxValue: BigDecimal): List[MtdError] = {
+
+    val error = InvalidMonetaryValueError.withFieldNameAndNonNegative(fieldName)
+
+    field match {
+      case Some(value) if value > maxValue || value < minValue  =>
+        List(error)
+      case _ => List()
+    }
+  }
+
   def validate(field:Option[BigDecimal], fieldName: String, minValue: BigInt, maxValue: BigInt): List[MtdError] = {
 
     val error = InvalidMonetaryValueError.withFieldName(fieldName)
