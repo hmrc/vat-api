@@ -22,7 +22,8 @@ import v1.models.auth.UserDetails
 case class AuditDetail(userType: String,
                        agentReferenceNumber: Option[String],
                        response: AuditResponse,
-                       `X-CorrelationId`: String)
+                       `X-CorrelationId`: String,
+                       clientId: String)
 
 object AuditDetail {
 
@@ -35,8 +36,9 @@ object AuditDetail {
     AuditDetail(
       userType = userDetails.userType,
       agentReferenceNumber = userDetails.agentReferenceNumber,
+      response = response,
       `X-CorrelationId` = `X-CorrelationId`,
-      response = response
+      clientId = userDetails.clientId
     )
   }
 }

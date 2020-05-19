@@ -16,8 +16,6 @@
 
 package v1.models.nrs
 
-import java.time.{Instant, LocalDateTime, ZoneId}
-
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
@@ -125,7 +123,7 @@ object NrsTestData {
       notableEvent = "vat-return",
       payloadContentType = "application/json",
       payloadSha256Checksum = None,
-      userSubmissionTimestamp = LocalDateTime.ofInstant(Instant.parse("2018-04-07T12:13:25.156Z"), ZoneId.of("UTC")),
+      userSubmissionTimestamp = DateTime.parse("2018-04-07T12:13:25.156Z"),
       identityData = IdentityDataTestData.correctModel,
       userAuthToken = "Bearer AbCdEf123456...",
       headerData = Map(

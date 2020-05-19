@@ -33,7 +33,7 @@ class ControllerBaseSpec extends UnitSpec
   lazy val cc: ControllerComponents = stubControllerComponents()
 
   lazy val fakeGetRequest: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withHeaders(
-    HeaderNames.AUTHORIZATION -> "Bearer Token"
+    HeaderNames.AUTHORIZATION -> "Bearer Token", "X-Client-Id" -> "client-Id"
   )
 
   def fakePostRequest[T](body: T): FakeRequest[T] = fakeRequest.withBody(body)

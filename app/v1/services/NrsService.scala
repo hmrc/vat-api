@@ -17,18 +17,17 @@
 package v1.services
 
 import java.nio.charset.StandardCharsets
-import java.time.LocalDateTime
 import java.util.Base64
 
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.Inject
+import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.EndpointLogContext
 import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
-import v1.models.errors.{DownstreamError, MtdError}
+import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
 import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
@@ -37,21 +36,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class NrsService @Inject()(connector: NrsConnector) {
 
-  def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: LocalDateTime)(
+  def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
-    ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[Either[MtdError, NrsResponse]] = {
+    ec: ExecutionContext): Future[Either[ErrorWrapper, NrsResponse]] = {
 
     val result = for {
       nrsResponse <- EitherT(connector.submitNrs(buildNrsSubmission(vatSubmission, submissionTimestamp, request)))
-        .leftMap(_ => DownstreamError)
+        .leftMap(_ => ErrorWrapper(None, DownstreamError, None))
     } yield nrsResponse
 
     result.value
   }
 
-  private def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: LocalDateTime, request: UserRequest[_]): NrsSubmission = {
+  private def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: DateTime, request: UserRequest[_]): NrsSubmission = {
 
     import vatSubmission._
 
@@ -71,7 +69,7 @@ class NrsService @Inject()(connector: NrsConnector) {
         payloadSha256Checksum = None,
         userSubmissionTimestamp = submissionTimestamp,
         identityData = request.userDetails.identityData.get,
-        userAuthToken = request.headers.get("Authorisation").get,
+        userAuthToken = request.headers.get("Authorization").get,
         headerData = request.headers.toMap.map { h => h._1 -> h._2.head },
         searchKeys =
           SearchKeys(
