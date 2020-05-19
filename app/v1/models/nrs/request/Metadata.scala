@@ -16,21 +16,18 @@
 
 package v1.models.nrs.request
 
-import org.joda.time.DateTime
-import play.api.libs.json.{Json, OWrites, Writes}
-import uk.gov.hmrc.http.controllers.RestFormats
+import play.api.libs.json.{Json, OWrites}
 
 case class Metadata(businessId: String,
                     notableEvent: String,
                     payloadContentType: String,
                     payloadSha256Checksum: Option[String],
-                    userSubmissionTimestamp: DateTime,
+                    userSubmissionTimestamp: String,
                     identityData: IdentityData,
                     userAuthToken: String,
                     headerData: Map[String, String],
                     searchKeys: SearchKeys)
 
 object Metadata {
-  implicit val dateFormats: Writes[DateTime] = RestFormats.dateTimeWrite
   implicit val writes: OWrites[Metadata] = Json.writes[Metadata]
 }

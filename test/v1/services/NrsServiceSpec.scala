@@ -19,7 +19,6 @@ package v1.services
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
@@ -38,7 +37,7 @@ class NrsServiceSpec extends ServiceSpec {
 
   private val vrn: Vrn = Vrn("123456789")
 
-  private val timestamp: DateTime = DateTime.parse("2018-04-07T12:13:25.156Z")
+  private val timestamp: String = "2018-04-07"
 
   private val submitRequestBody: SubmitRequestBody =
     SubmitRequestBody(
@@ -83,7 +82,7 @@ class NrsServiceSpec extends ServiceSpec {
         userAuthToken = "Bearer aaaa",
         headerData = Map(
           "Host" -> "localhost",
-          "Authorisation" -> "Bearer aaaa",
+          "Authorization" -> "Bearer aaaa",
           "dummyHeader1" -> "dummyValue1",
           "dummyHeader2" -> "dummyValue2"
         ),
@@ -116,7 +115,7 @@ class NrsServiceSpec extends ServiceSpec {
             identityData = Some(IdentityDataTestData.correctModel)
           ),
         request = FakeRequest().withHeaders(
-          "Authorisation" -> "Bearer aaaa",
+          "Authorization" -> "Bearer aaaa",
           "dummyHeader1" -> "dummyValue1",
           "dummyHeader2" -> "dummyValue2"
         )

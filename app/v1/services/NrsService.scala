@@ -22,7 +22,6 @@ import java.util.Base64
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.Inject
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.NrsConnector
@@ -36,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class NrsService @Inject()(connector: NrsConnector) {
 
-  def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
+  def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: String)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext): Future[Either[ErrorWrapper, NrsResponse]] = {
@@ -49,7 +48,7 @@ class NrsService @Inject()(connector: NrsConnector) {
     result.value
   }
 
-  private def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: DateTime, request: UserRequest[_]): NrsSubmission = {
+  def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: String, request: UserRequest[_]): NrsSubmission = {
 
     import vatSubmission._
 

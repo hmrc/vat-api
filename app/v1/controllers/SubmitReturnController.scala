@@ -22,11 +22,12 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{CurrentDateTime, DateUtils, EndpointLogContext, Logging}
+import utils.{CurrentDateTime, DateTimeUtil, DateUtils, EndpointLogContext, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
-import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
 import v1.models.errors._
+import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
 import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
 
@@ -61,13 +62,23 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
+        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp.toString(DateTimeUtil.datePattern)))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
-            Some(submissionTimestamp.toString(DateUtils.isoInstantDatePattern)), agentReference = arn))))
+            Some(submissionTimestamp.toString(DateTimeUtil.isoInstantDatePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created")
+
+        nrsResponse match {
+          case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
+            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
+              None, Some(Json.toJson(nrsService.buildNrsSubmission(parsedRequest,
+                submissionTimestamp.toString(DateTimeUtil.datePattern), request))), "")))
+          case _ => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
+            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
+              Some(nrsResponse.nrSubmissionId), None, "")))
+        }
 
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
           request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData))))))

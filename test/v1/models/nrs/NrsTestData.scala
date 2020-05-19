@@ -96,7 +96,7 @@ object NrsTestData {
          |    "businessId": "vat",
          |    "notableEvent": "vat-return",
          |    "payloadContentType": "application/json",
-         |    "userSubmissionTimestamp": "2018-04-07T12:13:25.156Z",
+         |    "userSubmissionTimestamp": "2018-04-07",
          |    "identityData": ${IdentityDataTestData.correctJson},
          |    "userAuthToken": "Bearer AbCdEf123456...",
          |    "headerData": {
@@ -123,7 +123,7 @@ object NrsTestData {
       notableEvent = "vat-return",
       payloadContentType = "application/json",
       payloadSha256Checksum = None,
-      userSubmissionTimestamp = DateTime.parse("2018-04-07T12:13:25.156Z"),
+      userSubmissionTimestamp = "2018-04-07",
       identityData = IdentityDataTestData.correctModel,
       userAuthToken = "Bearer AbCdEf123456...",
       headerData = Map(

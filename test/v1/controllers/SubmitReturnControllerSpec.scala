@@ -21,7 +21,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.DateUtils
+import utils.{DateTimeUtil, DateUtils}
 import v1.audit.AuditEvents
 import v1.mocks.MockCurrentDateTime
 import v1.mocks.requestParsers.MockSubmitReturnRequestParser
@@ -148,7 +148,7 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
+          .submitNrs(submitReturnRequest, date.toString(DateTimeUtil.datePattern))
           .returns(Future.successful(Right(nrsResponse)))
 
         MockSubmitReturnService
@@ -175,7 +175,7 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
+          .submitNrs(submitReturnRequest, date.toString(DateTimeUtil.datePattern))
           .returns(Future.successful(Left(ErrorWrapper(None, DownstreamError, None))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
@@ -333,7 +333,7 @@ class SubmitReturnControllerSpec
               .returns(Right(submitReturnRequest))
 
             MockNrsService
-              .submitNrs(submitReturnRequest, date)
+              .submitNrs(submitReturnRequest, date.toString(DateTimeUtil.datePattern))
               .returns(Future.successful(Right(nrsResponse)))
 
             MockSubmitReturnService

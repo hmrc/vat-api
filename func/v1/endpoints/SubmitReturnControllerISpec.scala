@@ -97,7 +97,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
     def uri: String = s"/$vrn/returns"
     def desUrl: String = s"/enterprise/return/vat/$vrn"
-    val nrsUrl: String = s"submission"
+    val nrsUrl: String = s".*/submission.*"
 
     def setupStubs(): StubMapping
 
@@ -219,7 +219,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
@@ -251,7 +251,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
@@ -335,7 +335,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(invalidRequestJson))
@@ -356,7 +356,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
-            AuthStub.authorised()
+            AuthStub.authorisedWithNrs()
           }
 
           private val response = await(request.post(requestJson))
