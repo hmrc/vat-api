@@ -17,10 +17,10 @@
 package utils
 
 import javax.inject.{Inject, Singleton}
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 
 @Singleton
 class CurrentDateTime @Inject()() {
 
-  def getDateTime: DateTime = DateTime.now()
+  def getDateTime: DateTime = DateTime.now(DateTimeZone.UTC)
 }
