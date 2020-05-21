@@ -23,7 +23,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub, DesStub}
+import v1.stubs.{AuditStub, AuthStub, DesStub, NrsStub}
 
 class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
@@ -42,6 +42,15 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     """.stripMargin
     )
 
+    val nrsSuccess: JsValue = Json.parse(
+      s"""
+         |{
+         |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
+         |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
+         |  "timestamp":""
+         |}
+         """.stripMargin)
+
     val mtdResponseJson: JsValue = Json.parse(
       """
         |{
@@ -55,17 +64,17 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     val requestJson: JsValue = Json.parse(
       s"""
          |{
-         |  "periodKey": "$periodKey",
-         |  "vatDueSales": 100.00,
-         |  "vatDueAcquisitions": 100.00,
-         |  "totalVatDue": 200.00,
-         |  "vatReclaimedCurrPeriod": 100.00,
-         |  "netVatDue": 100.00,
-         |  "totalValueSalesExVAT": 500,
-         |  "totalValuePurchasesExVAT": 500,
-         |  "totalValueGoodsSuppliedExVAT": 500,
-         |  "totalAcquisitionsExVAT": 500,
-         |  "finalised": true
+         |        "periodKey" : "$periodKey",
+         |        "vatDueSales" : 1000,
+         |        "vatDueAcquisitions" : -1000,
+         |        "totalVatDue" : 0,
+         |        "vatReclaimedCurrPeriod" : 100,
+         |        "netVatDue" : 100,
+         |        "totalValueSalesExVAT" : 5000,
+         |        "totalValuePurchasesExVAT" : 1000,
+         |        "totalValueGoodsSuppliedExVAT" : 9999999999999,
+         |        "totalAcquisitionsExVAT" : 9999999999999,
+         |        "finalised" : true
          |}
     """.stripMargin)
 
@@ -88,13 +97,14 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
     def uri: String = s"/$vrn/returns"
     def desUrl: String = s"/enterprise/return/vat/$vrn"
+    val nrsUrl: String = s".*/submission.*"
 
     def setupStubs(): StubMapping
 
     def request: WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"), ("Authorization", "Bearer testtoken"))
     }
 
     def errorBody(code: String): String =
@@ -106,13 +116,31 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     """.stripMargin
   }
 
-  "Making a request to the View VAT Return endpoint" should {
-    "return a 200 status code with expected body" when {
+  "Submit VAT Return endpoint" should {
+    "return a 201 status code with expected body" when {
       "a valid request is made" in new Test {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
+          //NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
+          DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe CREATED
+        response.json shouldBe mtdResponseJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+      "NRS returns non bad_request response" in new Test {
+
+        override def uri: String = s"/$vrn/returns"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, FORBIDDEN, nrsSuccess)
           DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
         }
 
@@ -123,11 +151,29 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
       }
     }
 
+    "return a 500 status code" when {
+     "NRS returns bad_request response" in new Test {
+
+        override def uri: String = s"/$vrn/returns"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onError(NrsStub.POST, nrsUrl, BAD_REQUEST, "{}")
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe Json.toJson(DownstreamError)
+      }
+    }
+
     "return a FORBIDDEN status code" when {
       "a request is made without finalising the submission" in new Test {
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
           DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
         }
 
@@ -173,7 +219,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
@@ -205,7 +251,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
@@ -235,7 +281,8 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
           DesStub.onError(DesStub.POST, desUrl, BAD_REQUEST, multipleErrors)
         }
 
@@ -288,7 +335,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          AuthStub.authorised()
+          AuthStub.authorisedWithNrs()
         }
 
         private val response = await(request.post(invalidRequestJson))
@@ -309,7 +356,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
-            AuthStub.authorised()
+            AuthStub.authorisedWithNrs()
           }
 
           private val response = await(request.post(requestJson))
@@ -333,7 +380,8 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
-            AuthStub.authorised()
+            AuthStub.authorisedWithNrs()
+            NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
             DesStub.onError(DesStub.POST, desUrl, desStatus, errorBody(desCode))
           }
 

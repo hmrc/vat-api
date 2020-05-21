@@ -19,17 +19,17 @@ package v1.controllers
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{CurrentDateTime, EndpointLogContext, Logging}
+import utils.{CurrentDateTime, DateUtils, EndpointLogContext, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
-import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
 import v1.models.errors._
+import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
-import v1.services.{AuditService, EnrolmentsAuthService, SubmitReturnService}
+import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        requestParser: SubmitReturnRequestParser,
                                        service: SubmitReturnService,
+                                       nrsService: NrsService,
                                        auditService: AuditService,
                                        cc: ControllerComponents,
                                        val dateTime: CurrentDateTime)(implicit ec: ExecutionContext)
@@ -49,33 +50,44 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
     )
 
   def submitReturn(vrn: String): Action[JsValue] = {
-    authorisedAction(vrn).async(parse.json) { implicit request =>
+    authorisedAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Submitting Vat Return")
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
 
-      val fmt = ISODateTimeFormat.dateTime()
-
-      def submissionTimestamp: String = dateTime.getDateTime.toString(fmt)
+      val submissionTimestamp = dateTime.getDateTime
 
       val arn = request.userDetails.agentReferenceNumber
 
-      //@TODO ClientID need to be added in the AuditDetail for all audit types
-      //val clientId = request.headers.get("X-Client-Id").getOrElse("N/A")
-
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body = parsedRequest.body.copy(receivedAt = Some(submissionTimestamp), agentReference = arn))))
+        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
+        serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
+          parsedRequest.body.copy(receivedAt =
+            Some(submissionTimestamp.toString(DateUtils.isoInstantDatePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created")
+
+        nrsResponse match {
+          case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
+            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
+              None, Some(Json.toJson(nrsService.buildNrsSubmission(parsedRequest,
+                submissionTimestamp, request))), "")))
+          case _ => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
+            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
+              Some(nrsResponse.nrSubmissionId), None, "")))
+        }
 
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
           request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
         Created(Json.toJson(serviceResponse.responseData))
-          .withApiHeaders(serviceResponse.correlationId)
+          .withApiHeaders(serviceResponse.correlationId,
+            "Receipt-ID" -> nrsResponse.nrSubmissionId,
+            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.dateTimePattern),
+            "Receipt-Signature" -> nrsResponse.cadesTSignature)
           .as(MimeTypes.JSON)
       }
 
@@ -90,7 +102,6 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       }.merge
     }
   }
-
 
   private def errorResult(errorWrapper: ErrorWrapper) = {
     (errorWrapper.error: @unchecked) match {

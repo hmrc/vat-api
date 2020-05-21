@@ -16,20 +16,22 @@
 
 package v1.models.nrs.request
 
-import java.time.LocalDateTime
-
-import play.api.libs.json.{Json, OWrites}
+import org.joda.time.DateTime
+import play.api.libs.json.{Format, JsValue, Json, OFormat}
+import utils.DateUtils
 
 case class Metadata(businessId: String,
                     notableEvent: String,
                     payloadContentType: String,
                     payloadSha256Checksum: Option[String],
-                    userSubmissionTimestamp: LocalDateTime,
-                    identityData: IdentityData,
+                    userSubmissionTimestamp: DateTime,
+                    identityData: Option[IdentityData],
                     userAuthToken: String,
-                    headerData: Map[String, String],
+                    headerData: JsValue,
                     searchKeys: SearchKeys)
 
 object Metadata {
-  implicit val writes: OWrites[Metadata] = Json.writes[Metadata]
+  implicit val idformat: OFormat[IdentityData] = IdentityData.format
+  implicit val dateFormats: Format[DateTime] = DateUtils.isoInstantDateFormat
+  implicit val format: OFormat[Metadata] = Json.format[Metadata]
 }

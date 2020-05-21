@@ -17,13 +17,16 @@
 package v1.models.nrs.request
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Format, Json, OFormat}
+import utils.DateUtils
 
-case class SearchKeys(vrn: Option[String],
-                      companyName: Option[String],
-                      taxPeriodEndDate: Option[LocalDate],
-                      periodKey: Option[String])
+case class SearchKeys(vrn: Option[String] = None,
+                      companyName: Option[String] = None,
+                      taxPeriodEndDate: Option[LocalDate] = None,
+                      periodKey: Option[String] = None
+                     )
 
 object SearchKeys {
-  implicit val writes: OWrites[SearchKeys] = Json.writes[SearchKeys]
+  implicit val dateFormats: Format[LocalDate] = DateUtils.dateFormat
+  implicit val format: OFormat[SearchKeys] = Json.format[SearchKeys]
 }

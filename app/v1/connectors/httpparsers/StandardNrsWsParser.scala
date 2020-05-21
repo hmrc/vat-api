@@ -46,7 +46,7 @@ object StandardNrsWsParser extends WsParser {
 
     if (response.status!=successCode.status){
       logger.info("[StandardNrsWsParser][read] - Error response received from NRS " +
-        "with status: ${response.status} and body\n ${response.body}")
+        s"with status: ${response.status} and body\n ${response.body}")
     }
     response.status match {
       case successCode.status =>

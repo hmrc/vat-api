@@ -16,40 +16,42 @@
 
 package v1.models.nrs.request
 
-import org.joda.time.LocalDate
-import play.api.libs.json.{Json, OWrites}
+import org.joda.time.{DateTime, LocalDate}
+import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{AffinityGroup, ConfidenceLevel, CredentialRole}
+import utils.DateUtils
 
-case class IdentityData(internalId: Option[String],
-                        externalId: Option[String],
-                        agentCode: Option[String],
-                        credentials: Option[Credentials],
+case class IdentityData(internalId: Option[String] = None,
+                        externalId: Option[String] = None,
+                        agentCode: Option[String] = None,
+                        credentials: Option[Credentials] = None,
                         confidenceLevel: ConfidenceLevel,
-                        nino: Option[String],
-                        saUtr: Option[String],
-                        name: Option[Name],
-                        dateOfBirth: Option[LocalDate],
-                        email: Option[String],
+                        nino: Option[String] = None,
+                        saUtr: Option[String] = None,
+                        name: Option[Name] = None,
+                        dateOfBirth: Option[LocalDate] = None,
+                        email: Option[String] = None,
                         agentInformation: AgentInformation,
-                        groupIdentifier: Option[String],
+                        groupIdentifier: Option[String] = None,
                         credentialRole: Option[CredentialRole],
-                        mdtpInformation: Option[MdtpInformation],
+                        mdtpInformation: Option[MdtpInformation] = None,
                         itmpName: ItmpName,
-                        itmpDateOfBirth: Option[LocalDate],
+                        itmpDateOfBirth: Option[LocalDate] = None,
                         itmpAddress: ItmpAddress,
                         affinityGroup: Option[AffinityGroup],
-                        credentialStrength: Option[String],
+                        credentialStrength: Option[String] = None,
                         loginTimes: LoginTimes)
 
 object IdentityData {
-  implicit val credFormat: OWrites[Credentials] = Json.writes[Credentials]
-  implicit val nameFormat: OWrites[Name] = Json.writes[Name]
-  implicit val agentInfoFormat: OWrites[AgentInformation] = Json.writes[AgentInformation]
-  implicit val mdtpInfoFormat: OWrites[MdtpInformation] = Json.writes[MdtpInformation]
-  implicit val itmpNameFormat: OWrites[ItmpName] = Json.writes[ItmpName]
-  implicit val itmpAddressFormat: OWrites[ItmpAddress] = Json.writes[ItmpAddress]
-  implicit val loginTimes: OWrites[LoginTimes] = Json.writes[LoginTimes]
-
-  implicit val writes: OWrites[IdentityData] = Json.writes[IdentityData]
+  implicit val localDateFormats: Format[LocalDate] = DateUtils.dateFormat
+  implicit val credFormat: OFormat[Credentials] = Json.format[Credentials]
+  implicit val nameFormat: OFormat[Name] = Json.format[Name]
+  implicit val agentInfoFormat: OFormat[AgentInformation] = Json.format[AgentInformation]
+  implicit val mdtpInfoFormat: OFormat[MdtpInformation] = Json.format[MdtpInformation]
+  implicit val itmpNameFormat: OFormat[ItmpName] = Json.format[ItmpName]
+  implicit val itmpAddressFormat: OFormat[ItmpAddress] = Json.format[ItmpAddress]
+  implicit val dateTimeFormats: Format[DateTime] = DateUtils.isoInstantDateFormat
+  implicit val loginTimesFormat: OFormat[LoginTimes] = Json.format[LoginTimes]
+  implicit val format: OFormat[IdentityData] = Json.format[IdentityData]
 }

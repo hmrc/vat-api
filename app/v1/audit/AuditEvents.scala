@@ -43,4 +43,5 @@ object AuditEvents {
 
   def auditNrsSubmit(auditType: String, nrsAuditDetail: NrsAuditDetail): AuditEvent[NrsAuditDetail] =
     AuditEvent(auditType,"submit-vat-return",nrsAuditDetail)
+
 }

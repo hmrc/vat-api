@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package v1.connectors
+package v1.mocks.services
 
-import config.AppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
+import org.joda.time.DateTime
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.models.nrs.request.NrsSubmission
+import v1.controllers.UserRequest
+import v1.models.errors.ErrorWrapper
 import v1.models.nrs.response.NrsResponse
+import v1.models.request.submit.SubmitRequest
+import v1.services.NrsService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class NrsConnector @Inject()(val ws: WSClient,
-                             val appConfig: AppConfig) extends BaseNrsConnector {
+trait MockNrsService extends MockFactory {
 
-  def submitNrs(body: NrsSubmission)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[NrsOutcome[NrsResponse]] = {
+  val mockNrsService: NrsService = mock[NrsService]
 
-    import v1.connectors.httpparsers.StandardNrsWsParser._
+  object MockNrsService {
 
-    nrsPost[NrsSubmission, NrsResponse](
-      uri = NrsUri[NrsResponse](s"submission"),
-      body = body,
-      defaultResult = Right(NrsResponse.empty)
-    )
+    def submitNrs(request: SubmitRequest, dateTime: DateTime): CallHandler[Future[Either[ErrorWrapper, NrsResponse]]] = {
+      (mockNrsService
+        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext))
+        .expects(request, *, *, *, *)
+    }
   }
+
 }

@@ -26,14 +26,15 @@ object AuditDetailFixture {
   val userType: String = "Agent"
   val agentReferenceNumber: Option[String] = Some("012345678")
   val correlationId = "a1e8057e-fbbc-47a8-a8b478d9f015c253"
-  val userDetails = UserDetails("Agent", agentReferenceNumber, "id")
+  val userDetails: UserDetails = UserDetails("Agent", agentReferenceNumber, "id")
 
   val auditDetailModelSuccess: AuditDetail =
     AuditDetail(
       userType = userType,
       agentReferenceNumber = agentReferenceNumber,
       response = auditResponseModelWithoutBody,
-      `X-CorrelationId` = correlationId
+      `X-CorrelationId` = correlationId,
+      clientId = "id"
     )
 
   val auditDetailModelError: AuditDetail =
@@ -49,7 +50,8 @@ object AuditDetailFixture {
        |   "response":{
        |     "httpStatus": ${auditResponseModelWithoutBody.httpStatus}
        |   },
-       |   "X-CorrelationId": "$correlationId"
+       |   "X-CorrelationId": "$correlationId",
+       |   "clientId": "id"
        |}
     """.stripMargin
   )
@@ -60,7 +62,8 @@ object AuditDetailFixture {
        |   "userType" : "$userType",
        |   "agentReferenceNumber" : "${agentReferenceNumber.get}",
        |   "response": $auditResponseJsonWithErrors,
-       |   "X-CorrelationId": "$correlationId"
+       |   "X-CorrelationId": "$correlationId",
+       |   "clientId": "id"
        |}
      """.stripMargin
   )

@@ -16,8 +16,6 @@
 
 package v1.controllers
 
-import java.util.UUID
-
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import utils.{EndpointLogContext, Logging}
@@ -48,7 +46,7 @@ trait BaseController {
             s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
         correlationId
       case None =>
-        val correlationId = UUID.randomUUID().toString
+        val correlationId = "No Correlation ID"
         logger.info(
           s"[${endpointLogContext.controllerName}][getCorrelationId] - " +
             s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")

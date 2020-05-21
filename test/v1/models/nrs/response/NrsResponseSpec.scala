@@ -24,6 +24,7 @@ class NrsResponseSpec extends UnitSpec {
   "reads" should {
     "parse correctly from JSON" in {
       correctJson.as[NrsResponse] shouldBe correctModel
+
     }
   }
 
