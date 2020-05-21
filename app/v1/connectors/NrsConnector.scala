@@ -35,7 +35,7 @@ class NrsConnector @Inject()(val ws: WSClient,
 
     import v1.connectors.httpparsers.StandardNrsWsParser._
 
-    nrsPost(
+    nrsPost[NrsSubmission, NrsResponse](
       uri = NrsUri[NrsResponse](s"submission"),
       body = body,
       defaultResult = Right(NrsResponse.empty)

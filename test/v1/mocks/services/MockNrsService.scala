@@ -16,6 +16,7 @@
 
 package v1.mocks.services
 
+import org.joda.time.DateTime
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,9 +34,9 @@ trait MockNrsService extends MockFactory {
 
   object MockNrsService {
 
-    def submitNrs(request: SubmitRequest, dateTime: String): CallHandler[Future[Either[ErrorWrapper, NrsResponse]]] = {
+    def submitNrs(request: SubmitRequest, dateTime: DateTime): CallHandler[Future[Either[ErrorWrapper, NrsResponse]]] = {
       (mockNrsService
-        .submitNrs(_ : SubmitRequest, _: String)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext))
+        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext))
         .expects(request, *, *, *, *)
     }
   }

@@ -55,8 +55,8 @@ object NrsTestData {
         |  "affinityGroup": "Agent",
         |  "credentialStrength": "strong",
         |  "loginTimes": {
-        |    "currentLogin": "2016-11-27T09:00:00.000Z",
-        |    "previousLogin": "2016-11-01T12:00:00.000Z"
+        |    "currentLogin": "2016-11-27T09:00:00Z",
+        |    "previousLogin": "2016-11-01T12:00:00Z"
         |  }
         |}
       """.stripMargin
@@ -83,8 +83,8 @@ object NrsTestData {
       affinityGroup = Some(Agent),
       credentialStrength = Some("strong"),
       loginTimes = LoginTimes(
-        DateTime.parse("2016-11-27T09:00:00.000Z").withZone(DateTimeZone.UTC),
-        Some(DateTime.parse("2016-11-01T12:00:00.000Z").withZone(DateTimeZone.UTC))
+        DateTime.parse("2016-11-27T09:00:00Z").withZone(DateTimeZone.UTC),
+        Some(DateTime.parse("2016-11-01T12:00:00Z").withZone(DateTimeZone.UTC))
       )
     )
   }
@@ -96,7 +96,7 @@ object NrsTestData {
          |    "businessId": "vat",
          |    "notableEvent": "vat-return",
          |    "payloadContentType": "application/json",
-         |    "userSubmissionTimestamp": "2018-04-07",
+         |    "userSubmissionTimestamp": "2018-04-07T12:13:25Z",
          |    "identityData": ${IdentityDataTestData.correctJson},
          |    "userAuthToken": "Bearer AbCdEf123456...",
          |    "headerData": {
@@ -123,10 +123,10 @@ object NrsTestData {
       notableEvent = "vat-return",
       payloadContentType = "application/json",
       payloadSha256Checksum = None,
-      userSubmissionTimestamp = "2018-04-07",
-      identityData = IdentityDataTestData.correctModel,
+      userSubmissionTimestamp = DateTime.parse("2018-04-07T12:13:25Z"),
+      identityData = Some(IdentityDataTestData.correctModel),
       userAuthToken = "Bearer AbCdEf123456...",
-      headerData = Map(
+      headerData = Json.toJson(Map(
         "Gov-Client-Public-IP" -> "127.0.0.0",
         "Gov-Client-Public-Port" -> "12345",
         "Gov-Client-Device-ID" -> "beec798b-b366-47fa-b1f8-92cede14a1ce",
@@ -136,7 +136,7 @@ object NrsTestData {
         "Gov-Client-Screen-Resolution" -> "1920x1080",
         "Gov-Client-Window-Size" -> "1256x803",
         "Gov-Client-Colour-Depth" -> "24"
-      ),
+      )),
       searchKeys =
         SearchKeys(
           vrn = Some("123456789"),

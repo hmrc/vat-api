@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{CurrentDateTime, DateTimeUtil, DateUtils, EndpointLogContext, Logging}
+import utils.{CurrentDateTime, DateUtils, EndpointLogContext, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
@@ -62,10 +62,10 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp.toString(DateTimeUtil.datePattern)))
+        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
-            Some(submissionTimestamp.toString(DateTimeUtil.isoInstantDatePattern)), agentReference = arn))))
+            Some(submissionTimestamp.toString(DateUtils.isoInstantDatePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created")
@@ -74,7 +74,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
           case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
             NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
               None, Some(Json.toJson(nrsService.buildNrsSubmission(parsedRequest,
-                submissionTimestamp.toString(DateTimeUtil.datePattern), request))), "")))
+                submissionTimestamp, request))), "")))
           case _ => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
             NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
               Some(nrsResponse.nrSubmissionId), None, "")))

@@ -16,21 +16,32 @@
 
 package utils
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json.{Format, JodaReads, JodaWrites}
 
 object DateUtils {
 
   val isoInstantDatePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'"
   val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+  val datePattern = "yyyy-MM-dd"
 
   val dateTimeFormat: Format[DateTime] = Format[DateTime](
     JodaReads.jodaDateReads(dateTimePattern),
     JodaWrites.jodaDateWrites(dateTimePattern)
   )
 
+  val isoInstantDateFormat: Format[DateTime] = Format[DateTime](
+    JodaReads.jodaDateReads(isoInstantDatePattern),
+    JodaWrites.jodaDateWrites(isoInstantDatePattern)
+  )
+
   val defaultDateTimeFormat: Format[DateTime] = Format[DateTime](
     JodaReads.jodaDateReads(isoInstantDatePattern),
     JodaWrites.jodaDateWrites(dateTimePattern)
+  )
+
+  val dateFormat: Format[LocalDate] = Format[LocalDate](
+    JodaReads.jodaLocalDateReads(datePattern),
+    JodaWrites.jodaLocalDateWrites(datePattern)
   )
 }

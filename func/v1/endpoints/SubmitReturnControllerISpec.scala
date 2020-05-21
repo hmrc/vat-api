@@ -64,17 +64,17 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     val requestJson: JsValue = Json.parse(
       s"""
          |{
-         |  "periodKey": "$periodKey",
-         |  "vatDueSales": 100.00,
-         |  "vatDueAcquisitions": 100.00,
-         |  "totalVatDue": 200.00,
-         |  "vatReclaimedCurrPeriod": 100.00,
-         |  "netVatDue": 100.00,
-         |  "totalValueSalesExVAT": 500,
-         |  "totalValuePurchasesExVAT": 500,
-         |  "totalValueGoodsSuppliedExVAT": 500,
-         |  "totalAcquisitionsExVAT": 500,
-         |  "finalised": true
+         |        "periodKey" : "$periodKey",
+         |        "vatDueSales" : 1000,
+         |        "vatDueAcquisitions" : -1000,
+         |        "totalVatDue" : 0,
+         |        "vatReclaimedCurrPeriod" : 100,
+         |        "netVatDue" : 100,
+         |        "totalValueSalesExVAT" : 5000,
+         |        "totalValuePurchasesExVAT" : 1000,
+         |        "totalValueGoodsSuppliedExVAT" : 9999999999999,
+         |        "totalAcquisitionsExVAT" : 9999999999999,
+         |        "finalised" : true
          |}
     """.stripMargin)
 
@@ -123,7 +123,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorisedWithNrs()
-          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
+          //NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
           DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
         }
 

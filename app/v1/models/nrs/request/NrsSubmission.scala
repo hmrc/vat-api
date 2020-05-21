@@ -21,5 +21,6 @@ import play.api.libs.json._
 case class NrsSubmission(payload: String, metadata: Metadata)
 
 object NrsSubmission {
-  implicit val writes: OWrites[NrsSubmission] = Json.writes[NrsSubmission]
+  implicit val mdFormat: OFormat[Metadata] = Metadata.format
+  implicit val format: OFormat[NrsSubmission] = Json.format[NrsSubmission]
 }
