@@ -31,24 +31,22 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
-  def servicesConfig: Map[String, String] = Map(
+  def servicesConfig: Map[String, Any] = Map(
     "microservice.services.des.host" -> mockHost,
     "microservice.services.des.port" -> mockPort,
     "microservice.services.auth.host" -> mockHost,
     "microservice.services.auth.port" -> mockPort,
     "auditing.consumer.baseUri.port" -> mockPort,
     "microservice.services.non-repudiation.host" -> mockHost,
-    "microservice.services.non-repudiation.port" -> mockPort
-  )
-
-  def servicesConfigInt: Map[String, Int] = Map(
+    "microservice.services.non-repudiation.port" -> mockPort,
+    "feature-switch.refactor.enabled" -> true,
+    "feature-switch.refactor.prod.enabled" -> false,
     "microservice.services.non-repudiation.maxTimeout" -> 5000
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
     .configure(servicesConfig)
-    .configure(servicesConfigInt)
     .build()
 
   override def beforeAll(): Unit = {

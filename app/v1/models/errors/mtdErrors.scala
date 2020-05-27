@@ -28,7 +28,7 @@ case class MtdError(code: String, message: String, customJson: Option[JsValue] =
 object MtdError {
   implicit val writes: Writes[MtdError] = {
     case o@MtdError(_, _, None) => o.toJson
-    case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> customJson)
+    case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
     case MtdError(_, _, Some(customJson)) => customJson
   }
 
