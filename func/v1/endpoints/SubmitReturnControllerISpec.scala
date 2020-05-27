@@ -209,11 +209,11 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
              |{
              |	"code": "INVALID_REQUEST",
              |	"message": "Invalid request",
-             |	"errors": {
+             |	"errors": [{
              |		"code": "INVALID_MONETARY_AMOUNT",
              |		"message": "The value must be between -9999999999999 and 9999999999999",
              |		"path": "/totalValueGoodsSuppliedExVAT"
-             |	}
+             |	}]
              |}
       """.stripMargin)
 
