@@ -19,6 +19,8 @@ package v1.connectors
 import mocks.MockAppConfig
 import org.joda.time.DateTime
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.RequestId
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
@@ -90,7 +92,8 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
           )
           .returns(Future.successful(outcome))
 
-        await(connector.submitReturn(submitReturnRequest)) shouldBe outcome
+        await(connector.submitReturn(submitReturnRequest)
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec)) shouldBe outcome
       }
     }
   }

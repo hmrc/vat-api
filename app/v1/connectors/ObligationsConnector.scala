@@ -20,6 +20,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v1.models.errors.ConnectorError
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
 
@@ -36,6 +37,9 @@ class ObligationsConnector @Inject()(val http: HttpClient,
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
     val vrn = request.vrn.vrn
+
+    implicit val connectorError: ConnectorError =
+      ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
 
     val queryParams: Seq[(String, String)] =
       Seq(

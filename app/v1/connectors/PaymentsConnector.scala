@@ -20,6 +20,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v1.models.errors.ConnectorError
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
 
@@ -34,6 +35,8 @@ class PaymentsConnector @Inject()(val http: HttpClient,
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
+    implicit val connectorError: ConnectorError =
+      ConnectorError(request.vrn.vrn, hc.requestId.fold(""){ requestId => requestId.value})
 
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom", request.from),

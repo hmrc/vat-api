@@ -20,6 +20,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v1.models.errors.ConnectorError
 import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
 
@@ -36,6 +37,8 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
     val vrn = request.vrn.vrn
+    implicit val connectorError: ConnectorError =
+      ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
 
     post(
       body = request.body,

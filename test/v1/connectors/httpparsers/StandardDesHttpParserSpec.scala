@@ -39,7 +39,7 @@ class StandardDesHttpParserSpec extends UnitSpec {
   val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   import v1.connectors.httpparsers.StandardDesHttpParser._
-
+  implicit val connectorError: ConnectorError = ConnectorError("vrn","requestId")
   val httpReads: HttpReads[DesOutcome[Unit]] = implicitly
 
   val data = "someData"

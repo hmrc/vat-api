@@ -26,6 +26,7 @@ import utils.{EndpointLogContext, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.LiabilitiesRequestParser
 import v1.models.audit.AuditResponse
+import v1.models.errors.ControllerError._
 import v1.models.errors._
 import v1.models.request.liabilities.LiabilitiesRawData
 import v1.services.{AuditService, EnrolmentsAuthService, LiabilitiesService}
@@ -57,7 +58,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
         serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
-        logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"Successfully retrieved Liabilities from DES")
 
         auditService.auditEvent(AuditEvents.auditLiabilities(serviceResponse.correlationId,
@@ -71,6 +72,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+        logger.warn(ControllerError(endpointLogContext ,vrn, request, result.header.status, errorWrapper.error.message))
 
         auditService.auditEvent(AuditEvents.auditLiabilities(correlationId,
           request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
