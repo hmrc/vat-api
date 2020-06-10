@@ -18,6 +18,8 @@ package v1.connectors
 
 import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.RequestId
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
@@ -81,7 +83,8 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           )
           .returns(Future.successful(outcome))
 
-        await(connector.retrieveObligations(request)) shouldBe outcome
+        await(connector.retrieveObligations(request)
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec)) shouldBe outcome
       }
 
       "not add query parameters if not supplied" in new Test {
