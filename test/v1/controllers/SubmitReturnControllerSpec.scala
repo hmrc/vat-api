@@ -36,6 +36,7 @@ import v1.models.response.submit.SubmitResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.matching.Regex
 
 class SubmitReturnControllerSpec
   extends ControllerBaseSpec
@@ -160,6 +161,7 @@ class SubmitReturnControllerSpec
         status(result) shouldBe CREATED
         contentAsJson(result) shouldBe submitReturnResponseJson
         header("X-CorrelationId", result) shouldBe Some(correlationId)
+        header("Receipt-Timestamp", result).getOrElse("No Header") should fullyMatch.regex(DateUtils.isoInstantDateRegex)
 
         val auditResponse: AuditResponse = AuditResponse(CREATED, None, Some(submitReturnResponseJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,

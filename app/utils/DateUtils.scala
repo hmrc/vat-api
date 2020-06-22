@@ -22,6 +22,7 @@ import play.api.libs.json.{Format, JodaReads, JodaWrites}
 object DateUtils {
 
   val isoInstantDatePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+  val isoInstantDateRegex = """(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}Z"""
   val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   val datePattern = "yyyy-MM-dd"
 
