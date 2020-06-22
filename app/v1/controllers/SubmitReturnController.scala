@@ -87,7 +87,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
             "Receipt-ID" -> nrsResponse.nrSubmissionId,
-            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.dateTimePattern),
+            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> nrsResponse.cadesTSignature)
           .as(MimeTypes.JSON)
       }
