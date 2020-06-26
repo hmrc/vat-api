@@ -19,23 +19,23 @@ package v1.models.response.obligations
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}
 
-case class Obligation(periodKey: String,
-                      start: String,
+case class Obligation(start: String,
                       end: String,
                       due: String,
                       status: String,
-                      received: Option[String])
+                      received: Option[String],
+                      periodKey: String)
 
 object Obligation {
 
   implicit val writes: OWrites[Obligation] = Json.writes[Obligation]
 
   implicit val reads: Reads[Obligation] = (
-    (JsPath \ "periodKey").read[String] and
-      (JsPath \ "inboundCorrespondenceFromDate").read[String] and
+    (JsPath \ "inboundCorrespondenceFromDate").read[String] and
       (JsPath \ "inboundCorrespondenceToDate").read[String] and
       (JsPath \ "inboundCorrespondenceDueDate").read[String] and
       (JsPath \ "status").read[String] and
-      (JsPath \ "inboundCorrespondenceDateReceived").readNullable[String]
+      (JsPath \ "inboundCorrespondenceDateReceived").readNullable[String] and
+      (JsPath \ "periodKey").read[String]
     )(Obligation.apply _)
 }
