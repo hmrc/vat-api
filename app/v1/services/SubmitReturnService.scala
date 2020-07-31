@@ -19,6 +19,7 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.SubmitReturnConnector
@@ -36,6 +37,8 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext): Future[ServiceOutcome[SubmitResponse]] = {
+
+    logger.warn(s"NEW VAT: \n${Json.prettyPrint(Json.toJson(request.body))}")
 
     val result = for {
       desResponseWrapper <- EitherT(connector.submitReturn(request)).leftMap(mapDesErrors(desErrorMap))

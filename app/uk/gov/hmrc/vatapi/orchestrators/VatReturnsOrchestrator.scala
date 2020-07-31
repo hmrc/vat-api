@@ -17,16 +17,15 @@
 package uk.gov.hmrc.vatapi.orchestrators
 
 import javax.inject.Inject
-
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vatapi.audit.AuditEvents
 import uk.gov.hmrc.vatapi.httpparsers.{EmptyNrsData, NRSData}
 import uk.gov.hmrc.vatapi.models.audit.AuditEvent
-import uk.gov.hmrc.vatapi.models.{ErrorResult, Errors, InternalServerErrorResult, NRSSubmission, VatReturnDeclaration}
+import uk.gov.hmrc.vatapi.models._
 import uk.gov.hmrc.vatapi.resources.AuthRequest
 import uk.gov.hmrc.vatapi.resources.wrappers.VatReturnResponse
 import uk.gov.hmrc.vatapi.services.{AuditService, NRSService, VatReturnsService}
@@ -64,6 +63,8 @@ class VatReturnsOrchestrator @Inject()(
         nrsData match {
           case EmptyNrsData =>
             auditService.audit(buildEmptyNrsAudit(vrn, submission, request))
+            implicit val w = des.VatReturnDeclaration
+            logger.warn(s"OLD VAT: \n${Json.prettyPrint(Json.parse(vatReturn.toDes(thisSubmissionTimestamp, arn).toJsonString))}")
             vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
               response => Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
