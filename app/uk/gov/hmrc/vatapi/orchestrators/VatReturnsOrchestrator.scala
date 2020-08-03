@@ -60,11 +60,12 @@ class VatReturnsOrchestrator @Inject()(
 
         val thisSubmissionTimestamp = submissionTimestamp
 
+        implicit val w = des.VatReturnDeclaration
+        logger.warn(s"OLD VAT: \n${Json.prettyPrint(Json.parse(vatReturn.toDes(thisSubmissionTimestamp, arn).toJsonString))}")
+
         nrsData match {
           case EmptyNrsData =>
             auditService.audit(buildEmptyNrsAudit(vrn, submission, request))
-            implicit val w = des.VatReturnDeclaration
-            logger.warn(s"OLD VAT: \n${Json.prettyPrint(Json.parse(vatReturn.toDes(thisSubmissionTimestamp, arn).toJsonString))}")
             vatReturnsService.submit(vrn, vatReturn.toDes(thisSubmissionTimestamp, arn)) map {
               response => Right(response withNrsData nrsData.copy(timestamp = thisSubmissionTimestamp.toIsoInstant))
             }
