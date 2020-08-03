@@ -66,7 +66,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
-            Some(submissionTimestamp.toString(DateUtils.isoInstantDatePattern)), agentReference = arn))))
+            Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created")

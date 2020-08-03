@@ -36,7 +36,6 @@ import v1.models.response.submit.SubmitResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.matching.Regex
 
 class SubmitReturnControllerSpec
   extends ControllerBaseSpec
@@ -47,8 +46,8 @@ class SubmitReturnControllerSpec
     with MockCurrentDateTime
     with MockNrsService {
 
-  val date: DateTime = DateTime.parse("2017-01-01T00:00:00.00Z")
-  val fmt: String = DateUtils.isoInstantDatePattern
+  val date: DateTime = DateTime.parse("2017-01-01T00:00:00.000Z")
+  val fmt: String = DateUtils.dateTimePattern
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()

@@ -38,8 +38,6 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
     ec: ExecutionContext,
     logContext: EndpointLogContext): Future[ServiceOutcome[SubmitResponse]] = {
 
-    logger.warn(s"NEW VAT: \n${Json.prettyPrint(Json.toJson(request.body))}")
-
     val result = for {
       desResponseWrapper <- EitherT(connector.submitReturn(request)).leftMap(mapDesErrors(desErrorMap))
     } yield desResponseWrapper
