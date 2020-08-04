@@ -45,7 +45,7 @@ class SubmitRequestBodySpec extends UnitSpec {
       |   "vatDueAcquisitions":2000,
       |   "vatDueSales":1000,
       |   "totalValuePurchasesExVAT":9999999999999,
-      |   "agentReference":"LARN0085901",
+      |   "agentReferenceNumber":"LARN0085901",
       |   "totalAllAcquisitionsExVAT":9999999999999,
       |   "periodKey":"AB12",
       |   "vatDueNet":99999999999.99,

@@ -19,7 +19,6 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.SubmitReturnConnector
