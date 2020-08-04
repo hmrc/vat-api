@@ -20,7 +20,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v1.models.errors.{ConnectorError, ControllerError}
+import v1.models.errors.ConnectorError
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.LiabilitiesResponse
 

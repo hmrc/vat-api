@@ -66,7 +66,7 @@ object SubmitRequestBody {
         response.totalValuePurchasesExVAT.fold(Json.obj())(value => Json.obj("totalValuePurchasesExVAT" -> value)) ++
         response.totalValueGoodsSuppliedExVAT.fold(Json.obj())(value => Json.obj("totalValueGoodsSuppliedExVAT" -> value)) ++
         response.totalAcquisitionsExVAT.fold(Json.obj())(value => Json.obj("totalAllAcquisitionsExVAT" -> value)) ++
-        response.agentReference.fold(Json.obj())(value => Json.obj("agentReference" -> value)) ++
+        response.agentReference.fold(Json.obj())(value => Json.obj("agentReferenceNumber" -> value)) ++
         response.receivedAt.fold(Json.obj())(value => Json.obj("receivedAt" -> value))
     }
   }
