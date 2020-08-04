@@ -19,6 +19,7 @@ package routing
 import config.{AppConfig, FeatureSwitch}
 import definition.Versions
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import play.api.http.{DefaultHttpRequestHandler, HttpConfiguration, HttpErrorHandler, HttpFilters}
 import play.api.libs.json.Json
 import play.api.mvc.{DefaultActionBuilder, Handler, RequestHeader, Results}
@@ -53,7 +54,9 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
           case Some(_) => Some(unsupportedVersionAction)
           case None => Some(unsupportedVersionAction)
         }
-      case None => Some(invalidAcceptHeaderError)
+      case None =>
+        Logger.warn(s"\n$request\n")
+        Some(invalidAcceptHeaderError)
     }
 
     documentHandler orElse apiHandler

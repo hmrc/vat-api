@@ -21,7 +21,6 @@ import play.api.http.DefaultHttpFilters
 import uk.gov.hmrc.play.bootstrap.filters._
 
 case class VatApiFilters @Inject()(
-                                    agentSimulationFilter: AgentSimulationFilter,
                                     emptyResponseFilter: EmptyResponseFilter,
                                     headerValidatorFilter: HeaderValidatorFilter,
                                     setContentTypeFilter: SetContentTypeFilter,
@@ -30,7 +29,6 @@ case class VatApiFilters @Inject()(
                                     defaultFilters: MicroserviceFilters
                                   ) extends DefaultHttpFilters(
   defaultFilters.filters :+
-    agentSimulationFilter :+
     emptyResponseFilter :+
     headerValidatorFilter :+
     setContentTypeFilter :+

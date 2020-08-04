@@ -20,13 +20,11 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc._
-import play.api.routing.Router.Attrs
 import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
-import uk.gov.hmrc.vatapi.config.ControllerConfiguration
 
 import scala.concurrent.Future
 
-class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controllerConfiguration: ControllerConfiguration,
+class HeaderValidatorFilter @Inject()(implicit val mat: Materializer,
                                       cc: MessagesControllerComponents
                                      ) extends Filter with HeaderValidator {
 
@@ -34,15 +32,7 @@ class HeaderValidatorFilter @Inject()(implicit val mat: Materializer, controller
   def parser: play.api.mvc.BodyParser[play.api.mvc.AnyContent] = cc.parsers.defaultBodyParser
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    val handlerDef = rh.attrs.get(Attrs.HandlerDef)
-    val needsHeaderValidation =
-      handlerDef.forall(
-        hd =>
-          controllerConfiguration
-            .controllerParamsConfig(hd.controller)
-            .needsHeaderValidation)
-
-    if (!needsHeaderValidation || acceptHeaderValidationRules(
+    if (acceptHeaderValidationRules(
       rh.headers.get("Accept"))) {
       f(rh)
     }

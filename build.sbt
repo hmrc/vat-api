@@ -23,10 +23,6 @@ import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin}
 
 val appName = "vat-api"
 
-lazy val playSettings: Seq[Setting[_]] = Seq(
-  routesImport += "uk.gov.hmrc.vatapi.resources.Binders._"
-)
-
 lazy val FuncTest = config("func") extend Test
 
 lazy val microservice = Project(appName, file("."))
@@ -43,7 +39,6 @@ lazy val microservice = Project(appName, file("."))
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
   )
   .settings(majorVersion := 1)
-  .settings(playSettings: _*)
   .settings(publishingSettings: _*)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(defaultSettings(): _*)
