@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.filters
+package v1.filters
 
 import akka.stream.Materializer
 import javax.inject.Inject

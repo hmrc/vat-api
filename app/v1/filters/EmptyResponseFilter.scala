@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.filters
+package v1.filters
 
 import akka.stream.Materializer
 import javax.inject.Inject
+import play.api.http.HttpEntity
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SetContentTypeFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+class EmptyResponseFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+
+  val emptyHeader = "Gov-Empty-Response"
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    f(rh).map(_.as("application/json"))
+    f(rh) map { res =>
+      if ((res.header.status == 201 || res.header.status == 409) && res.body.isKnownEmpty) {
+        val headers = res.header.headers
+          .updated("Content-Type", "application/json")
+          .updated(emptyHeader, "true")
+        res.copy(res.header.copy(headers = headers), HttpEntity.NoEntity)
+      } else res
+    }
   }
 
 }

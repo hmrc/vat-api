@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.filters
+package v1.filters
 
 import akka.stream.Materializer
 import javax.inject.Inject
@@ -22,16 +22,10 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SetXContentTypeOptionsFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
-
-  import SetXContentTypeOptionsFilter._
+class SetContentTypeFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
 
   def apply(f: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    f(rh).map(_.withHeaders((xContentTypeOptionsHeader, "nosniff")))
+    f(rh).map(_.as("application/json"))
   }
 
-}
-
-object SetXContentTypeOptionsFilter {
-  val xContentTypeOptionsHeader = "X-Content-Type-Options"
 }
