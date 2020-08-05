@@ -40,8 +40,6 @@ case class VersionRoutingMapImpl @Inject()(appConfig: AppConfig,
                                            defaultRouter: Router,
                                            v1Router: v1.Routes) extends VersionRoutingMap {
 
-  val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
-
   val map: Map[String, Router] = Map(
     VERSION_1 ->  {
           Logger.info("[VersionRoutingMap][map] using v1Router - pointing to new packages")
