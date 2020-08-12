@@ -52,7 +52,7 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
           case Some(versionRouter) if featureSwitch.isVersionEnabled(version) =>
             routeWith(versionRouter)(request)
           case Some(_) => Some(unsupportedVersionAction)
-          case None => Some(unsupportedVersionAction)
+          case None => Some(invalidAcceptHeaderError)
         }
       case None =>
         Logger.warn(s"\n$request\n")

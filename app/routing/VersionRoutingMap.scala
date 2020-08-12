@@ -17,7 +17,7 @@
 package routing
 
 import com.google.inject.ImplementedBy
-import config.{AppConfig, FeatureSwitch}
+import config.AppConfig
 import definition.Versions.VERSION_1
 import javax.inject.Inject
 import play.api.Logger
