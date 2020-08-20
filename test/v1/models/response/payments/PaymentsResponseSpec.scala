@@ -222,6 +222,45 @@ class PaymentsResponseSpec extends UnitSpec {
       }
 
       "filter away any payments without paymentItems" in {
+        val noPaymentAmountDesJson: JsValue = Json.parse(
+          """
+            |{
+            |   "idType":"VRN",
+            |   "idNumber":"100062914",
+            |   "regimeType":"VATC",
+            |   "processingDate":"2017-05-13T09:30:00.000Z",
+            |   "financialTransactions":[
+            |      {
+            |         "chargeType":"not payment on account",
+            |         "taxPeriodFrom":"2017-02-01",
+            |         "taxPeriodTo":"2017-12-28"
+            |      },
+            |      {
+            |         "chargeType":"VAT Return Debit Charge",
+            |         "mainType":"VAT Return Charge",
+            |         "periodKey":"15AD",
+            |         "periodKeyDescription":"February 2018",
+            |         "taxPeriodFrom":"2017-04-20",
+            |         "taxPeriodTo":"2017-09-28",
+            |         "items":[
+            |            {
+            |               "clearingDate":"2017-03-19",
+            |               "paymentAmount":-25.0
+            |            },
+            |            {
+            |               "clearingDate":"2017-04-19"
+            |            }
+            |         ]
+            |      }
+            |   ]
+            |}
+          """.stripMargin
+        )
+
+        noPaymentAmountDesJson.as[PaymentsResponse] shouldBe filteredPaymentsResponseModel
+      }
+
+      "filter away any payments that don't have paymentAmount but have a clearingDate" in {
         val noPaymentItemsDesJson: JsValue = Json.parse(
           """
             |{

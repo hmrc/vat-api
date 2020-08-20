@@ -56,7 +56,7 @@ object PaymentsResponse extends FinancialDataReadsUtils {
       ) (Payment.apply _)
 
     def filterNotEmpty(items: Option[Seq[PaymentItem]]): Option[Seq[PaymentItem]] = {
-      items.map(_.filterNot(_ == PaymentItem.empty)) match {
+      items.map(_.filterNot(paymentItem => paymentItem.amount.isEmpty)) match {
         case None => None
         case Some(Nil) => None
         case nonEmpty => nonEmpty
