@@ -79,6 +79,131 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
   }
 
   "Making a request to the 'retrieve payments' endpoint" should {
+    "return only payments with amounts" when {
+      "payments are received with no amount but have a clearing date" in new Test{
+
+        val paymentsDesJson: JsValue = Json.parse(
+          """
+            |{
+            |   "idType":"VRN",
+            |   "idNumber":"100062914",
+            |   "regimeType":"VATC",
+            |   "processingDate":"2017-05-13T09:30:00.000Z",
+            |   "financialTransactions":[
+            |      {
+            |         "chargeType":"VAT Return Debit Charge",
+            |         "mainType":"VAT Return Charge",
+            |         "periodKey":"15AD",
+            |         "periodKeyDescription":"February 2018",
+            |         "taxPeriodFrom":"2017-02-01",
+            |         "taxPeriodTo":"2017-02-28",
+            |         "businessPartner":"0100062914",
+            |         "contractAccountCategory":"33",
+            |         "contractAccount":"000917000429",
+            |         "contractObjectType":"ZVAT",
+            |         "contractObject":"00000018000000000104",
+            |         "sapDocumentNumber":"003390002284",
+            |         "sapDocumentNumberItem":"0001",
+            |         "chargeReference":"XQ002750002150",
+            |         "mainTransaction":"4700",
+            |         "subTransaction":"1174",
+            |         "originalAmount":15.65,
+            |         "outstandingAmount":10.65,
+            |         "clearedAmount":5.0,
+            |         "accruedInterest":0,
+            |         "items":[
+            |            {
+            |               "subItem":"000",
+            |               "dueDate":"2017-02-11",
+            |               "amount":15.0,
+            |               "clearingDate": "2017-02-11",
+            |               "clearingReason":"01",
+            |               "outgoingPaymentMethod":"A",
+            |               "paymentLock":"a",
+            |               "clearingLock":"A",
+            |               "interestLock":"C",
+            |               "dunningLock":"1",
+            |               "returnFlag":true,
+            |               "paymentReference":"a",
+            |               "paymentMethod":"A",
+            |               "paymentLot":"081203010024",
+            |               "paymentLotItem":"000001",
+            |               "clearingSAPDocument":"3350000212",
+            |               "statisticalDocument":"A"
+            |            },
+            |            {
+            |               "subItem":"000",
+            |               "dueDate":"2017-02-11",
+            |               "amount":15.0,
+            |               "clearingDate": "2017-02-11",
+            |               "clearingReason":"01",
+            |               "outgoingPaymentMethod":"A",
+            |               "paymentLock":"a",
+            |               "clearingLock":"A",
+            |               "interestLock":"C",
+            |               "dunningLock":"1",
+            |               "returnFlag":true,
+            |               "paymentReference":"a",
+            |               "paymentMethod":"A",
+            |               "paymentAmount":15.0,
+            |               "paymentLot":"081203010024",
+            |               "paymentLotItem":"000001",
+            |               "clearingSAPDocument":"3350000212",
+            |               "statisticalDocument":"A"
+            |            }
+            |         ]
+            |      },
+            |      {
+            |         "chargeType":"Payment on account",
+            |         "items":[
+            |            {
+            |               "subItem":"000",
+            |               "amount":-10
+            |            },
+            |            {
+            |               "subItem":"001",
+            |               "dueDate":"2017-04-01",
+            |               "amount":-10,
+            |               "clearingDate":"2017-11-27",
+            |               "paymentAmount":999999999,
+            |               "paymentMethod":"DIRECT DEBIT"
+            |            }
+            |         ],
+            |         "periodKey":"0318",
+            |         "taxPeriodFrom":"2017-01-01",
+            |         "taxPeriodTo":"2017-03-31"
+            |      }
+            |   ]
+            |}
+    """.stripMargin
+        )
+
+        val paymentsMtdJson: JsValue = Json.parse(
+          """
+            |{
+            |   "payments":[
+            |      {
+            |         "amount":15,
+            |         "received":"2017-02-11"
+            |      }
+            |   ]
+            |}
+    """.stripMargin
+        )
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams,  OK, paymentsDesJson)
+        }
+
+        private val response = await(request.get())
+        response.status shouldBe OK
+        response.json shouldBe paymentsMtdJson
+        response.header("Content-Type")  shouldBe Some("application/json")
+      }
+    }
+
     "return a 200 status code with expected body" when {
       "a valid request is made" in new Test{
 
