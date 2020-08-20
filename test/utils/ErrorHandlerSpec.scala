@@ -16,22 +16,29 @@
 
 package utils
 
-import javax.inject.Provider
-import org.scalamock.scalatest.MockFactory
+import org.joda.time.DateTime
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Configuration
+import play.api.http.Status
+import play.api.http.Status.UNSUPPORTED_MEDIA_TYPE
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsEmpty
-import play.api.routing.Router
+import play.api.mvc.{AnyContentAsEmpty, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, OptionalSourceMapper}
 import support.UnitSpec
-import uk.gov.hmrc.http.NotImplementedException
-import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes, VrnFormatError}
+import uk.gov.hmrc.auth.core.InsufficientEnrolments
+import uk.gov.hmrc.http.{HeaderCarrier, JsValidationException, NotFoundException}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
+import v1.models.errors._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NoStackTrace
 
-class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFactory{
+class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   def versionHeader: (String, String) = ACCEPT -> s"application/vnd.hmrc.1.0+json"
 
@@ -40,91 +47,113 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
 
     val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(versionHeader)
 
-    val env: Environment = mock[Environment]
-    val sourceMapper: OptionalSourceMapper = mock[OptionalSourceMapper]
-    val provider: Provider[Router] = mock[Provider[Router]]
+    val auditConnector: AuditConnector = mock[AuditConnector]
+    val httpAuditEvent: HttpAuditEvent = mock[HttpAuditEvent]
 
+    val eventTags: Map[String, String] = Map("transactionName" -> "event.transactionName")
+
+    val dataEvent: DataEvent = DataEvent(
+      auditSource = "auditSource",
+      auditType = "event.auditType",
+      eventId = "",
+      tags = eventTags,
+      detail = Map("test" -> "test"),
+      generatedAt = DateTime.now()
+    )
+
+    (httpAuditEvent.dataEvent(_: String, _: String, _: RequestHeader, _: Map[String, String])(_: HeaderCarrier)).expects(*, *, *, *, *)
+      .returns(dataEvent)
+
+    (auditConnector.sendEvent(_ : DataEvent)(_: HeaderCarrier, _: ExecutionContext)).expects(*, *, *)
+      .returns(Future.successful(Success))
 
     val configuration: Configuration = Configuration("appName" -> "myApp")
-    val handler = new ErrorHandler(env, configuration, sourceMapper, provider)
+    val handler = new ErrorHandler(configuration, auditConnector, httpAuditEvent)
   }
 
   "onClientError" should {
+    "return 404 with error body" when {
+      s"URI not found" in new Test() {
 
-    "return 400 with ERROR_VRN_INVALID error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_VRN_INVALID")
-        status(result) shouldBe BAD_REQUEST
+        private val result = handler.onClientError(requestHeader, Status.NOT_FOUND, "test")
+        status(result) shouldBe Status.NOT_FOUND
 
-        contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
+        contentAsJson(result) shouldBe Json.toJson(NotFoundError)
       }
     }
 
-    "return 400 with ERROR_INVALID_FROM_DATE error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_INVALID_FROM_DATE")
+    "return 400 with error body" when {
+      "JsValidationException thrown and header is supplied" in new Test() {
+        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "test")
         status(result) shouldBe BAD_REQUEST
 
-        contentAsJson(result) shouldBe Json.toJson(InvalidDateFromErrorDes)
+        contentAsJson(result) shouldBe Json.toJson(BadRequestError)
       }
     }
 
-    "return 400 with ERROR_INVALID_TO_DATE error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_INVALID_TO_DATE")
-        status(result) shouldBe BAD_REQUEST
+    "return 401 with error body" when {
+      "unauthorised and header is supplied" in new Test() {
+        private val result = handler.onClientError(requestHeader, UNAUTHORIZED, "test")
+        status(result) shouldBe UNAUTHORIZED
 
-        contentAsJson(result) shouldBe Json.toJson(InvalidDateToErrorDes)
+        contentAsJson(result) shouldBe Json.toJson(LegacyUnauthorisedError)
       }
     }
 
-    "return 400 with INVALID_STATUS error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "INVALID_STATUS")
-        status(result) shouldBe BAD_REQUEST
+    "return 415 with error body" when {
+      "unsupported body and header is supplied" in new Test() {
+        private val result = handler.onClientError(requestHeader, UNSUPPORTED_MEDIA_TYPE, "test")
+        status(result) shouldBe UNSUPPORTED_MEDIA_TYPE
 
-        contentAsJson(result) shouldBe Json.toJson(Json.obj("statusCode" -> 400, "message" -> "INVALID_STATUS"))
+        contentAsJson(result) shouldBe Json.toJson(InvalidBodyTypeError)
       }
     }
 
-    "return 400 with INVALID_DATE_RANGE error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "INVALID_DATE_RANGE")
-        status(result) shouldBe BAD_REQUEST
+    "return 405 with error body" when {
+      "invalid method type" in new Test() {
+        private val result = handler.onClientError(requestHeader, METHOD_NOT_ALLOWED, "test")
+        status(result) shouldBe METHOD_NOT_ALLOWED
 
-        contentAsJson(result) shouldBe Json.toJson(Json.obj("statusCode" -> 400, "message" -> "INVALID_DATE_RANGE"))
-      }
-    }
-
-    "return 400 with unmatchedError error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "INVALID_PAYLOAD")
-        status(result) shouldBe BAD_REQUEST
-
-        contentAsJson(result) shouldBe Json.toJson(Json.obj("statusCode" -> 400,
-          "message" -> JsonErrorSanitiser.sanitise("INVALID_PAYLOAD")))
+        contentAsJson(result) shouldBe Json.toJson(MtdError("INVALID_REQUEST", "test"))
       }
     }
   }
 
   "onServerError" should {
 
-    "return NotImplemented with error body and NOT_IMPLEMENTED status code" when {
-      "NotImplementedException is thrown" in new Test() {
+    "return 404 with error body" when {
+      "NotFoundException thrown" in new Test() {
+        private val result = handler.onServerError(requestHeader, new NotFoundException("test") with NoStackTrace)
+        status(result) shouldBe NOT_FOUND
 
-        private val result = handler.onServerError(requestHeader, new Throwable("test", new NotImplementedException("test")))
-        status(result) shouldBe NOT_IMPLEMENTED
-
-        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
+        contentAsJson(result) shouldBe Json.toJson(NotFoundError)
       }
     }
 
-    "return the result as standard for any other cases" when {
-      "a any 5xx is thrown" in new Test() {
+    "return 401 with error body" when {
+      "AuthorisationException thrown" in new Test() {
+        private val result = handler.onServerError(requestHeader, new InsufficientEnrolments("test") with NoStackTrace)
+        status(result) shouldBe UNAUTHORIZED
 
-        private val result = handler.onServerError(requestHeader, new Throwable("any other exception", new NullPointerException("null pointer")))
+        contentAsJson(result) shouldBe Json.toJson(LegacyUnauthorisedError)
+      }
+    }
 
-        status(result) shouldBe 500
+    "return 400 with error body" when {
+      "JsValidationException thrown" in new Test() {
+        private val result = handler.onServerError(requestHeader, new JsValidationException("test", "test", classOf[String], "errs") with NoStackTrace)
+        status(result) shouldBe BAD_REQUEST
+
+        contentAsJson(result) shouldBe Json.toJson(BadRequestError)
+      }
+    }
+
+    "return 500 with error body" when {
+      "other exception thrown" in new Test() {
+        private val result = handler.onServerError(requestHeader, new Exception with NoStackTrace)
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+
+        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
       }
     }
   }
