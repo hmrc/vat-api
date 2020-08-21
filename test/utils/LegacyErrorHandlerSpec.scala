@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.utils
+package utils
 
 import javax.inject.Provider
 import org.scalamock.scalatest.MockFactory
@@ -25,13 +25,13 @@ import play.api.routing.Router
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, OptionalSourceMapper}
+import support.UnitSpec
 import uk.gov.hmrc.http.NotImplementedException
-import uk.gov.hmrc.vatapi.UnitSpec
-import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
+import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes, VrnFormatError}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFactory{
+class LegacyErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFactory{
 
   def versionHeader: (String, String) = ACCEPT -> s"application/vnd.hmrc.1.0+json"
 
@@ -45,8 +45,8 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
     val provider: Provider[Router] = mock[Provider[Router]]
 
 
-    val configuration = Configuration("appName" -> "myApp")
-    val handler = new ErrorHandler(env, configuration, sourceMapper, provider)
+    val configuration: Configuration = Configuration("appName" -> "myApp")
+    val handler = new LegacyErrorHandler(env, configuration, sourceMapper, provider)
   }
 
   "onClientError" should {
@@ -56,16 +56,7 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
         private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_VRN_INVALID")
         status(result) shouldBe BAD_REQUEST
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid"))
-      }
-    }
-
-    "return 400 with ERROR_INVALID_DATE error message" when {
-      "invalid vrn error occurred" in new Test() {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_INVALID_DATE")
-        status(result) shouldBe BAD_REQUEST
-
-        contentAsJson(result) shouldBe Json.toJson(ErrorBadRequest(ErrorCode.INVALID_DATE, "The provided date is invalid"))
+        contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
       }
     }
 
@@ -74,7 +65,7 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
         private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_INVALID_FROM_DATE")
         status(result) shouldBe BAD_REQUEST
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid"))
+        contentAsJson(result) shouldBe Json.toJson(InvalidDateFromErrorDes)
       }
     }
 
@@ -83,7 +74,7 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
         private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_INVALID_TO_DATE")
         status(result) shouldBe BAD_REQUEST
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid"))
+        contentAsJson(result) shouldBe Json.toJson(InvalidDateToErrorDes)
       }
     }
 
@@ -124,7 +115,7 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with MockFacto
         private val result = handler.onServerError(requestHeader, new Throwable("test", new NotImplementedException("test")))
         status(result) shouldBe NOT_IMPLEMENTED
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorNotImplemented)
+        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
       }
     }
 

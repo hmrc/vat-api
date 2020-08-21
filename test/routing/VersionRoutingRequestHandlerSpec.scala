@@ -131,8 +131,8 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
         case Some(a: EssentialAction) =>
           val result = a.apply(request)
 
-          status(result) shouldBe NOT_FOUND
-          contentAsJson(result) shouldBe Json.toJson(UnsupportedVersionError)
+          status(result) shouldBe NOT_ACCEPTABLE
+          contentAsJson(result) shouldBe Json.toJson(InvalidAcceptHeaderError)
       }
     }
   }

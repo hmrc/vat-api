@@ -182,7 +182,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
           private val response = await(request.get)
           response.status shouldBe NOT_FOUND
           response.body shouldBe ""
-          response.header("Content-Type") shouldBe Some("application/json")
+          response.header("Content-Type") shouldBe None
         }
       }
   }

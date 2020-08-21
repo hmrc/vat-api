@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.vatapi.utils
+package utils
 
 import javax.inject._
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
 import play.api.libs.json.Json
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.Results.{BadRequest, NotImplemented}
+import play.api.mvc.{RequestHeader, Result}
 import play.api.routing.Router
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.vatapi.models.{ErrorBadRequest, ErrorCode, ErrorNotImplemented}
+import uk.gov.hmrc.http.NotImplementedException
+import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes, LegacyNotFoundError, VrnFormatError}
 
-import scala.concurrent._
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(
+class LegacyErrorHandler @Inject()(
                               env: Environment,
                               config: Configuration,
                               sourceMapper: OptionalSourceMapper,
@@ -42,9 +42,9 @@ class ErrorHandler @Inject()(
         case _ =>
           ex.getCause match {
             case _: NotImplementedException =>
-              NotImplemented(Json.toJson(ErrorNotImplemented))
+              NotImplemented(Json.toJson(DownstreamError))
             case _ =>
-              Logger.info(s"[ErrorHandler][onServerError] uncaught 5xx Exception")
+              Logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
               result
           }
       }
@@ -54,15 +54,13 @@ class ErrorHandler @Inject()(
   override protected def onBadRequest(request: RequestHeader, error: String): Future[Result] = {
     super.onBadRequest(request, error).map { _ =>
       error match {
-        case "ERROR_VRN_INVALID" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.VRN_INVALID, "The provided Vrn is invalid")))
-        case "ERROR_INVALID_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_DATE, "The provided date is invalid")))
-        case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_FROM_DATE, "The provided from date is invalid")))
-        case "ERROR_INVALID_TO_DATE" => BadRequest(Json.toJson(ErrorBadRequest(ErrorCode.INVALID_TO_DATE, "The provided to date is invalid")))
+        case "ERROR_VRN_INVALID" => BadRequest(Json.toJson(VrnFormatError))
+        case "ERROR_INVALID_FROM_DATE" => BadRequest(Json.toJson(InvalidDateFromErrorDes))
+        case "ERROR_INVALID_TO_DATE" => BadRequest(Json.toJson(InvalidDateToErrorDes))
         case "INVALID_STATUS" | "INVALID_DATE_RANGE" => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
-        case unmatchedError => {
-          Logger.warn(s"[ErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
+        case unmatchedError =>
+          Logger.warn(s"[LegacyErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
           BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> JsonErrorSanitiser.sanitise(unmatchedError))))
-        }
       }
     }
   }
@@ -73,11 +71,10 @@ class ErrorHandler @Inject()(
         case _ =>
           ex.getCause match {
             case _: NotImplementedException =>
-              NotImplemented(Json.toJson(ErrorNotImplemented))
+              NotImplemented(Json.toJson(LegacyNotFoundError))
             case _ => result
           }
       }
     }
   }
 }
-
