@@ -26,6 +26,8 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
 
+  private val acceptListDisabled: Option[Access] = None
+
   lazy val definition: Definition =
     Definition(
       scopes = Seq(
@@ -49,7 +51,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         versions = Seq(
           APIVersion(
             version = "1.0",
-            access = buildWhiteListingAccess(),
+            access = acceptListDisabled,
             status = buildAPIStatus("1.0"),
             endpointsEnabled = true
           )
@@ -64,10 +66,5 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA
       }
-  }
-
-  private[definition] def buildWhiteListingAccess(): Option[Access] = {
-    val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
-    if (featureSwitch.isWhiteListingEnabled) Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds)) else None
   }
 }
