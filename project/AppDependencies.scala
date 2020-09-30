@@ -21,20 +21,20 @@ import sbt._
 object AppDependencies {
 
   val bootstrapPlayVersion = "1.5.0"
-  val domainVersion = "5.6.0-play-26"
+  val domainVersion = "5.9.0-play-26"
   val hmrcApiVersion = "4.1.0-play-26"
   val jsonJodaVersion = "2.6.13"
   val playJsonVersion = "2.6.0"
   val catsCoreVersion = "1.6.0"
   val json4SnativeVersion = "3.6.3"
   val json4SextVersion = "3.6.3"
-  val silencerVersion = "1.4.4"
+  val silencerVersion = "1.6.0"
 
   val hmrcTestVersion = "3.9.0-play-26"
-  val scalaTestVersion = "3.1.0"
+  val scalaTestVersion = "3.2.0"
   val pegdownVersion = "1.6.0"
   val scalaTestPlusVerson = "3.1.3"
-  val wiremockversion = "2.22.0"
+  val wiremockversion = "2.27.2"
   val scalacheckVersion = "1.14.3"
   val jsonAssertVersion = "1.5.0"
   val restAssuredVersion = "2.9.0"
@@ -46,8 +46,8 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapPlayVersion,
     "uk.gov.hmrc"       %% "domain"            % domainVersion,
     "uk.gov.hmrc"       %% "play-hmrc-api"     % hmrcApiVersion,
-    "org.typelevel"     %% "cats-core"         % "2.1.0",
-    "com.chuusai"   %% "shapeless"         % "2.3.3",
+    "org.typelevel"     %% "cats-core"         % "2.2.0",
+    "com.chuusai"   %% "shapeless"         % "2.4.0-M1",
     "com.typesafe.play" %% "play-json-joda"    % playJsonVersion,
     "org.json4s"        %% "json4s-native"     % json4SnativeVersion,
     "org.json4s"        %% "json4s-ext"        % json4SextVersion,
@@ -58,7 +58,7 @@ object AppDependencies {
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
     "org.scalatest"          %% "scalatest"                % scalaTestVersion    % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.35.10"           % scope,
-    "org.scalamock"          %% "scalamock"                % "4.4.0"             % scope,
+    "org.scalamock"          %% "scalamock"                % "5.0.0"             % scope,
     "com.typesafe.play"      %% "play-test"                % PlayVersion.current % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % scalaTestPlusVerson % scope,
     "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"          % scope,
