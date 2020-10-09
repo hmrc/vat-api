@@ -16,15 +16,13 @@
 
 package utils.pagerDutyLogging
 
-import akka.http.scaladsl.model.StatusCodes
-
 object PagerDutyLogging {
 
   def logError(loggerMessage: LoggerMessages.Value, status: Int, body: String,
                f: String => Unit, affinityGroup: String): Unit = {
       val message = s"DES error occurred. User type: $affinityGroup\n" + s"Status code: $status\nBody: $body"
-      status match {
-        case StatusCodes.InternalServerError.intValue => f(s"$message ( ${loggerMessage.toString} )")
+      status.toString.head match {
+        case '5' => f(s"$message ( ${loggerMessage.toString} )")
         case _ => f(message)
       }
     }
