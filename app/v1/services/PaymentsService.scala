@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.PaymentsConnector
+import v1.controllers.UserRequest
 import v1.models.errors._
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
@@ -35,7 +36,8 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
   def retrievePayments(request: PaymentsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[PaymentsResponse]] = {
+    logContext: EndpointLogContext,
+    userRequest: UserRequest[_]): Future[ServiceOutcome[PaymentsResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))

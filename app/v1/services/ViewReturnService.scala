@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.ViewReturnConnector
+import v1.controllers.UserRequest
 import v1.models.errors._
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
@@ -35,7 +36,8 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
   def viewReturn(request: ViewRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[ViewReturnResponse]] = {
+    logContext: EndpointLogContext,
+    userRequest: UserRequest[_]): Future[ServiceOutcome[ViewReturnResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.viewReturn(request)).leftMap(mapDesErrors(desErrorMap))

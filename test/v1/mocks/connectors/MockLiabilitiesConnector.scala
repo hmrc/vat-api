@@ -20,6 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, LiabilitiesConnector}
+import v1.controllers.UserRequest
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.LiabilitiesResponse
 
@@ -33,8 +34,8 @@ trait MockLiabilitiesConnector extends MockFactory {
 
     def retrieveLiabilities(requestData: LiabilitiesRequest): CallHandler[Future[DesOutcome[LiabilitiesResponse]]] = {
       (mockRetrieveLiabilitiesConnector
-        .retrieveLiabilities(_: LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(requestData, *, *)
+        .retrieveLiabilities(_: LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(requestData, *, *, *)
     }
   }
 

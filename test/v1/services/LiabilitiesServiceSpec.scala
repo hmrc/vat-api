@@ -16,8 +16,11 @@
 
 package v1.services
 
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
+import v1.controllers.UserRequest
 import v1.mocks.connectors.MockLiabilitiesConnector
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
@@ -27,6 +30,7 @@ import scala.concurrent.Future
 
 class LiabilitiesServiceSpec extends ServiceSpec {
 
+  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
   private val to: String = "2017-12-31"

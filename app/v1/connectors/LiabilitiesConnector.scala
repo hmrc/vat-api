@@ -20,6 +20,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.LiabilitiesResponse
@@ -31,13 +33,14 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
                                      val appConfig: AppConfig) extends BaseDesConnector {
 
   def retrieveLiabilities(request: LiabilitiesRequest)(implicit hc: HeaderCarrier,
-                                                       ec: ExecutionContext): Future[DesOutcome[LiabilitiesResponse]] = {
+                                                       ec: ExecutionContext,
+                                                       userRequest: UserRequest[_]): Future[DesOutcome[LiabilitiesResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
     implicit val connectorError: ConnectorError =
       ConnectorError(request.vrn.vrn, hc.requestId.fold(""){ requestId => requestId.value})
-
+    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom", request.from),
       ("dateTo", request.to),

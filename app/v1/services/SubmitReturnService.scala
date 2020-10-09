@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.SubmitReturnConnector
+import v1.controllers.UserRequest
 import v1.models.errors._
 import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
@@ -35,7 +36,8 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
   def submitReturn(request: SubmitRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[SubmitResponse]] = {
+    logContext: EndpointLogContext,
+    userRequest: UserRequest[_]): Future[ServiceOutcome[SubmitResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.submitReturn(request)).leftMap(mapDesErrors(desErrorMap))

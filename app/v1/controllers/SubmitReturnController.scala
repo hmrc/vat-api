@@ -26,8 +26,8 @@ import utils.{CurrentDateTime, DateUtils, EndpointLogContext, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
-import v1.models.errors._
 import v1.models.errors.ControllerError._
+import v1.models.errors._
 import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
 import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
@@ -94,13 +94,13 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
-        val result = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, result.header.status, errorWrapper.error.message))
+        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
+        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
 
         auditService.auditEvent(AuditEvents.auditSubmit(correlationId,
-          request.userDetails, AuditResponse(result.header.status, Left(retrieveAuditErrors(errorWrapper)))))
+          request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper)))))
 
-        result
+        leftResult
       }.merge
     }
   }

@@ -23,6 +23,7 @@ import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.ObligationsConnector
+import v1.controllers.UserRequest
 import v1.models.errors._
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
@@ -36,7 +37,8 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
   def retrieveObligations(request: ObligationsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    logContext: EndpointLogContext): Future[ServiceOutcome[ObligationsResponse]] = {
+    logContext: EndpointLogContext,
+    userRequest: UserRequest[_]): Future[ServiceOutcome[ObligationsResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrieveObligations(request)).leftMap(mapDesErrors(desErrorMap))
