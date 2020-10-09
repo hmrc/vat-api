@@ -16,20 +16,11 @@
 
 package utils.pagerDutyLogging
 
-import v1.models.response.liabilities.LiabilitiesResponse
-
 sealed trait Endpoint {
   def toLoggerMessage: LoggerMessages.Value
 }
 
 object Endpoint {
-
-  def logMessage[A](response: A) = {
-    response match {
-      case LiabilitiesResponse => RetrieveLiabilities.toLoggerMessage
-      case _ => RetrieveLiabilities.toLoggerMessage
-    }
-  }
 
   case object RetrieveObligations extends Endpoint {
     override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.RETRIEVE_OBLIGATIONS_500
