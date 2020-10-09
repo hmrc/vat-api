@@ -20,6 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, PaymentsConnector}
+import v1.controllers.UserRequest
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
 
@@ -33,8 +34,8 @@ trait MockPaymentsConnector extends MockFactory {
 
     def retrievePayments(requestData: PaymentsRequest): CallHandler[Future[DesOutcome[PaymentsResponse]]] = {
       (mockRetrievePaymentsConnector
-        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(requestData, *, *)
+        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(requestData, *, *, *)
     }
   }
 

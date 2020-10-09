@@ -20,6 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, ObligationsConnector}
+import v1.controllers.UserRequest
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
 
@@ -33,8 +34,8 @@ trait MockObligationsConnector extends MockFactory {
 
     def retrieveObligations(requestData: ObligationsRequest): CallHandler[Future[DesOutcome[ObligationsResponse]]] = {
       (mockObligationsConnector
-        .retrieveObligations(_: ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(requestData, *, *)
+        .retrieveObligations(_: ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(requestData, *, *, *)
     }
   }
 

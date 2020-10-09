@@ -18,10 +18,13 @@ package v1.connectors
 
 import mocks.MockAppConfig
 import org.joda.time.DateTime
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.RequestId
+import v1.controllers.UserRequest
 import v1.mocks.MockHttpClient
+import v1.models.auth.UserDetails
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
@@ -30,6 +33,7 @@ import scala.concurrent.Future
 
 class SubmitReturnConnectorSpec extends ConnectorSpec {
 
+  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
 
   private val submitReturnRequest: SubmitRequest =
@@ -93,7 +97,7 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
           .returns(Future.successful(outcome))
 
         await(connector.submitReturn(submitReturnRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec)) shouldBe outcome
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest)) shouldBe outcome
       }
     }
   }

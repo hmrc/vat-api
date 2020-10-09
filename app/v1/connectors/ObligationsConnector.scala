@@ -20,6 +20,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
@@ -32,7 +34,8 @@ class ObligationsConnector @Inject()(val http: HttpClient,
 
   def retrieveObligations(request: ObligationsRequest)(
     implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[DesOutcome[ObligationsResponse]] = {
+    ec: ExecutionContext,
+    userRequest: UserRequest[_]): Future[DesOutcome[ObligationsResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
@@ -40,6 +43,7 @@ class ObligationsConnector @Inject()(val http: HttpClient,
 
     implicit val connectorError: ConnectorError =
       ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
+    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveObligations.toLoggerMessage
 
     val queryParams: Seq[(String, String)] =
       Seq(

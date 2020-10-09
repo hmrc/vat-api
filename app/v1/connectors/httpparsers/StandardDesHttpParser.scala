@@ -20,7 +20,9 @@ import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import utils.pagerDutyLogging.{LoggerMessages, PagerDutyLogging}
 import v1.connectors.DesOutcome
+import v1.controllers.UserRequest
 import v1.models.errors.{ConnectorError, DownstreamError, OutboundError}
 import v1.models.outcomes.ResponseWrapper
 
@@ -32,13 +34,15 @@ object StandardDesHttpParser extends HttpParser {
 
   // Return Right[DesResponse[Unit]] as success response has no body - no need to assign it a value
   implicit def readsEmpty(implicit successCode: SuccessCode = SuccessCode(NO_CONTENT),
-                          connectorError: ConnectorError): HttpReads[DesOutcome[Unit]] =
+                          connectorError: ConnectorError,
+                          userRequest: UserRequest[_], logMessage: LoggerMessages.Value): HttpReads[DesOutcome[Unit]] =
     (_: String, url: String, response: HttpResponse) => doRead(url, response) { correlationId =>
       Right(ResponseWrapper(correlationId, ()))
     }
 
   implicit def reads[A: Reads](implicit successCode: SuccessCode = SuccessCode(OK),
-                               connectorError: ConnectorError): HttpReads[DesOutcome[A]] =
+                               connectorError: ConnectorError,
+                               userRequest: UserRequest[_], logMessage: LoggerMessages.Value): HttpReads[DesOutcome[A]] =
     (_: String, url: String, response: HttpResponse) => doRead(url, response) { correlationId =>
       response.validateJson[A] match {
         case Some(ref) => Right(ResponseWrapper(correlationId, ref))
@@ -48,7 +52,8 @@ object StandardDesHttpParser extends HttpParser {
 
   private def doRead[A](url: String, response: HttpResponse,
                        )(successOutcomeFactory: String => DesOutcome[A])(
-    implicit successCode: SuccessCode, connectorError: ConnectorError): DesOutcome[A] = {
+    implicit successCode: SuccessCode, connectorError: ConnectorError,
+    userRequest: UserRequest[_], logMessage: LoggerMessages.Value): DesOutcome[A] = {
 
     val correlationId = retrieveCorrelationId(response)
 
@@ -58,6 +63,8 @@ object StandardDesHttpParser extends HttpParser {
           s"Error response received from DES with status: ${response.status} and body\n" +
           s"${response.body} and correlationId: $correlationId when calling $url - " +
           s"vrn: ${connectorError.vrn}, requestId: ${connectorError.requestId}")
+
+      PagerDutyLogging.logError(logMessage, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
     }
     response.status match {
       case successCode.status =>

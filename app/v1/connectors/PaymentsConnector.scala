@@ -20,6 +20,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
@@ -31,12 +33,14 @@ class PaymentsConnector @Inject()(val http: HttpClient,
                                   val appConfig: AppConfig) extends BaseDesConnector {
 
   def retrievePayments(request: PaymentsRequest)(implicit hc: HeaderCarrier,
-                                                 ec: ExecutionContext): Future[DesOutcome[PaymentsResponse]] = {
+                                                 ec: ExecutionContext,
+                                                 userRequest: UserRequest[_]): Future[DesOutcome[PaymentsResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
     implicit val requestToDate: String = request.to
     implicit val connectorError: ConnectorError =
       ConnectorError(request.vrn.vrn, hc.requestId.fold(""){ requestId => requestId.value})
+    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrievePayments.toLoggerMessage
 
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom", request.from),

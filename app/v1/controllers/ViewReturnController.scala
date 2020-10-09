@@ -75,13 +75,13 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       result.leftMap { errorWrapper =>
         val correlationId = getCorrelationId(errorWrapper)
-        val result = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, result.header.status, errorWrapper.error.message))
+        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
+        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
 
         auditService.auditEvent(AuditEvents.auditReturns(correlationId,
-          request.userDetails, AuditResponse(httpStatus = result.header.status, Left(errorWrapper.auditErrors))))
+          request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
-        result
+        leftResult
       }.merge
 
     }

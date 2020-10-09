@@ -16,8 +16,11 @@
 
 package v1.services
 
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
+import v1.controllers.UserRequest
 import v1.mocks.connectors.MockViewReturnConnector
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.ViewRequest
@@ -27,10 +30,10 @@ import scala.concurrent.Future
 
 class ViewReturnServiceSpec extends ServiceSpec {
 
+  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
   private val periodKey: String = "F034"
   private val correlationId = "X-123"
-
   private val viewReturnRequest: ViewRequest =
     ViewRequest(
       vrn = Vrn(vrn),

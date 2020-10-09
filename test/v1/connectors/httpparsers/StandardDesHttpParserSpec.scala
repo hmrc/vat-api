@@ -18,9 +18,13 @@ package v1.connectors.httpparsers
 
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.test.FakeRequest
 import support.UnitSpec
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
 import v1.connectors.DesOutcome
+import v1.controllers.UserRequest
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 
@@ -40,6 +44,9 @@ class StandardDesHttpParserSpec extends UnitSpec {
 
   import v1.connectors.httpparsers.StandardDesHttpParser._
   implicit val connectorError: ConnectorError = ConnectorError("vrn","requestId")
+  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
+
   val httpReads: HttpReads[DesOutcome[Unit]] = implicitly
 
   val data = "someData"

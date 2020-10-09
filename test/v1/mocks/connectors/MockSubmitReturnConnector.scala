@@ -20,6 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, SubmitReturnConnector}
+import v1.controllers.UserRequest
 import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
 
@@ -33,8 +34,8 @@ trait MockSubmitReturnConnector extends MockFactory {
 
     def submitReturn(requestData: SubmitRequest): CallHandler[Future[DesOutcome[SubmitResponse]]] = {
       (mockSubmitReturnConnector
-        .submitReturn(_: SubmitRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(requestData, *, *)
+        .submitReturn(_: SubmitRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(requestData, *, *, *)
     }
   }
 

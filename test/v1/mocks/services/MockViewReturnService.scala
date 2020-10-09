@@ -20,6 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
+import v1.controllers.UserRequest
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
 import v1.services.{ServiceOutcome, ViewReturnService}
@@ -34,8 +35,8 @@ trait MockViewReturnService extends MockFactory {
 
     def viewReturn(request: ViewRequest): CallHandler[Future[ServiceOutcome[ViewReturnResponse]]] = {
       (mockViewReturnService
-        .viewReturn(_ : ViewRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext))
-        .expects(request, *, *, *)
+        .viewReturn(_ : ViewRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_]))
+        .expects(request, *, *, *, *)
     }
   }
 

@@ -20,6 +20,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
@@ -32,13 +34,15 @@ class ViewReturnConnector @Inject()(val http: HttpClient,
 
   def viewReturn(request: ViewRequest)(
     implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[DesOutcome[ViewReturnResponse]] = {
+    ec: ExecutionContext,
+    userRequest: UserRequest[_]): Future[DesOutcome[ViewReturnResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
     val vrn = request.vrn.vrn
     implicit val connectorError: ConnectorError =
       ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
+    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveReturns.toLoggerMessage
 
     val queryParams: Seq[(String, String)] =
       Seq(

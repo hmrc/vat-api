@@ -17,10 +17,13 @@
 package v1.connectors
 
 import mocks.MockAppConfig
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.RequestId
+import v1.controllers.UserRequest
 import v1.mocks.MockHttpClient
+import v1.models.auth.UserDetails
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.common.TaxPeriod
@@ -30,6 +33,7 @@ import scala.concurrent.Future
 
 class LiabilitiesConnectorSpec extends ConnectorSpec {
 
+  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
 
   private val retrieveLiabilitiesRequest: LiabilitiesRequest =
@@ -110,7 +114,7 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
           .returns(Future.successful(outcome))
 
         await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec)) shouldBe outcome
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest)) shouldBe outcome
       }
 
       "return a valid response for multiple results" in new Test {
