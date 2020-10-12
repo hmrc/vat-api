@@ -16,11 +16,9 @@
 
 package definition
 
-import com.typesafe.config.ConfigFactory
 import definition.APIStatus.{ALPHA, BETA}
 import definition.Versions.VERSION_1
 import mocks.MockAppConfig
-import play.api.Configuration
 import support.UnitSpec
 import v1.mocks.MockHttpClient
 
