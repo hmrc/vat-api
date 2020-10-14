@@ -20,26 +20,26 @@ import sbt._
 
 object AppDependencies {
 
-  val bootstrapPlayVersion = "1.5.0"
+  val bootstrapPlayVersion = "1.16.0"
   val domainVersion = "5.9.0-play-26"
   val hmrcApiVersion = "4.1.0-play-26"
   val jsonJodaVersion = "2.6.13"
   val playJsonVersion = "2.6.0"
   val catsCoreVersion = "1.6.0"
-  val json4SnativeVersion = "3.6.3"
-  val json4SextVersion = "3.6.3"
+  val json4SnativeVersion = "3.6.10"
+  val json4SextVersion = "3.6.10"
   val silencerVersion = "1.6.0"
 
   val hmrcTestVersion = "3.9.0-play-26"
-  val scalaTestVersion = "3.2.0"
+  val scalaTestVersion = "3.2.2"
   val pegdownVersion = "1.6.0"
   val scalaTestPlusVerson = "3.1.3"
   val wiremockversion = "2.27.2"
   val scalacheckVersion = "1.14.3"
   val jsonAssertVersion = "1.5.0"
   val restAssuredVersion = "2.9.0"
-  val mockitoVersion = "3.2.4"
-  val scoverageVersion = "1.3.1"
+  val mockitoVersion = "3.5.13"
+  val scoverageVersion = "1.4.1"
 
   val compile = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
