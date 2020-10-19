@@ -37,7 +37,7 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
     class TestController extends AuthorisedController(cc) {
       override val authService: EnrolmentsAuthService = mockEnrolmentsAuthService
 
-      def action(vrn: String): Action[AnyContent] = authorisedAction(vrn, "123").async {
+      def action(vrn: String): Action[AnyContent] = authorisedAction(vrn).async {
         Future.successful(Ok(Json.obj()))
       }
     }
