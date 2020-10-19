@@ -23,7 +23,7 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.DateUtils
 import v1.audit.AuditEvents
-import v1.mocks.MockCurrentDateTime
+import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.mocks.requestParsers.MockSubmitReturnRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockNrsService, MockSubmitReturnService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -44,7 +44,8 @@ class SubmitReturnControllerSpec
     with MockSubmitReturnRequestParser
     with MockAuditService
     with MockCurrentDateTime
-    with MockNrsService {
+    with MockNrsService
+    with MockIdGenerator {
 
   val date: DateTime = DateTime.parse("2017-01-01T00:00:00.000Z")
   val fmt: String = DateUtils.dateTimePattern
@@ -59,11 +60,13 @@ class SubmitReturnControllerSpec
       mockNrsService,
       auditService = mockAuditService,
       cc,
-      dateTime = mockCurrentDateTime
+      dateTime = mockCurrentDateTime,
+      mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
+    MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
   val vrn: String = "123456789"
@@ -185,7 +188,7 @@ class SubmitReturnControllerSpec
         contentAsJson(result) shouldBe Json.toJson(DownstreamError)
 
         val auditResponse: AuditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError("INTERNAL_SERVER_ERROR"))), None)
-        MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit("No Correlation ID",
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
           UserDetails("Individual", None, "N/A"), auditResponse)).once
       }
     }

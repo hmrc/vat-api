@@ -16,10 +16,9 @@
 
 package v1.controllers
 
-import play.api.libs.json.Json
 import play.api.mvc.Result
-import utils.{EndpointLogContext, Logging}
-import v1.models.errors.ErrorWrapper
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.Logging
 
 trait BaseController {
   self: Logging =>
@@ -38,19 +37,7 @@ trait BaseController {
     }
   }
 
-  protected def getCorrelationId(errorWrapper: ErrorWrapper)(implicit endpointLogContext: EndpointLogContext): String = {
-    errorWrapper.correlationId match {
-      case Some(correlationId) =>
-        logger.info(
-          s"[${endpointLogContext.controllerName}][getCorrelationId] - " +
-            s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
-        correlationId
-      case None =>
-        val correlationId = "No Correlation ID"
-        logger.info(
-          s"[${endpointLogContext.controllerName}][getCorrelationId] - " +
-            s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
-        correlationId
-    }
-  }
+  protected def addCorrelationId(correlationId: String)(implicit hc: HeaderCarrier): HeaderCarrier =
+    hc.withExtraHeaders(("CorrelationId", correlationId))
+
 }

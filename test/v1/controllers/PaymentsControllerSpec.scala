@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockPaymentsRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPaymentsService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -40,7 +41,8 @@ class PaymentsControllerSpec
    with MockEnrolmentsAuthService
    with MockPaymentsService
    with MockPaymentsRequestParser
-   with MockAuditService {
+   with MockAuditService
+   with MockIdGenerator {
 
   trait Test{
     val hc: HeaderCarrier = HeaderCarrier()
@@ -50,9 +52,11 @@ class PaymentsControllerSpec
       requestParser = mockPaymentsRequestParser,
       service = mockPaymentsService,
       auditService = mockAuditService,
-      cc = cc
+      cc = cc,
+      mockIdGenerator
     )
 
+    MockIdGenerator.getCorrelationId.returns(correlationId)
     MockEnrolmentsAuthService.authoriseUser()
   }
 

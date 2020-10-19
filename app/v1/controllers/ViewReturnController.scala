@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{EndpointLogContext, Logging}
+import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ViewReturnRequestParser
 import v1.models.audit.AuditResponse
@@ -37,7 +37,8 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
                                     requestParser: ViewReturnRequestParser,
                                     service: ViewReturnService,
                                     auditService: AuditService,
-                                    cc: ControllerComponents)(implicit ec: ExecutionContext)
+                                    cc: ControllerComponents,
+                                    val idGenerator: IdGenerator)(implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -47,9 +48,11 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
     )
 
   def viewReturn(vrn: String, periodKey: String): Action[AnyContent] =
-    authorisedAction(vrn).async{ implicit request =>
+    authorisedAction(vrn).async { implicit request =>
+
+      val correlationId = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"Retrieve VAT returns for VRN : $vrn")
+        s"Retrieve VAT returns for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: ViewRawData =
         ViewRawData(
@@ -60,10 +63,10 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
       val result =
         for {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-          serviceResponse <- EitherT(service.viewReturn(parsedRequest))
+          serviceResponse <- EitherT(service.viewReturn(parsedRequest)(addCorrelationId(correlationId), ec, endpointLogContext, request))
         } yield {
           logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-            s"Successfully retrieved Vat Return from DES")
+            s"Successfully retrieved Vat Return from DES with correlationId : ${serviceResponse.correlationId}")
 
           auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
             request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
@@ -74,11 +77,11 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
         }
 
       result.leftMap { errorWrapper =>
-        val correlationId = getCorrelationId(errorWrapper)
-        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
+        val resCorrelationId: String = errorWrapper.correlationId.getOrElse(correlationId)
+        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditReturns(correlationId,
+        auditService.auditEvent(AuditEvents.auditReturns(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
         leftResult

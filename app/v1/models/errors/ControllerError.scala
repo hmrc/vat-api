@@ -20,10 +20,11 @@ import utils.EndpointLogContext
 import v1.controllers.UserRequest
 
 case class ControllerError[A](endpointLogContext: EndpointLogContext,
-                           vrn: String,
-                           request: UserRequest[A],
-                           status: Int,
-                           details: String)
+                              vrn: String,
+                              request: UserRequest[A],
+                              status: Int,
+                              details: String,
+                              correlationId: String)
 
 object ControllerError {
 
@@ -31,6 +32,7 @@ object ControllerError {
     s"[${errorDetails.endpointLogContext.controllerName}][${errorDetails.endpointLogContext.endpointName}] " +
     s"VRN: ${errorDetails.vrn}, X-Request-Id: ${errorDetails.request.id.toString}, " +
     s"X-Client-Id: ${errorDetails.request.userDetails.clientId}, errorStatus: ${errorDetails.status.toString}, " +
-    s"errorMessage: ${errorDetails.details}"
+    s"errorMessage: ${errorDetails.details}, " +
+      s"correlationId: ${errorDetails.correlationId}"
   }
 }

@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -37,7 +38,8 @@ class ObligationsControllerSpec extends ControllerBaseSpec
   with MockEnrolmentsAuthService
   with MockObligationService
   with MockObligationRequestParser
-  with MockAuditService {
+  with MockAuditService
+  with MockIdGenerator {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -47,10 +49,12 @@ class ObligationsControllerSpec extends ControllerBaseSpec
       mockObligationRequestParser,
       mockObligationsService,
       mockAuditService,
-      cc
+      cc,
+      mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
+    MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
   val vrn: String = "123456789"
