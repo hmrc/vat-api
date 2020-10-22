@@ -16,13 +16,11 @@
 
 package v1.services
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
+import utils.HashUtil
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockNrsConnector
 import v1.models.auth.UserDetails
@@ -64,11 +62,7 @@ class NrsServiceSpec extends ServiceSpec {
     )
 
   private val payloadString: String =
-    Base64.getEncoder.encodeToString(
-      Json.toJson(submitRequestBody)
-        .toString()
-        .getBytes(StandardCharsets.UTF_8)
-    )
+    HashUtil.encode(Json.toJson(submitRequestBody).toString())
 
   private val nrsSubmission: NrsSubmission =
     NrsSubmission(
@@ -77,7 +71,7 @@ class NrsServiceSpec extends ServiceSpec {
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
-        payloadSha256Checksum = None,
+        payloadSha256Checksum = HashUtil.getHash(Json.toJson(submitRequestBody).toString()),
         userSubmissionTimestamp = timestamp,
         identityData = Some(IdentityDataTestData.correctModel),
         userAuthToken = "Bearer aaaa",

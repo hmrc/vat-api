@@ -23,7 +23,7 @@ import utils.DateUtils
 case class Metadata(businessId: String,
                     notableEvent: String,
                     payloadContentType: String,
-                    payloadSha256Checksum: Option[String],
+                    payloadSha256Checksum: String,
                     userSubmissionTimestamp: DateTime,
                     identityData: Option[IdentityData],
                     userAuthToken: String,
