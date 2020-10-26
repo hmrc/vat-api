@@ -39,11 +39,12 @@ class NrsService @Inject()(connector: NrsConnector) {
   def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Either[ErrorWrapper, NrsResponse]] = {
+    ec: ExecutionContext,
+    correlationId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
 
     val result = for {
       nrsResponse <- EitherT(connector.submitNrs(buildNrsSubmission(vatSubmission, submissionTimestamp, request)))
-        .leftMap(_ => ErrorWrapper(None, DownstreamError, None))
+        .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
     } yield nrsResponse
 
     result.value

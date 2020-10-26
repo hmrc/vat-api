@@ -35,7 +35,8 @@ class ViewReturnConnector @Inject()(val http: HttpClient,
   def viewReturn(request: ViewRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    userRequest: UserRequest[_]): Future[DesOutcome[ViewReturnResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[DesOutcome[ViewReturnResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 

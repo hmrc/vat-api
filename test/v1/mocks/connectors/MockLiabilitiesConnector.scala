@@ -34,8 +34,8 @@ trait MockLiabilitiesConnector extends MockFactory {
 
     def retrieveLiabilities(requestData: LiabilitiesRequest): CallHandler[Future[DesOutcome[LiabilitiesResponse]]] = {
       (mockRetrieveLiabilitiesConnector
-        .retrieveLiabilities(_: LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(requestData, *, *, *)
+        .retrieveLiabilities(_: LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+        .expects(requestData, *, *, *, *)
     }
   }
 

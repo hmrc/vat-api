@@ -16,6 +16,7 @@
 
 package v1.services
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import v1.controllers.UserRequest
@@ -30,11 +31,10 @@ import scala.concurrent.Future
 
 class LiabilitiesServiceSpec extends ServiceSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
   private val from: String = "2017-1-1"
   private val to: String = "2017-12-31"
-  private val correlationId = "X-123"
 
   private val retrieveLiabilitiesRequest: LiabilitiesRequest =
     LiabilitiesRequest(
@@ -68,7 +68,7 @@ class LiabilitiesServiceSpec extends ServiceSpec {
         MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilitiesResponse(Seq.empty[Liability])))))
 
-        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), LegacyNotFoundError))
+        await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(correlationId, LegacyNotFoundError))
       }
     }
 
@@ -81,7 +81,7 @@ class LiabilitiesServiceSpec extends ServiceSpec {
             MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(

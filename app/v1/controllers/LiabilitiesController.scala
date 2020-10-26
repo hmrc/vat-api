@@ -51,7 +51,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
   def retrieveLiabilities(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
 
-      val correlationId = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieving Liabilities for VRN : $vrn with correlationId : $correlationId")
 
@@ -59,7 +59,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest)(addCorrelationId(correlationId), ec, endpointLogContext, request))
+        serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
         logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"Successfully retrieved Liabilities from DES with correlationId : ${serviceResponse.correlationId}")
@@ -74,7 +74,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
 
      result.leftMap { errorWrapper =>
 
-       val resCorrelationId: String = errorWrapper.correlationId.getOrElse(correlationId)
+       val resCorrelationId: String = errorWrapper.correlationId
        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 

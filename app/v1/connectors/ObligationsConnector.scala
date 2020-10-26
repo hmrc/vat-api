@@ -35,7 +35,8 @@ class ObligationsConnector @Inject()(val http: HttpClient,
   def retrieveObligations(request: ObligationsRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    userRequest: UserRequest[_]): Future[DesOutcome[ObligationsResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[DesOutcome[ObligationsResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 

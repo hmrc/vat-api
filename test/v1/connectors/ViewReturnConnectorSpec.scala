@@ -17,6 +17,7 @@
 package v1.connectors
 
 import mocks.MockAppConfig
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,7 +33,7 @@ import scala.concurrent.Future
 
 class ViewReturnConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
   private val periodKey: String = "F034"
 
@@ -94,7 +95,7 @@ class ViewReturnConnectorSpec extends ConnectorSpec {
           .returns(Future.successful(outcome))
 
         await(connector.viewReturn(viewReturnRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest)) shouldBe outcome
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
       }
     }
   }

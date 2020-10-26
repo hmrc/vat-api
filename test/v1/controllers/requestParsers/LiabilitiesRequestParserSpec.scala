@@ -28,6 +28,7 @@ class LiabilitiesRequestParserSpec extends UnitSpec {
     lazy val parser = new LiabilitiesRequestParser(mockValidator)
   }
 
+  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
   private val validVrn = "123456789"
   private val validFromDate = "2020-01-01"
   private val validToDate = "2020-03-31"
@@ -52,7 +53,7 @@ class LiabilitiesRequestParserSpec extends UnitSpec {
         MockVrnValidator.validate(LiabilitiesRawData(invalidVrn, Some(validFromDate), Some(validToDate))).returns(List(VrnFormatError))
 
         parser.parseRequest(LiabilitiesRawData(invalidVrn, Some(validFromDate), Some(validToDate))) shouldBe
-          Left(ErrorWrapper(None, VrnFormatError, None))
+          Left(ErrorWrapper(correlationId, VrnFormatError, None))
       }
 
       "invalid from date is provided" in new Test {
@@ -60,7 +61,7 @@ class LiabilitiesRequestParserSpec extends UnitSpec {
           .returns(List(FinancialDataInvalidDateFromError))
 
         parser.parseRequest(LiabilitiesRawData(validVrn, Some(invalidFrom), Some(validToDate))) shouldBe
-          Left(ErrorWrapper(None, FinancialDataInvalidDateFromError, None))
+          Left(ErrorWrapper(correlationId, FinancialDataInvalidDateFromError, None))
       }
 
       "invalid to date is provided" in new Test {
@@ -68,7 +69,7 @@ class LiabilitiesRequestParserSpec extends UnitSpec {
           .returns(List(FinancialDataInvalidDateToError))
 
         parser.parseRequest(LiabilitiesRawData(validVrn, Some(validFromDate), Some(invalidTo))) shouldBe
-          Left(ErrorWrapper(None, FinancialDataInvalidDateToError, None))
+          Left(ErrorWrapper(correlationId, FinancialDataInvalidDateToError, None))
       }
 
       "invalid date range is provided" in new Test {
@@ -76,7 +77,7 @@ class LiabilitiesRequestParserSpec extends UnitSpec {
           .returns(List(FinancialDataInvalidDateRangeError))
 
         parser.parseRequest(LiabilitiesRawData(validVrn, Some("2017-01-01"), Some("2019-01-01"))) shouldBe
-          Left(ErrorWrapper(None, FinancialDataInvalidDateRangeError, None))
+          Left(ErrorWrapper(correlationId, FinancialDataInvalidDateRangeError, None))
       }
     }
   }

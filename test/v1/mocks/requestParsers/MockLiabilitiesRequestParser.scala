@@ -29,7 +29,7 @@ trait MockLiabilitiesRequestParser extends MockFactory {
   object MockLiabilitiesRequestParser{
 
     def parse(rawData: LiabilitiesRawData): CallHandler[Either[ErrorWrapper, LiabilitiesRequest]] = {
-      (mockLiabilitiesRequestParser.parseRequest(_: LiabilitiesRawData)).expects(rawData)
+      (mockLiabilitiesRequestParser.parseRequest(_: LiabilitiesRawData)(_: String)).expects(rawData, *)
     }
   }
 

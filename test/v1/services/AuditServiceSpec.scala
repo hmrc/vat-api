@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import v1.fixtures.audit.AuditDetailFixture._
-import v1.models.audit.AuditEvent
+import v1.models.audit.{AuditDetail, AuditEvent}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,7 +52,7 @@ class AuditServiceSpec extends ServiceSpec {
           .expects(*, *, *)
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
+        val event: AuditEvent[AuditDetail] = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
         target.auditEvent(event) shouldBe expected
       }
 
@@ -66,7 +66,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
+        val event: AuditEvent[AuditDetail] = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -81,7 +81,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
+        val event: AuditEvent[AuditDetail] = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -96,7 +96,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
+        val event: AuditEvent[AuditDetail] = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }
@@ -111,7 +111,7 @@ class AuditServiceSpec extends ServiceSpec {
           )
           .returns(expected)
 
-        val event = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
+        val event: AuditEvent[AuditDetail] = AuditEvent(auditType, transactionName, auditDetailModelSuccess)
 
         target.auditEvent(event)
       }

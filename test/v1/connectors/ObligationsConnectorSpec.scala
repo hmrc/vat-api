@@ -17,6 +17,7 @@
 package v1.connectors
 
 import mocks.MockAppConfig
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,8 +33,8 @@ import scala.concurrent.Future
 
 class ObligationsConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
-  val vrn = Vrn("123456789")
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  val vrn: Vrn = Vrn("123456789")
 
   val obligationsResponse: ObligationsResponse =
     ObligationsResponse(Seq(
@@ -88,7 +89,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest)) shouldBe outcome
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
       }
 
       "not add query parameters if not supplied" in new Test {

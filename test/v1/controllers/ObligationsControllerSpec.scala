@@ -41,6 +41,12 @@ class ObligationsControllerSpec extends ControllerBaseSpec
   with MockAuditService
   with MockIdGenerator {
 
+  val vrn: String = "123456789"
+  val from: String = "2017-01-01"
+  val to: String = "2017-03-31"
+  val obligationStatus: String = "F"
+  val correlationId: String = "X-ID"
+
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
@@ -56,12 +62,6 @@ class ObligationsControllerSpec extends ControllerBaseSpec
     MockEnrolmentsAuthService.authoriseUser()
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val from: String = "2017-01-01"
-  val to: String = "2017-03-31"
-  val obligationStatus: String = "F"
-  val correlationId: String = "X-ID"
 
   val retrieveObligationsRawData: ObligationsRawData =
     ObligationsRawData(
@@ -180,7 +180,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             MockObligationRequestParser
               .parse(retrieveObligationsRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
 
@@ -215,7 +215,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             MockObligationService
               .receiveObligations(retrieveObligationsRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
 

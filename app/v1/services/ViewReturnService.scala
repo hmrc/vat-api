@@ -37,7 +37,8 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext,
-    userRequest: UserRequest[_]): Future[ServiceOutcome[ViewReturnResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[ServiceOutcome[ViewReturnResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.viewReturn(request)).leftMap(mapDesErrors(desErrorMap))

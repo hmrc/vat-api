@@ -55,7 +55,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
   def submitReturn(vrn: String): Action[JsValue] =
     authorisedAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
 
-      val correlationId = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Submitting Vat Return for VRN : $vrn with correlationId : $correlationId")
 
@@ -70,7 +70,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
-            Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn)))(addCorrelationId(correlationId), ec, endpointLogContext, request))
+            Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
@@ -97,7 +97,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       }
 
       result.leftMap { errorWrapper =>
-        val resCorrelationId: String = errorWrapper.correlationId.getOrElse(correlationId)
+        val resCorrelationId: String = errorWrapper.correlationId
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 

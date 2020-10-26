@@ -51,7 +51,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
   def retrievePayments(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
 
-      val correlationId = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieve Payments for VRN : $vrn with correlationId : $correlationId")
 
@@ -65,7 +65,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
       val result =
         for {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-          serviceResponse <- EitherT(service.retrievePayments(parsedRequest)(addCorrelationId(correlationId), ec, endpointLogContext, request))
+          serviceResponse <- EitherT(service.retrievePayments(parsedRequest))
         } yield {
           logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
             s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
@@ -79,7 +79,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
         }
 
       result.leftMap { errorWrapper =>
-        val resCorrelationId: String = errorWrapper.correlationId.getOrElse(correlationId)
+        val resCorrelationId: String = errorWrapper.correlationId
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 

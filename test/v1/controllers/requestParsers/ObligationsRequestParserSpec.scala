@@ -28,7 +28,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
     lazy val parser = new ObligationsRequestParser(mockValidator)
   }
 
-
+  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
   private val validVrn = "123456789"
   private val validFromDate = "2020-01-01"
   private val validToDate = "2020-03-31"
@@ -64,7 +64,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(VrnFormatError))
 
         parser.parseRequest(ObligationsRawData(invalidVrn, Some(validFromDate), Some(validToDate), Some("F"))) shouldBe
-          Left(ErrorWrapper(None, VrnFormatError, None))
+          Left(ErrorWrapper(correlationId, VrnFormatError, None))
       }
 
       "invalid from date is provided" in new Test {
@@ -72,7 +72,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(InvalidFromError))
 
         parser.parseRequest(ObligationsRawData(validVrn, Some(invalidFrom), Some(validToDate), Some("F"))) shouldBe
-          Left(ErrorWrapper(None, InvalidFromError, None))
+          Left(ErrorWrapper(correlationId, InvalidFromError, None))
       }
 
       "invalid to date is provided" in new Test {
@@ -80,7 +80,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(InvalidToError))
 
         parser.parseRequest(ObligationsRawData(validVrn, Some(validFromDate), Some(invalidTo), Some("F"))) shouldBe
-          Left(ErrorWrapper(None, InvalidToError, None))
+          Left(ErrorWrapper(correlationId, InvalidToError, None))
       }
 
       "invalid status is provided" in new Test {
@@ -88,7 +88,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(InvalidStatusError))
 
         parser.parseRequest(ObligationsRawData(validVrn, Some(validFromDate), Some(validToDate), Some("NotAStatus"))) shouldBe
-          Left(ErrorWrapper(None, InvalidStatusError, None))
+          Left(ErrorWrapper(correlationId, InvalidStatusError, None))
       }
 
       "multiple request parameters supplied are invalid" in new Test {
@@ -96,7 +96,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(VrnFormatError))
 
         parser.parseRequest(ObligationsRawData(invalidVrn, Some(invalidFrom), Some(invalidTo), Some("NotAStatus"))) shouldBe
-          Left(ErrorWrapper(None, VrnFormatError, None))
+          Left(ErrorWrapper(correlationId, VrnFormatError, None))
       }
 
       "omissions are made without status('O')" in new Test {
@@ -104,7 +104,7 @@ class ObligationsRequestParserSpec extends UnitSpec {
           .returns(List(InvalidStatusError))
 
         parser.parseRequest(ObligationsRawData(validVrn, None, None, Some("NotAStatus"))) shouldBe
-        Left(ErrorWrapper(None, InvalidStatusError, None))
+        Left(ErrorWrapper(correlationId, InvalidStatusError, None))
       }
     }
   }

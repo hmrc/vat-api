@@ -16,6 +16,8 @@
 
 package v1.models.response.liabilities
 
+import java.time.LocalDate
+
 import play.api.libs.json._
 import utils.FinancialDataReadsUtils
 
@@ -27,7 +29,7 @@ object LiabilitiesResponse extends FinancialDataReadsUtils {
 
   implicit val writes: OWrites[LiabilitiesResponse] = Json.writes[LiabilitiesResponse]
 
-  implicit def reads(implicit to: String): Reads[LiabilitiesResponse] =
+  implicit def reads(implicit to: LocalDate): Reads[LiabilitiesResponse] =
     (JsPath \ "financialTransactions")
       .read(filterNotArrayReads[Liability](filterName = "chargeType", notMatching = unsupportedChargeTypes))
       .map(_.filter(liability => dateCheck(liability.taxPeriod, to)))

@@ -43,6 +43,11 @@ class LiabilitiesControllerSpec
     with MockAuditService
     with MockIdGenerator {
 
+  val vrn: String = "123456789"
+  val from: String = "01-01-2017"
+  val to: String = "01-12-2017"
+  val correlationId: String = "X-ID"
+
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
@@ -58,11 +63,6 @@ class LiabilitiesControllerSpec
     MockEnrolmentsAuthService.authoriseUser()
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val from: String = "01-01-2017"
-  val to: String = "01-12-2017"
-  val correlationId: String = "X-ID"
 
   val retrieveLiabilitiesRawData: LiabilitiesRawData =
     LiabilitiesRawData(
@@ -135,7 +135,7 @@ class LiabilitiesControllerSpec
 
             MockLiabilitiesRequestParser
               .parse(retrieveLiabilitiesRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 
@@ -169,7 +169,7 @@ class LiabilitiesControllerSpec
 
             MockRetrieveLiabilitiesService
               .retrieveLiabilities(retrieveLiabilitiesRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 

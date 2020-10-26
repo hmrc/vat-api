@@ -42,7 +42,10 @@ class ViewReturnControllerSpec
     with MockAuditService
     with MockIdGenerator {
 
-
+  val vrn: String = "123456789"
+  val periodKey: String = "18A1"
+  val correlationId: String = "X-ID"
+  
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
@@ -58,10 +61,6 @@ class ViewReturnControllerSpec
     MockEnrolmentsAuthService.authoriseUser()
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val periodKey: String = "18A1"
-  val correlationId: String = "X-ID"
 
   val viewReturnRawData: ViewRawData =
     ViewRawData(
@@ -137,7 +136,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnRequestParser
               .parse(viewReturnRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 
@@ -170,7 +169,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnService
               .viewReturn(viewReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 
@@ -205,7 +204,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnService
               .viewReturn(viewReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), EmptyNotFoundError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, EmptyNotFoundError))))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 

@@ -37,7 +37,8 @@ class LiabilitiesService @Inject()(connector: LiabilitiesConnector) extends DesR
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext,
-    userRequest: UserRequest[_]): Future[ServiceOutcome[LiabilitiesResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[ServiceOutcome[LiabilitiesResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrieveLiabilities(request)).leftMap(mapDesErrors(desErrorMap))

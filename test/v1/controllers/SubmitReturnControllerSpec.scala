@@ -49,10 +49,13 @@ class SubmitReturnControllerSpec
 
   val date: DateTime = DateTime.parse("2017-01-01T00:00:00.000Z")
   val fmt: String = DateUtils.dateTimePattern
+  val vrn: String = "123456789"
+  val correlationId: String = "X-ID"
+  val periodKey: String = "A1A2"
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
-
+    
     val controller: SubmitReturnController = new SubmitReturnController(
       mockEnrolmentsAuthService,
       mockSubmitReturnRequestParser,
@@ -69,9 +72,6 @@ class SubmitReturnControllerSpec
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
-  val vrn: String = "123456789"
-  val correlationId: String = "X-ID"
-  val periodKey: String = "A1A2"
 
   val submitRequestBody: SubmitRequestBody = SubmitRequestBody(
     periodKey = Some("#001"),
@@ -180,7 +180,7 @@ class SubmitReturnControllerSpec
 
         MockNrsService
           .submitNrs(submitReturnRequest, date)
-          .returns(Future.successful(Left(ErrorWrapper(None, DownstreamError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
 
@@ -231,7 +231,7 @@ class SubmitReturnControllerSpec
 
         MockSubmitReturnRequestParser
           .parse(submitRequestRawData.copy(body = AnyContent(submitRequestBodyJsonWithInvalidFinalisedFormat)))
-          .returns(Left(ErrorWrapper(Some(correlationId), UnMappedPlayRuleError, None)))
+          .returns(Left(ErrorWrapper(correlationId, UnMappedPlayRuleError, None)))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJsonWithInvalidFinalisedFormat))
 
@@ -285,7 +285,7 @@ class SubmitReturnControllerSpec
 
         MockSubmitReturnRequestParser
           .parse(submitRequestRawData.copy(body = AnyContent(submitRequestBodyJsonWithInvalidFinalisedFormat)))
-          .returns(Left(ErrorWrapper(Some(correlationId), BadRequestError, Some(List(VATTotalValueRuleError, VATNetValueRuleError)))))
+          .returns(Left(ErrorWrapper(correlationId, BadRequestError, Some(List(VATTotalValueRuleError, VATNetValueRuleError)))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJsonWithInvalidFinalisedFormat))
 
@@ -306,7 +306,7 @@ class SubmitReturnControllerSpec
 
             MockSubmitReturnRequestParser
               .parse(submitRequestRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
 
@@ -342,7 +342,7 @@ class SubmitReturnControllerSpec
 
             MockSubmitReturnService
               .submitReturn(submitReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
 

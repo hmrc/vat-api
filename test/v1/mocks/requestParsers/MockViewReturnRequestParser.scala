@@ -29,7 +29,7 @@ trait MockViewReturnRequestParser extends MockFactory {
   object MockViewReturnRequestParser{
 
     def parse(rawData: ViewRawData): CallHandler[Either[ErrorWrapper, ViewRequest]] = {
-      (mockViewReturnRequestParser.parseRequest(_: ViewRawData)).expects(rawData)
+      (mockViewReturnRequestParser.parseRequest(_: ViewRawData)(_: String)).expects(rawData, *)
     }
   }
 

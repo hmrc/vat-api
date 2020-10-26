@@ -34,8 +34,8 @@ trait MockViewReturnConnector extends MockFactory {
 
     def viewReturn(requestData: ViewRequest): CallHandler[Future[DesOutcome[ViewReturnResponse]]] = {
       (mockViewReturnConnector
-        .viewReturn(_: ViewRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(requestData, *, *, *)
+        .viewReturn(_: ViewRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+        .expects(requestData, *, *, *, *)
     }
   }
 

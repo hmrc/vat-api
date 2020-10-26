@@ -37,7 +37,8 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext,
-    userRequest: UserRequest[_]): Future[ServiceOutcome[PaymentsResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[ServiceOutcome[PaymentsResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))

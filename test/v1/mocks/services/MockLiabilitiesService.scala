@@ -35,8 +35,9 @@ trait MockLiabilitiesService extends MockFactory {
 
     def retrieveLiabilities(request: LiabilitiesRequest): CallHandler[Future[ServiceOutcome[LiabilitiesResponse]]] = {
       (mockRetrieveLiabilitiesService
-        .retrieveLiabilities(_ : LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_]))
-        .expects(request, *, *, *, *)
+        .retrieveLiabilities(_ : LiabilitiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext,
+          _: UserRequest[_], _: String))
+        .expects(request, *, *, *, *, *)
     }
   }
 

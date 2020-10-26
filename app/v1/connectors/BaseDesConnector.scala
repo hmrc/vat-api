@@ -43,34 +43,37 @@ trait BaseDesConnector {
 
   def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
-                                                              httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
+                                                              httpReads: HttpReads[DesOutcome[Resp]],
+                                                              correlationId: String): Future[DesOutcome[Resp]] = {
 
     def doPost(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
       http.POST(s"${appConfig.desBaseUrl}/${uri.value}", body)
     }
 
-    doPost(desPostHeaderCarrier(hc))
+    doPost(desPostHeaderCarrier(hc.withExtraHeaders(("CorrelationId", correlationId))))
   }
 
   def get[Resp](uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                    hc: HeaderCarrier,
-                                   httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
+                                   httpReads: HttpReads[DesOutcome[Resp]],
+                                   correlationId: String): Future[DesOutcome[Resp]] = {
 
     def doGet(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] =
       http.GET(s"${appConfig.desBaseUrl}/${uri.value}")
 
-    doGet(desHeaderCarrier(hc))
+    doGet(desHeaderCarrier(hc.withExtraHeaders(("CorrelationId", correlationId))))
   }
 
   def get[Resp](uri: DesUri[Resp], queryParams: Seq[(String, String)])(implicit ec: ExecutionContext,
                                                                        hc: HeaderCarrier,
-                                                                       httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
+                                                                       httpReads: HttpReads[DesOutcome[Resp]],
+                                                                       correlationId: String): Future[DesOutcome[Resp]] = {
 
     def doGet(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
       http.GET(s"${appConfig.desBaseUrl}/${uri.value}", queryParams)
     }
 
-    doGet(desHeaderCarrier(hc))
+    doGet(desHeaderCarrier(hc.withExtraHeaders(("CorrelationId", correlationId))))
   }
 
 }

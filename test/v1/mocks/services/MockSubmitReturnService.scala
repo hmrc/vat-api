@@ -35,8 +35,8 @@ trait MockSubmitReturnService extends MockFactory {
 
     def submitReturn(request: SubmitRequest): CallHandler[Future[ServiceOutcome[SubmitResponse]]] = {
       (mockSubmitReturnService
-        .submitReturn(_ : SubmitRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_]))
-        .expects(request, *, *, *, *)
+        .submitReturn(_ : SubmitRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_], _: String))
+        .expects(request, *, *, *, *, *)
     }
   }
 

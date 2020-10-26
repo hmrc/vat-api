@@ -35,8 +35,8 @@ trait MockPaymentsService extends MockFactory {
 
     def retrievePayments(request: PaymentsRequest): CallHandler[Future[ServiceOutcome[PaymentsResponse]]] = {
       (mockPaymentsService
-        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_]))
-        .expects(request, *, *, *, *)
+        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_], _: String))
+        .expects(request, *, *, *, *, *)
     }
   }
 
