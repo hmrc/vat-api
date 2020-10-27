@@ -16,15 +16,13 @@
 
 package v1.services
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.Inject
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.HashUtil
 import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
 import v1.models.errors.{DownstreamError, ErrorWrapper}
@@ -54,20 +52,17 @@ class NrsService @Inject()(connector: NrsConnector) {
 
     import vatSubmission._
 
-    val payloadString: String =
-      Base64.getEncoder.encodeToString(
-        Json.toJson(body)
-          .toString()
-          .getBytes(StandardCharsets.UTF_8)
-      )
+    val payloadString = Json.toJson(body).toString()
+    val htmlPayload = HashUtil.encode(payloadString)
+    val sha256Checksum = HashUtil.getHash(payloadString)
 
     NrsSubmission(
-      payload = payloadString,
+      payload = htmlPayload,
       Metadata(
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
-        payloadSha256Checksum = None,
+        payloadSha256Checksum = sha256Checksum,
         userSubmissionTimestamp = submissionTimestamp,
         identityData = request.userDetails.identityData,
         userAuthToken = request.headers.get("Authorization").get,

@@ -21,6 +21,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
+import utils.HashUtil
 import v1.models.nrs.request._
 import v1.models.nrs.response.NrsResponse
 
@@ -96,6 +97,7 @@ object NrsTestData {
          |    "businessId": "vat",
          |    "notableEvent": "vat-return",
          |    "payloadContentType": "application/json",
+         |    "payloadSha256Checksum":"2c98a3e52aed1f06728e35e4f47699bd4af6f328c3dabfde998007382dba86ce",
          |    "userSubmissionTimestamp": "2018-04-07T12:13:25Z",
          |    "identityData": ${IdentityDataTestData.correctJson},
          |    "userAuthToken": "Bearer AbCdEf123456...",
@@ -122,7 +124,7 @@ object NrsTestData {
       businessId = "vat",
       notableEvent = "vat-return",
       payloadContentType = "application/json",
-      payloadSha256Checksum = None,
+      payloadSha256Checksum = HashUtil.getHash("XXX-base64checksum-XXX"),
       userSubmissionTimestamp = DateTime.parse("2018-04-07T12:13:25Z"),
       identityData = Some(IdentityDataTestData.correctModel),
       userAuthToken = "Bearer AbCdEf123456...",
