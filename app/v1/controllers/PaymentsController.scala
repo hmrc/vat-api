@@ -83,7 +83,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditPayments(correlationId,
+        auditService.auditEvent(AuditEvents.auditPayments(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
         leftResult

@@ -85,7 +85,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditObligations(correlationId,
+        auditService.auditEvent(AuditEvents.auditObligations(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
         leftResult

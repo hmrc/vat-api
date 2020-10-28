@@ -101,7 +101,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditSubmit(correlationId,
+        auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
           request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper)))))
 
         leftResult
