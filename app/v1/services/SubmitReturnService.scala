@@ -37,7 +37,8 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext,
-    userRequest: UserRequest[_]): Future[ServiceOutcome[SubmitResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[ServiceOutcome[SubmitResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.submitReturn(request)).leftMap(mapDesErrors(desErrorMap))

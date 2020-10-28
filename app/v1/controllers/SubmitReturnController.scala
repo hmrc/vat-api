@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{CurrentDateTime, DateUtils, EndpointLogContext, Logging}
+import utils.{CurrentDateTime, DateUtils, EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
@@ -41,7 +41,9 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        nrsService: NrsService,
                                        auditService: AuditService,
                                        cc: ControllerComponents,
-                                       val dateTime: CurrentDateTime)(implicit ec: ExecutionContext)
+                                       val dateTime: CurrentDateTime,
+                                       val idGenerator: IdGenerator)
+                                      (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -50,10 +52,12 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       endpointName = "submitVatReturn"
     )
 
-  def submitReturn(vrn: String): Action[JsValue] = {
+  def submitReturn(vrn: String): Action[JsValue] =
     authorisedAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"Submitting Vat Return")
+        s"Submitting Vat Return for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
 
@@ -69,7 +73,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
             Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
       } yield {
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-          s" - Successfully created")
+          s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 
         nrsResponse match {
           case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
@@ -93,17 +97,16 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       }
 
       result.leftMap { errorWrapper =>
-        val correlationId = getCorrelationId(errorWrapper)
-        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
+        val resCorrelationId: String = errorWrapper.correlationId
+        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditSubmit(correlationId,
+        auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
           request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper)))))
 
         leftResult
       }.merge
     }
-  }
 
   private def errorResult(errorWrapper: ErrorWrapper) = {
     (errorWrapper.error: @unchecked) match {

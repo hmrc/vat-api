@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{EndpointLogContext, Logging}
+import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ObligationsRequestParser
 import v1.models.audit.AuditResponse
@@ -37,7 +37,9 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
                                       requestParser: ObligationsRequestParser,
                                       service: ObligationsService,
                                       auditService: AuditService,
-                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
+                                      cc: ControllerComponents,
+                                      val idGenerator: IdGenerator)
+                                     (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -47,8 +49,12 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
     )
 
   def retrieveObligations(vrn: String, from: Option[String], to: Option[String], status: Option[String]): Action[AnyContent] =
-    authorisedAction(vrn).async{ implicit request =>
-      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Retrieve obligations for VRN : $vrn")
+    authorisedAction(vrn).async { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
+
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"Retrieve obligations for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: ObligationsRawData =
         ObligationsRawData(
@@ -63,7 +69,8 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.retrieveObligations(parsedRequest))
         } yield {
-          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] Successfully retrieved Obligations from DES")
+          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}]" +
+            s" Successfully retrieved Obligations from DES with correlationId : ${serviceResponse.correlationId}")
 
           auditService.auditEvent(AuditEvents.auditObligations(serviceResponse.correlationId,
             request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
@@ -74,16 +81,15 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
         }
 
       result.leftMap { errorWrapper =>
-        val correlationId = getCorrelationId(errorWrapper)
-        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
+        val resCorrelationId: String = errorWrapper.correlationId
+        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditObligations(correlationId,
+        auditService.auditEvent(AuditEvents.auditObligations(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
         leftResult
       }.merge
-
     }
 
   private def errorResult(errorWrapper: ErrorWrapper) = {

@@ -17,6 +17,7 @@
 package v1.services
 
 import org.joda.time.DateTime
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import v1.controllers.UserRequest
@@ -31,9 +32,8 @@ import scala.concurrent.Future
 
 class SubmitReturnServiceSpec extends ServiceSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
-  private val correlationId = "X-123"
 
   private val submitRequestBody: SubmitRequestBody =
     SubmitRequestBody(
@@ -90,7 +90,7 @@ class SubmitReturnServiceSpec extends ServiceSpec {
             MockSubmitReturnConnector.submitReturn(submitReturnRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.submitReturn(submitReturnRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.submitReturn(submitReturnRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(

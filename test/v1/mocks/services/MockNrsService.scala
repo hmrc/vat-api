@@ -36,8 +36,8 @@ trait MockNrsService extends MockFactory {
 
     def submitNrs(request: SubmitRequest, dateTime: DateTime): CallHandler[Future[Either[ErrorWrapper, NrsResponse]]] = {
       (mockNrsService
-        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext))
-        .expects(request, *, *, *, *)
+        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: String))
+        .expects(request, *, *, *, *, *)
     }
   }
 

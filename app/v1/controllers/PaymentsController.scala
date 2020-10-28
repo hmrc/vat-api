@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.http.MimeTypes
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import utils.{EndpointLogContext, Logging}
+import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PaymentsRequestParser
 import v1.models.audit.AuditResponse
@@ -37,7 +37,9 @@ class PaymentsController @Inject()(val authService: EnrolmentsAuthService,
                                    requestParser: PaymentsRequestParser,
                                    service: PaymentsService,
                                    auditService: AuditService,
-                                   cc: ControllerComponents)(implicit ec: ExecutionContext)
+                                   cc: ControllerComponents,
+                                   val idGenerator: IdGenerator)
+                                  (implicit ec: ExecutionContext)
 extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -47,9 +49,11 @@ extends AuthorisedController(cc) with BaseController with Logging {
     )
 
   def retrievePayments(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
-    authorisedAction(vrn).async{ implicit request =>
-      logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"Successfully retrieved Payments from DES")
+    authorisedAction(vrn).async { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"Retrieve Payments for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: PaymentsRawData =
         PaymentsRawData(
@@ -64,7 +68,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
           serviceResponse <- EitherT(service.retrievePayments(parsedRequest))
         } yield {
           logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-            s"Successfully retrieved Payments from DES")
+            s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
 
           auditService.auditEvent(AuditEvents.auditPayments(serviceResponse.correlationId,
             request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
@@ -74,17 +78,16 @@ extends AuthorisedController(cc) with BaseController with Logging {
             .as(MimeTypes.JSON)
         }
 
-      result.leftMap{errorWrapper =>
-        val correlationId = getCorrelationId(errorWrapper)
-        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
+      result.leftMap { errorWrapper =>
+        val resCorrelationId: String = errorWrapper.correlationId
+        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditPayments(correlationId,
+        auditService.auditEvent(AuditEvents.auditPayments(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
         leftResult
       }.merge
-
     }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {

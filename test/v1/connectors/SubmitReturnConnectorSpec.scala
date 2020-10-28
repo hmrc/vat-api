@@ -18,6 +18,7 @@ package v1.connectors
 
 import mocks.MockAppConfig
 import org.joda.time.DateTime
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,7 +34,7 @@ import scala.concurrent.Future
 
 class SubmitReturnConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
 
   private val submitReturnRequest: SubmitRequest =
@@ -97,7 +98,7 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
           .returns(Future.successful(outcome))
 
         await(connector.submitReturn(submitReturnRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest)) shouldBe outcome
+        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
       }
     }
   }

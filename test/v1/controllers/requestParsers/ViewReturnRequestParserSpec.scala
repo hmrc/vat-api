@@ -32,6 +32,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
   private val validPeriodKey = "F02LDPDEE"
   private val invalidVrn = "notAVrn"
   private val invalidPeriodKey = "notAperiodKey"
+  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   "parsing a retrieve periodKey request" should {
     "return a retrieve periodKey request" when {
@@ -52,7 +53,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
         .returns(List(VrnFormatError))
 
       parser.parseRequest(ViewRawData(invalidVrn, validPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, VrnFormatError, None))
+        Left(ErrorWrapper(correlationId, VrnFormatError, None))
     }
   }
 
@@ -62,7 +63,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
         .returns(List(PeriodKeyFormatError))
 
       parser.parseRequest(ViewRawData(validVrn, invalidPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, PeriodKeyFormatError, None))
+        Left(ErrorWrapper(correlationId, PeriodKeyFormatError, None))
     }
   }
 
@@ -72,7 +73,7 @@ class ViewReturnRequestParserSpec extends UnitSpec {
         .returns(List(VrnFormatError))
 
       parser.parseRequest(ViewRawData(invalidVrn, invalidPeriodKey)) shouldBe
-        Left(ErrorWrapper(None, VrnFormatError, None))
+        Left(ErrorWrapper(correlationId, VrnFormatError, None))
     }
   }
 }

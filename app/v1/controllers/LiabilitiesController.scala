@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{EndpointLogContext, Logging}
+import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.LiabilitiesRequestParser
 import v1.models.audit.AuditResponse
@@ -38,7 +38,8 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
                                       requestParser: LiabilitiesRequestParser,
                                       service: LiabilitiesService,
                                       auditService: AuditService,
-                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
+                                      cc: ControllerComponents,
+                                      val idGenerator: IdGenerator)(implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -49,8 +50,10 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
 
   def retrieveLiabilities(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"Retrieving Liabilities from DES")
+        s"Retrieving Liabilities for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: LiabilitiesRawData = LiabilitiesRawData(vrn, from, to)
 
@@ -59,7 +62,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
         serviceResponse <- EitherT(service.retrieveLiabilities(parsedRequest))
       } yield {
         logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-          s"Successfully retrieved Liabilities from DES")
+          s"Successfully retrieved Liabilities from DES with correlationId : ${serviceResponse.correlationId}")
 
         auditService.auditEvent(AuditEvents.auditLiabilities(serviceResponse.correlationId,
           request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
@@ -71,11 +74,11 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
 
      result.leftMap { errorWrapper =>
 
-        val correlationId = getCorrelationId(errorWrapper)
-        val leftResult = errorResult(errorWrapper).withApiHeaders(correlationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message))
+       val resCorrelationId: String = errorWrapper.correlationId
+       val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+       logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-        auditService.auditEvent(AuditEvents.auditLiabilities(correlationId,
+       auditService.auditEvent(AuditEvents.auditLiabilities(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
        leftResult

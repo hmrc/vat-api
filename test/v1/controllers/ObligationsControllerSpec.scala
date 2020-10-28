@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockObligationRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockObligationService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -37,7 +38,14 @@ class ObligationsControllerSpec extends ControllerBaseSpec
   with MockEnrolmentsAuthService
   with MockObligationService
   with MockObligationRequestParser
-  with MockAuditService {
+  with MockAuditService
+  with MockIdGenerator {
+
+  val vrn: String = "123456789"
+  val from: String = "2017-01-01"
+  val to: String = "2017-03-31"
+  val obligationStatus: String = "F"
+  val correlationId: String = "X-ID"
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -47,17 +55,13 @@ class ObligationsControllerSpec extends ControllerBaseSpec
       mockObligationRequestParser,
       mockObligationsService,
       mockAuditService,
-      cc
+      cc,
+      mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
+    MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val from: String = "2017-01-01"
-  val to: String = "2017-03-31"
-  val obligationStatus: String = "F"
-  val correlationId: String = "X-ID"
 
   val retrieveObligationsRawData: ObligationsRawData =
     ObligationsRawData(
@@ -176,7 +180,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             MockObligationRequestParser
               .parse(retrieveObligationsRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
 
@@ -211,7 +215,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             MockObligationService
               .receiveObligations(retrieveObligationsRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.retrieveObligations(vrn, Some(from), Some(to), Some(obligationStatus))(fakeGetRequest)
 

@@ -16,6 +16,8 @@
 
 package utils
 
+import java.time.LocalDate
+
 import play.api.libs.json.{JsError, JsPath, Json, Reads}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
@@ -38,7 +40,7 @@ class FinancialDataReadsUtilsSpec extends UnitSpec with FinancialDataReadsUtils 
   }
 
   "dateCheck" when {
-    val toDate = "2019-01-01"
+    val toDate: LocalDate = LocalDate.parse("2019-01-01")
 
     "a valid date is supplied" should {
       "return 'true'" in {

@@ -148,7 +148,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Left(NrsError)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Left(ErrorWrapper(None, DownstreamError, None))
+        await(service.submitNrs(submitRequest, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
       }
     }
   }

@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockViewReturnRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockViewReturnService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -38,9 +39,13 @@ class ViewReturnControllerSpec
     with MockEnrolmentsAuthService
     with MockViewReturnService
     with MockViewReturnRequestParser
-    with MockAuditService {
+    with MockAuditService
+    with MockIdGenerator {
 
-
+  val vrn: String = "123456789"
+  val periodKey: String = "18A1"
+  val correlationId: String = "X-ID"
+  
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
@@ -49,15 +54,13 @@ class ViewReturnControllerSpec
       requestParser = mockViewReturnRequestParser,
       service = mockViewReturnService,
       auditService = mockAuditService,
-      cc = cc
+      cc = cc,
+      idGenerator = mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
+    MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val periodKey: String = "18A1"
-  val correlationId: String = "X-ID"
 
   val viewReturnRawData: ViewRawData =
     ViewRawData(
@@ -133,7 +136,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnRequestParser
               .parse(viewReturnRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 
@@ -166,7 +169,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnService
               .viewReturn(viewReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 
@@ -201,7 +204,7 @@ class ViewReturnControllerSpec
 
             MockViewReturnService
               .viewReturn(viewReturnRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), EmptyNotFoundError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, EmptyNotFoundError))))
 
             val result: Future[Result] = controller.viewReturn(vrn, periodKey)(fakeGetRequest)
 

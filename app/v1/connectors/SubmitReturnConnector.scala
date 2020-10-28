@@ -35,7 +35,8 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
   def submitReturn(request: SubmitRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
-    userRequest: UserRequest[_]): Future[DesOutcome[SubmitResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[DesOutcome[SubmitResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 

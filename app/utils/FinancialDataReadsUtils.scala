@@ -37,9 +37,9 @@ trait FinancialDataReadsUtils {
             .validate[Seq[T]])
   }
 
-  def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: String): Boolean = {
+  def dateCheck(taxPeriod: Option[TaxPeriod], requestToDate: LocalDate): Boolean = {
     val toDate = taxPeriod.fold(None: Option[LocalDate]) { l => Some(LocalDate.parse(l.to)) }
-    toDate.fold(true) { desTo => desTo.compareTo(LocalDate.parse(requestToDate)) <= 0
+    toDate.fold(true) { desTo => desTo.compareTo(requestToDate) <= 0
     }
   }
 }

@@ -16,6 +16,8 @@
 
 package v1.connectors
 
+import java.time.LocalDate
+
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,12 +36,14 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
 
   def retrieveLiabilities(request: LiabilitiesRequest)(implicit hc: HeaderCarrier,
                                                        ec: ExecutionContext,
-                                                       userRequest: UserRequest[_]): Future[DesOutcome[LiabilitiesResponse]] = {
+                                                       userRequest: UserRequest[_],
+                                                       correlationId: String): Future[DesOutcome[LiabilitiesResponse]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
-    implicit val requestToDate: String = request.to
+    implicit val requestToDate: LocalDate = LocalDate.parse(request.to)
+    val vrn = request.vrn.vrn
     implicit val connectorError: ConnectorError =
-      ConnectorError(request.vrn.vrn, hc.requestId.fold(""){ requestId => requestId.value})
+      ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
     implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom", request.from),
@@ -51,7 +55,7 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
     )
 
     get(
-      uri = DesUri[LiabilitiesResponse](s"enterprise/financial-data/VRN/${request.vrn.vrn}/VATC"),
+      uri = DesUri[LiabilitiesResponse](s"enterprise/financial-data/VRN/$vrn/VATC"),
       queryParams = queryParams
     )
   }

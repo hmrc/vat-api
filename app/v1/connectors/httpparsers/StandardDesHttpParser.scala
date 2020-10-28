@@ -30,7 +30,7 @@ object StandardDesHttpParser extends HttpParser {
 
   case class SuccessCode(status: Int) extends AnyVal
 
-  val logger = Logger(getClass)
+  val logger: Logger = Logger(getClass)
 
   // Return Right[DesResponse[Unit]] as success response has no body - no need to assign it a value
   implicit def readsEmpty(implicit successCode: SuccessCode = SuccessCode(NO_CONTENT),
@@ -55,13 +55,13 @@ object StandardDesHttpParser extends HttpParser {
     implicit successCode: SuccessCode, connectorError: ConnectorError,
     userRequest: UserRequest[_], logMessage: LoggerMessages.Value): DesOutcome[A] = {
 
-    val correlationId = retrieveCorrelationId(response)
+    val responseCorrelationId = retrieveCorrelationId(response)
 
     if (response.status != successCode.status) {
       logger.info(
         "[StandardDesHttpParser][read] - " +
           s"Error response received from DES with status: ${response.status} and body\n" +
-          s"${response.body} and correlationId: $correlationId when calling $url - " +
+          s"${response.body} and correlationId: $responseCorrelationId when calling $url - " +
           s"vrn: ${connectorError.vrn}, requestId: ${connectorError.requestId}")
 
       PagerDutyLogging.logError(logMessage, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
@@ -70,10 +70,10 @@ object StandardDesHttpParser extends HttpParser {
       case successCode.status =>
         logger.info(
           "[StandardDesHttpParser][read] - " +
-            s"Success response received from DES with correlationId: $correlationId when calling $url")
-        successOutcomeFactory(correlationId)
-      case BAD_REQUEST | NOT_FOUND | FORBIDDEN | CONFLICT | UNPROCESSABLE_ENTITY => Left(ResponseWrapper(correlationId, parseErrors(response)))
-      case _                                                                     => Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
+            s"Success response received from DES with correlationId: $responseCorrelationId when calling $url")
+        successOutcomeFactory(responseCorrelationId)
+      case BAD_REQUEST | NOT_FOUND | FORBIDDEN | CONFLICT | UNPROCESSABLE_ENTITY => Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
+      case _                                                                     => Left(ResponseWrapper(responseCorrelationId, OutboundError(DownstreamError)))
     }
   }
 }

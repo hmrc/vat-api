@@ -28,6 +28,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
 
   private val validVrn = "AA111111A"
   private val invalidVrn = "notAVrn"
+  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   val validBodyJson: JsValue = Json.parse(
     """
@@ -139,7 +140,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
           .returns(List(VrnFormatError))
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson))) shouldBe
-          Left(ErrorWrapper(None, VrnFormatError, None))
+          Left(ErrorWrapper(correlationId, VrnFormatError, None))
       }
     }
 
@@ -149,7 +150,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
           .returns(List(PeriodKeyFormatError))
 
         parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(invalidPeriodKeyJson))) shouldBe
-          Left(ErrorWrapper(None, PeriodKeyFormatError, None))
+          Left(ErrorWrapper(correlationId, PeriodKeyFormatError, None))
       }
     }
 
@@ -159,7 +160,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
           .returns(List(InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))))
 
         parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(invalidMonetaryFormatJson))) shouldBe
-          Left(ErrorWrapper(None, InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)), None))
+          Left(ErrorWrapper(correlationId, InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)), None))
       }
     }
 
@@ -169,7 +170,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
           .returns(List(InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99))))
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(invalidMonetaryRangeJson))) shouldBe
-          Left(ErrorWrapper(None, InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)), None))
+          Left(ErrorWrapper(correlationId, InvalidMonetaryValueError.withFieldName("vatDueAcquisitions", BigDecimal(-9999999999999.99), BigDecimal(9999999999999.99)), None))
       }
     }
 
@@ -179,7 +180,7 @@ class SubmitReturnRequestParserSpec extends UnitSpec {
           .returns(List(VrnFormatError))
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(invalidMonetaryRangeJson))) shouldBe
-          Left(ErrorWrapper(None, VrnFormatError, None))
+          Left(ErrorWrapper(correlationId, VrnFormatError, None))
       }
     }
   }

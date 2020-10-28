@@ -34,8 +34,8 @@ trait MockPaymentsConnector extends MockFactory {
 
     def retrievePayments(requestData: PaymentsRequest): CallHandler[Future[DesOutcome[PaymentsResponse]]] = {
       (mockRetrievePaymentsConnector
-        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(requestData, *, *, *)
+        .retrievePayments(_: PaymentsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+        .expects(requestData, *, *, *, *)
     }
   }
 

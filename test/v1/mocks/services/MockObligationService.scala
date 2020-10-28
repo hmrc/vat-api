@@ -35,8 +35,8 @@ trait MockObligationService extends MockFactory{
 
     def receiveObligations(request: ObligationsRequest): CallHandler[Future[ServiceOutcome[ObligationsResponse]]] = {
       (mockObligationsService
-        .retrieveObligations(_ : ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_]))
-        .expects(request, *, *, *, *)
+        .retrieveObligations(_ : ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: UserRequest[_], _: String))
+        .expects(request, *, *, *, *, *)
     }
   }
 

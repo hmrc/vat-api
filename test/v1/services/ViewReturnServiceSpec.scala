@@ -16,6 +16,7 @@
 
 package v1.services
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import v1.controllers.UserRequest
@@ -30,10 +31,9 @@ import scala.concurrent.Future
 
 class ViewReturnServiceSpec extends ServiceSpec {
 
-  implicit val userRequest = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
   private val periodKey: String = "F034"
-  private val correlationId = "X-123"
   private val viewReturnRequest: ViewRequest =
     ViewRequest(
       vrn = Vrn(vrn),
@@ -81,7 +81,7 @@ class ViewReturnServiceSpec extends ServiceSpec {
             MockViewReturnConnector.viewReturn(viewReturnRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
-            await(service.viewReturn(viewReturnRequest)) shouldBe Left(ErrorWrapper(Some(correlationId), error))
+            await(service.viewReturn(viewReturnRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(

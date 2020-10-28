@@ -16,6 +16,8 @@
 
 package v1.models.response.payments
 
+import java.time.LocalDate
+
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import utils.FinancialDataReadsUtils
@@ -36,7 +38,7 @@ object PaymentsResponse extends FinancialDataReadsUtils {
       } yield Json.toJson(item)
     })
 
-  implicit def reads(implicit to: String): Reads[PaymentsResponse] =
+  implicit def reads(implicit to: LocalDate): Reads[PaymentsResponse] =
     (JsPath \ "financialTransactions")
       .read(filterNotArrayReads[Payment]("chargeType", unsupportedChargeTypes))
       .map(_.filter(payment => dateCheck(payment.taxPeriod, to) && payment.paymentItems.isDefined))

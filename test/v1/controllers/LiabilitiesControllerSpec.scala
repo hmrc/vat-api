@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockLiabilitiesRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockLiabilitiesService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -39,7 +40,13 @@ class LiabilitiesControllerSpec
     with MockEnrolmentsAuthService
     with MockLiabilitiesService
     with MockLiabilitiesRequestParser
-    with MockAuditService {
+    with MockAuditService
+    with MockIdGenerator {
+
+  val vrn: String = "123456789"
+  val from: String = "01-01-2017"
+  val to: String = "01-12-2017"
+  val correlationId: String = "X-ID"
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -49,16 +56,13 @@ class LiabilitiesControllerSpec
       mockLiabilitiesRequestParser,
       mockRetrieveLiabilitiesService,
       auditService = mockAuditService,
-      cc
+      cc,
+      mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
+    MockIdGenerator.getCorrelationId.returns(correlationId)
   }
-
-  val vrn: String = "123456789"
-  val from: String = "01-01-2017"
-  val to: String = "01-12-2017"
-  val correlationId: String = "X-ID"
 
   val retrieveLiabilitiesRawData: LiabilitiesRawData =
     LiabilitiesRawData(
@@ -131,7 +135,7 @@ class LiabilitiesControllerSpec
 
             MockLiabilitiesRequestParser
               .parse(retrieveLiabilitiesRawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 
@@ -165,7 +169,7 @@ class LiabilitiesControllerSpec
 
             MockRetrieveLiabilitiesService
               .retrieveLiabilities(retrieveLiabilitiesRequest)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.retrieveLiabilities(vrn, Some(from), Some(to))(fakeGetRequest)
 

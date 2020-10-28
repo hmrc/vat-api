@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockPaymentsRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPaymentsService}
 import v1.models.audit.{AuditError, AuditResponse}
@@ -40,7 +41,13 @@ class PaymentsControllerSpec
    with MockEnrolmentsAuthService
    with MockPaymentsService
    with MockPaymentsRequestParser
-   with MockAuditService {
+   with MockAuditService
+   with MockIdGenerator {
+
+  val vrn: String = "123456789"
+  val toDate: String = "2017-01-01"
+  val fromDate: String = "2018-01-01"
+  val correlationId: String = "X-ID"
 
   trait Test{
     val hc: HeaderCarrier = HeaderCarrier()
@@ -50,17 +57,14 @@ class PaymentsControllerSpec
       requestParser = mockPaymentsRequestParser,
       service = mockPaymentsService,
       auditService = mockAuditService,
-      cc = cc
+      cc = cc,
+      mockIdGenerator
     )
 
+    MockIdGenerator.getCorrelationId.returns(correlationId)
     MockEnrolmentsAuthService.authoriseUser()
   }
 
-  val vrn: String = "123456789"
-  val toDate: String = "2017-01-01"
-  val fromDate: String = "2018-01-01"
-
-  val correlationId: String = "X-ID"
 
   val rawData: PaymentsRawData =
     PaymentsRawData(vrn = vrn, from = Some(fromDate), to = Some(toDate))
@@ -161,7 +165,7 @@ class PaymentsControllerSpec
 
             MockPaymentsRequestParser
               .parse(rawData)
-              .returns(Left(ErrorWrapper(Some(correlationId), error, None)))
+              .returns(Left(ErrorWrapper(correlationId, error, None)))
 
             val result: Future[Result] = controller.retrievePayments(vrn, Some(fromDate), Some(toDate))(fakeGetRequest)
 
@@ -195,7 +199,7 @@ class PaymentsControllerSpec
 
             MockPaymentsService
               .retrievePayments(request)
-              .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), mtdError))))
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
             val result: Future[Result] = controller.retrievePayments(vrn, Some(fromDate), Some(toDate))(fakeGetRequest)
 

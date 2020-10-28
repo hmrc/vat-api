@@ -34,8 +34,8 @@ trait MockObligationsConnector extends MockFactory {
 
     def retrieveObligations(requestData: ObligationsRequest): CallHandler[Future[DesOutcome[ObligationsResponse]]] = {
       (mockObligationsConnector
-        .retrieveObligations(_: ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(requestData, *, *, *)
+        .retrieveObligations(_: ObligationsRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+        .expects(requestData, *, *, *, *)
     }
   }
 

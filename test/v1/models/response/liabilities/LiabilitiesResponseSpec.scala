@@ -16,13 +16,15 @@
 
 package v1.models.response.liabilities
 
+import java.time.LocalDate
+
 import play.api.libs.json.{JsError, Json}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
 
 class LiabilitiesResponseSpec extends UnitSpec {
 
-  implicit val to: String = "2017-12-01"
+  implicit val to: LocalDate = LocalDate.parse("2017-12-01")
 
   "LiabilityResponse" should {
     "read from the downstream model" when {

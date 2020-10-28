@@ -38,7 +38,8 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
     implicit hc: HeaderCarrier,
     ec: ExecutionContext,
     logContext: EndpointLogContext,
-    userRequest: UserRequest[_]): Future[ServiceOutcome[ObligationsResponse]] = {
+    userRequest: UserRequest[_],
+    correlationId: String): Future[ServiceOutcome[ObligationsResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.retrieveObligations(request)).leftMap(mapDesErrors(desErrorMap))

@@ -16,6 +16,8 @@
 
 package v1.models.response.payments
 
+import java.time.LocalDate
+
 import play.api.libs.json.{JsError, JsValue, Json}
 import support.UnitSpec
 import v1.models.response.common.TaxPeriod
@@ -23,7 +25,7 @@ import v1.models.response.payments.PaymentsResponse.Payment
 
 class PaymentsResponseSpec extends UnitSpec {
 
-  implicit val to: String = "2017-12-01"
+  implicit val to: LocalDate = LocalDate.parse("2017-12-01")
 
   val desJson: JsValue = Json.parse(
     """
