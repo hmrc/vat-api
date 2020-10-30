@@ -16,6 +16,7 @@
 
 package v1.services
 
+import mocks.MockIdGenerator
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -100,7 +101,7 @@ class NrsServiceSpec extends ServiceSpec {
       ""
     )
 
-  trait Test extends MockNrsConnector with MockHashUtil {
+  trait Test extends MockNrsConnector with MockIdGenerator with MockHashUtil {
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -119,9 +120,12 @@ class NrsServiceSpec extends ServiceSpec {
       )
 
     val service: NrsService = new NrsService(
+      mockUuidGenerator,
       mockNrsConnector,
       mockHashUtil
     )
+
+    MockIdGenerator.getUuid
   }
 
   "service" when {

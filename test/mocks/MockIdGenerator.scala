@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package utils
+package mocks
 
-import java.util.UUID
+import org.joda.time.DateTime
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
+import utils.{CurrentDateTime, IdGenerator}
 
-import javax.inject.{Inject, Singleton}
+trait MockIdGenerator extends MockFactory {
 
-@Singleton
-class IdGenerator @Inject()() {
+  val mockUuidGenerator: IdGenerator = mock[IdGenerator]
 
-  def getCorrelationId: String = getUid
-  def getUid: String = UUID.randomUUID().toString
+  object MockIdGenerator {
+    val testUid = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
+    def getUuid: CallHandler[String] = (mockUuidGenerator.getUid _).expects().returns(testUid)
+  }
+
 }

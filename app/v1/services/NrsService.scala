@@ -23,7 +23,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.HashUtil
+import utils.{HashUtil, IdGenerator}
 import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
 import v1.models.errors.{DownstreamError, ErrorWrapper}
@@ -34,7 +34,7 @@ import v1.models.request.submit.SubmitRequest
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NrsService @Inject()(connector: NrsConnector, hashUtil: HashUtil) {
+class NrsService @Inject()(idGenerator: IdGenerator, connector: NrsConnector, hashUtil: HashUtil) {
 
   def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
@@ -54,6 +54,7 @@ class NrsService @Inject()(connector: NrsConnector, hashUtil: HashUtil) {
 
     import vatSubmission._
 
+    val uid = idGenerator.getUid
     val payloadString = Json.toJson(body).toString()
     val htmlPayload = hashUtil.encode(payloadString)
     val sha256Checksum = hashUtil.getHash(payloadString)
