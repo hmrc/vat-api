@@ -61,13 +61,14 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
 
+      val nrsId = idGenerator.getUid
       val submissionTimestamp = dateTime.getDateTime
 
       val arn = request.userDetails.agentReferenceNumber
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
+        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, nrsId, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
             Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
@@ -75,22 +76,12 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 
-        nrsResponse match {
-          case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
-            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
-              None, Some(Json.toJson(nrsService.buildNrsSubmission(parsedRequest,
-                submissionTimestamp, request))), "")))
-          case _ => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
-            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
-              Some(nrsResponse.nrSubmissionId), None, "")))
-        }
-
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
           request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
-            "Receipt-ID" -> nrsResponse.nrSubmissionId,
+            "Receipt-ID" -> nrsId,
             "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> nrsResponse.cadesTSignature)
           .as(MimeTypes.JSON)

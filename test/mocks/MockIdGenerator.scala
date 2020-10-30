@@ -29,5 +29,4 @@ trait MockIdGenerator extends MockFactory {
     val testUid = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
     def getUuid: CallHandler[String] = (mockUuidGenerator.getUid _).expects().returns(testUid)
   }
-
 }

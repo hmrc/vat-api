@@ -51,6 +51,7 @@ class SubmitReturnControllerSpec
   val fmt: String = DateUtils.dateTimePattern
   val vrn: String = "123456789"
   val correlationId: String = "X-ID"
+  val uid: String = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
   val periodKey: String = "A1A2"
 
   trait Test {
@@ -69,6 +70,7 @@ class SubmitReturnControllerSpec
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
+    MockIdGenerator.getUid.returns(uid)
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
@@ -151,7 +153,7 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
+          .submitNrs(submitReturnRequest, uid, date)
           .returns(Future.successful(Right(nrsResponse)))
 
         MockSubmitReturnService
@@ -179,7 +181,7 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
+          .submitNrs(submitReturnRequest, uid, date)
           .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
@@ -337,7 +339,7 @@ class SubmitReturnControllerSpec
               .returns(Right(submitReturnRequest))
 
             MockNrsService
-              .submitNrs(submitReturnRequest, date)
+              .submitNrs(submitReturnRequest, uid, date)
               .returns(Future.successful(Right(nrsResponse)))
 
             MockSubmitReturnService

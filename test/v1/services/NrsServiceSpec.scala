@@ -24,6 +24,7 @@ import uk.gov.hmrc.domain.Vrn
 import utils.MockHashUtil
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockNrsConnector
+import v1.mocks.services.MockAuditService
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.NrsTestData.IdentityDataTestData
@@ -67,10 +68,13 @@ class NrsServiceSpec extends ServiceSpec {
   private val encodedString: String = "encodedString"
   private val checksum: String = "checksum"
 
+  private val nrsId = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
+
   private val nrsSubmission: NrsSubmission =
     NrsSubmission(
       payload = encodedString,
       metadata = Metadata(
+        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
@@ -96,12 +100,12 @@ class NrsServiceSpec extends ServiceSpec {
 
   private val nrsResponse: NrsResponse =
     NrsResponse(
-      "id",
+      nrsId,
       "This has been deprecated - DO NOT USE",
       ""
     )
 
-  trait Test extends MockNrsConnector with MockIdGenerator with MockHashUtil {
+  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil{
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -120,6 +124,7 @@ class NrsServiceSpec extends ServiceSpec {
       )
 
     val service: NrsService = new NrsService(
+      mockAuditService,
       mockUuidGenerator,
       mockNrsConnector,
       mockHashUtil
@@ -138,7 +143,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(nrsResponse)
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(nrsResponse)
       }
     }
 
@@ -151,7 +156,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Right(NrsResponse.empty)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(NrsResponse.empty)
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse.empty)
       }
     }
 
@@ -164,7 +169,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Left(NrsError)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
       }
     }
   }
