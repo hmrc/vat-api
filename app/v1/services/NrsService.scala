@@ -20,6 +20,7 @@ import cats.data.EitherT
 import cats.implicits._
 import javax.inject.Inject
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.HashUtil
@@ -55,6 +56,8 @@ class NrsService @Inject()(connector: NrsConnector) {
     val payloadString = Json.toJson(body).toString()
     val htmlPayload = HashUtil.encode(payloadString)
     val sha256Checksum = HashUtil.getHash(payloadString)
+
+    Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}\nbody: ${Json.prettyPrint(Json.toJson(vatSubmission.body))}\nchecksum:$sha256Checksum")
 
     NrsSubmission(
       payload = htmlPayload,
