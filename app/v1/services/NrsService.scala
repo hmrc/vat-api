@@ -16,8 +16,6 @@
 
 package v1.services
 
-import cats.data.EitherT
-import cats.implicits._
 import javax.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
@@ -26,9 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.HashUtil
 import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
-import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,14 +35,12 @@ class NrsService @Inject()(connector: NrsConnector) {
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
-    correlationId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
+    correlationId: String,
+    submissionId: String): Future[String] = {
 
-    val result = for {
-      nrsResponse <- EitherT(connector.submitNrs(buildNrsSubmission(vatSubmission, submissionTimestamp, request)))
-        .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
-    } yield nrsResponse
-
-    result.value
+    for {
+      _ <- connector.submitNrs(buildNrsSubmission(vatSubmission, submissionTimestamp, request))
+    } yield submissionId
   }
 
   def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: DateTime, request: UserRequest[_]): NrsSubmission = {

@@ -28,7 +28,7 @@ import play.shaded.ahc.org.asynchttpclient.uri.Uri
 import v1.mocks.MockWsClient
 import v1.models.nrs.NrsTestData.{FullRequestTestData, NrsResponseTestData}
 import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.{NrsError, NrsResponse}
+import v1.models.nrs.response.NrsError
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -37,7 +37,6 @@ class NrsConnectorSpec extends ConnectorSpec {
 
   private val nrsSubmissionModel: NrsSubmission = FullRequestTestData.correctModel
   private val nrsSubmissionJson: JsValue = FullRequestTestData.correctJson
-  private val nrsResponseModel: NrsResponse = NrsResponseTestData.correctModel
   private val nrsResponseJson: JsValue = NrsResponseTestData.correctJson
 
   class Test extends MockWsClient with MockAppConfig {
@@ -71,7 +70,7 @@ class NrsConnectorSpec extends ConnectorSpec {
 
   "NrsConnector" when {
     "a valid request is supplied" should {
-      "return the expected NrsResponse for a successful response with valid body" in new Test {
+      "return a unit given a post" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
@@ -81,10 +80,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(nrsResponseModel)
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
       }
 
-      "return an NrsError for a successful response with an invalid body" in new Test {
+      "return a unit for a successful response with an invalid body" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
@@ -94,10 +93,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
       }
 
-      "return an NrsError for an unsuccessful response with error code: 400" in new Test {
+      "return a unit for an unsuccessful response with error code: 400" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), BAD_REQUEST, "status text", "protocols!"))
@@ -107,10 +106,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
       }
 
-      "return the default result for an unsuccessful response with unexpected error code" in new Test {
+      "return a unit for an unsuccessful response with unexpected error code" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), INTERNAL_SERVER_ERROR, "status text", "protocols!"))
@@ -120,7 +119,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty)
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
       }
     }
 
@@ -130,7 +129,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.failed(new TimeoutException))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty)
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
       }
     }
   }

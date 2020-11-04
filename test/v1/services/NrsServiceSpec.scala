@@ -27,7 +27,7 @@ import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.NrsTestData.IdentityDataTestData
 import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.models.nrs.response.{NrsError, NrsResponse}
+import v1.models.nrs.response.NrsError
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 
 import scala.concurrent.Future
@@ -91,13 +91,6 @@ class NrsServiceSpec extends ServiceSpec {
       )
     )
 
-  private val nrsResponse: NrsResponse =
-    NrsResponse(
-      "id",
-      "This has been deprecated - DO NOT USE",
-      ""
-    )
-
   trait Test extends MockNrsConnector {
 
     implicit val userRequest: UserRequest[_] =
@@ -126,9 +119,9 @@ class NrsServiceSpec extends ServiceSpec {
       "return the expected result" in new Test {
 
         MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Right(nrsResponse)))
+          .returns(Future.successful(Right("")))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(nrsResponse)
+        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
       }
     }
 
@@ -136,9 +129,9 @@ class NrsServiceSpec extends ServiceSpec {
       "return the expected result" in new Test {
 
         MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Right(NrsResponse.empty)))
+          .returns(Future.successful(""))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(NrsResponse.empty)
+        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
       }
     }
 
@@ -148,7 +141,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Left(NrsError)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
+        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
       }
     }
   }

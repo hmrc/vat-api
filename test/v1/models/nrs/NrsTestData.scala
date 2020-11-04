@@ -23,7 +23,6 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
 import utils.HashUtil
 import v1.models.nrs.request._
-import v1.models.nrs.response.NrsResponse
 
 object NrsTestData {
 
@@ -188,13 +187,6 @@ object NrsTestData {
         |}
     """.stripMargin
     )
-
-    val correctModel: NrsResponse =
-      NrsResponse(
-        nrSubmissionId = "anID",
-        cadesTSignature = "This has been deprecated - DO NOT USE",
-        timestamp = ""
-      )
   }
 
 }

@@ -21,7 +21,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,14 +30,11 @@ class NrsConnector @Inject()(val ws: WSClient,
 
   def submitNrs(body: NrsSubmission)(
     implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[NrsOutcome[NrsResponse]] = {
+    ec: ExecutionContext): Future[Unit] = {
 
-    import v1.connectors.httpparsers.StandardNrsWsParser._
-
-    nrsPost[NrsSubmission, NrsResponse](
-      uri = NrsUri[NrsResponse](s"submission"),
-      body = body,
-      defaultResult = Right(NrsResponse.empty)
+    nrsPost[NrsSubmission, Unit](
+      uri = s"submission",
+      body = body
     )
   }
 }

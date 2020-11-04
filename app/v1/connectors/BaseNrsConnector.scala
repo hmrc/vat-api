@@ -16,14 +16,11 @@
 
 package v1.connectors
 
-import java.util.concurrent.TimeoutException
-
 import config.AppConfig
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.httpparsers.WsReads
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,20 +36,18 @@ trait BaseNrsConnector {
       "User-Agent" -> appConfig.appName
     )
 
-  def nrsPost[Body: Writes, Resp](body: Body, uri: NrsUri[Resp], defaultResult: NrsOutcome[Resp])(implicit ec: ExecutionContext,
-                                                                                      hc: HeaderCarrier,
-                                                                                      wsReads: WsReads[NrsOutcome[Resp]]): Future[NrsOutcome[Resp]] = {
+  def nrsPost[Body: Writes, Resp](body: Body, uri: String)(implicit ec: ExecutionContext,
+                                                                                      hc: HeaderCarrier): Future[Unit] = {
 
-    def doPost(implicit hc: HeaderCarrier): Future[NrsOutcome[Resp]] = {
+    def doPost(implicit hc: HeaderCarrier): Future[Unit] = {
 
-      ws.url(s"${appConfig.nrsBaseUrl}/${uri.value}")
+      ws.url(s"${appConfig.nrsBaseUrl}/${uri}")
         .withHttpHeaders(hc.headers: _*)
-        .withRequestTimeout(appConfig.nrsMaxTimeout)
         .post(Json.toJson(body))
-        .map(wsReads.wsRead(_, defaultResult)).recover {
-        case e: TimeoutException =>
-          logger.warn(s"[NrsConnector][nrsPost] - NRS Call timed out - $e")
-          defaultResult
+        .map(_ => ()).recover {
+        case e: Exception =>
+          logger.warn(s"[NrsConnector][nrsPost] - NRS Exception - $e")
+          ()
       }
     }
 

@@ -19,9 +19,8 @@ package v1.mocks.connectors
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{NrsConnector, NrsOutcome}
+import v1.connectors.NrsConnector
 import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,7 +30,7 @@ trait MockNrsConnector extends MockFactory {
 
   object MockNrsConnector {
 
-    def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome[NrsResponse]]] = {
+    def submitNrs(body: NrsSubmission): CallHandler[Future[Unit]] = {
       (mockNrsConnector
         .submitNrs(_: NrsSubmission)(_: HeaderCarrier, _: ExecutionContext))
         .expects(body, *, *)

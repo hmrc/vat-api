@@ -21,8 +21,6 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
-import v1.models.errors.ErrorWrapper
-import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
 import v1.services.NrsService
 
@@ -34,10 +32,10 @@ trait MockNrsService extends MockFactory {
 
   object MockNrsService {
 
-    def submitNrs(request: SubmitRequest, dateTime: DateTime): CallHandler[Future[Either[ErrorWrapper, NrsResponse]]] = {
+    def submitNrs(request: SubmitRequest, dateTime: DateTime): CallHandler[Future[String]] = {
       (mockNrsService
-        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: String))
-        .expects(request, *, *, *, *, *)
+        .submitNrs(_ : SubmitRequest, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: String, _: String))
+        .expects(request, *, *, *, *, *, *)
     }
   }
 

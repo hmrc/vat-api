@@ -22,13 +22,12 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import utils.{CurrentDateTime, DateUtils, EndpointLogContext, IdGenerator, Logging}
+import utils._
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
 import v1.models.errors.ControllerError._
 import v1.models.errors._
-import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
 import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
 
@@ -67,7 +66,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, submissionTimestamp))
+        nrsSubmissionId <- EitherT.right(nrsService.submitNrs(parsedRequest, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
             Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
@@ -75,24 +74,17 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 
-        nrsResponse match {
-          case NrsResponse.empty => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
-            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
-              None, Some(Json.toJson(nrsService.buildNrsSubmission(parsedRequest,
-                submissionTimestamp, request))), "")))
-          case _ => auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
-            NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
-              Some(nrsResponse.nrSubmissionId), None, "")))
-        }
+        auditService.auditEvent(AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
+          NrsAuditDetail(vrn, request.headers.get("Authorization").getOrElse(""),
+            Some(nrsSubmissionId), None, "")))
 
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
           request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
-            "Receipt-ID" -> nrsResponse.nrSubmissionId,
-            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
-            "Receipt-Signature" -> nrsResponse.cadesTSignature)
+            "Receipt-ID" -> nrsSubmissionId,
+            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern))
           .as(MimeTypes.JSON)
       }
 
