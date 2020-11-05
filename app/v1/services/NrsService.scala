@@ -18,9 +18,8 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -37,7 +36,7 @@ import v1.models.request.submit.SubmitRequest
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NrsService @Inject()(auditService: AuditService,idGenerator: IdGenerator, connector: NrsConnector, hashUtil: HashUtil) {
+class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator, connector: NrsConnector, hashUtil: HashUtil) {
 
   def submitNrs(vatSubmission: SubmitRequest, nrsId: String, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
@@ -46,7 +45,6 @@ class NrsService @Inject()(auditService: AuditService,idGenerator: IdGenerator, 
     correlationId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
 
     val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
-
 
     def audit(resp: NrsResponse): Future[AuditResult] = resp match {
       case NrsResponse.empty =>
@@ -70,8 +68,8 @@ class NrsService @Inject()(auditService: AuditService,idGenerator: IdGenerator, 
     val result = for {
       nrsResponse <- EitherT(connector.submitNrs(nrsSubmission))
         .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
+      _ <- EitherT.right[ErrorWrapper](audit(nrsResponse))
     } yield {
-      audit(nrsResponse)
       nrsResponse
     }
 
@@ -86,13 +84,11 @@ class NrsService @Inject()(auditService: AuditService,idGenerator: IdGenerator, 
     import vatSubmission._
 
     val payloadString = Json.toJson(body).toString()
-    val htmlPayload = hashUtil.encode(payloadString)
+    val encodedPayload = hashUtil.encode(payloadString)
     val sha256Checksum = hashUtil.getHash(payloadString)
 
-    Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}payload:$htmlPayload\nchecksum:$sha256Checksum")
-
     NrsSubmission(
-      payload = htmlPayload,
+      payload = encodedPayload,
       Metadata(
         nrSubmissionId = Some(nrsId),
         businessId = "vat",

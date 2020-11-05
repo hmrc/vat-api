@@ -53,7 +53,7 @@ class ViewReturnControllerSpec
       authService = mockEnrolmentsAuthService,
       requestParser = mockViewReturnRequestParser,
       service = mockViewReturnService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )

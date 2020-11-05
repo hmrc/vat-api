@@ -62,7 +62,7 @@ class SubmitReturnControllerSpec
       mockSubmitReturnRequestParser,
       mockSubmitReturnService,
       mockNrsService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc,
       dateTime = mockCurrentDateTime,
       mockIdGenerator

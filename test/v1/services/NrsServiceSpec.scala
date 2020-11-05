@@ -22,9 +22,12 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import utils.MockHashUtil
+import utils.HashUtil
+import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockNrsConnector
 import v1.mocks.services.MockAuditService
+import v1.models.audit.{AuditResponse, NrsAuditDetail}
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.NrsTestData.IdentityDataTestData
@@ -56,8 +59,6 @@ class NrsServiceSpec extends ServiceSpec {
       receivedAt = None,
       agentReference = None
     )
-
-  private val submitRequestBodyString: String = Json.toJson(submitRequestBody).toString
 
   private val submitRequest: SubmitRequest =
     SubmitRequest(
@@ -137,6 +138,18 @@ class NrsServiceSpec extends ServiceSpec {
     "service call successful" must {
       "return the expected result" in new Test {
 
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              nrSubmissionID = Some(nrsId),
+              request = None,
+              correlationId = "")
+          )
+        )
+
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Right(nrsResponse)))
 
@@ -149,6 +162,18 @@ class NrsServiceSpec extends ServiceSpec {
 
     "service call successful (empty response)" must {
       "return the expected result" in new Test {
+
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStoreFailure",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              None,
+              Some(Json.toJson(nrsSubmission)),
+              correlationId = "")
+          )
+        )
 
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
