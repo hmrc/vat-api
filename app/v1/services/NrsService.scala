@@ -57,7 +57,7 @@ class NrsService @Inject()(connector: NrsConnector) {
     val htmlPayload = HashUtil.encode(payloadString)
     val sha256Checksum = HashUtil.getHash(payloadString)
 
-    Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}\nbody: ${Json.prettyPrint(Json.toJson(vatSubmission.body))}\nchecksum:$sha256Checksum")
+    Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}payload:$htmlPayload\nchecksum:$sha256Checksum")
 
     NrsSubmission(
       payload = htmlPayload,
