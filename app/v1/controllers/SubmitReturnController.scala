@@ -34,7 +34,6 @@ import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitRetur
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
 class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        requestParser: SubmitReturnRequestParser,
                                        service: SubmitReturnService,
