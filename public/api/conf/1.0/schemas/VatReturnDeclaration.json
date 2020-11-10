@@ -40,11 +40,11 @@
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValueGoodsSuppliedExVAT": {
-      "description": "Total value of intra-community dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States. This corresponds to box 8 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "description": "Total value of intra-community dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States. This corresponds to box 8 on the VAT Return form. The value must be in pounds (no pence) between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalAcquisitionsExVAT": {
-      "description": "Total value of intra-community acquisitions of goods and related costs (excluding VAT) made in Northern Ireland from EU Member States. This corresponds to box 9 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "description": "Total value of intra-community acquisitions of goods and related costs (excluding VAT) made in Northern Ireland from EU Member States. This corresponds to box 9 on the VAT Return form. The value must be in pounds (no pence) between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "finalised": {
