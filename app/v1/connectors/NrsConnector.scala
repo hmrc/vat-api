@@ -25,6 +25,7 @@ import v1.models.nrs.response.NrsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class NrsConnector @Inject()(val ws: WSClient,
                              val appConfig: AppConfig) extends BaseNrsConnector {
 

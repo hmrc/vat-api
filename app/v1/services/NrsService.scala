@@ -18,7 +18,7 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
@@ -33,7 +33,8 @@ import v1.models.request.submit.SubmitRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NrsService @Inject()(connector: NrsConnector) {
+@Singleton
+class NrsService @Inject()(connector: NrsConnector, hashUtil: HashUtil) {
 
   def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
@@ -54,8 +55,8 @@ class NrsService @Inject()(connector: NrsConnector) {
     import vatSubmission._
 
     val payloadString = Json.toJson(body).toString()
-    val htmlPayload = HashUtil.encode(payloadString)
-    val sha256Checksum = HashUtil.getHash(payloadString)
+    val htmlPayload = hashUtil.encode(payloadString)
+    val sha256Checksum = hashUtil.getHash(payloadString)
 
     Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}payload:$htmlPayload\nchecksum:$sha256Checksum")
 
