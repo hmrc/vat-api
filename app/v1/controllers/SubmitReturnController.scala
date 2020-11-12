@@ -34,14 +34,15 @@ import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitRetur
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        requestParser: SubmitReturnRequestParser,
                                        service: SubmitReturnService,
                                        nrsService: NrsService,
                                        auditService: AuditService,
                                        cc: ControllerComponents,
-                                       val dateTime: CurrentDateTime,
-                                       val idGenerator: IdGenerator)
+                                       dateTime: CurrentDateTime,
+                                       idGenerator: IdGenerator)
                                       (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 

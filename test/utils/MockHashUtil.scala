@@ -16,18 +16,27 @@
 
 package utils
 
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
-import java.util.Base64
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 
-import javax.inject.{Inject, Singleton}
+trait MockHashUtil extends MockFactory {
 
-@Singleton
-class HashUtil @Inject()() {
+  val mockHashUtil: HashUtil = mock[HashUtil]
 
-  private val sha256 = MessageDigest.getInstance("SHA-256")
+  object MockedHashUtil {
 
-  def encode(value: String): String = Base64.getEncoder.encodeToString(value.getBytes(StandardCharsets.UTF_8))
-  def getHash(value: String): String = sha256.digest(value.getBytes()).map("%02x" format _).mkString
+    def encode(string: String): CallHandler[String] = {
+      (mockHashUtil
+        .encode(_: String))
+        .expects(string)
+    }
+
+    def getHash(string: String): CallHandler[String] = {
+      (mockHashUtil
+        .getHash(_: String))
+        .expects(string)
+    }
+
+  }
 
 }

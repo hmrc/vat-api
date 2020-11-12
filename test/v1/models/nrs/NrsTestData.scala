@@ -124,7 +124,7 @@ object NrsTestData {
       businessId = "vat",
       notableEvent = "vat-return",
       payloadContentType = "application/json",
-      payloadSha256Checksum = HashUtil.getHash("XXX-base64checksum-XXX"),
+      payloadSha256Checksum = "2c98a3e52aed1f06728e35e4f47699bd4af6f328c3dabfde998007382dba86ce",
       userSubmissionTimestamp = DateTime.parse("2018-04-07T12:13:25Z"),
       identityData = Some(IdentityDataTestData.correctModel),
       userAuthToken = "Bearer AbCdEf123456...",
