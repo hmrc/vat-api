@@ -60,6 +60,8 @@ class NrsServiceSpec extends ServiceSpec {
       agentReference = None
     )
 
+  private val submitRequestBodyString = Json.toJson(submitRequestBody).toString
+
   private val submitRequest: SubmitRequest =
     SubmitRequest(
       vrn = vrn,
