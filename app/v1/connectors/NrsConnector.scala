@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class NrsConnector @Inject()(val ws: WSClient,
                              val appConfig: AppConfig) extends BaseNrsConnector {
 
-  def submitNrs(body: NrsSubmission)(
+  def submitNrs(body: NrsSubmission, submissionId: String)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[NrsOutcome[NrsResponse]] = {
 
@@ -37,7 +37,7 @@ class NrsConnector @Inject()(val ws: WSClient,
     nrsPost[NrsSubmission, NrsResponse](
       uri = NrsUri[NrsResponse](s"submission"),
       body = body,
-      defaultResult = Right(NrsResponse.empty)
+      submissionId = submissionId
     )
   }
 }

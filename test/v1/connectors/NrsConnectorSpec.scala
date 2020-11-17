@@ -70,7 +70,7 @@ class NrsConnectorSpec extends ConnectorSpec {
 
   "NrsConnector" when {
     "a valid request is supplied" should {
-      "return a unit given a post" in new Test {
+      "return the expected NrsResponse for a successful response with valid body" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
@@ -80,23 +80,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anID"))
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
       }
 
-      "return a unit for a successful response with an invalid body" in new Test {
-
-        val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
-          .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
-          .accumulate(new CacheableHttpResponseBodyPart("".getBytes, true))
-          .build())
-
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.successful(wsResponse))
-
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
-      }
-
-      "return a unit for an unsuccessful response with error code: 400" in new Test {
+      "return an NrsError for an unsuccessful response with error code: 400" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), BAD_REQUEST, "status text", "protocols!"))
@@ -106,10 +93,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
       }
 
-      "return a unit for an unsuccessful response with unexpected error code" in new Test {
+      "return the default result for an unsuccessful response with unexpected error code" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), INTERNAL_SERVER_ERROR, "status text", "protocols!"))
@@ -119,17 +106,17 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = ""))
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
       }
     }
 
     "the response time from NRS exceeds the specified request timeout" should {
-      "return the default result" in new Test {
+      "return an error" in new Test {
 
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.failed(new TimeoutException))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = ""))
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
       }
     }
   }

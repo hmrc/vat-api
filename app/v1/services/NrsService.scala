@@ -43,8 +43,7 @@ class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator,
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
-    correlationId: String,
-    submissionId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
+    correlationId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
 
     val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
 
@@ -68,12 +67,11 @@ class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator,
     }
 
     val result = for {
-      nrsResponse <- EitherT(connector.submitNrs(nrsSubmission))
+      nrsResponse <- EitherT(connector.submitNrs(nrsSubmission, nrsId))
         .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
-      response = nrsResponse.copy(nrSubmissionId = submissionId)
-      _ <- EitherT.right[ErrorWrapper](audit(response))
+      _ <- EitherT.right[ErrorWrapper](audit(nrsResponse))
     } yield {
-      response
+      nrsResponse
     }
 
     result.value

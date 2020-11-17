@@ -149,7 +149,7 @@ class NrsServiceSpec extends ServiceSpec {
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
-        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse("a1e8057e-fbbc-47a8-a8b4-78d9f015c253","",""))
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse("a5894863-9cd7-4d0d-9eee-301ae79cbae6","",""))
       }
     }
 
