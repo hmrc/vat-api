@@ -54,7 +54,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
       mockEnrolmentsAuthService,
       mockObligationRequestParser,
       mockObligationsService,
-      mockAuditService,
+      stubAuditService,
       cc,
       mockIdGenerator
     )

@@ -28,7 +28,7 @@ import play.shaded.ahc.org.asynchttpclient.uri.Uri
 import v1.mocks.MockWsClient
 import v1.models.nrs.NrsTestData.{FullRequestTestData, NrsResponseTestData}
 import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsError
+import v1.models.nrs.response.{NrsError, NrsResponse}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -80,7 +80,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anID"))
       }
 
       "return a unit for a successful response with an invalid body" in new Test {
@@ -93,7 +93,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
       }
 
       "return a unit for an unsuccessful response with error code: 400" in new Test {
@@ -106,7 +106,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
       }
 
       "return a unit for an unsuccessful response with unexpected error code" in new Test {
@@ -119,7 +119,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = ""))
       }
     }
 
@@ -129,7 +129,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.failed(new TimeoutException))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe (): Unit
+        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = ""))
       }
     }
   }

@@ -56,7 +56,7 @@ class PaymentsControllerSpec
       authService = mockEnrolmentsAuthService,
       requestParser = mockPaymentsRequestParser,
       service = mockPaymentsService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc = cc,
       mockIdGenerator
     )

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package utils
+package v1.models.nrs.response
 
-import java.util.UUID
+import play.api.libs.json.{JsPath, Reads}
 
-import javax.inject.{Inject, Singleton}
+case class NrsResponse(nrSubmissionId: String, cadesTSignature: String, timestamp: String)
 
-@Singleton
-class IdGenerator @Inject()() {
+object NrsResponse {
 
-  def getCorrelationId: String = getUid
-  def getUid: String = UUID.randomUUID().toString
+  val deprecatedString: String = "This has been deprecated - DO NOT USE"
+  val empty: NrsResponse = NrsResponse("", deprecatedString, "")
+
+  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId").read[String].map(NrsResponse(_, deprecatedString, ""))
 }

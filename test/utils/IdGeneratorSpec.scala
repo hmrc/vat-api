@@ -16,13 +16,18 @@
 
 package utils
 
-import java.util.UUID
+import support.UnitSpec
 
-import javax.inject.{Inject, Singleton}
+class IdGeneratorSpec extends UnitSpec {
 
-@Singleton
-class IdGenerator @Inject()() {
+  val classUnderTest = new IdGenerator
 
-  def getCorrelationId: String = getUid
-  def getUid: String = UUID.randomUUID().toString
+  "IdGenerator" should {
+    "return a valid v4 UUID" when {
+      ".getUid is called" in {
+        classUnderTest.getUid should fullyMatch regex "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      }
+    }
+  }
+
 }

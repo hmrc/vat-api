@@ -55,7 +55,7 @@ class LiabilitiesControllerSpec
       mockEnrolmentsAuthService,
       mockLiabilitiesRequestParser,
       mockRetrieveLiabilitiesService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc,
       mockIdGenerator
     )

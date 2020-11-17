@@ -17,45 +17,83 @@
 package v1.services
 
 import javax.inject.Inject
+import cats.data.EitherT
+import cats.implicits._
+import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.HashUtil
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import utils.{HashUtil, IdGenerator}
+import v1.audit.AuditEvents
 import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
+import v1.models.audit.NrsAuditDetail
+import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
+import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NrsService @Inject()(connector: NrsConnector) {
+@Singleton
+class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator, connector: NrsConnector, hashUtil: HashUtil) {
 
-  def submitNrs(vatSubmission: SubmitRequest, submissionTimestamp: DateTime)(
+  def submitNrs(vatSubmission: SubmitRequest, nrsId: String, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
     correlationId: String,
-    submissionId: String): Future[String] = {
+    submissionId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
 
-    for {
-      _ <- connector.submitNrs(buildNrsSubmission(vatSubmission, submissionTimestamp, request))
-    } yield submissionId
+    val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
+
+    def audit(resp: NrsResponse): Future[AuditResult] = resp match {
+      case NrsResponse.empty =>
+        auditService.auditEvent(
+          AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
+            NrsAuditDetail(
+              vatSubmission.vrn.toString,
+              request.headers.get("Authorization").getOrElse(""),
+              None,
+              Some(Json.toJson(nrsSubmission)), ""))
+        )
+      case _ => auditService.auditEvent(
+        AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
+          NrsAuditDetail(
+            vatSubmission.vrn.toString,
+            request.headers.get("Authorization").getOrElse(""),
+            Some(nrsId), None, ""))
+      )
+    }
+
+    val result = for {
+      nrsResponse <- EitherT(connector.submitNrs(nrsSubmission))
+        .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
+      response = nrsResponse.copy(nrSubmissionId = submissionId)
+      _ <- EitherT.right[ErrorWrapper](audit(response))
+    } yield {
+      response
+    }
+
+    result.value
   }
 
-  def buildNrsSubmission(vatSubmission: SubmitRequest, submissionTimestamp: DateTime, request: UserRequest[_]): NrsSubmission = {
+  def buildNrsSubmission(vatSubmission: SubmitRequest,
+                         nrsId: String,
+                         submissionTimestamp: DateTime,
+                         request: UserRequest[_]): NrsSubmission = {
 
     import vatSubmission._
 
     val payloadString = Json.toJson(body).toString()
-    val htmlPayload = HashUtil.encode(payloadString)
-    val sha256Checksum = HashUtil.getHash(payloadString)
-
-    Logger.warn(s"[NrsService][buildNrsSubmission] - VRN: ${vatSubmission.vrn}\nbody: ${Json.prettyPrint(Json.toJson(vatSubmission.body))}\nchecksum:$sha256Checksum")
+    val encodedPayload = hashUtil.encode(payloadString)
+    val sha256Checksum = hashUtil.getHash(payloadString)
 
     NrsSubmission(
-      payload = htmlPayload,
+      payload = encodedPayload,
       Metadata(
+        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
@@ -74,4 +112,6 @@ class NrsService @Inject()(connector: NrsConnector) {
       )
     )
   }
+
+
 }

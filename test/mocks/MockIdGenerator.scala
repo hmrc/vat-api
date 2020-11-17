@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package v1.mocks.connectors
+package mocks
 
+import org.joda.time.DateTime
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{NrsConnector, NrsOutcome}
-import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsResponse
+import utils.{CurrentDateTime, IdGenerator}
 
-import scala.concurrent.{ExecutionContext, Future}
+trait MockIdGenerator extends MockFactory {
 
-trait MockNrsConnector extends MockFactory {
+  val mockUuidGenerator: IdGenerator = mock[IdGenerator]
 
-  val mockNrsConnector: NrsConnector = mock[NrsConnector]
-
-  object MockNrsConnector {
-
-    def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome[NrsResponse]]] = {
-      (mockNrsConnector
-        .submitNrs(_: NrsSubmission)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(body, *, *)
-    }
+  object MockIdGenerator {
+    val testUid = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
+    def getUuid: CallHandler[String] = (mockUuidGenerator.getUid _).expects().returns(testUid)
   }
-
 }

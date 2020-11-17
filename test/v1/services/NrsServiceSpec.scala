@@ -16,18 +16,22 @@
 
 package v1.services
 
+import mocks.MockIdGenerator
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
-import utils.HashUtil
+import utils.MockHashUtil
+import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockNrsConnector
+import v1.mocks.services.MockAuditService
+import v1.models.audit.NrsAuditDetail
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.NrsTestData.IdentityDataTestData
 import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.models.nrs.response.NrsError
+import v1.models.nrs.response.{NrsError, NrsResponse}
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 
 import scala.concurrent.Future
@@ -55,23 +59,28 @@ class NrsServiceSpec extends ServiceSpec {
       agentReference = None
     )
 
+  private val submitRequestBodyString = Json.toJson(submitRequestBody).toString
+
   private val submitRequest: SubmitRequest =
     SubmitRequest(
       vrn = vrn,
       body = submitRequestBody
     )
 
-  private val payloadString: String =
-    HashUtil.encode(Json.toJson(submitRequestBody).toString())
+  private val encodedString: String = "encodedString"
+  private val checksum: String = "checksum"
+
+  private val nrsId = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
 
   private val nrsSubmission: NrsSubmission =
     NrsSubmission(
-      payload = payloadString,
+      payload = encodedString,
       metadata = Metadata(
+        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
-        payloadSha256Checksum = HashUtil.getHash(Json.toJson(submitRequestBody).toString()),
+        payloadSha256Checksum = checksum,
         userSubmissionTimestamp = timestamp,
         identityData = Some(IdentityDataTestData.correctModel),
         userAuthToken = "Bearer aaaa",
@@ -91,7 +100,7 @@ class NrsServiceSpec extends ServiceSpec {
       )
     )
 
-  trait Test extends MockNrsConnector {
+  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil{
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -110,38 +119,62 @@ class NrsServiceSpec extends ServiceSpec {
       )
 
     val service: NrsService = new NrsService(
-        mockNrsConnector
-      )
+      mockAuditService,
+      mockUuidGenerator,
+      mockNrsConnector,
+      mockHashUtil
+    )
   }
 
   "service" when {
     "service call successful" must {
       "return the expected result" in new Test {
 
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              nrSubmissionID = Some(nrsId),
+              request = None,
+              correlationId = "")
+          )
+        )
+        MockIdGenerator.getUuid
+
         MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Right("")))
+          .returns(Future.successful(Right(NrsResponse(nrsId, "", ""))))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-      }
-    }
+        MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
+        MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
-    "service call successful (empty response)" must {
-      "return the expected result" in new Test {
-
-        MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(""))
-
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse("a1e8057e-fbbc-47a8-a8b4-78d9f015c253","",""))
       }
     }
 
     "service call unsuccessful" must {
       "map errors correctly" in new Test {
 
+        MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
+        MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
+
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Left(NrsError)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              nrSubmissionID = Some(nrsId),
+              request = None,
+              correlationId = "")
+          )
+        )
+
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
       }
     }
   }

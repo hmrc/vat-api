@@ -29,6 +29,7 @@ import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
 import v1.models.errors._
+import v1.models.nrs.response.NrsResponse
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
@@ -50,6 +51,7 @@ class SubmitReturnControllerSpec
   val fmt: String = DateUtils.dateTimePattern
   val vrn: String = "123456789"
   val correlationId: String = "X-ID"
+  val uid: String = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
   val periodKey: String = "A1A2"
 
   trait Test {
@@ -60,7 +62,7 @@ class SubmitReturnControllerSpec
       mockSubmitReturnRequestParser,
       mockSubmitReturnService,
       mockNrsService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc,
       dateTime = mockCurrentDateTime,
       mockIdGenerator
@@ -68,6 +70,7 @@ class SubmitReturnControllerSpec
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
+    MockIdGenerator.getUid.returns(uid)
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
@@ -143,8 +146,8 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
-          .returns(Future.successful(""))
+          .submitNrs(submitReturnRequest, uid, date)
+          .returns(Future.successful(Right(NrsResponse("","",""))))
 
         MockSubmitReturnService
           .submitReturn(submitReturnRequest)
@@ -184,6 +187,28 @@ class SubmitReturnControllerSpec
 //          UserDetails("Individual", None, "N/A"), auditResponse)).once
 //      }
 //    }
+
+    "a valid request is supplied but NRS is failed" should {
+      "return the INTERNAL_SERVER_ERROR" in new Test {
+
+        MockSubmitReturnRequestParser
+          .parse(submitRequestRawData)
+          .returns(Right(submitReturnRequest))
+
+        MockNrsService
+          .submitNrs(submitReturnRequest, uid, date)
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
+
+        private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
+
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
+
+        val auditResponse: AuditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError("INTERNAL_SERVER_ERROR"))), None)
+        MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
+          UserDetails("Individual", None, "N/A"), auditResponse)).once
+      }
+    }
 
     "a invalid finalised format request is supplied" should {
       "return the UNMAPPED_PLAY_ERROR" in new Test {
@@ -329,8 +354,8 @@ class SubmitReturnControllerSpec
               .returns(Right(submitReturnRequest))
 
             MockNrsService
-              .submitNrs(submitReturnRequest, date)
-              .returns(Future.successful(""))
+              .submitNrs(submitReturnRequest, uid, date)
+              .returns(Future.successful(Right(NrsResponse("","",""))))
 
             MockSubmitReturnService
               .submitReturn(submitReturnRequest)

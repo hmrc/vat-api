@@ -20,7 +20,10 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.Base64
 
-object HashUtil {
+import javax.inject.{Inject, Singleton}
+
+@Singleton
+class HashUtil @Inject()() {
 
   private val sha256 = MessageDigest.getInstance("SHA-256")
 
