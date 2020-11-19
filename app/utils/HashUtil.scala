@@ -25,7 +25,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class HashUtil @Inject()() {
 
-  private val sha256 = MessageDigest.getInstance("SHA-256")
+  private def sha256: MessageDigest = MessageDigest.getInstance("SHA-256")
 
   def encode(value: String): String = Base64.getEncoder.encodeToString(value.getBytes(StandardCharsets.UTF_8))
   def getHash(value: String): String = sha256.digest(value.getBytes()).map("%02x" format _).mkString
