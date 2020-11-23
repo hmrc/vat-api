@@ -37,7 +37,6 @@ class NrsConnectorSpec extends ConnectorSpec {
 
   private val nrsSubmissionModel: NrsSubmission = FullRequestTestData.correctModel
   private val nrsSubmissionJson: JsValue = FullRequestTestData.correctJson
-  private val nrsResponseModel: NrsResponse = NrsResponseTestData.correctModel
   private val nrsResponseJson: JsValue = NrsResponseTestData.correctJson
 
   class Test extends MockWsClient with MockAppConfig {
@@ -81,20 +80,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(nrsResponseModel)
-      }
-
-      "return an NrsError for a successful response with an invalid body" in new Test {
-
-        val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
-          .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
-          .accumulate(new CacheableHttpResponseBodyPart("".getBytes, true))
-          .build())
-
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.successful(wsResponse))
-
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
       }
 
       "return an NrsError for an unsuccessful response with error code: 400" in new Test {
@@ -107,7 +93,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
       }
 
       "return the default result for an unsuccessful response with unexpected error code" in new Test {
@@ -120,17 +106,17 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
       }
     }
 
     "the response time from NRS exceeds the specified request timeout" should {
-      "return the default result" in new Test {
+      "return an error" in new Test {
 
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.failed(new TimeoutException))
 
-        await(connector.submitNrs(nrsSubmissionModel)) shouldBe Right(NrsResponse.empty)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
       }
     }
   }

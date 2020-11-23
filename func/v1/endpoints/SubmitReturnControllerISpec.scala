@@ -164,8 +164,8 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
         private val response = await(request.post(requestJson))
         response.status shouldBe INTERNAL_SERVER_ERROR
-        response.json shouldBe Json.toJson(DownstreamError)
-      }
+       response.header("Content-Type") shouldBe Some("application/json")
+     }
     }
 
     "return a FORBIDDEN status code" when {

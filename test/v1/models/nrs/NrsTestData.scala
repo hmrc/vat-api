@@ -23,7 +23,6 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
 import utils.HashUtil
 import v1.models.nrs.request._
-import v1.models.nrs.response.NrsResponse
 
 object NrsTestData {
 
@@ -94,6 +93,7 @@ object NrsTestData {
     val correctJson: JsValue = Json.parse(
       s"""
          |{
+         |    "nrSubmissionId": "a5894863-9cd7-4d0d-9eee-301ae79cbae6",
          |    "businessId": "vat",
          |    "notableEvent": "vat-return",
          |    "payloadContentType": "application/json",
@@ -121,6 +121,7 @@ object NrsTestData {
     )
 
     val correctModel: Metadata = Metadata(
+      nrSubmissionId = Some("a5894863-9cd7-4d0d-9eee-301ae79cbae6"),
       businessId = "vat",
       notableEvent = "vat-return",
       payloadContentType = "application/json",
@@ -182,19 +183,12 @@ object NrsTestData {
     val correctJson: JsValue = Json.parse(
       """
         |{
-        |  "nrSubmissionId": "anID",
+        |  "nrSubmissionId": "anId",
         |  "cadesTSignature": "aSignature",
         |  "timestamp": "aTimeStamp"
         |}
     """.stripMargin
     )
-
-    val correctModel: NrsResponse =
-      NrsResponse(
-        nrSubmissionId = "anID",
-        cadesTSignature = "This has been deprecated - DO NOT USE",
-        timestamp = ""
-      )
   }
 
 }

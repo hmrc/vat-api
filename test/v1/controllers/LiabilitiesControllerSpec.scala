@@ -55,13 +55,13 @@ class LiabilitiesControllerSpec
       mockEnrolmentsAuthService,
       mockLiabilitiesRequestParser,
       mockRetrieveLiabilitiesService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc,
       mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(correlationId)
   }
 
   val retrieveLiabilitiesRawData: LiabilitiesRawData =

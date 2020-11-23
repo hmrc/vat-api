@@ -23,9 +23,9 @@ import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.DateUtils
 import v1.audit.AuditEvents
-import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.mocks.requestParsers.MockSubmitReturnRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockNrsService, MockSubmitReturnService}
+import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
 import v1.models.errors._
@@ -51,6 +51,7 @@ class SubmitReturnControllerSpec
   val fmt: String = DateUtils.dateTimePattern
   val vrn: String = "123456789"
   val correlationId: String = "X-ID"
+  val uid: String = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
   val periodKey: String = "A1A2"
 
   trait Test {
@@ -61,7 +62,7 @@ class SubmitReturnControllerSpec
       mockSubmitReturnRequestParser,
       mockSubmitReturnService,
       mockNrsService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc,
       dateTime = mockCurrentDateTime,
       mockIdGenerator
@@ -69,7 +70,8 @@ class SubmitReturnControllerSpec
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(uid).once()
+    MockIdGenerator.getUid.returns(correlationId).anyNumberOfTimes()
   }
 
 
@@ -135,13 +137,6 @@ class SubmitReturnControllerSpec
       |""".stripMargin
   )
 
-  private val nrsResponse: NrsResponse =
-    NrsResponse(
-      "id",
-      "This has been deprecated - DO NOT USE",
-      ""
-    )
-
   "submitReturn" when {
     "a valid request is supplied" should {
       "return the expected data on a successful service call" in new Test {
@@ -151,8 +146,8 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
-          .returns(Future.successful(Right(nrsResponse)))
+          .submitNrs(submitReturnRequest, uid, date)
+          .returns(Future.successful(Right(NrsResponse("","",""))))
 
         MockSubmitReturnService
           .submitReturn(submitReturnRequest)
@@ -179,7 +174,7 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, date)
+          .submitNrs(submitReturnRequest, uid, date)
           .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
@@ -337,8 +332,8 @@ class SubmitReturnControllerSpec
               .returns(Right(submitReturnRequest))
 
             MockNrsService
-              .submitNrs(submitReturnRequest, date)
-              .returns(Future.successful(Right(nrsResponse)))
+              .submitNrs(submitReturnRequest, uid, date)
+              .returns(Future.successful(Right(NrsResponse("","",""))))
 
             MockSubmitReturnService
               .submitReturn(submitReturnRequest)

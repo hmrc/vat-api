@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.response
+package utils
 
 import support.UnitSpec
-import v1.models.nrs.NrsTestData.NrsResponseTestData._
 
-class NrsResponseSpec extends UnitSpec {
+class IdGeneratorSpec extends UnitSpec {
 
-  "reads" should {
-    "parse correctly from JSON" in {
-      correctJson.as[NrsResponse] shouldBe correctModel
+  val classUnderTest = new IdGenerator
 
+  "IdGenerator" should {
+    "return a valid v4 UUID" when {
+      ".getUid is called" in {
+        classUnderTest.getUid should fullyMatch regex "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      }
     }
   }
 

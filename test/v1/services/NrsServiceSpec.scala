@@ -21,8 +21,12 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import utils.MockHashUtil
+import v1.audit.AuditEvents
 import v1.controllers.UserRequest
+import v1.mocks.MockIdGenerator
 import v1.mocks.connectors.MockNrsConnector
+import v1.mocks.services.MockAuditService
+import v1.models.audit.NrsAuditDetail
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.nrs.NrsTestData.IdentityDataTestData
@@ -55,7 +59,7 @@ class NrsServiceSpec extends ServiceSpec {
       agentReference = None
     )
 
-  private val submitRequestBodyString: String = Json.toJson(submitRequestBody).toString
+  private val submitRequestBodyString = Json.toJson(submitRequestBody).toString
 
   private val submitRequest: SubmitRequest =
     SubmitRequest(
@@ -66,10 +70,13 @@ class NrsServiceSpec extends ServiceSpec {
   private val encodedString: String = "encodedString"
   private val checksum: String = "checksum"
 
+  private val nrsId = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
+
   private val nrsSubmission: NrsSubmission =
     NrsSubmission(
       payload = encodedString,
       metadata = Metadata(
+        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",
@@ -93,14 +100,7 @@ class NrsServiceSpec extends ServiceSpec {
       )
     )
 
-  private val nrsResponse: NrsResponse =
-    NrsResponse(
-      "id",
-      "This has been deprecated - DO NOT USE",
-      ""
-    )
-
-  trait Test extends MockNrsConnector with MockHashUtil {
+  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil{
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -119,6 +119,8 @@ class NrsServiceSpec extends ServiceSpec {
       )
 
     val service: NrsService = new NrsService(
+      mockAuditService,
+      mockIdGenerator,
       mockNrsConnector,
       mockHashUtil
     )
@@ -128,26 +130,26 @@ class NrsServiceSpec extends ServiceSpec {
     "service call successful" must {
       "return the expected result" in new Test {
 
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              nrSubmissionID = Some(nrsId),
+              request = None,
+              correlationId = "")
+          )
+        )
+        MockIdGenerator.getUid.returns(nrsId)
+
         MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Right(nrsResponse)))
+          .returns(Future.successful(Right(NrsResponse(nrsId, "", ""))))
 
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(nrsResponse)
-      }
-    }
-
-    "service call successful (empty response)" must {
-      "return the expected result" in new Test {
-
-        MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
-        MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
-
-        MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Right(NrsResponse.empty)))
-
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Right(NrsResponse.empty)
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse("a5894863-9cd7-4d0d-9eee-301ae79cbae6","",""))
       }
     }
 
@@ -160,7 +162,19 @@ class NrsServiceSpec extends ServiceSpec {
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Left(NrsError)))
 
-        await(service.submitNrs(submitRequest, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
+        MockedAuditService.mockAuditEvent(
+          AuditEvents.auditNrsSubmit(
+            "submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vrn = vrn.toString,
+              authorization = "Bearer aaaa",
+              nrSubmissionID = Some(nrsId),
+              request = None,
+              correlationId = "")
+          )
+        )
+
+        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
       }
     }
   }

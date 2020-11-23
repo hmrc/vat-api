@@ -51,7 +51,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
   def retrievePayments(vrn: String, from: Option[String], to: Option[String]): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
 
-      implicit val correlationId: String = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getUid
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieve Payments for VRN : $vrn with correlationId : $correlationId")
 

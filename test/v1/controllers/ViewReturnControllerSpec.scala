@@ -53,13 +53,13 @@ class ViewReturnControllerSpec
       authService = mockEnrolmentsAuthService,
       requestParser = mockViewReturnRequestParser,
       service = mockViewReturnService,
-      auditService = mockAuditService,
+      auditService = stubAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )
 
     MockEnrolmentsAuthService.authoriseUser()
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(correlationId)
   }
 
   val viewReturnRawData: ViewRawData =
