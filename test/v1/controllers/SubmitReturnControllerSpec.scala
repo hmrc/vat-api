@@ -70,8 +70,8 @@ class SubmitReturnControllerSpec
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
-    MockIdGenerator.getCorrelationId.returns(uid)
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(uid).once()
+    MockIdGenerator.getUid.returns(correlationId).anyNumberOfTimes()
   }
 
 

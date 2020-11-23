@@ -59,7 +59,7 @@ class ViewReturnControllerSpec
     )
 
     MockEnrolmentsAuthService.authoriseUser()
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(correlationId)
   }
 
   val viewReturnRawData: ViewRawData =

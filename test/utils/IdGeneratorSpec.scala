@@ -25,7 +25,7 @@ class IdGeneratorSpec extends UnitSpec {
   "IdGenerator" should {
     "return a valid v4 UUID" when {
       ".getUid is called" in {
-        classUnderTest.getCorrelationId should fullyMatch regex "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+        classUnderTest.getUid should fullyMatch regex "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
       }
     }
   }

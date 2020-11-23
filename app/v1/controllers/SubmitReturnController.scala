@@ -55,13 +55,13 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
   def submitReturn(vrn: String): Action[JsValue] =
     authorisedAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
 
-      implicit val correlationId: String = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getUid
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Submitting Vat Return for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
 
-      val nrsId = idGenerator.getCorrelationId
+      val nrsId = idGenerator.getUid
       val submissionTimestamp = dateTime.getDateTime
 
       val arn = request.userDetails.agentReferenceNumber

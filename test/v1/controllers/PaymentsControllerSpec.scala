@@ -61,7 +61,7 @@ class PaymentsControllerSpec
       mockIdGenerator
     )
 
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(correlationId)
     MockEnrolmentsAuthService.authoriseUser()
   }
 
