@@ -28,6 +28,7 @@ import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
 import v1.models.errors.ControllerError._
 import v1.models.errors._
+import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
 import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
 
@@ -60,14 +61,14 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
 
-      val nrsId = idGenerator.getUid
+      val nrsId = idGenerator.getCorrelationId
       val submissionTimestamp = dateTime.getDateTime
 
       val arn = request.userDetails.agentReferenceNumber
 
       val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        nrsResponse <- EitherT(nrsService.submitNrs(parsedRequest, nrsId, submissionTimestamp))
+        _ <- EitherT(nrsService.submitNrs(parsedRequest, nrsId, submissionTimestamp))
         serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
           parsedRequest.body.copy(receivedAt =
             Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
@@ -82,7 +83,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
           .withApiHeaders(serviceResponse.correlationId,
             "Receipt-ID" -> nrsId,
             "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
-            "Receipt-Signature" -> nrsResponse.cadesTSignature)
+            "Receipt-Signature" -> NrsResponse.deprecatedString)
           .as(MimeTypes.JSON)
       }
 

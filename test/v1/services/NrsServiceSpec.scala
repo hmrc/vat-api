@@ -16,7 +16,6 @@
 
 package v1.services
 
-import mocks.MockIdGenerator
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -24,6 +23,7 @@ import uk.gov.hmrc.domain.Vrn
 import utils.MockHashUtil
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
+import v1.mocks.MockIdGenerator
 import v1.mocks.connectors.MockNrsConnector
 import v1.mocks.services.MockAuditService
 import v1.models.audit.NrsAuditDetail
@@ -120,7 +120,7 @@ class NrsServiceSpec extends ServiceSpec {
 
     val service: NrsService = new NrsService(
       mockAuditService,
-      mockUuidGenerator,
+      mockIdGenerator,
       mockNrsConnector,
       mockHashUtil
     )
@@ -141,7 +141,7 @@ class NrsServiceSpec extends ServiceSpec {
               correlationId = "")
           )
         )
-        MockIdGenerator.getUuid
+        MockIdGenerator.getCorrelationId
 
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Right(NrsResponse(nrsId, "", ""))))

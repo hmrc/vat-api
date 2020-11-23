@@ -70,7 +70,7 @@ class SubmitReturnControllerSpec
 
     MockEnrolmentsAuthService.authoriseUser()
     MockCurrentDateTime.getCurrentDate.returns(date).anyNumberOfTimes()
-    MockIdGenerator.getUid.returns(uid)
+    MockIdGenerator.getCorrelationId.returns(uid)
     MockIdGenerator.getCorrelationId.returns(correlationId)
   }
 
@@ -165,28 +165,6 @@ class SubmitReturnControllerSpec
           UserDetails("Individual", None, "N/A"), auditResponse)).once
       }
     }
-
-//    "a valid request is supplied but NRS is failed" should {
-//      "return the INTERNAL_SERVER_ERROR" in new Test {
-//
-//        MockSubmitReturnRequestParser
-//          .parse(submitRequestRawData)
-//          .returns(Right(submitReturnRequest))
-//
-//        MockNrsService
-//          .submitNrs(submitReturnRequest, date)
-//          .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
-//
-//        private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
-//
-//        status(result) shouldBe INTERNAL_SERVER_ERROR
-//        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
-//
-//        val auditResponse: AuditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError("INTERNAL_SERVER_ERROR"))), None)
-//        MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-//          UserDetails("Individual", None, "N/A"), auditResponse)).once
-//      }
-//    }
 
     "a valid request is supplied but NRS is failed" should {
       "return the INTERNAL_SERVER_ERROR" in new Test {

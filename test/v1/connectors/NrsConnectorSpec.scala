@@ -70,7 +70,7 @@ class NrsConnectorSpec extends ConnectorSpec {
 
   "NrsConnector" when {
     "a valid request is supplied" should {
-      "return the expected NrsResponse for a successful response with valid body" in new Test {
+      "return an empty NrsResponse for a successful result" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
@@ -80,10 +80,10 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty)
       }
 
-      "return an NrsError for an unsuccessful response with error code: 400" in new Test {
+      "return an empty NrsResponse for an unsuccessful response with error code: 400" in new Test {
 
         val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
           .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), BAD_REQUEST, "status text", "protocols!"))
@@ -93,7 +93,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty)
       }
 
       "return the default result for an unsuccessful response with unexpected error code" in new Test {
@@ -106,7 +106,7 @@ class NrsConnectorSpec extends ConnectorSpec {
         MockWsRequest.post(nrsSubmissionJson)
           .returns(Future.successful(wsResponse))
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
+        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty)
       }
     }
 

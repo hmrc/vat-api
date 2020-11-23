@@ -23,7 +23,6 @@ import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.httpparsers.WsReads
 import v1.models.nrs.response.{NrsError, NrsResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,8 +40,7 @@ trait BaseNrsConnector {
     )
 
   def nrsPost[Body: Writes, Resp](body: Body, uri: NrsUri[Resp], submissionId: String)(implicit ec: ExecutionContext,
-                                                                 hc: HeaderCarrier,
-                                                                 wsReads: WsReads[NrsOutcome[NrsResponse]]): Future[NrsOutcome[NrsResponse]] = {
+                                                                 hc: HeaderCarrier): Future[NrsOutcome[NrsResponse]] = {
 
     def doPost(implicit hc: HeaderCarrier): Future[NrsOutcome[NrsResponse]] = {
 
@@ -50,7 +48,7 @@ trait BaseNrsConnector {
         .withHttpHeaders(hc.headers: _*)
         .withRequestTimeout(appConfig.nrsMaxTimeout)
         .post(Json.toJson(body))
-        .map(res => wsReads.wsRead(res, Right(NrsResponse.empty)).map(_.copy(nrSubmissionId = submissionId))).recover {
+        .map(_ => Right(NrsResponse.empty)).recover {
         case e: TimeoutException =>
           logger.warn(s"[NrsConnector][nrsPost] - NRS Call timed out - $e")
           Left(NrsError)
