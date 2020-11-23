@@ -46,7 +46,7 @@ class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator,
 
     val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
 
-    def audit(resp: NrsResponse): Future[AuditResult] = resp match {
+   def audit(resp: NrsResponse): Future[AuditResult] = resp match {
       case NrsResponse.empty =>
         auditService.auditEvent(
           AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",

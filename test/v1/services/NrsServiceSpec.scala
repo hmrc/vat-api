@@ -141,7 +141,7 @@ class NrsServiceSpec extends ServiceSpec {
               correlationId = "")
           )
         )
-        MockIdGenerator.getCorrelationId
+        MockIdGenerator.getUid.returns(nrsId)
 
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Right(NrsResponse(nrsId, "", ""))))

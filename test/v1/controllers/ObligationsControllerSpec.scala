@@ -60,7 +60,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
     )
 
     MockEnrolmentsAuthService.authoriseUser()
-    MockIdGenerator.getCorrelationId.returns(correlationId)
+    MockIdGenerator.getUid.returns(correlationId)
   }
 
   val retrieveObligationsRawData: ObligationsRawData =

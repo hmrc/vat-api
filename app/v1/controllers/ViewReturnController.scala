@@ -50,7 +50,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
   def viewReturn(vrn: String, periodKey: String): Action[AnyContent] =
     authorisedAction(vrn).async { implicit request =>
 
-      implicit val correlationId: String = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.getUid
       logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieve VAT returns for VRN : $vrn with correlationId : $correlationId")
 
