@@ -151,7 +151,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
       }
     }
 
-    "return a 500 status code" when {
+    "return a 201 status code" when {
      "NRS returns bad_request response" in new Test {
 
         override def uri: String = s"/$vrn/returns"
@@ -163,9 +163,10 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         }
 
         private val response = await(request.post(requestJson))
-        response.status shouldBe INTERNAL_SERVER_ERROR
-        response.json shouldBe Json.toJson(DownstreamError)
-      }
+        response.status shouldBe CREATED
+       response.json shouldBe mtdResponseJson
+       response.header("Content-Type") shouldBe Some("application/json")
+     }
     }
 
     "return a FORBIDDEN status code" when {
