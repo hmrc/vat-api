@@ -63,6 +63,8 @@ lazy val microservice = Project(appName, file("."))
   )
 
 dependencyUpdatesFilter -= moduleFilter(organization = "com.typesafe.play")
+dependencyUpdatesFilter -= moduleFilter(organization = "uk.gov.hmrc")
+dependencyUpdatesFilter -= moduleFilter(organization = "org.scalatest")
 dependencyUpdatesFilter -= moduleFilter(name = "simple-reactivemongo")
 dependencyUpdatesFilter -= moduleFilter(name = "reactivemongo-test")
 dependencyUpdatesFilter -= moduleFilter(name = "domain")

@@ -21,7 +21,6 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
-import utils.HashUtil
 import v1.models.nrs.request._
 
 object NrsTestData {

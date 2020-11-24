@@ -16,12 +16,13 @@
 
 package v1.controllers
 
+import com.kenshoo.play.metrics.Metrics
 import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.DateUtils
+import utils.{DateUtils, MockMetrics}
 import v1.audit.AuditEvents
 import v1.mocks.requestParsers.MockSubmitReturnRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockNrsService, MockSubmitReturnService}
@@ -56,7 +57,9 @@ class SubmitReturnControllerSpec
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
-    
+
+    val mockedMetrics: Metrics = new MockMetrics
+
     val controller: SubmitReturnController = new SubmitReturnController(
       mockEnrolmentsAuthService,
       mockSubmitReturnRequestParser,
