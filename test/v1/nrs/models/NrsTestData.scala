@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package v1.models.nrs
+package v1.nrs.models
 
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
-import v1.models.nrs.request._
+import v1.nrs.models.request._
 
 object NrsTestData {
 
@@ -61,7 +61,7 @@ object NrsTestData {
       """.stripMargin
     )
 
-    val correctModel: IdentityData = request.IdentityData(
+    val correctModel: IdentityData = IdentityData(
       internalId = Some("some-id"),
       externalId = Some("some-id"),
       agentCode = Some("TZRXXV"),

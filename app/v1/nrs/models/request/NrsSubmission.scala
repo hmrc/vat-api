@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.response
+package v1.nrs.models.request
 
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json._
 
-case class NrsResponse(nrSubmissionId: String, cadesTSignature: String, timestamp: String)
+case class NrsSubmission(payload: String, metadata: Metadata)
 
-object NrsResponse {
-
-  val deprecatedString: String = "This has been deprecated - DO NOT USE"
-  val empty: NrsResponse = NrsResponse("", deprecatedString, "")
-
-  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId").read[String].map(NrsResponse(_, deprecatedString, ""))
+object NrsSubmission {
+  implicit val mdFormat: OFormat[Metadata] = Metadata.format
+  implicit val format: OFormat[NrsSubmission] = Json.format[NrsSubmission]
 }

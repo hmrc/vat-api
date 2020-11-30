@@ -19,9 +19,12 @@ package v1.mocks.connectors
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{NrsConnector, NrsOutcome}
-import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsResponse
+import v1.connectors.NrsOutcome
+import v1.nrs.models.request.NrsSubmission
+import v1.nrs.models.response.NrsResponse
+import v1.nrs.NrsConnector
+import v1.nrs.models.request.NrsSubmission
+import v1.nrs.models.response.NrsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 

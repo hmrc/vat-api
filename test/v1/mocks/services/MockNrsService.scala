@@ -16,15 +16,15 @@
 
 package v1.mocks.services
 
+import v1.nrs.NrsService
 import org.joda.time.DateTime
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
 import v1.models.errors.ErrorWrapper
-import v1.models.nrs.response.NrsResponse
+import v1.nrs.models.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
-import v1.services.NrsService
 
 import scala.concurrent.{ExecutionContext, Future}
 

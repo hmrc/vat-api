@@ -25,12 +25,13 @@ import play.mvc.Http.MimeTypes
 import utils._
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
-import v1.models.audit.{AuditError, AuditResponse, NrsAuditDetail}
+import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.errors.ControllerError._
 import v1.models.errors._
-import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRawData
-import v1.services.{AuditService, EnrolmentsAuthService, NrsService, SubmitReturnService}
+import v1.nrs.NrsService
+import v1.nrs.models.response.NrsResponse
+import v1.services.{AuditService, EnrolmentsAuthService, SubmitReturnService}
 
 import scala.concurrent.{ExecutionContext, Future}
 

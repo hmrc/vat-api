@@ -25,7 +25,7 @@ import play.shaded.ahc.org.asynchttpclient.Response
 import play.shaded.ahc.org.asynchttpclient.uri.Uri
 import support.UnitSpec
 import v1.connectors.NrsOutcome
-import v1.models.nrs.response.NrsError
+import v1.nrs.models.response.NrsError
 
 class StandardNrsWsParserSpec extends UnitSpec {
 

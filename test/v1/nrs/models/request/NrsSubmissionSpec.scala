@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package v1.nrs.models.request
 
-import v1.nrs.models.request.IdentityData
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.nrs.models.NrsTestData.FullRequestTestData._
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+class NrsSubmissionSpec extends UnitSpec {
+
+  "writes" should {
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
+}

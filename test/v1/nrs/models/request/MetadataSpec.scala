@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package v1.nrs.models.request
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import v1.models.nrs.NrsTestData.FullRequestTestData._
+import v1.nrs.models.NrsTestData.MetadataTestData._
 
-class NrsSubmissionSpec extends UnitSpec {
+class MetadataSpec extends UnitSpec {
 
   "writes" should {
     "parse correctly to json" in {

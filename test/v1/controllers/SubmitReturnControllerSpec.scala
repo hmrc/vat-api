@@ -30,7 +30,7 @@ import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.models.nrs.response.NrsResponse
+import v1.nrs.models.response.NrsResponse
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse

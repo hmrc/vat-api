@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package v1.services
+package v1.nrs
 
-import v1.nrs.NrsService
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -30,10 +29,10 @@ import v1.mocks.services.MockAuditService
 import v1.models.audit.NrsAuditDetail
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ErrorWrapper}
+import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.nrs.models.NrsTestData.IdentityDataTestData
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.nrs.models.response.{NrsError, NrsResponse}
-import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
+import v1.nrs.models.response.NrsResponse
 
 import scala.concurrent.Future
 

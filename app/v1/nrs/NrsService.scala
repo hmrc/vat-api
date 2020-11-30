@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package v1.services
+package v1.nrs
 
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
+import v1.nrs.models.response.NrsResponse
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.{HashUtil, IdGenerator}
 import v1.audit.AuditEvents
-import v1.connectors.NrsConnector
 import v1.controllers.UserRequest
 import v1.models.audit.NrsAuditDetail
 import v1.models.errors.{DownstreamError, ErrorWrapper}
-import v1.models.nrs.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.models.nrs.response.NrsResponse
 import v1.models.request.submit.SubmitRequest
+import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
+import v1.services.AuditService
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -66,7 +66,7 @@ class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator,
     }
 
     val result = for {
-      nrsResponse <- EitherT(connector.submitNrs(nrsSubmission, nrsId))
+      nrsResponse <- EitherT(connector.submit(nrsSubmission))
         .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
       _ <- EitherT.right[ErrorWrapper](audit(nrsResponse))
     } yield {

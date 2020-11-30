@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package v1
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.models.nrs.NrsTestData.SearchKeysTestData._
+import v1.models.errors.ErrorWrapper
+import v1.models.outcomes.ResponseWrapper
+import v1.nrs.models.response.{NrsFailure, NrsResponse}
 
-class SearchKeysSpec extends UnitSpec {
-
-  "writes" should {
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
-  }
+package object nrs {
+  type NrsServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
+  type NrsOutcome = Either[NrsFailure, NrsResponse]
 }

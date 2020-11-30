@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package v1.nrs.models.response
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.models.nrs.NrsTestData.MetadataTestData._
+import play.api.http.Status
 
-class MetadataSpec extends UnitSpec {
+sealed trait NrsFailure {
+  def retryable: Boolean
+}
 
-  "writes" should {
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
+case object NrsFailure {
+  case class ErrorResponse(status: Int) extends NrsFailure {
+    override def retryable: Boolean = Status.isServerError(status)
+  }
+  case object ExceptionThrown extends NrsFailure {
+    override def retryable: Boolean = false
   }
 }

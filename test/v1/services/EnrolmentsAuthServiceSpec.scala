@@ -50,7 +50,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
 
   "authorised" when {
 
-    "the user is an authorised individual and nrs check is not required" should {
+    "the user is an authorised individual and v1.nrs check is not required" should {
       "return the 'Individual' user type in the user details" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Individual), vatEnrolments)
@@ -66,7 +66,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user is an authorised individual and nrs check is required" should {
+    "the user is an authorised individual and v1.nrs check is required" should {
       "return the 'Individual' user type in the user details" in new Test {
 
         private val retrievalsResultAffinity = authResponse(indIdentityData, vatEnrolments)
@@ -85,7 +85,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user is an authorised organisation and nrs check is not required" should {
+    "the user is an authorised organisation and v1.nrs check is not required" should {
       "return the 'Organisation' user type in the user details" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Organisation), vatEnrolments)
@@ -101,7 +101,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user is an authorised organisation and nrs check is required" should {
+    "the user is an authorised organisation and v1.nrs check is required" should {
       "return the 'Organisation' user type in the user details" in new Test {
 
         private val retrievalsResultAffinity = authResponse(orgIdentityData, vatEnrolments)
@@ -120,7 +120,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user is an authorised agent and nrs check is not required" should {
+    "the user is an authorised agent and v1.nrs check is not required" should {
       "return the 'Agent' user type in the user details" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Agent), agentEnrolments)
@@ -136,7 +136,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user is an authorised agent and nrs check is required" should {
+    "the user is an authorised agent and v1.nrs check is required" should {
       "return the 'Agent' user type in the user details" in new Test {
 
         private val retrievalsResultAffinity = authResponse(agentIdentityData, agentEnrolments)
@@ -155,7 +155,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user belongs to an unsupported affinity group and nrs check is not required" should {
+    "the user belongs to an unsupported affinity group and v1.nrs check is not required" should {
       "return an unauthorised error" in new Test {
 
         case object OtherAffinity extends AffinityGroup
@@ -171,7 +171,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the user belongs to an unsupported affinity group and nrs check is required" should {
+    "the user belongs to an unsupported affinity group and v1.nrs check is required" should {
       "return an unauthorised error" in new Test {
 
         case object OtherAffinity extends AffinityGroup
@@ -187,7 +187,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "an exception occurs during enrolment authorisation and nrs check is not required" must {
+    "an exception occurs during enrolment authorisation and v1.nrs check is not required" must {
       "map the exceptions correctly" when {
 
         def serviceException(exception: RuntimeException, mtdError: MtdError): Unit = {
@@ -218,7 +218,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "an exception occurs during enrolment authorisation and nrs check is required" must {
+    "an exception occurs during enrolment authorisation and v1.nrs check is required" must {
       "map the exceptions correctly" when {
 
         def serviceException(exception: RuntimeException, mtdError: MtdError): Unit = {
@@ -249,7 +249,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the arn and vrn are missing from the authorisation response and nrs check is not required" should {
+    "the arn and vrn are missing from the authorisation response and v1.nrs check is not required" should {
       "not throw an error" in new Test {
 
         val retrievalsResultAffinity = new ~(Some(Agent), Enrolments(Set.empty[Enrolment]))
@@ -265,7 +265,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       }
     }
 
-    "the arn and vrn are missing from the authorisation response and nrs check is required" should {
+    "the arn and vrn are missing from the authorisation response and v1.nrs check is required" should {
       "not throw an error" in new Test {
 
         private val retrievalsResultAffinity = authResponse(orgIdentityData.copy(affinityGroup = Some(Agent)), vatEnrolments)

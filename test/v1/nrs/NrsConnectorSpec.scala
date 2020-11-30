@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.connectors
+package v1.nrs
 
 import java.util.concurrent.{TimeUnit, TimeoutException}
 
@@ -28,8 +28,7 @@ import play.shaded.ahc.org.asynchttpclient.uri.Uri
 import v1.mocks.MockWsClient
 import v1.nrs.models.NrsTestData.{FullRequestTestData, NrsResponseTestData}
 import v1.nrs.models.request.NrsSubmission
-import v1.nrs.models.response.{NrsError, NrsResponse}
-import v1.nrs.NrsConnector
+import v1.nrs.models.response.NrsResponse
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
