@@ -172,6 +172,8 @@ object NrsTestData {
       "metadata" -> MetadataTestData.correctJson
     )
 
+    val correctJsonString: String = correctJson.toString
+
     val correctModel: NrsSubmission = NrsSubmission(
       "XXX-base64checksum-XXX", MetadataTestData.correctModel
     )

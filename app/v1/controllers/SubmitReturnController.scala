@@ -18,7 +18,7 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.{Inject, Singleton}
+import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
@@ -33,6 +33,7 @@ import v1.nrs.NrsService
 import v1.nrs.models.response.NrsResponse
 import v1.services.{AuditService, EnrolmentsAuthService, SubmitReturnService}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -43,9 +44,10 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        auditService: AuditService,
                                        cc: ControllerComponents,
                                        dateTime: CurrentDateTime,
-                                       idGenerator: IdGenerator)
+                                       idGenerator: IdGenerator,
+                                       override val metrics: Metrics)
                                       (implicit ec: ExecutionContext)
-  extends AuthorisedController(cc) with BaseController with Logging {
+  extends AuthorisedController(cc) with BaseController with Timer with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
@@ -67,13 +69,18 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val arn = request.userDetails.agentReferenceNumber
 
-      val result = for {
+      lazy val result = for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        _ <- EitherT(nrsService.submitNrs(parsedRequest, nrsId, submissionTimestamp))
-        serviceResponse <- EitherT(service.submitReturn(parsedRequest.copy(body =
-          parsedRequest.body.copy(receivedAt =
-            Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
+        serviceResponse <- {
+          //Submit asynchronously to NRS
+          nrsService.submit(parsedRequest, nrsId, submissionTimestamp)
+          //Submit Return to ETMP
+          EitherT(service.submitReturn(parsedRequest.copy(body =
+            parsedRequest.body.copy(receivedAt =
+              Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
+        }
       } yield {
+
         logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 

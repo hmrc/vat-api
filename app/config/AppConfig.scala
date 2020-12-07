@@ -41,7 +41,6 @@ trait AppConfig {
 
   // NRS config items
   def nrsApiKey: String
-  def nrsMaxTimeout: Duration
   def nrsRetries: List[FiniteDuration]
 
   def appName: String
@@ -60,10 +59,7 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   // NRS config items
   val nrsApiKey: String = config.getString("access-keys.xApiKey")
   val appName: String = config.getString("appName")
-
-
   private val nrsConfig = configuration.get[Configuration]("microservice.services.non-repudiation")
-  val nrsMaxTimeout: Duration = config.getInt("microservice.services.non-repudiation.maxTimeout").milliseconds
   val nrsBaseUrl: String = config.baseUrl("non-repudiation")
   lazy val nrsRetries: List[FiniteDuration] =
     Retrying.fibonacciDelays(getFiniteDuration(nrsConfig, "initialDelay"), nrsConfig.get[Int]("numberOfRetries"))

@@ -21,7 +21,8 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{Delayer, Logging, Retrying}
 import v1.nrs.models.request.NrsSubmission
 import v1.nrs.models.response.{NrsFailure, NrsResponse}
@@ -31,14 +32,15 @@ import scala.util.control.NonFatal
 import scala.util.{Success, Try}
 
 @Singleton
-class NrsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(
-  implicit val scheduler: Scheduler,
-  val ec: ExecutionContext)
+class NrsConnector @Inject()(val httpClient: HttpClient,
+                             appConfig: AppConfig)
+                            (implicit val scheduler: Scheduler, val ec: ExecutionContext)
   extends Retrying
-    with Delayer with Logging {
+    with Delayer
+    with Logging {
 
-  private val url: String    = s"${appConfig.nrsBaseUrl}/submission"
-  private val apiKey: String = appConfig.nrsApiKey
+  private lazy val url: String    = s"${appConfig.nrsBaseUrl}/submission"
+  private lazy val apiKey: String = appConfig.nrsApiKey
 
   def submit(nrsSubmission: NrsSubmission)(
     implicit hc: HeaderCarrier): Future[NrsOutcome] = {

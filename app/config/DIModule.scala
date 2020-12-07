@@ -16,11 +16,20 @@
 
 package config
 
-import com.google.inject.AbstractModule
+import akka.actor.{ActorSystem, Scheduler}
+import com.google.inject.{AbstractModule, Provides}
+import uk.gov.hmrc.http.HttpClient
+import v1.nrs.NrsConnector
 
 class DIModule extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[AppConfig]).to(classOf[AppConfigImpl]).asEagerSingleton()
+//    bind(classOf[NrsConnector]).asEagerSingleton()
   }
+
+
+  @Provides
+  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
+    actorSystem.scheduler
 }

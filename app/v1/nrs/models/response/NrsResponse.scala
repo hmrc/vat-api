@@ -17,8 +17,9 @@
 package v1.nrs.models.response
 
 import play.api.libs.json.{JsPath, Reads}
+import v1.nrs.models.response.NrsResponse.deprecatedString
 
-case class NrsResponse(nrSubmissionId: String, cadesTSignature: String, timestamp: String)
+case class NrsResponse(nrSubmissionId: String, cadesTSignature: String = deprecatedString, timestamp: String = "")
 
 object NrsResponse {
 

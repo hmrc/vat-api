@@ -16,27 +16,30 @@
 
 package v1.nrs
 
+import com.kenshoo.play.metrics.Metrics
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
-import utils.MockHashUtil
+import utils.{MockHashUtil, MockMetrics}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.mocks.MockIdGenerator
-import v1.mocks.connectors.MockNrsConnector
+import v1.mocks.nrs.MockNrsConnector
 import v1.mocks.services.MockAuditService
 import v1.models.audit.NrsAuditDetail
 import v1.models.auth.UserDetails
-import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.nrs.models.NrsTestData.IdentityDataTestData
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
-import v1.nrs.models.response.NrsResponse
+import v1.nrs.models.response.{NrsFailure, NrsResponse}
+import v1.services.ServiceSpec
 
 import scala.concurrent.Future
 
 class NrsServiceSpec extends ServiceSpec {
+
+  val metrics: Metrics = new MockMetrics
 
   private val vrn: Vrn = Vrn("123456789")
 
@@ -100,7 +103,7 @@ class NrsServiceSpec extends ServiceSpec {
       )
     )
 
-  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil{
+  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil {
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -122,7 +125,8 @@ class NrsServiceSpec extends ServiceSpec {
       mockAuditService,
       mockIdGenerator,
       mockNrsConnector,
-      mockHashUtil
+      mockHashUtil,
+      metrics
     )
   }
 
@@ -138,7 +142,7 @@ class NrsServiceSpec extends ServiceSpec {
               authorization = "Bearer aaaa",
               nrSubmissionID = Some(nrsId),
               request = None,
-              correlationId = "")
+              correlationId = correlationId)
           )
         )
         MockIdGenerator.getUid.returns(nrsId)
@@ -149,32 +153,32 @@ class NrsServiceSpec extends ServiceSpec {
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
-        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Right(NrsResponse("a5894863-9cd7-4d0d-9eee-301ae79cbae6","",""))
+        await(service.submit(submitRequest, nrsId, timestamp)) shouldBe Some(NrsResponse("a5894863-9cd7-4d0d-9eee-301ae79cbae6","",""))
       }
     }
 
     "service call unsuccessful" must {
-      "map errors correctly" in new Test {
+      "map 4xx errors correctly" in new Test {
 
         MockedHashUtil.encode(submitRequestBodyString).returns(encodedString)
         MockedHashUtil.getHash(submitRequestBodyString).returns(checksum)
 
         MockNrsConnector.submitNrs(nrsSubmission)
-          .returns(Future.successful(Left(NrsError)))
+          .returns(Future.successful(Left(NrsFailure.ExceptionThrown)))
 
         MockedAuditService.mockAuditEvent(
           AuditEvents.auditNrsSubmit(
-            "submitToNonRepudiationStore",
+            "submitToNonRepudiationStoreFailure",
             NrsAuditDetail(
               vrn = vrn.toString,
               authorization = "Bearer aaaa",
               nrSubmissionID = Some(nrsId),
-              request = None,
-              correlationId = "")
+              request = Some(Json.toJson(nrsSubmission)),
+              correlationId = correlationId)
           )
         )
 
-        await(service.submitNrs(submitRequest, nrsId, timestamp)) shouldBe Left(ErrorWrapper(correlationId, DownstreamError, None))
+        await(service.submit(submitRequest, nrsId, timestamp)) shouldBe None
       }
     }
   }

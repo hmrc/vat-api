@@ -16,107 +16,179 @@
 
 package v1.nrs
 
-import java.util.concurrent.{TimeUnit, TimeoutException}
-
+import akka.actor.{ActorSystem, Scheduler}
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.http.Fault
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import mocks.MockAppConfig
-import play.api.libs.json.JsValue
-import play.api.libs.ws.WSResponse
-import play.api.libs.ws.ahc.AhcWSResponse
-import play.api.libs.ws.ahc.cache.{CacheableHttpResponseBodyPart, CacheableHttpResponseStatus}
-import play.shaded.ahc.org.asynchttpclient.Response
-import play.shaded.ahc.org.asynchttpclient.uri.Uri
-import v1.mocks.MockWsClient
-import v1.nrs.models.NrsTestData.{FullRequestTestData, NrsResponseTestData}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.http.MimeTypes
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsValue, Json}
+import play.api.test.Injecting
+import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v1.connectors.ConnectorSpec
+import v1.nrs.models.NrsTestData.{FullRequestTestData, MetadataTestData, NrsResponseTestData}
 import v1.nrs.models.request.NrsSubmission
-import v1.nrs.models.response.NrsResponse
+import v1.nrs.models.response.{NrsFailure, NrsResponse}
 
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{FiniteDuration, _}
 
-class NrsConnectorSpec extends ConnectorSpec {
 
-  private val nrsSubmissionModel: NrsSubmission = FullRequestTestData.correctModel
-  private val nrsSubmissionJson: JsValue = FullRequestTestData.correctJson
+class NrsConnectorSpec extends ConnectorSpec
+  with BeforeAndAfterAll
+  with GuiceOneAppPerSuite
+  with Injecting
+  with MockAppConfig {
+
+  private val nrsSubmission: NrsSubmission = FullRequestTestData.correctModel
+  private val nrsSubmissionJsonString: String = FullRequestTestData.correctJsonString
   private val nrsResponseJson: JsValue = NrsResponseTestData.correctJson
 
-  class Test extends MockWsClient with MockAppConfig {
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .in(Environment.simple(mode = Mode.Dev))
+    .configure("metrics.enabled" -> "false", "auditing.enabled" -> "false")
+    .build()
 
-    val connector: NrsConnector =
-      new NrsConnector(
-        ws = mockWsClient,
-        appConfig = mockAppConfig
-      )
+  val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
-    val nrsRequestHeaders: Seq[(String, String)] =
-      Seq(
-        "X-API-Key" -> "dummyKey",
-        "User-Agent" -> "vat-api"
-      )
+  private val wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort())
 
-    MockWsClient.url(s"$baseUrl/submission")
-      .returns(mockWsRequest)
+  var port: Int = _
 
-    MockWsRequest.withHttpHeaders(nrsRequestHeaders)
-      .returns(mockWsRequest)
+  val actorSystem: ActorSystem              = inject[ActorSystem]
+  implicit val scheduler: Scheduler         = actorSystem.scheduler
+  implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+//  implicit val lc: LoggingContext           = LoggingContext("eori", "corrId", "subId")
 
-    MockWsRequest.withRequestTimeout(Duration(100, TimeUnit.MILLISECONDS))
-      .returns(mockWsRequest)
+  // Long delays to force a test to timeout if it does retry when we're not expecting it...
+  val longDelays = List(10.minutes)
 
-    MockedAppConfig.nrsBaseUrl returns baseUrl
-    MockedAppConfig.nrsApiKey returns "dummyKey"
-    MockedAppConfig.appName returns "vat-api"
-    MockedAppConfig.nrsMaxTimeout returns Duration(100, TimeUnit.MILLISECONDS)
+  val successResponseJson: JsValue =
+    Json.parse("""{
+                 |   "nrSubmissionId": "submissionId"
+                 |}""".stripMargin)
+
+//  val nrsSubmission: NrsSubmission = NrsSubmission("payload", MetadataTestData.correctModel)
+
+  override def beforeAll(): Unit = {
+    wireMockServer.start()
+    port = wireMockServer.port()
   }
 
-  "NrsConnector" when {
-    "a valid request is supplied" should {
-      "return the expected NrsResponse for a successful response with valid body" in new Test {
+  override def afterAll(): Unit =
+    wireMockServer.stop()
 
-        val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
-          .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), ACCEPTED, "status text", "protocols!"))
-          .accumulate(new CacheableHttpResponseBodyPart(nrsResponseJson.toString().getBytes, true))
-          .build())
+  val url         = "/submission"
+  val apiKeyValue = "api-key"
 
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.successful(wsResponse))
+  class Test(retryDelays: List[FiniteDuration] = List(100.millis)) {
+    MockedAppConfig.nrsBaseUrl.returns(s"http://localhost:$port")
+    MockedAppConfig.nrsRetries returns retryDelays
+    MockedAppConfig.nrsApiKey returns apiKeyValue
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
-      }
+    val connector = new NrsConnector(httpClient, mockAppConfig)
 
-      "return an NrsError for an unsuccessful response with error code: 400" in new Test {
+  }
 
-        val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
-          .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), BAD_REQUEST, "status text", "protocols!"))
-          .accumulate(new CacheableHttpResponseBodyPart("".getBytes, true))
-          .build())
 
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.successful(wsResponse))
+  "NRSConnector" when {
+    "immediately successful" must {
+      "return the response" in new Test(longDelays) {
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .withRequestBody(equalToJson(nrsSubmissionJsonString, true, false))
+            .willReturn(aResponse()
+              .withBody(successResponseJson.toString)
+              .withStatus(ACCEPTED)))
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
-      }
-
-      "return the default result for an unsuccessful response with unexpected error code" in new Test {
-
-        val wsResponse: WSResponse = new AhcWSResponse(new Response.ResponseBuilder()
-          .accumulate(new CacheableHttpResponseStatus(Uri.create("http://uri"), INTERNAL_SERVER_ERROR, "status text", "protocols!"))
-          .accumulate(new CacheableHttpResponseBodyPart("".getBytes, true))
-          .build())
-
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.successful(wsResponse))
-
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Right(NrsResponse.empty.copy(nrSubmissionId = "anId"))
+        await(connector.submit(nrsSubmission)) shouldBe Right(NrsResponse("submissionId"))
       }
     }
 
-    "the response time from NRS exceeds the specified request timeout" should {
-      "return an error" in new Test {
+    "fails with 5xx status" must {
+      "retry" in new Test {
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .inScenario("Retry")
+            .whenScenarioStateIs(STARTED)
+            .willReturn(aResponse()
+              .withStatus(GATEWAY_TIMEOUT))
+            .willSetStateTo("SUCCESS"))
 
-        MockWsRequest.post(nrsSubmissionJson)
-          .returns(Future.failed(new TimeoutException))
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .inScenario("Retry")
+            .whenScenarioStateIs("SUCCESS")
+            .willReturn(aResponse()
+              .withBody(successResponseJson.toString)
+              .withStatus(ACCEPTED)))
 
-        await(connector.submitNrs(nrsSubmissionModel, "anId")) shouldBe Left(NrsError)
+        await(connector.submit(nrsSubmission)) shouldBe Right(NrsResponse("submissionId"))
+      }
+
+      "give up after all retries" in new Test {
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .willReturn(aResponse()
+              .withStatus(GATEWAY_TIMEOUT)))
+
+        await(connector.submit(nrsSubmission)) shouldBe Left(NrsFailure.ErrorResponse(GATEWAY_TIMEOUT))
+      }
+    }
+
+    "fails with 4xx status" must {
+      "give up" in new Test(longDelays) {
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .willReturn(aResponse()
+              .withStatus(BAD_REQUEST)))
+
+        await(connector.submit(nrsSubmission)) shouldBe Left(NrsFailure.ErrorResponse(BAD_REQUEST))
+      }
+    }
+
+    "fails with exception" must {
+      "give up" in new Test(longDelays) {
+
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)))
+
+        await(connector.submit(nrsSubmission)) shouldBe Left(NrsFailure.ExceptionThrown)
+      }
+    }
+
+    "fails because unparsable JSON returned" must {
+      "give up" in new Test(longDelays) {
+        wireMockServer.stubFor(
+          post(urlPathEqualTo(url))
+            .withHeader("Content-Type", equalTo(MimeTypes.JSON))
+            .withHeader("X-API-Key", equalTo(apiKeyValue))
+            .willReturn(aResponse()
+              .withBody("""{
+                          |   "badKey": "badValue"
+                          |}""".stripMargin)
+              .withStatus(ACCEPTED)))
+
+        await(connector.submit(nrsSubmission)) shouldBe Left(NrsFailure.ExceptionThrown)
       }
     }
   }

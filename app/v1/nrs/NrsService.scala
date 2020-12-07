@@ -16,64 +16,67 @@
 
 package v1.nrs
 
-import cats.data.EitherT
-import cats.implicits._
-import javax.inject.{Inject, Singleton}
-import v1.nrs.models.response.NrsResponse
+import com.kenshoo.play.metrics.Metrics
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{HashUtil, IdGenerator}
+import utils.{HashUtil, IdGenerator, Logging, Timer}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.models.audit.NrsAuditDetail
-import v1.models.errors.{DownstreamError, ErrorWrapper}
 import v1.models.request.submit.SubmitRequest
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
+import v1.nrs.models.response.{NrsFailure, NrsResponse}
 import v1.services.AuditService
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NrsService @Inject()(auditService: AuditService, idGenerator: IdGenerator, connector: NrsConnector, hashUtil: HashUtil) {
+class NrsService @Inject()(auditService: AuditService,
+                           idGenerator: IdGenerator,
+                           connector: NrsConnector,
+                           hashUtil: HashUtil,
+                           override val metrics: Metrics) extends Timer with Logging {
 
-  def submitNrs(vatSubmission: SubmitRequest, nrsId: String, submissionTimestamp: DateTime)(
+  def submit(vatSubmission: SubmitRequest, nrsId: String, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
-    correlationId: String): Future[Either[ErrorWrapper, NrsResponse]] = {
+    correlationId: String): Future[Option[NrsResponse]] = {
 
     val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
 
-   def audit(resp: NrsResponse): Future[AuditResult] = resp match {
-      case NrsResponse.empty =>
+    def audit(resp: NrsOutcome): Future[AuditResult] = resp match {
+      case Left(err) =>
         auditService.auditEvent(
           AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
             NrsAuditDetail(
               vatSubmission.vrn.toString,
               request.headers.get("Authorization").getOrElse(""),
-              None,
-              Some(Json.toJson(nrsSubmission)), ""))
+              Some(nrsId),
+              Some(Json.toJson(nrsSubmission)),
+              correlationId))
         )
-      case _ => auditService.auditEvent(
-        AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
-          NrsAuditDetail(
-            vatSubmission.vrn.toString,
-            request.headers.get("Authorization").getOrElse(""),
-            Some(nrsId), None, ""))
-      )
+      case _ =>
+        auditService.auditEvent(
+          AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
+            NrsAuditDetail(
+              vatSubmission.vrn.toString,
+              request.headers.get("Authorization").getOrElse(""),
+              Some(nrsId),
+              None,
+              correlationId))
+        )
     }
 
-    val result = for {
-      nrsResponse <- EitherT(connector.submit(nrsSubmission))
-        .leftMap(_ => ErrorWrapper(correlationId, DownstreamError, None))
-      _ <- EitherT.right[ErrorWrapper](audit(nrsResponse))
-    } yield {
-      nrsResponse
+    timeFuture("NRS Submission", "nrs.submission") {
+      connector.submit(nrsSubmission).map { response =>
+        audit(response)
+        response.toOption
+      }
     }
-
-    result.value
   }
 
   def buildNrsSubmission(vatSubmission: SubmitRequest,

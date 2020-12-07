@@ -41,7 +41,9 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.non-repudiation.port" -> mockPort,
     "feature-switch.refactor.enabled" -> true,
     "feature-switch.refactor.prod.enabled" -> false,
-    "microservice.services.non-repudiation.maxTimeout" -> 5000
+    "microservice.services.non-repudiation.numberOfRetries" -> 10,
+    "microservice.services.non-repudiation.initialDelays" -> "500 milliseconds",
+    "metrics.enabled"               -> "false"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

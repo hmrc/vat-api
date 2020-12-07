@@ -43,6 +43,9 @@ object MtdErrorWrapper {
   implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
 
+//NRS error
+object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
+
 // Format Errors
 object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
 object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is invalid")
