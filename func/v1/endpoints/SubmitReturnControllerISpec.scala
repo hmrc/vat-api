@@ -29,18 +29,21 @@ import v1.stubs.{AuditStub, AuthStub, DesStub, NrsStub}
 
 class SubmitReturnControllerISpec extends IntegrationBaseSpec {
 
-  override lazy val app: Application = new GuiceApplicationBuilder()
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
-    .configure(    "microservice.services.des.host" -> mockHost,
+    .configure(
+      "microservice.services.des.host" -> mockHost,
       "microservice.services.des.port" -> mockPort,
       "microservice.services.auth.host" -> mockHost,
       "microservice.services.auth.port" -> mockPort,
       "auditing.consumer.baseUri.port" -> mockPort,
       "microservice.services.non-repudiation.host" -> mockHost,
       "microservice.services.non-repudiation.port" -> mockPort,
-      "microservice.services.non-repudiation.numberOfRetries" -> 10,
+      "microservice.services.non-repudiation.numberOfRetries" -> 3,
       "microservice.services.non-repudiation.initialDelays" -> "5 milliseconds",
-      "metrics.enabled" -> "false")
+      "metrics.enabled" -> true
+    )
+    .disable()
     .build()
 
   private trait Test {
@@ -133,56 +136,55 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
   }
 
   "Submit VAT Return endpoint" should {
-//    "return a 201 status code with expected body" when {
-//      "a valid request is made" in new Test {
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          AuthStub.authorisedWithNrs()
-//          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
-//          DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
-//        }
-//
-//        private val response = await(request.post(requestJson))
-//        response.status shouldBe CREATED
-//        response.json shouldBe mtdResponseJson
-//        response.header("Content-Type") shouldBe Some("application/json")
-//      }
-//
-//      "NRS returns non bad_request response" in new Test {
-//
-//        override def uri: String = s"/$vrn/returns"
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          AuthStub.authorisedWithNrs()
-//          NrsStub.onSuccess(NrsStub.POST, nrsUrl, FORBIDDEN, nrsSuccess)
-//          DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
-//        }
-//
-//        private val response = await(request.post(requestJson))
-//        response.status shouldBe CREATED
-//        response.json shouldBe mtdResponseJson
-//        response.header("Content-Type") shouldBe Some("application/json")
-//      }
-//    }
+    "return a 201 status code with expected body" when {
+      "a valid request is made" in new Test {
 
-//    "return a 500 status code" when {
-//     "NRS returns bad_request response" in new Test {
-//
-//        override def uri: String = s"/$vrn/returns"
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          AuthStub.authorisedWithNrs()
-//          NrsStub.onError(NrsStub.POST, nrsUrl, BAD_REQUEST, "{}")
-//        }
-//
-//        private val response = await(request.post(requestJson))
-//        response.status shouldBe INTERNAL_SERVER_ERROR
-//       response.header("Content-Type") shouldBe Some("application/json")
-//     }
-//    }
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
+          DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe CREATED
+        response.json shouldBe mtdResponseJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+      "NRS returns non bad_request response" in new Test {
+
+        override def uri: String = s"/$vrn/returns"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, FORBIDDEN, nrsSuccess)
+          DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe CREATED
+        response.json shouldBe mtdResponseJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+      "NRS returns bad_request response" in new Test {
+
+        override def uri: String = s"/$vrn/returns"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          NrsStub.onError(NrsStub.POST, nrsUrl, BAD_REQUEST, "{}")
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe CREATED
+        response.json shouldBe mtdResponseJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
 
     "return a FORBIDDEN status code" when {
       "a request is made without finalising the submission" in new Test {

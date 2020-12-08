@@ -35,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NrsService @Inject()(auditService: AuditService,
-                           idGenerator: IdGenerator,
                            connector: NrsConnector,
                            hashUtil: HashUtil,
                            override val metrics: Metrics) extends Timer with Logging {

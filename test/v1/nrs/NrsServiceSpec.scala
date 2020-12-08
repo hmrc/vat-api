@@ -103,7 +103,7 @@ class NrsServiceSpec extends ServiceSpec {
       )
     )
 
-  trait Test extends MockNrsConnector with MockAuditService with MockIdGenerator with MockHashUtil {
+  trait Test extends MockNrsConnector with MockAuditService with MockHashUtil {
 
     implicit val userRequest: UserRequest[_] =
       UserRequest(
@@ -123,7 +123,6 @@ class NrsServiceSpec extends ServiceSpec {
 
     val service: NrsService = new NrsService(
       mockAuditService,
-      mockIdGenerator,
       mockNrsConnector,
       mockHashUtil,
       metrics
@@ -145,7 +144,6 @@ class NrsServiceSpec extends ServiceSpec {
               correlationId = correlationId)
           )
         )
-        MockIdGenerator.getUid.returns(nrsId)
 
         MockNrsConnector.submitNrs(nrsSubmission)
           .returns(Future.successful(Right(NrsResponse(nrsId, "", ""))))

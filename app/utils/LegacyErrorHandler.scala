@@ -16,7 +16,6 @@
 
 package utils
 
-import javax.inject._
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
 import play.api.libs.json.Json
@@ -24,8 +23,9 @@ import play.api.mvc.Results.{BadRequest, NotImplemented}
 import play.api.mvc.{RequestHeader, Result}
 import play.api.routing.Router
 import uk.gov.hmrc.http.NotImplementedException
-import v1.models.errors.{DownstreamError, InvalidDateFromErrorDes, InvalidDateToErrorDes, LegacyNotFoundError, VrnFormatError}
+import v1.models.errors._
 
+import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
