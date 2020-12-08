@@ -17,8 +17,10 @@
 package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.{Application, Environment, Mode}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
@@ -26,6 +28,20 @@ import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub, NrsStub}
 
 class SubmitReturnControllerISpec extends IntegrationBaseSpec {
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .in(Environment.simple(mode = Mode.Dev))
+    .configure(    "microservice.services.des.host" -> mockHost,
+      "microservice.services.des.port" -> mockPort,
+      "microservice.services.auth.host" -> mockHost,
+      "microservice.services.auth.port" -> mockPort,
+      "auditing.consumer.baseUri.port" -> mockPort,
+      "microservice.services.non-repudiation.host" -> mockHost,
+      "microservice.services.non-repudiation.port" -> mockPort,
+      "microservice.services.non-repudiation.numberOfRetries" -> 10,
+      "microservice.services.non-repudiation.initialDelays" -> "5 milliseconds",
+      "metrics.enabled" -> "false")
+    .build()
 
   private trait Test {
 
@@ -102,7 +118,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def request: WSRequest = {
-      setupStubs()
+        setupStubs()
       buildRequest(uri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"), ("Authorization", "Bearer testtoken"))
     }
