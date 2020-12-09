@@ -33,8 +33,8 @@ trait MockNrsConnector extends MockFactory {
 
     def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome]] = {
       (mockNrsConnector
-        .submit(_: NrsSubmission)(_: HeaderCarrier))
-        .expects(body, *)
+        .submit(_: NrsSubmission)(_: HeaderCarrier, _: String))
+        .expects(body, *, *)
     }
   }
 
