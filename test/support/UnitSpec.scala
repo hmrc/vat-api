@@ -20,7 +20,6 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import play.api.mvc.Result
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 trait UnitSpec extends AnyWordSpecLike

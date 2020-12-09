@@ -19,11 +19,10 @@ package v1.mocks.nrs
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.nrs.{NrsConnector, NrsOutcome}
 import v1.nrs.models.request.NrsSubmission
-import v1.nrs.models.response.NrsResponse
+import v1.nrs.{NrsConnector, NrsOutcome}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MockNrsConnector extends MockFactory {
 

@@ -18,10 +18,6 @@ package config
 
 import akka.actor.{ActorSystem, Scheduler}
 import com.google.inject.{AbstractModule, Provides}
-import com.kenshoo.play.metrics.{Metrics, MetricsImpl}
-import uk.gov.hmrc.http.HttpClient
-import v1.controllers.SubmitReturnController
-import v1.nrs.{NrsConnector, NrsService}
 
 class DIModule extends AbstractModule {
 

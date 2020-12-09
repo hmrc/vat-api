@@ -24,7 +24,6 @@ import uk.gov.hmrc.domain.Vrn
 import utils.{MockHashUtil, MockMetrics}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
-import v1.mocks.MockIdGenerator
 import v1.mocks.nrs.MockNrsConnector
 import v1.mocks.services.MockAuditService
 import v1.models.audit.NrsAuditDetail

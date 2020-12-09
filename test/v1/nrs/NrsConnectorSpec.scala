@@ -33,7 +33,7 @@ import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import v1.connectors.ConnectorSpec
-import v1.nrs.models.NrsTestData.{FullRequestTestData, MetadataTestData, NrsResponseTestData}
+import v1.nrs.models.NrsTestData.{FullRequestTestData, NrsResponseTestData}
 import v1.nrs.models.request.NrsSubmission
 import v1.nrs.models.response.{NrsFailure, NrsResponse}
 
@@ -48,7 +48,6 @@ class NrsConnectorSpec extends ConnectorSpec
 
   private val nrsSubmission: NrsSubmission = FullRequestTestData.correctModel
   private val nrsSubmissionJsonString: String = FullRequestTestData.correctJsonString
-  private val nrsResponseJson: JsValue = NrsResponseTestData.correctJson
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
@@ -64,7 +63,6 @@ class NrsConnectorSpec extends ConnectorSpec
   val actorSystem: ActorSystem              = inject[ActorSystem]
   implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-//  implicit val lc: LoggingContext           = LoggingContext("eori", "corrId", "subId")
 
   // Long delays to force a test to timeout if it does retry when we're not expecting it...
   val longDelays = List(10.minutes)
@@ -74,7 +72,6 @@ class NrsConnectorSpec extends ConnectorSpec
                  |   "nrSubmissionId": "submissionId"
                  |}""".stripMargin)
 
-//  val nrsSubmission: NrsSubmission = NrsSubmission("payload", MetadataTestData.correctModel)
 
   override def beforeAll(): Unit = {
     wireMockServer.start()

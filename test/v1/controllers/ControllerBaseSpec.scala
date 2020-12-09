@@ -18,9 +18,8 @@ package v1.controllers
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
-import play.api.test.{FakeRequest, ResultExtractors}
 import play.api.test.Helpers.stubControllerComponents
-import play.api.test.Helpers
+import play.api.test.{FakeRequest, ResultExtractors}
 import support.UnitSpec
 
 import scala.concurrent.duration.Duration
