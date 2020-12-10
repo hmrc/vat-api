@@ -78,7 +78,6 @@ class NrsServiceSpec extends ServiceSpec {
     NrsSubmission(
       payload = encodedString,
       metadata = Metadata(
-        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",

@@ -39,13 +39,13 @@ class NrsService @Inject()(auditService: AuditService,
                            hashUtil: HashUtil,
                            override val metrics: Metrics) extends Timer with Logging {
 
-  def submit(vatSubmission: SubmitRequest, nrsId: String, submissionTimestamp: DateTime)(
+  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: DateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
     correlationId: String): Future[Option[NrsResponse]] = {
 
-    val nrsSubmission = buildNrsSubmission(vatSubmission, nrsId, submissionTimestamp, request)
+    val nrsSubmission = buildNrsSubmission(vatSubmission, submissionTimestamp, request)
 
     def audit(resp: NrsOutcome): Future[AuditResult] = resp match {
       case Left(err) =>
@@ -54,17 +54,17 @@ class NrsService @Inject()(auditService: AuditService,
             NrsAuditDetail(
               vatSubmission.vrn.toString,
               request.headers.get("Authorization").getOrElse(""),
-              Some(nrsId),
+              Some(generatedNrsId),
               Some(Json.toJson(nrsSubmission)),
               correlationId))
         )
-      case _ =>
+      case Right(resp) =>
         auditService.auditEvent(
           AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
             NrsAuditDetail(
               vatSubmission.vrn.toString,
               request.headers.get("Authorization").getOrElse(""),
-              Some(nrsId),
+              Some(resp.nrSubmissionId),
               None,
               correlationId))
         )
@@ -79,7 +79,6 @@ class NrsService @Inject()(auditService: AuditService,
   }
 
   def buildNrsSubmission(vatSubmission: SubmitRequest,
-                         nrsId: String,
                          submissionTimestamp: DateTime,
                          request: UserRequest[_]): NrsSubmission = {
 
@@ -92,7 +91,6 @@ class NrsService @Inject()(auditService: AuditService,
     NrsSubmission(
       payload = encodedPayload,
       Metadata(
-        nrSubmissionId = Some(nrsId),
         businessId = "vat",
         notableEvent = "vat-return",
         payloadContentType = "application/json",

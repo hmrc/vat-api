@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.{Format, JsValue, Json, OFormat}
 import utils.DateUtils
 
-case class Metadata(nrSubmissionId: Option[String],
+case class Metadata(
                     businessId: String,
                     notableEvent: String,
                     payloadContentType: String,
