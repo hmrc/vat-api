@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package v1.mocks.connectors
+package v1.mocks.nrs
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{NrsConnector, NrsOutcome}
-import v1.models.nrs.request.NrsSubmission
-import v1.models.nrs.response.NrsResponse
+import v1.nrs.models.request.NrsSubmission
+import v1.nrs.{NrsConnector, NrsOutcome}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MockNrsConnector extends MockFactory {
 
@@ -31,10 +30,10 @@ trait MockNrsConnector extends MockFactory {
 
   object MockNrsConnector {
 
-    def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome[NrsResponse]]] = {
+    def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome]] = {
       (mockNrsConnector
-        .submitNrs(_: NrsSubmission, _: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(body, *, *, *)
+        .submit(_: NrsSubmission)(_: HeaderCarrier, _: String))
+        .expects(body, *, *)
     }
   }
 

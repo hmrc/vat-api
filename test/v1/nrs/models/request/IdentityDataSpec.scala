@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.response
+package v1.nrs.models.request
 
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.nrs.models.NrsTestData.IdentityDataTestData._
 
-case class NrsResponse(nrSubmissionId: String, cadesTSignature: String, timestamp: String)
+class IdentityDataSpec extends UnitSpec {
 
-object NrsResponse {
-
-  val deprecatedString: String = "This has been deprecated - DO NOT USE"
-  val empty: NrsResponse = NrsResponse("", deprecatedString, "")
-
-  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId").read[String].map(NrsResponse(_, deprecatedString, ""))
+  "writes" should {
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
 }

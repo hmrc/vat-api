@@ -17,8 +17,10 @@
 package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.{Application, Environment, Mode}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import support.IntegrationBaseSpec
@@ -26,6 +28,23 @@ import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub, NrsStub}
 
 class SubmitReturnControllerISpec extends IntegrationBaseSpec {
+
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
+    .in(Environment.simple(mode = Mode.Dev))
+    .configure(
+      "microservice.services.des.host" -> mockHost,
+      "microservice.services.des.port" -> mockPort,
+      "microservice.services.auth.host" -> mockHost,
+      "microservice.services.auth.port" -> mockPort,
+      "auditing.consumer.baseUri.port" -> mockPort,
+      "microservice.services.non-repudiation.host" -> mockHost,
+      "microservice.services.non-repudiation.port" -> mockPort,
+      "microservice.services.non-repudiation.numberOfRetries" -> 3,
+      "microservice.services.non-repudiation.initialDelays" -> "5 milliseconds",
+      "metrics.enabled" -> true
+    )
+    .disable()
+    .build()
 
   private trait Test {
 
@@ -102,7 +121,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def request: WSRequest = {
-      setupStubs()
+        setupStubs()
       buildRequest(uri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"), ("Authorization", "Bearer testtoken"))
     }
@@ -123,7 +142,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorisedWithNrs()
-          //NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
+          NrsStub.onSuccess(NrsStub.POST, nrsUrl, ACCEPTED, nrsSuccess)
           DesStub.onSuccess(DesStub.POST, desUrl, OK, desResponseJson)
         }
 
@@ -149,10 +168,8 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         response.json shouldBe mtdResponseJson
         response.header("Content-Type") shouldBe Some("application/json")
       }
-    }
 
-    "return a 500 status code" when {
-     "NRS returns bad_request response" in new Test {
+      "NRS returns bad_request response" in new Test {
 
         override def uri: String = s"/$vrn/returns"
 
@@ -163,9 +180,10 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         }
 
         private val response = await(request.post(requestJson))
-        response.status shouldBe INTERNAL_SERVER_ERROR
-       response.header("Content-Type") shouldBe Some("application/json")
-     }
+        response.status shouldBe CREATED
+        response.json shouldBe mtdResponseJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
     }
 
     "return a FORBIDDEN status code" when {

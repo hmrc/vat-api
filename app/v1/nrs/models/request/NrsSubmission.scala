@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package v1.nrs.models.request
 
-import v1.nrs.models.request.IdentityData
+import play.api.libs.json._
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case class NrsSubmission(payload: String, metadata: Metadata)
+
+object NrsSubmission {
+  implicit val mdFormat: OFormat[Metadata] = Metadata.format
+  implicit val format: OFormat[NrsSubmission] = Json.format[NrsSubmission]
+}

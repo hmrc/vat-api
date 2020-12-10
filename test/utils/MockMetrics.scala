@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package utils
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.models.nrs.NrsTestData.IdentityDataTestData._
+import com.codahale.metrics.MetricRegistry
+import com.kenshoo.play.metrics.Metrics
 
-class IdentityDataSpec extends UnitSpec {
+class MockMetrics extends Metrics {
+  override val defaultRegistry: MetricRegistry = new MetricRegistry()
 
-  "writes" should {
-    "parse correctly to json" in {
-      Json.toJson(correctModel) shouldBe correctJson
-    }
-  }
+  override def toJson: String = throw new UnsupportedOperationException
 }

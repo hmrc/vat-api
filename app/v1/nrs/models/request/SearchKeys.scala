@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package v1.nrs.models.request
 
 import org.joda.time.LocalDate
 import play.api.libs.json.{Format, Json, OFormat}

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.request
+package v1.nrs.models.request
 
-import play.api.libs.json._
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.nrs.models.NrsTestData.MetadataTestData._
 
-case class NrsSubmission(payload: String, metadata: Metadata)
+class MetadataSpec extends UnitSpec {
 
-object NrsSubmission {
-  implicit val mdFormat: OFormat[Metadata] = Metadata.format
-  implicit val format: OFormat[NrsSubmission] = Json.format[NrsSubmission]
+  "writes" should {
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
 }

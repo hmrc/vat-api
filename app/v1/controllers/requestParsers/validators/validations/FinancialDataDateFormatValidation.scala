@@ -30,6 +30,7 @@ object FinancialDataDateFormatValidation {
       case NoValidationErrors => error match {
         case FinancialDataInvalidDateFromError => validateFrom(date)
         case FinancialDataInvalidDateToError => validateTo(date)
+        case _ => NoValidationErrors
       }
       case _ => List(error)
     }

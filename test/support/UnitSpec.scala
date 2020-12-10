@@ -27,4 +27,19 @@ trait UnitSpec extends AnyWordSpecLike
   with EitherValues
   with Matchers
   with FutureAwaits
-  with DefaultAwaitTimeout
+  with DefaultAwaitTimeout {
+
+
+  //lifted from hmrctest UnitSpec.  Should find a way to use their UnitSpec in future iterations
+  import scala.concurrent.duration._
+  import scala.concurrent.{Await, Future}
+
+  implicit val defaultTimeout: FiniteDuration = 5 seconds
+
+  implicit def extractAwait[A](future: Future[A]): A = await[A](future)
+
+  def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
+
+  // Convenience to avoid having to wrap andThen() parameters in Future.successful
+  implicit def liftFuture[A](v: A): Future[A] = Future.successful(v)
+}

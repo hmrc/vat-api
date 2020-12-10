@@ -21,7 +21,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 
 trait MockAppConfig extends MockFactory {
 
@@ -38,8 +38,8 @@ trait MockAppConfig extends MockFactory {
 
     // NRS config items
     def nrsApiKey: CallHandler[String] = (mockAppConfig.nrsApiKey _).expects()
-    def nrsMaxTimeout: CallHandler[Duration] = (mockAppConfig.nrsMaxTimeout _).expects()
     def appName: CallHandler[String] = (mockAppConfig.appName _).expects()
     def nrsBaseUrl: CallHandler[String] = (mockAppConfig.nrsBaseUrl _).expects()
+    def nrsRetries: CallHandler[List[FiniteDuration]] = (mockAppConfig.nrsRetries _).expects()
   }
 }

@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.nrs.response
+package v1.nrs.models.request
 
-sealed trait NrsError
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.nrs.models.NrsTestData.SearchKeysTestData._
 
-case object NrsError extends NrsError
+class SearchKeysSpec extends UnitSpec {
+
+  "writes" should {
+    "parse correctly to json" in {
+      Json.toJson(correctModel) shouldBe correctJson
+    }
+  }
+}

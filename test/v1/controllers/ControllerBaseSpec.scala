@@ -17,10 +17,13 @@
 package v1.controllers
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
-import play.api.mvc.{AnyContentAsEmpty, ControllerComponents}
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{FakeRequest, ResultExtractors}
 import support.UnitSpec
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class ControllerBaseSpec extends UnitSpec
   with Status
@@ -37,4 +40,8 @@ class ControllerBaseSpec extends UnitSpec
   )
 
   def fakePostRequest[T](body: T): FakeRequest[T] = fakeRequest.withBody(body)
+
+  def status(of: Result): Int = of.header.status
+
+  def status(of: Future[Result])(implicit timeout: Duration): Int = status(Await.result(of, timeout))
 }

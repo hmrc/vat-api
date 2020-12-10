@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package v1.models.auth
+package utils
 
-import v1.nrs.models.request.IdentityData
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+import akka.actor.Scheduler
+
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future, Promise}
+
+trait Delayer {
+
+  implicit val scheduler: Scheduler
+  implicit val ec: ExecutionContext
+
+  def delay(delay: FiniteDuration): Future[Unit] = {
+    val promise = Promise[Unit]
+
+    scheduler.scheduleOnce(delay)(promise.success(()))
+
+    promise.future
+  }
+
+}

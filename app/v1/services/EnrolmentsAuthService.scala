@@ -28,8 +28,8 @@ import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
-import v1.models.nrs.request.IdentityData
 import v1.models.outcomes.AuthOutcome
+import v1.nrs.models.request.IdentityData
 
 import scala.concurrent.{ExecutionContext, Future}
 

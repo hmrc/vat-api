@@ -19,6 +19,7 @@ package config
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.Retrying
 
 import scala.concurrent.duration._
 
@@ -40,8 +41,7 @@ trait AppConfig {
 
   // NRS config items
   def nrsApiKey: String
-
-  def nrsMaxTimeout: Duration
+  def nrsRetries: List[FiniteDuration]
 
   def appName: String
 
@@ -59,8 +59,19 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   // NRS config items
   val nrsApiKey: String = config.getString("access-keys.xApiKey")
   val appName: String = config.getString("appName")
-  val nrsMaxTimeout: Duration = config.getInt("microservice.services.non-repudiation.maxTimeout").milliseconds
+  private val nrsConfig = configuration.get[Configuration]("microservice.services.non-repudiation")
   val nrsBaseUrl: String = config.baseUrl("non-repudiation")
+  lazy val nrsRetries: List[FiniteDuration] =
+    Retrying.fibonacciDelays(getFiniteDuration(nrsConfig, "initialDelay"), nrsConfig.get[Int]("numberOfRetries"))
+
+  private final def getFiniteDuration(config: Configuration, path: String): FiniteDuration = {
+    val string = config.get[String](path)
+
+    Duration.create(string) match {
+      case f: FiniteDuration => f
+      case _                 => throw new RuntimeException(s"Not a finite duration '$string' for $path")
+    }
+  }
 
   def apiStatus(version: String): String = config.getString(s"api.$version.status")
 

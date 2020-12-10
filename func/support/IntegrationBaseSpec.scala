@@ -26,8 +26,8 @@ import play.api.{Application, Environment, Mode}
 trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite
   with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  val mockHost: String = WireMockHelper.host
-  val mockPort: String = WireMockHelper.wireMockPort.toString
+  lazy val mockHost: String = WireMockHelper.host
+  lazy val mockPort: String = WireMockHelper.wireMockPort.toString
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
@@ -41,11 +41,14 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.non-repudiation.port" -> mockPort,
     "feature-switch.refactor.enabled" -> true,
     "feature-switch.refactor.prod.enabled" -> false,
-    "microservice.services.non-repudiation.maxTimeout" -> 5000
+    "microservice.services.non-repudiation.numberOfRetries" -> 1,
+    "microservice.services.non-repudiation.initialDelays" -> "5 milliseconds",
+    "metrics.enabled" -> false
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
+    .disable[com.kenshoo.play.metrics.PlayModule]
     .configure(servicesConfig)
     .build()
 
@@ -60,6 +63,5 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
   }
 
   def buildRequest(path: String): WSRequest = client.url(s"http://localhost:$port$path").withFollowRedirects(false)
-
   def document(response: WSResponse): JsValue = Json.parse(response.body)
 }

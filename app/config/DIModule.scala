@@ -16,11 +16,16 @@
 
 package config
 
-import com.google.inject.AbstractModule
+import akka.actor.{ActorSystem, Scheduler}
+import com.google.inject.{AbstractModule, Provides}
 
 class DIModule extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[AppConfig]).to(classOf[AppConfigImpl]).asEagerSingleton()
   }
+
+  @Provides
+  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
+    actorSystem.scheduler
 }

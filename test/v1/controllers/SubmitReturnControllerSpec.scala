@@ -16,26 +16,28 @@
 
 package v1.controllers
 
+import com.kenshoo.play.metrics.Metrics
 import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.DateUtils
+import utils.{DateUtils, MockMetrics}
 import v1.audit.AuditEvents
+import v1.mocks.nrs.MockNrsService
 import v1.mocks.requestParsers.MockSubmitReturnRequestParser
-import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockNrsService, MockSubmitReturnService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockSubmitReturnService}
 import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.models.nrs.response.NrsResponse
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
+import v1.nrs.models.response.NrsResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 class SubmitReturnControllerSpec
   extends ControllerBaseSpec
@@ -56,7 +58,9 @@ class SubmitReturnControllerSpec
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
-    
+
+    val mockedMetrics: Metrics = new MockMetrics
+
     val controller: SubmitReturnController = new SubmitReturnController(
       mockEnrolmentsAuthService,
       mockSubmitReturnRequestParser,
@@ -65,7 +69,8 @@ class SubmitReturnControllerSpec
       auditService = stubAuditService,
       cc,
       dateTime = mockCurrentDateTime,
-      mockIdGenerator
+      mockIdGenerator,
+      mockedMetrics
     )
 
     MockEnrolmentsAuthService.authoriseUser()
@@ -146,8 +151,8 @@ class SubmitReturnControllerSpec
           .returns(Right(submitReturnRequest))
 
         MockNrsService
-          .submitNrs(submitReturnRequest, uid, date)
-          .returns(Future.successful(Right(NrsResponse("","",""))))
+          .submit(submitReturnRequest, uid, date)
+          .returns(Future.successful(Some(NrsResponse("submissionId"))))
 
         MockSubmitReturnService
           .submitReturn(submitReturnRequest)
@@ -166,23 +171,29 @@ class SubmitReturnControllerSpec
       }
     }
 
-    "a valid request is supplied but NRS is failed" should {
-      "return the INTERNAL_SERVER_ERROR" in new Test {
+    "a valid request is supplied but NRS has failed" should {
+      "not wait until NRS submission completes" in new Test {
 
         MockSubmitReturnRequestParser
           .parse(submitRequestRawData)
           .returns(Right(submitReturnRequest))
 
-        MockNrsService
-          .submitNrs(submitReturnRequest, uid, date)
-          .returns(Future.successful(Left(ErrorWrapper(correlationId, DownstreamError, None))))
+        val nrsPromise: Promise[Option[NrsResponse]] = Promise[Option[NrsResponse]]
+
+        MockNrsService.submit(submitReturnRequest, uid, date) returns nrsPromise.future
+
+        MockSubmitReturnService
+          .submitReturn(submitReturnRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, submitReturnResponse))))
 
         private val result: Future[Result] = controller.submitReturn(vrn)(fakePostRequest(submitRequestBodyJson))
 
-        status(result) shouldBe INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.toJson(DownstreamError)
+        status(result) shouldBe CREATED
+        contentAsJson(result) shouldBe submitReturnResponseJson
+        header("X-CorrelationId", result) shouldBe Some(correlationId)
+        header("Receipt-Timestamp", result).getOrElse("No Header") should fullyMatch.regex(DateUtils.isoInstantDateRegex)
 
-        val auditResponse: AuditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError("INTERNAL_SERVER_ERROR"))), None)
+        val auditResponse: AuditResponse = AuditResponse(CREATED, None, Some(submitReturnResponseJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
           UserDetails("Individual", None, "N/A"), auditResponse)).once
       }
@@ -325,15 +336,15 @@ class SubmitReturnControllerSpec
 
       "service errors occur" must {
         def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
-          s"a $mtdError error is returned from the service" in new Test {
+          s"a ${mtdError.code} error is returned from the service" in new Test {
 
             MockSubmitReturnRequestParser
               .parse(submitRequestRawData)
               .returns(Right(submitReturnRequest))
 
             MockNrsService
-              .submitNrs(submitReturnRequest, uid, date)
-              .returns(Future.successful(Right(NrsResponse("","",""))))
+              .submit(submitReturnRequest, uid, date)
+              .returns(Future.successful(Some(NrsResponse("","",""))))
 
             MockSubmitReturnService
               .submitReturn(submitReturnRequest)
