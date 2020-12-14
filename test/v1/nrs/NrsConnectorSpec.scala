@@ -33,7 +33,7 @@ import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import v1.connectors.ConnectorSpec
-import v1.nrs.models.NrsTestData.{FullRequestTestData, NrsResponseTestData}
+import v1.nrs.models.NrsTestData.FullRequestTestData
 import v1.nrs.models.request.NrsSubmission
 import v1.nrs.models.response.{NrsFailure, NrsResponse}
 

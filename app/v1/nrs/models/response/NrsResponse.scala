@@ -26,5 +26,5 @@ object NrsResponse {
   val deprecatedString: String = "This has been deprecated - DO NOT USE"
   val empty: NrsResponse = NrsResponse("", deprecatedString, "")
 
-  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId").read[String].map(NrsResponse(_, deprecatedString, ""))
+  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId" ).read[String].map(NrsResponse(_, deprecatedString, ""))
 }
