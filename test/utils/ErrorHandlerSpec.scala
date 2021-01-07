@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,11 @@ class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite {
     (auditConnector.sendEvent(_ : DataEvent)(_: HeaderCarrier, _: ExecutionContext)).expects(*, *, *)
       .returns(Future.successful(Success))
 
-    val configuration: Configuration = Configuration("appName" -> "myApp")
+    val configuration = Configuration(
+      "appName" -> "myApp",
+      "bootstrap.errorHandler.warnOnly.statusCodes" -> List.empty
+    )
+
     val handler = new ErrorHandler(configuration, auditConnector, httpAuditEvent)
   }
 
