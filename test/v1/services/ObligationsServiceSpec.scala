@@ -94,6 +94,7 @@ class ObligationsServiceSpec extends ServiceSpec {
           ("INVALID_DATE_FROM", InvalidDateFromErrorDes),
           ("INVALID_DATE_TO", InvalidDateToErrorDes),
           ("INVALID_DATE_RANGE", RuleOBLDateRangeTooLargeError),
+          ("INSOLVENT_TRADER", RuleInsolventTraderError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )

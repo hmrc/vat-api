@@ -91,6 +91,7 @@ class ViewReturnServiceSpec extends ServiceSpec {
           ("NOT_FOUND_VRN", DownstreamError),
           ("INVALID_INPUTDATA", InvalidInputDataError),
           ("DATE_RANGE_TOO_LARGE", RuleDateRangeTooLargeError),
+          ("INSOLVENT_TRADER", RuleInsolventTraderError),
           ("NOT_FOUND", EmptyNotFoundError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)

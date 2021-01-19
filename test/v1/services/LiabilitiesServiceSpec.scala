@@ -96,6 +96,7 @@ class LiabilitiesServiceSpec extends ServiceSpec {
           "INVALID_DATETO" -> InvalidDateToErrorDes,
           "NOT_FOUND" -> LegacyNotFoundError,
           "INVALID_DATA" -> InvalidDataError,
+          "INSOLVENT_TRADER" -> RuleInsolventTraderError,
           "SERVER_ERROR" -> DownstreamError,
           "SERVICE_UNAVAILABLE" -> DownstreamError
         )

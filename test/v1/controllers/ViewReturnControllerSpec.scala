@@ -189,6 +189,7 @@ class ViewReturnControllerSpec
           (PeriodKeyFormatErrorDesNotFound, NOT_FOUND),
           (RuleDateRangeTooLargeError, FORBIDDEN),
           (InvalidInputDataError, FORBIDDEN),
+          (RuleInsolventTraderError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

@@ -417,6 +417,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         (FORBIDDEN, "TAX_PERIOD_NOT_ENDED", FORBIDDEN, TaxPeriodNotEnded),
         (CONFLICT, "DUPLICATE_SUBMISSION", FORBIDDEN, DuplicateVatSubmission),
         (FORBIDDEN, "NOT_FOUND_VRN", INTERNAL_SERVER_ERROR, DownstreamError),
+        (FORBIDDEN, "INSOLVENT_TRADER", FORBIDDEN, RuleInsolventTraderError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_ORIGINATOR_ID", INTERNAL_SERVER_ERROR, DownstreamError),
         (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError),

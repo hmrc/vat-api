@@ -60,6 +60,7 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
       "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
       "INVALID_DATETO" -> InvalidDateToErrorDes,
       "INVALID_DATA" -> InvalidDataError,
+      "INSOLVENT_TRADER" -> RuleInsolventTraderError,
       "NOT_FOUND" -> LegacyNotFoundError,
       "SERVER_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError

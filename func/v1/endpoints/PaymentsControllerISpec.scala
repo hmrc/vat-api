@@ -363,6 +363,7 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
         (BAD_REQUEST, "INVALID_CUSTOMERPAYMENTINFORMATION", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_DATEFROM", BAD_REQUEST, InvalidDateFromErrorDes),
         (BAD_REQUEST, "INVALID_DATETO", BAD_REQUEST, InvalidDateToErrorDes),
+        (FORBIDDEN, "INSOLVENT_TRADER", FORBIDDEN, RuleInsolventTraderError),
         (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (UNPROCESSABLE_ENTITY, "INVALID_DATA", BAD_REQUEST, InvalidDataError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),

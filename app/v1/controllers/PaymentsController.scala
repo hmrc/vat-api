@@ -97,6 +97,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |
            FinancialDataInvalidDateRangeError | InvalidDataError
       => BadRequest(Json.toJson(errorWrapper))
+      case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }

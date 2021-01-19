@@ -236,6 +236,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (InvalidStatusErrorDes, BAD_REQUEST),
           (RuleOBLDateRangeTooLargeError, BAD_REQUEST),
           (RuleMissingDateRangeError, BAD_REQUEST),
+          (RuleInsolventTraderError, FORBIDDEN),
           (LegacyNotFoundError, NOT_FOUND),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )

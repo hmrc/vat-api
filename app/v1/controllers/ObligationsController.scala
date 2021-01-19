@@ -100,6 +100,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
            InvalidDateToErrorDes | InvalidStatusErrorDes |
            RuleDateRangeInvalidError | RuleOBLDateRangeTooLargeError |
            RuleMissingDateRangeError | BadRequestError => BadRequest(Json.toJson(errorWrapper))
+      case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }

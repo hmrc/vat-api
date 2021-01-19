@@ -163,6 +163,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         (FORBIDDEN, "NOT_FOUND_VRN", INTERNAL_SERVER_ERROR, DownstreamError),
         (FORBIDDEN, "INVALID_INPUTDATA", FORBIDDEN, InvalidInputDataError),
         (FORBIDDEN, "DATE_RANGE_TOO_LARGE", FORBIDDEN, RuleDateRangeTooLargeError),
+        (FORBIDDEN, "INSOLVENT_TRADER", FORBIDDEN, RuleInsolventTraderError),
         (BAD_REQUEST, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
         (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError)
       )
