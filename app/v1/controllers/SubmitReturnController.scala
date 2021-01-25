@@ -113,7 +113,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
            PeriodKeyFormatError | PeriodKeyFormatErrorDes | BodyPeriodKeyFormatError |
            VATTotalValueRuleError | VATNetValueRuleError | NumericFormatRuleError |
            MandatoryFieldRuleError | StringFormatRuleError | UnMappedPlayRuleError => BadRequest(Json.toJson(errorWrapper))
-      case TaxPeriodNotEnded | DuplicateVatSubmission | FinalisedValueRuleError => Forbidden(Json.toJson(errorWrapper))
+      case TaxPeriodNotEnded | DuplicateVatSubmission | FinalisedValueRuleError | RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
       case _: MtdError => BadRequest(Json.toJson(errorWrapper))
     }

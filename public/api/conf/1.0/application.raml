@@ -55,6 +55,17 @@ traits:
                 description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                 value:
                   code: CLIENT_OR_AGENT_NOT_AUTHORISED
+  ruleInsolventTrader:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleInsolventTrader:
+                description: 'The request could not be completed as it relates to an insolvent trader, which are not supported by this API.'
+                value:
+                  code: RULE_INSOLVENT_TRADER
 
 /organisations/vat:
   /{vrn}:
@@ -70,7 +81,7 @@ traits:
         displayName: Retrieve VAT obligations
         description: Retrieve VAT obligations. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Submit VAT return for period](#_submit-vat-return-for-period_post_accordion).
         (annotations.sandboxData): !include scenarios/vat-obligation-scenarios.md
-        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -152,7 +163,7 @@ traits:
           displayName: View VAT Return
           description: Retrieve a submitted VAT return
           (annotations.sandboxData): !include scenarios/vat-retrieve-returns-scenarios.md
-          is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
+          is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
           (annotations.scope): "read:vat"
           securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
           responses:
@@ -206,7 +217,7 @@ traits:
         displayName: Submit VAT return for period
         description: Submit VAT return for period. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Retrieve VAT obligations](#_retrieve-vat-obligations_get_accordion).
         (annotations.sandboxData): !include scenarios/vat-submit-returns-scenarios.md
-        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, contentType, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
         (annotations.scope): "write:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "write:vat" ] } ]
         body:
@@ -296,7 +307,7 @@ traits:
         displayName: Retrieve VAT liabilities
         description: Retrieve VAT liabilities
         (annotations.sandboxData): !include scenarios/vat-liabilities-scenarios.md
-        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:
@@ -357,7 +368,7 @@ traits:
         displayName: Retrieve VAT payments
         description: Retrieve VAT payments
         (annotations.sandboxData): !include scenarios/vat-payments-scenarios.md
-        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         queryParameters:

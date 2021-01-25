@@ -102,6 +102,7 @@ class PaymentsServiceSpec extends ServiceSpec {
           "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
           "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
           "INVALID_DATETO" -> InvalidDateToErrorDes,
+          "INSOLVENT_TRADER" -> RuleInsolventTraderError,
           "NOT_FOUND" -> LegacyNotFoundError,
           "INVALID_DATA" -> InvalidDataError,
           "SERVER_ERROR" -> DownstreamError,

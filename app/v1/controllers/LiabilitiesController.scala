@@ -92,6 +92,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |
            FinancialDataInvalidDateRangeError | InvalidDataError
       => BadRequest(Json.toJson(errorWrapper))
+      case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }

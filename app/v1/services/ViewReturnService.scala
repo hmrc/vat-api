@@ -55,6 +55,7 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
       "NOT_FOUND_VRN" -> DownstreamError,
       "DATE_RANGE_TOO_LARGE" -> RuleDateRangeTooLargeError,
       "INVALID_INPUTDATA" -> InvalidInputDataError,
+      "INSOLVENT_TRADER" -> RuleInsolventTraderError,
       "NOT_FOUND" -> EmptyNotFoundError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError

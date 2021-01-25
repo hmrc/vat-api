@@ -18,7 +18,7 @@
         </tr>
         <tr>
             <td><p>INVALID_PAYLOAD</p></td>
-            <td><p>Submission has not passed validation. Invalid parameter Payload</p></td>
+            <td><p>Submission has not passed validation. Invalid parameter Payload.</p></td>
         </tr>
         <tr>
             <td><p>DUPLICATE_SUBMISSION</p></td>
@@ -28,5 +28,9 @@
             <td><p>TAX_PERIOD_NOT_ENDED</p></td>
             <td><p>The remote endpoint has indicated that the submission is for a tax period that has not ended.</p></td>
         </tr>
+        <tr>
+            <td><p>INSOLVENT_TRADER</p></td>
+            <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+        </tr>        
     </tbody>
 </table>

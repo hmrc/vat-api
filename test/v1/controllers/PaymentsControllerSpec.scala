@@ -219,6 +219,7 @@ class PaymentsControllerSpec
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidDataError, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
+          (RuleInsolventTraderError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

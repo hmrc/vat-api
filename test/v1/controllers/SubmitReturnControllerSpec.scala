@@ -368,6 +368,7 @@ class SubmitReturnControllerSpec
           (PeriodKeyFormatErrorDes, BAD_REQUEST),
           (TaxPeriodNotEnded, FORBIDDEN),
           (DuplicateVatSubmission, FORBIDDEN),
+          (RuleInsolventTraderError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

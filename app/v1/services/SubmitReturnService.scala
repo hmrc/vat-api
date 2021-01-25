@@ -57,6 +57,7 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
       "NOT_FOUND_VRN" -> DownstreamError,
       "INVALID_SUBMISSION" -> DownstreamError,
       "INVALID_ORIGINATOR_ID" -> DownstreamError,
+      "INSOLVENT_TRADER" -> RuleInsolventTraderError,
       "SERVICE_ERROR" -> DownstreamError,
       "SERVICE_UNAVAILABLE" -> DownstreamError
     )

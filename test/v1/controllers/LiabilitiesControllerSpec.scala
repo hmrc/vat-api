@@ -188,6 +188,7 @@ class LiabilitiesControllerSpec
           (InvalidDateToErrorDes, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
           (InvalidDataError, BAD_REQUEST),
+          (RuleInsolventTraderError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

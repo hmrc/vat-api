@@ -268,6 +268,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
         (BAD_REQUEST, "INVALID_DATE_FROM", BAD_REQUEST, InvalidDateFromErrorDes),
         (BAD_REQUEST, "INVALID_DATE_TO", BAD_REQUEST, InvalidDateToErrorDes),
         (BAD_REQUEST, "INVALID_DATE_RANGE", BAD_REQUEST, RuleOBLDateRangeTooLargeError),
+        (FORBIDDEN, "INSOLVENT_TRADER", FORBIDDEN, RuleInsolventTraderError),
         (FORBIDDEN, "NOT_FOUND_BKEY", INTERNAL_SERVER_ERROR, DownstreamError),
         (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),

@@ -102,6 +102,7 @@ class SubmitReturnServiceSpec extends ServiceSpec {
           ("NOT_FOUND_VRN", DownstreamError),
           ("INVALID_SUBMISSION", DownstreamError),
           ("INVALID_ORIGINATOR_ID", DownstreamError),
+          ("INSOLVENT_TRADER", RuleInsolventTraderError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
