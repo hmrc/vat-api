@@ -80,7 +80,7 @@
         </tr>
         <tr>
             <td><p>INSOLVENT_TRADER</p></td>
-            <td><p>The back end has indicated that the Trader is insolvent.</p></td>
+            <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
         </tr>        
         <tr>
             <td><p>NOT_FOUND</p></td>
