@@ -34,12 +34,14 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         Scope(
           key = readScope,
           name = "View your VAT information",
-          description = "Allow read access to VAT data"
+          description = "Allow read access to VAT data",
+          confidenceLevel = 200
         ),
         Scope(
           key = writeScope,
           name = "Change your VAT information",
-          description = "Allow write access to VAT data"
+          description = "Allow write access to VAT data",
+          confidenceLevel = 200
         )
       ),
       api = APIDefinition(

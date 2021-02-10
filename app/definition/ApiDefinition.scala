@@ -78,7 +78,7 @@ object APIDefinition {
   implicit val formatAPIDefinition: OFormat[APIDefinition] = Json.format[APIDefinition]
 }
 
-case class Scope(key: String, name: String, description: String)
+case class Scope(key: String, name: String, description: String, confidenceLevel: Int)
 
 object Scope {
   implicit val formatScope: OFormat[Scope] = Json.format[Scope]
