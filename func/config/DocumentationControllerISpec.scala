@@ -29,12 +29,14 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
       |    {
       |      "key":"read:vat",
       |      "name":"View your VAT information",
-      |      "description":"Allow read access to VAT data"
+      |      "description":"Allow read access to VAT data",
+      |      "confidenceLevel": 200
       |    },
       |    {
       |      "key":"write:vat",
       |      "name":"Change your VAT information",
-      |      "description":"Allow write access to VAT data"
+      |      "description":"Allow write access to VAT data",
+      |      "confidenceLevel": 200
       |    }
       |  ],
       |  "api":{
