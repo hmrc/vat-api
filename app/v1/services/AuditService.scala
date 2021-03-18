@@ -46,13 +46,6 @@ class AuditService @Inject()(auditConnector: AuditConnector,
       tags = eventTags
     )
 
-    event.detail match {
-      case detail: NrsAuditDetail => logger.info(s"Audit event :- dataEvent.tags :: ${dataEvent.tags} --  auditSource:: ${dataEvent.auditSource}" +
-        s" --- detail :: ${Json.toJson(detail.copy(authorization = ""))}")
-      case _ => logger.info(s"Audit event :- dataEvent.tags :: ${dataEvent.tags} --  auditSource:: ${dataEvent.auditSource}" +
-        s" --- detail :: ${dataEvent.detail}")
-    }
-
     auditConnector.sendExtendedEvent(dataEvent)
   }
 }
