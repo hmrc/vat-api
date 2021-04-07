@@ -16,7 +16,7 @@
       "$ref": "#/definitions/monetaryPosNeg13"
     },
     "vatDueAcquisitions": {
-      "description": "VAT due on acquisitions from other EC Member States. This corresponds to box 2 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "description": "VAT due in the period on acquisitions of goods made in Northern Ireland from EU Member States. This corresponds to box 2 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
       "$ref": "#/definitions/monetaryPosNeg13"
     },
     "totalVatDue": {
@@ -24,7 +24,7 @@
       "$ref": "#/definitions/monetaryPosNeg13"
     },
     "vatReclaimedCurrPeriod": {
-      "description": "VAT reclaimed on purchases and other inputs (including acquisitions from the EC). This corresponds to box 4 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
+      "description": "VAT reclaimed in the period on purchases and other inputs (including acquisitions in Northern Ireland from EU member states). This corresponds to box 4 on the VAT Return form. The value must be between -9999999999999.99 and 9999999999999.99.",
       "$ref": "#/definitions/monetaryPosNeg13"
     },
     "netVatDue": {
@@ -40,11 +40,11 @@
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalValueGoodsSuppliedExVAT": {
-      "description": "Total value of all supplies of goods and related costs, excluding any VAT, to other EC member states. This corresponds to box 8 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "description": "Total value of dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States. This corresponds to box 8 on the VAT Return form. The value must be in pounds (no pence) between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "totalAcquisitionsExVAT": {
-      "description": "Total value of acquisitions of goods and related costs excluding any VAT, from other EC member states. This corresponds to box 9 on the VAT Return form. The value must be between -9999999999999 and 9999999999999.",
+      "description": "Total value of acquisitions of goods and related costs (excluding VAT) made in Northern Ireland from EU Member States. This corresponds to box 9 on the VAT Return form. The value must be in pounds (no pence) between -9999999999999 and 9999999999999.",
       "$ref": "#/definitions/monetaryPosNegZeroDec13"
     },
     "finalised": {
