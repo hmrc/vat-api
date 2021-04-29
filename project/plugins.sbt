@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-resolvers += Resolver.url("hmrc-sbt-plugin-releases", url("https://dl.bintray.com/hmrc/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
-
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
+resolvers += "HMRC-open-artefacts-maven" at "https://open.artefacts.tax.service.gov.uk/maven2"
+resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts.tax.service.gov.uk/ivy2"))(Resolver.ivyStylePatterns)
 
-resolvers += "HMRC Releases" at "https://dl.bintray.com/hmrc/releases"
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "2.12.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "2.14.0")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
 
