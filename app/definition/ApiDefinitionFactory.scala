@@ -26,8 +26,6 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
 
-  private val acceptListDisabled: Option[Access] = None
-
   lazy val definition: Definition =
     Definition(
       scopes = Seq(
@@ -51,7 +49,6 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         versions = Seq(
           APIVersion(
             version = "1.0",
-            access = acceptListDisabled,
             status = buildAPIStatus("1.0"),
             endpointsEnabled = true
           )

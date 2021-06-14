@@ -62,7 +62,6 @@ class ApiDefinitionFactorySpec extends UnitSpec {
               versions = Seq(
                 APIVersion(
                   version = VERSION_1,
-                  access = None,
                   status = BETA,
                   endpointsEnabled = true
                 )
