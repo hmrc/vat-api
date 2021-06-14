@@ -19,12 +19,6 @@ package definition
 import play.api.libs.json.{Format, Json, OFormat}
 import utils.enums.Enums
 
-case class Access(`type`: String, whitelistedApplicationIds: Seq[String])
-
-object Access {
-  implicit val formatAccess: OFormat[Access] = Json.format[Access]
-}
-
 case class Parameter(name: String, required: Boolean = false)
 
 object Parameter {
@@ -46,7 +40,7 @@ object APIStatus extends Enumeration {
   val parser: PartialFunction[String, APIStatus] = Enums.parser[APIStatus]
 }
 
-case class APIVersion(version: String, access: Option[Access] = None, status: APIStatus, endpointsEnabled: Boolean) {
+case class APIVersion(version: String, status: APIStatus, endpointsEnabled: Boolean) {
 
   require(version.nonEmpty, "version is required")
 }
