@@ -22,25 +22,19 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc"       %% "bootstrap-backend-play-26" % "3.2.0",
-    "uk.gov.hmrc"       %% "domain"            % "5.10.0-play-26",
-    "org.typelevel"     %% "cats-core"         % "2.3.0",
-    "com.chuusai"       %% "shapeless"         % "2.4.0-M1",
-    "com.typesafe.play" %% "play-json-joda"    % "2.7.3",
-    "org.json4s"        %% "json4s-native"     % "3.7.0-M7",
-    "org.json4s"        %% "json4s-ext"        % "3.7.0-M7",
-    "com.github.ghik"   %  "silencer-lib"      % "1.6.0" % Provided cross CrossVersion.full,
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full)
+    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.3.0",
+    "org.typelevel" %% "cats-core"         % "2.6.1",
+    "com.chuusai"   %% "shapeless"         % "2.4.0-M1"
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
-    "org.scalatest"          %% "scalatest"                % "3.2.3"              % scope,
+    "org.scalatest"          %% "scalatest"                % "3.2.9"              % scope,
     "com.typesafe.play"      %% "play-test"                % PlayVersion.current  % scope,
     "uk.gov.hmrc"            %% "hmrctest"                 % "3.10.0-play-26"     % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.36.8"             % scope,
     "org.scalamock"          %% "scalamock"                % "5.1.0"              % scope,
-    "org.scalacheck"         %% "scalacheck"               % "1.15.1"             % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play"       % "3.1.3"              % scope,
+    "org.scalacheck"         %% "scalacheck"               % "1.15.4"             % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"              % scope,
     "org.scalatestplus"      %% "scalatestplus-mockito"    % "1.0.0-M2"           % scope,
     "com.github.tomakehurst" %  "wiremock-jre8"            % "2.27.2"             % scope,
     "org.skyscreamer"        %  "jsonassert"               % "1.5.0"              % scope,

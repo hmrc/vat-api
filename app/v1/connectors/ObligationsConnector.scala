@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ObligationsConnector @Inject()(val http: HttpClient,
-                                     val appConfig: AppConfig) extends BaseDesConnector {
+                                     val appConfig: AppConfig) extends BaseDownstreamConnector {
 
   def retrieveObligations(request: ObligationsRequest)(
     implicit hc: HeaderCarrier,

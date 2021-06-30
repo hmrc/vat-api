@@ -18,7 +18,7 @@ package v1.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockViewReturnConnector
 import v1.models.auth.UserDetails

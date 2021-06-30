@@ -36,6 +36,8 @@ class LegacyErrorHandler @Inject()(
                               router: Provider[Router]
                             )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
+  val logger: Logger = Logger(this.getClass)
+
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
     super.onServerError(request, ex).map { result =>
       ex match {
@@ -44,7 +46,7 @@ class LegacyErrorHandler @Inject()(
             case _: NotImplementedException =>
               NotImplemented(Json.toJson(DownstreamError))
             case _ =>
-              Logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
+              logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
               result
           }
       }
@@ -59,7 +61,7 @@ class LegacyErrorHandler @Inject()(
         case "ERROR_INVALID_TO_DATE" => BadRequest(Json.toJson(InvalidDateToErrorDes))
         case "INVALID_STATUS" | "INVALID_DATE_RANGE" => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
         case unmatchedError =>
-          Logger.warn(s"[LegacyErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
+          logger.warn(s"[LegacyErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
           BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> JsonErrorSanitiser.sanitise(unmatchedError))))
       }
     }

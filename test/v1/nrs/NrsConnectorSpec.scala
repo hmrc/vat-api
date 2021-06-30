@@ -84,9 +84,9 @@ class NrsConnectorSpec extends ConnectorSpec
   val apiKeyValue = "api-key"
 
   class Test(retryDelays: List[FiniteDuration] = List(100.millis)) {
-    MockedAppConfig.nrsBaseUrl.returns(s"http://localhost:$port")
-    MockedAppConfig.nrsRetries returns retryDelays
-    MockedAppConfig.nrsApiKey returns apiKeyValue
+    MockAppConfig.nrsBaseUrl.returns(s"http://localhost:$port")
+    MockAppConfig.nrsRetries returns retryDelays
+    MockAppConfig.nrsApiKey returns apiKeyValue
 
     val connector = new NrsConnector(httpClient, mockAppConfig)
 

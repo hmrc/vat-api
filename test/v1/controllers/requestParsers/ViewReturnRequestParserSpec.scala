@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers
 
 import support.UnitSpec
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.mocks.validators.MockViewReturnValidator
 import v1.models.errors.{ErrorWrapper, PeriodKeyFormatError, VrnFormatError}
 import v1.models.request.viewReturn.{ViewRawData, ViewRequest}

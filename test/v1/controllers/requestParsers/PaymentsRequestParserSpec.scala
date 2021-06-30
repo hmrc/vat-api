@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers
 
 import support.UnitSpec
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.mocks.validators.MockPaymentsValidator
 import v1.models.errors._
 import v1.models.request.payments.{PaymentsRawData, PaymentsRequest}
