@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PaymentsConnector @Inject()(val http: HttpClient,
-                                  val appConfig: AppConfig) extends BaseDesConnector {
+                                  val appConfig: AppConfig) extends BaseDownstreamConnector {
 
   def retrievePayments(request: PaymentsRequest)(implicit hc: HeaderCarrier,
                                                  ec: ExecutionContext,

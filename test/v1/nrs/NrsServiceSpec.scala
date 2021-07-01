@@ -20,7 +20,7 @@ import com.kenshoo.play.metrics.Metrics
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import utils.{MockHashUtil, MockMetrics}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest

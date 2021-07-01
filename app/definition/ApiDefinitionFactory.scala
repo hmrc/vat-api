@@ -18,13 +18,14 @@ package definition
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import utils.Logging
 
 @Singleton
-class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
+class ApiDefinitionFactory @Inject()(appConfig: AppConfig) extends Logging{
 
   private val readScope = "read:vat"
   private val writeScope = "write:vat"
+
 
   lazy val definition: Definition =
     Definition(
@@ -60,7 +61,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
   private[definition] def buildAPIStatus(version: String): APIStatus = {
     APIStatus.parser.lift(appConfig.apiStatus(version))
       .getOrElse {
-        Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+        logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA
       }
   }

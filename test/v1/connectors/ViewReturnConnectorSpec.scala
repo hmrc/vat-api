@@ -19,7 +19,7 @@ package v1.connectors
 import mocks.MockAppConfig
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.RequestId
 import v1.controllers.UserRequest
@@ -71,9 +71,9 @@ class ViewReturnConnectorSpec extends ConnectorSpec {
         "Authorization" -> s"Bearer des-token"
       )
 
-    MockedAppConfig.desBaseUrl returns baseUrl
-    MockedAppConfig.desToken returns "des-token"
-    MockedAppConfig.desEnvironment returns "des-environment"
+    MockAppConfig.desBaseUrl returns baseUrl
+    MockAppConfig.desToken returns "des-token"
+    MockAppConfig.desEnvironment returns "des-environment"
   }
 
   "ViewReturnConnector" when {

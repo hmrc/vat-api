@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers
 
 import javax.inject.Inject
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.controllers.requestParsers.validators.SubmitReturnValidator
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 

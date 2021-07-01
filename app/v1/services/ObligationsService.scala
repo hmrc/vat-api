@@ -19,7 +19,6 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{EndpointLogContext, Logging}
 import v1.connectors.ObligationsConnector
@@ -59,7 +58,7 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
       "INVALID_DATE_RANGE" -> RuleOBLDateRangeTooLargeError,
       "INSOLVENT_TRADER" -> RuleInsolventTraderError,
       "NOT_FOUND_BP_KEY" -> {
-        Logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BP_KEY error")
+        logger.warn("[ObligationsService] [desErrorMap] - Backend returned NOT_FOUND_BP_KEY error")
         DownstreamError
       },
       "NOT_FOUND" -> LegacyNotFoundError,

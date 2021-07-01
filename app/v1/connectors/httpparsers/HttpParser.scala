@@ -16,14 +16,14 @@
 
 package v1.connectors.httpparsers
 
-import play.api.Logger
+import utils.Logging
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import v1.models.errors._
 
 import scala.util.{Success, Try}
 
-trait HttpParser {
+trait HttpParser extends Logging{
 
   implicit class KnownJsonResponse(response: HttpResponse) {
 
@@ -31,7 +31,7 @@ trait HttpParser {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
         case _ =>
-          Logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
+          logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
           None
       }
     }
@@ -40,7 +40,7 @@ trait HttpParser {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
-        Logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
+        logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
         None
     }
   }
@@ -61,11 +61,10 @@ trait HttpParser {
     //lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
     lazy val bvrErrors      = response.validateJson(bvrErrorReads).map(errs => OutboundError(BVRError, Some(errs.map(_.toMtd))))
     lazy val unableToParseJsonError = {
-      Logger.warn(s"unable to parse errors from response: ${response.body}")
+      logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)
     }
 
     singleError orElse bvrErrors getOrElse unableToParseJsonError
   }
-
 }

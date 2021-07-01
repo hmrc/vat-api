@@ -40,6 +40,9 @@ case class MtdErrorWrapper(code: String, message: String, path: Option[String], 
 object MtdErrorWrapper {
   implicit val writes: Writes[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
 
+  implicit def genericWrites[T <: MtdErrorWrapper]: Writes[T] =
+    writes.contramap[T](c => c: MtdErrorWrapper)
+
   implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
 

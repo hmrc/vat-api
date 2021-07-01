@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LiabilitiesConnector @Inject()(val http: HttpClient,
-                                     val appConfig: AppConfig) extends BaseDesConnector {
+                                     val appConfig: AppConfig) extends BaseDownstreamConnector {
 
   def retrieveLiabilities(request: LiabilitiesRequest)(implicit hc: HeaderCarrier,
                                                        ec: ExecutionContext,

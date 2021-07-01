@@ -17,7 +17,7 @@
 package v1.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.models.request.payments.{PaymentsRawData, PaymentsRequest}
 import v1.models.response.common.TaxPeriod
 import v1.models.response.payments.PaymentsResponse.Payment
