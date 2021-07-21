@@ -24,6 +24,7 @@ import play.api.http.{DefaultHttpRequestHandler, HttpConfiguration, HttpErrorHan
 import play.api.libs.json.Json
 import play.api.mvc.{DefaultActionBuilder, Handler, RequestHeader, Results}
 import play.api.routing.Router
+import play.core.DefaultWebCommands
 import v1.controllers.requestParsers.validators.validations.VrnValidation
 import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError, VrnFormatError}
 
@@ -34,7 +35,14 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
                                              config: AppConfig,
                                              filters: HttpFilters,
                                              action: DefaultActionBuilder)
-  extends DefaultHttpRequestHandler(versionRoutingMap.defaultRouter, errorHandler, httpConfiguration, filters) {
+  extends DefaultHttpRequestHandler(
+    webCommands = new DefaultWebCommands,
+    optDevContext = None,
+    router = versionRoutingMap.defaultRouter,
+    errorHandler = errorHandler,
+    configuration = httpConfiguration,
+    filters = filters.filters
+  ) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -49,7 +57,8 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
     def apiHandler: Option[Handler] = Versions.getFromRequest(request) match {
       case Some(version) =>
         versionRoutingMap.versionRouter(version) match {
-          case Some(versionRouter) if featureSwitch.isVersionEnabled(version) => routeWith(versionRouter)(request)
+          case Some(versionRouter) if featureSwitch.isVersionEnabled(version) =>
+            routeWith(versionRouter)(request)
           case Some(_) => Some(unsupportedVersionAction)
           case None => Some(invalidAcceptHeaderError)
         }
@@ -78,7 +87,7 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
         }
       }
 
-  private def validatePath(path: String) = {
+  private def validatePath(path: String): Boolean = {
     val vrn = path.split("/")(1)
     if(VrnValidation.validate(vrn) == Nil)
       true

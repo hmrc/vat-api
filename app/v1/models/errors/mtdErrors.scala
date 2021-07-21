@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes}
+import play.api.libs.json.{JsObject, JsValue, Json, Reads, OWrites}
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -26,7 +26,7 @@ case class MtdError(code: String, message: String, customJson: Option[JsValue] =
 }
 
 object MtdError {
-  implicit val writes: Writes[MtdError] = {
+  implicit val writes: OWrites[MtdError] = {
     case o@MtdError(_, _, None) => o.toJson
     case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
     case MtdError(_, _, Some(customJson)) => customJson
@@ -37,11 +37,11 @@ object MtdError {
 
 case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
 
-object MtdErrorWrapper {
-  implicit val writes: Writes[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
+object MtdError {
+  implicit val writes: OWrites[MtdError] = Json.writes[MtdError]
 
-  implicit def genericWrites[T <: MtdErrorWrapper]: Writes[T] =
-    writes.contramap[T](c => c: MtdErrorWrapper)
+  implicit def genericWrites[T <: MtdError]: OWrites[T] =
+    writes.contramap[T](c => c: MtdError)
 
   implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
@@ -55,23 +55,17 @@ object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is in
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
-
 object RuleInsolventTraderError extends MtdError("RULE_INSOLVENT_TRADER", "The remote endpoint has indicated that the Trader is insolvent")
 
 // Standard Errors
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
-
 object DownstreamError extends MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")
-
 object BadRequestError extends MtdError("INVALID_REQUEST", "Invalid request")
-
 object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
-
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
 
 // Authorisation Errors
 object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
-
 object InvalidBearerTokenError extends MtdError("UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 // Legacy Authorisation Errors
@@ -94,15 +88,10 @@ object ForbiddenDownstreamError extends MtdError(
 
 // Accept header Errors
 object InvalidAcceptHeaderError extends MtdError("ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
-
 object UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested resource could not be found")
-
 object InvalidBodyTypeError extends MtdError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
 
-
-
 // Custom VAT errors
-
 object LegacyNotFoundError extends MtdError("NOT_FOUND", "The remote endpoint has indicated that no data can be found")
 
 object RuleDateRangeTooLargeError extends MtdError(
@@ -127,9 +116,7 @@ object RuleDateRangeTooLargeError extends MtdError(
 )
 
 object InvalidDateToErrorDes extends MtdError("DATE_TO_INVALID", "The provided to date is invalid")
-
 object InvalidDateFromErrorDes extends MtdError("DATE_FROM_INVALID", "The provided from date is invalid")
-
 object TaxPeriodNotEnded extends MtdError("TAX_PERIOD_NOT_ENDED", "The remote endpoint has indicated that the submission is for a tax period that has not ended")
 
 object DuplicateVatSubmission extends MtdError(
