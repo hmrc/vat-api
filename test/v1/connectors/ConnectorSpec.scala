@@ -17,8 +17,12 @@
 package v1.connectors
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.controllers.UserRequest
+import v1.models.auth.UserDetails
 
 import scala.concurrent.ExecutionContext
 
@@ -29,6 +33,7 @@ trait ConnectorSpec extends UnitSpec
 
   lazy val baseUrl = "http://test-BaseUrl"
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
 
   val otherHeaders: Seq[(String, String)] = Seq(
     "Gov-Test-Scenario" -> "DEFAULT",
@@ -46,7 +51,7 @@ trait ConnectorSpec extends UnitSpec
     "Environment" -> "des-environment",
     "Authorization" -> s"Bearer des-token",
     "User-Agent" -> "vat-api",
-    "OriginatorID" -> "SCAN",
+    "OriginatorID" -> "MDTP",
     "CorrelationId" -> correlationId,
     "Gov-Test-Scenario" -> "DEFAULT"
   )

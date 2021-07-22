@@ -18,14 +18,9 @@ package v1.connectors
 
 import mocks.MockAppConfig
 import org.joda.time.DateTime
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import v1.models.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.RequestId
-import v1.controllers.UserRequest
 import v1.mocks.MockHttpClient
-import v1.models.auth.UserDetails
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
@@ -34,7 +29,6 @@ import scala.concurrent.Future
 
 class SubmitReturnConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
 
   private val submitReturnRequest: SubmitRequest =
@@ -70,12 +64,6 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
         appConfig = mockAppConfig
       )
 
-    val desRequestHeaders: Seq[(String, String)] =
-      Seq(
-        "Environment" -> "des-environment",
-        "Authorization" -> s"Bearer des-token"
-      )
-
     MockedAppConfig.desBaseUrl returns baseUrl
     MockedAppConfig.desToken returns "des-token"
     MockedAppConfig.desEnvironment returns "des-environment"
@@ -86,22 +74,21 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
       "return a valid response" when {
         "a valid VAT return is submitted" in new Test {
         val outcome = Right(ResponseWrapper(correlationId, submitReturnResponse))
+
           implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
           val requiredDesHeadersPost: Seq[(String, String)] = requiredDesHeaders ++ Seq("Content-Type" -> "application/json")
 
         MockedHttpClient
           .post(
             url = s"$baseUrl/enterprise/return/vat/$vrn",
+            config = dummyDesHeaderCarrierConfig,
             body = submitReturnRequest.body,
-            requiredHeaders = "Environment" -> "des-environment",
-                              "Authorization" -> s"Bearer des-token",
-                              "Accept" -> "application/json",
-                              "OriginatorID" -> "MDTP"
-          )
+            requiredHeaders = requiredDesHeadersPost,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+            )
           .returns(Future.successful(outcome))
 
-        await(connector.submitReturn(submitReturnRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
+        await(connector.submitReturn(submitReturnRequest)) shouldBe outcome
       }
     }
   }

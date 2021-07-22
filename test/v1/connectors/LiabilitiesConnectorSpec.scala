@@ -17,14 +17,8 @@
 package v1.connectors
 
 import mocks.MockAppConfig
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import v1.models.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.RequestId
-import v1.controllers.UserRequest
 import v1.mocks.MockHttpClient
-import v1.models.auth.UserDetails
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.common.TaxPeriod
@@ -34,7 +28,6 @@ import scala.concurrent.Future
 
 class LiabilitiesConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   private val vrn: String = "123456789"
 
   private val retrieveLiabilitiesRequest: LiabilitiesRequest =
@@ -99,6 +92,7 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
     MockedAppConfig.desBaseUrl returns baseUrl
     MockedAppConfig.desToken returns "des-token"
     MockedAppConfig.desEnvironment returns "des-environment"
+    MockedAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
   }
 
   "RetrieveLiabilitiesConnector" when {
@@ -107,27 +101,28 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
         val outcome = Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
 
         MockedHttpClient
-          .get(
+          .parameterGet(
             url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
-          )
-          .returns(Future.successful(outcome))
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(outcome))
 
-        await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
+        await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe outcome
       }
 
       "return a valid response for multiple results" in new Test {
         val outcome = Right(ResponseWrapper(correlationId, retrieveMultipleLiabilitiesResponse))
 
         MockedHttpClient
-          .get(
+          .parameterGet(
             url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
-          )
-          .returns(Future.successful(outcome))
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe outcome
       }
