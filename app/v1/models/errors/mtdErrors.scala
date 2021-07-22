@@ -31,22 +31,15 @@ object MtdError {
     case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
     case MtdError(_, _, Some(customJson)) => customJson
   }
-
+  implicit def genericWrites[T <: MtdError]: Writes[T] =
+    writes.contramap[T](c => c: MtdError)
   implicit val reads: Reads[MtdError] = Json.reads[MtdError]
 }
-
-object MtdError {
-  implicit val writes: OWrites[MtdError] = Json.writes[MtdError]
-
-  implicit def genericWrites[T <: MtdError]: OWrites[T] =
-    writes.contramap[T](c => c: MtdError)
-}
-
 case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
-
 object MtdErrorWrapper {
-  implicit val writes: Writes[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
-
+  implicit val writes: OWrites[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
+  implicit def genericWrites[T <: MtdErrorWrapper]: OWrites[T] =
+    writes.contramap[T](c => c: MtdErrorWrapper)
   implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
 

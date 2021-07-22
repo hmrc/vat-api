@@ -22,9 +22,15 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.3.0",
-    "org.typelevel" %% "cats-core"         % "2.6.1",
-    "com.chuusai"   %% "shapeless"         % "2.4.0-M1"
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-28" % "5.3.0",
+    "uk.gov.hmrc"       %% "domain"            % "5.10.0-play-26",
+    "org.typelevel"     %% "cats-core"         % "2.6.1",
+    "com.chuusai"       %% "shapeless"         % "2.4.0-M1",
+    "com.typesafe.play" %% "play-json-joda"    % "2.7.3",
+    "org.json4s"        %% "json4s-native"     % "3.7.0-M7",
+    "org.json4s"        %% "json4s-ext"        % "3.7.0-M7",
+    "com.github.ghik"   %  "silencer-lib"      % "1.6.0" % Provided cross CrossVersion.full,
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full)
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(

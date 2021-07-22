@@ -55,9 +55,9 @@ class ObligationsConnectorSpec extends ConnectorSpec {
     val connector: ObligationsConnector = new ObligationsConnector(http = mockHttpClient, appConfig = mockAppConfig)
     val desRequestHeaders: Seq[(String, String)] = Seq("Environment" -> "des-environment", "Authorization" -> s"Bearer des-token")
 
-    MockAppConfig.desBaseUrl returns baseUrl
-    MockAppConfig.desToken returns "des-token"
-    MockAppConfig.desEnvironment returns "des-environment"
+    MockedAppConfig.desBaseUrl returns baseUrl
+    MockedAppConfig.desToken returns "des-token"
+    MockedAppConfig.desEnvironment returns "des-environment"
   }
 
   "ObligationsConnector" when {

@@ -76,10 +76,10 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
         "Authorization" -> s"Bearer des-token"
       )
 
-    MockAppConfig.desBaseUrl returns baseUrl
-    MockAppConfig.desToken returns "des-token"
-    MockAppConfig.desEnvironment returns "des-environment"
-    MockAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
+    MockedAppConfig.desBaseUrl returns baseUrl
+    MockedAppConfig.desToken returns "des-token"
+    MockedAppConfig.desEnvironment returns "des-environment"
+    MockedAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
   }
 
   "submitReturnConnector" should {

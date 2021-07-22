@@ -26,15 +26,15 @@ class ApiDefinitionFactorySpec extends UnitSpec {
 
   class Test extends MockHttpClient with MockAppConfig {
     val apiDefinitionFactory = new ApiDefinitionFactory(mockAppConfig)
-    MockAppConfig.apiGatewayContext returns "test/context"
+    MockedAppConfig.apiGatewayContext returns "test/context"
   }
 
   "definition" when {
     "called" should {
       "return a valid Definition case class" in new Test {
-        MockAppConfig.featureSwitch returns None
-        MockAppConfig.apiStatus returns "BETA"
-        MockAppConfig.endpointsEnabled returns true
+        MockedAppConfig.featureSwitch returns None
+        MockedAppConfig.apiStatus returns "BETA"
+        MockedAppConfig.endpointsEnabled returns true
 
         private val readScope = "read:vat"
         private val writeScope = "write:vat"
@@ -76,14 +76,14 @@ class ApiDefinitionFactorySpec extends UnitSpec {
   "buildAPIStatus" when {
     "the 'apiStatus' parameter is present and valid" should {
       "return the correct status" in new Test {
-        MockAppConfig.apiStatus returns "BETA"
+        MockedAppConfig.apiStatus returns "BETA"
         apiDefinitionFactory.buildAPIStatus("1.0") shouldBe BETA
       }
     }
 
     "the 'apiStatus' parameter is present and invalid" should {
       "default to alpha" in new Test {
-        MockAppConfig.apiStatus returns "ALPHO"
+        MockedAppConfig.apiStatus returns "ALPHO"
         apiDefinitionFactory.buildAPIStatus("1.0") shouldBe ALPHA
       }
     }

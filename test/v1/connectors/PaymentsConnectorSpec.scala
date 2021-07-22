@@ -97,9 +97,9 @@ class PaymentsConnectorSpec extends ConnectorSpec {
       ("customerPaymentInformation" , "true")
     )
 
-    MockAppConfig.desBaseUrl returns baseUrl
-    MockAppConfig.desToken returns "des-token"
-    MockAppConfig.desEnvironment returns "des-environment"
+    MockedAppConfig.desBaseUrl returns baseUrl
+    MockedAppConfig.desToken returns "des-token"
+    MockedAppConfig.desEnvironment returns "des-environment"
   }
 
   "RetrievePaymentsConnector" when {
