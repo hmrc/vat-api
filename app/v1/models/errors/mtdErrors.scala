@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{JsObject, JsValue, Json, Reads, OWrites}
+import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes, OWrites}
 
 case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
@@ -26,7 +26,7 @@ case class MtdError(code: String, message: String, customJson: Option[JsValue] =
 }
 
 object MtdError {
-  implicit val writes: OWrites[MtdError] = {
+  implicit val writes: Writes[MtdError] = {
     case o@MtdError(_, _, None) => o.toJson
     case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
     case MtdError(_, _, Some(customJson)) => customJson
@@ -35,13 +35,17 @@ object MtdError {
   implicit val reads: Reads[MtdError] = Json.reads[MtdError]
 }
 
-case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
-
 object MtdError {
   implicit val writes: OWrites[MtdError] = Json.writes[MtdError]
 
   implicit def genericWrites[T <: MtdError]: OWrites[T] =
     writes.contramap[T](c => c: MtdError)
+}
+
+case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
+
+object MtdErrorWrapper {
+  implicit val writes: Writes[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
 
   implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
