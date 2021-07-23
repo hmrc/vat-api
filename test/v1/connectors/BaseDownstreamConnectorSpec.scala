@@ -71,6 +71,8 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
   "get (with query parameters)" must {
     "get with the required des headers and return the result" in new Test {
+      implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders)
+
       MockedHttpClient
         .get(
           url = absoluteUrl,
