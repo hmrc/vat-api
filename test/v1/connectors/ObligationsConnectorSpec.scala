@@ -74,7 +74,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
         val request: ObligationsRequest = ObligationsRequest(vrn, Some(from), Some(to), Some(status))
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,
@@ -92,7 +92,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
         val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = None)
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,
@@ -110,7 +110,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
         val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = Some("O"))
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,

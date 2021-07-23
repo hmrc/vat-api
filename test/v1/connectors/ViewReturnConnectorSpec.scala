@@ -75,7 +75,7 @@ class ViewReturnConnectorSpec extends ConnectorSpec {
           )
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/vat/returns/vrn/$vrn",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,

@@ -69,24 +69,10 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     }
   }
 
-  "get" must {
-    "get with the required des headers and return the result" in new Test {
-      MockedHttpClient
-        .get(
-          url = absoluteUrl,
-          config = dummyDesHeaderCarrierConfig,
-          requiredHeaders = requiredDesHeaders,
-          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-        ).returns(Future.successful(outcome))
-
-      await(connector.get(DesUri[Result](url))) shouldBe outcome
-    }
-  }
-
   "get (with query parameters)" must {
     "get with the required des headers and return the result" in new Test {
       MockedHttpClient
-        .parameterGet(
+        .get(
           url = absoluteUrl,
           config = dummyDesHeaderCarrierConfig,
           queryParams = queryParams,

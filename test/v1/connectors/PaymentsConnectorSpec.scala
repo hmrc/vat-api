@@ -96,7 +96,7 @@ class PaymentsConnectorSpec extends ConnectorSpec {
         val outcome = Right(ResponseWrapper(correlationId, retrievePaymentsResponse))
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,
@@ -111,7 +111,7 @@ class PaymentsConnectorSpec extends ConnectorSpec {
         val outcome = Right(ResponseWrapper(correlationId, retrieveMultipleLiabilitiesResponse))
 
         MockedHttpClient
-          .parameterGet(
+          .get(
             url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
             queryParams = queryParams,
             config = dummyDesHeaderCarrierConfig,

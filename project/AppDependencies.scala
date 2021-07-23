@@ -25,7 +25,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28" % "5.7.0",
     "org.typelevel"     %% "cats-core"         % "2.6.1",
     "com.chuusai"       %% "shapeless"         % "2.4.0-M1",
-    "com.typesafe.play" %% "play-json-joda"    % "2.7.3"
+    "com.typesafe.play" %% "play-json-joda"    % "2.9.2"
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
