@@ -19,7 +19,6 @@ package routing
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import mocks.MockAppConfig
-import org.scalamock.handlers.CallHandler1
 import org.scalatest.Inside
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Configuration
@@ -78,13 +77,6 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
 
     val requestHandler: VersionRoutingRequestHandler =
       new VersionRoutingRequestHandler(routingMap, errorHandler, httpConfiguration, mockAppConfig, filters, action)
-
-    def stubHandling(router: Router, path: String)(handler: Option[Handler]): CallHandler1[RequestHeader, Option[Handler]] =
-      (router.handlerFor _)
-        .expects(where { r: RequestHeader =>
-          r.path == path
-        })
-        .returns(handler)
 
     def buildRequest(path: String): RequestHeader =
       acceptHeader

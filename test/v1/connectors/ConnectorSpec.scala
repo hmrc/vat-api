@@ -20,7 +20,7 @@ import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 
@@ -49,7 +49,15 @@ trait ConnectorSpec extends UnitSpec
 
   val requiredDesHeaders: Seq[(String, String)] = Seq(
     "Environment" -> "des-environment",
-    "Authorization" -> s"Bearer des-token",
+    "Authorization" -> "Bearer des-token",
+    "User-Agent" -> "vat-api",
+    "CorrelationId" -> correlationId,
+    "Gov-Test-Scenario" -> "DEFAULT"
+  )
+
+  val requiredDesHeadersPost: Seq[(String, String)] = Seq(
+    "Environment" -> "des-environment",
+    "Authorization" -> "Bearer des-token",
     "User-Agent" -> "vat-api",
     "OriginatorID" -> "MDTP",
     "CorrelationId" -> correlationId,
@@ -65,6 +73,6 @@ trait ConnectorSpec extends UnitSpec
     "X-Session-Id"
   )
 
-  implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders)
+  implicit val hc: HeaderCarrier = HeaderCarrier(requestId = Some(RequestId("123")), otherHeaders = otherHeaders)
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 }

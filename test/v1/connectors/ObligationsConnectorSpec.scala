@@ -80,8 +80,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          )
-          .returns(Future.successful(outcome))
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
       }
@@ -99,8 +98,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          )
-          .returns(Future.successful(outcome))
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
       }
@@ -118,8 +116,7 @@ class ObligationsConnectorSpec extends ConnectorSpec {
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          )
-          .returns(Future.successful(outcome))
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
       }

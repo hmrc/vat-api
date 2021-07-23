@@ -74,12 +74,6 @@ class LiabilitiesConnectorSpec extends ConnectorSpec {
         appConfig = mockAppConfig
       )
 
-    val desRequestHeaders: Seq[(String, String)] =
-      Seq(
-        "Environment" -> "des-environment",
-        "Authorization" -> s"Bearer des-token"
-      )
-
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom" , retrieveLiabilitiesRequest.from),
       ("dateTo" , retrieveLiabilitiesRequest.to),

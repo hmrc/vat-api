@@ -29,14 +29,11 @@ import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class LegacyErrorHandler @Inject()(
-                              env: Environment,
-                              config: Configuration,
-                              sourceMapper: OptionalSourceMapper,
-                              router: Provider[Router]
-                            )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
-
-  val logger: Logger = Logger(this.getClass)
+class LegacyErrorHandler @Inject()(env: Environment,
+                                   config: Configuration,
+                                   sourceMapper: OptionalSourceMapper,
+                                   router: Provider[Router]
+                                  )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) with Logging {
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
     super.onServerError(request, ex).map { result =>
@@ -68,7 +65,7 @@ class LegacyErrorHandler @Inject()(
   }
 
   override protected def onDevServerError(request: RequestHeader, ex: UsefulException): Future[Result] = {
-    super.onServerError(request, ex).map { result =>
+    super.onDevServerError(request, ex).map { result =>
       ex match {
         case _ =>
           ex.getCause match {

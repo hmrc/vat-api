@@ -23,7 +23,7 @@ import v1.models.errors._
 
 import scala.util.{Success, Try}
 
-trait HttpParser extends Logging{
+trait HttpParser extends Logging {
 
   implicit class KnownJsonResponse(response: HttpResponse) {
 

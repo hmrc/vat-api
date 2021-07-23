@@ -54,21 +54,30 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
   "post" must {
     "posts with the required des headers and returns the result" in new Test {
       implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
-      val requiredDesHeadersPost: Seq[(String, String)] = requiredDesHeaders ++ Seq("Content-Type" -> "application/json")
+      val requiredDesHeaders: Seq[(String, String)] = requiredDesHeadersPost ++ Seq("Content-Type" -> "application/json")
 
       MockedHttpClient
-        .post(absoluteUrl, dummyDesHeaderCarrierConfig, body, requiredDesHeadersPost)
-        .returns(Future.successful(outcome))
+        .post(
+          url = absoluteUrl,
+          config = dummyDesHeaderCarrierConfig,
+          body = body,
+          requiredHeaders = requiredDesHeaders,
+          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+        ).returns(Future.successful(outcome))
 
       await(connector.post(body, DesUri[Result](url))) shouldBe outcome
     }
   }
 
   "get" must {
-    "get with the requred des headers and return the result" in new Test {
+    "get with the required des headers and return the result" in new Test {
       MockedHttpClient
-        .get(absoluteUrl, dummyDesHeaderCarrierConfig, requiredDesHeaders)
-        .returns(Future.successful(outcome))
+        .get(
+          url = absoluteUrl,
+          config = dummyDesHeaderCarrierConfig,
+          requiredHeaders = requiredDesHeaders,
+          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+        ).returns(Future.successful(outcome))
 
       await(connector.get(DesUri[Result](url))) shouldBe outcome
     }
@@ -77,8 +86,13 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
   "get (with query parameters)" must {
     "get with the required des headers and return the result" in new Test {
       MockedHttpClient
-        .parameterGet(absoluteUrl, dummyDesHeaderCarrierConfig, queryParams, requiredDesHeaders)
-        .returns(Future.successful(outcome))
+        .parameterGet(
+          url = absoluteUrl,
+          config = dummyDesHeaderCarrierConfig,
+          queryParams = queryParams,
+          requiredHeaders = requiredDesHeaders,
+          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+        ).returns(Future.successful(outcome))
 
       await(connector.get(DesUri[Result](url), queryParams)) shouldBe outcome
     }

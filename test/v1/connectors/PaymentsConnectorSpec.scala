@@ -102,8 +102,7 @@ class PaymentsConnectorSpec extends ConnectorSpec {
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          )
-          .returns(Future.successful(outcome))
+          ).returns(Future.successful(outcome))
 
         await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
       }
@@ -118,8 +117,7 @@ class PaymentsConnectorSpec extends ConnectorSpec {
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          )
-          .returns(Future.successful(outcome))
+          ).returns(Future.successful(outcome))
 
         await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
       }

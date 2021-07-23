@@ -34,7 +34,7 @@ import v1.nrs.models.request.IdentityData
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logging{
+class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logging {
 
   private val authFunction: AuthorisedFunctions = new AuthorisedFunctions {
     override def authConnector: AuthConnector = connector
