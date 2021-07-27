@@ -19,7 +19,7 @@ package v1.services
 import org.joda.time.DateTime
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockSubmitReturnConnector
 import v1.models.auth.UserDetails

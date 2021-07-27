@@ -18,7 +18,7 @@ package v1.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
 import v1.mocks.MockIdGenerator

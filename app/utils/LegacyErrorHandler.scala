@@ -29,12 +29,11 @@ import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class LegacyErrorHandler @Inject()(
-                              env: Environment,
-                              config: Configuration,
-                              sourceMapper: OptionalSourceMapper,
-                              router: Provider[Router]
-                            )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+class LegacyErrorHandler @Inject()(env: Environment,
+                                   config: Configuration,
+                                   sourceMapper: OptionalSourceMapper,
+                                   router: Provider[Router]
+                                  )(implicit ec: ExecutionContext) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) with Logging {
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
     super.onServerError(request, ex).map { result =>
@@ -44,7 +43,7 @@ class LegacyErrorHandler @Inject()(
             case _: NotImplementedException =>
               NotImplemented(Json.toJson(DownstreamError))
             case _ =>
-              Logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
+              logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
               result
           }
       }
@@ -59,14 +58,14 @@ class LegacyErrorHandler @Inject()(
         case "ERROR_INVALID_TO_DATE" => BadRequest(Json.toJson(InvalidDateToErrorDes))
         case "INVALID_STATUS" | "INVALID_DATE_RANGE" => BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> error)))
         case unmatchedError =>
-          Logger.warn(s"[LegacyErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
+          logger.warn(s"[LegacyErrorHandler][onBadRequest] - Received unmatched error: '$unmatchedError'")
           BadRequest(Json.toJson(Json.obj("statusCode" -> 400, "message" -> JsonErrorSanitiser.sanitise(unmatchedError))))
       }
     }
   }
 
   override protected def onDevServerError(request: RequestHeader, ex: UsefulException): Future[Result] = {
-    super.onServerError(request, ex).map { result =>
+    super.onDevServerError(request, ex).map { result =>
       ex match {
         case _ =>
           ex.getCause match {

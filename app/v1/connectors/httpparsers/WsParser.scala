@@ -16,13 +16,13 @@
 
 package v1.connectors.httpparsers
 
-import play.api.Logger
+import utils.Logging
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import play.api.libs.ws.WSResponse
 
 import scala.util.{Success, Try}
 
-trait WsParser {
+trait WsParser extends Logging {
 
   implicit class KnownJsonResponse(response: WSResponse) {
 
@@ -30,7 +30,7 @@ trait WsParser {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
         case _ =>
-          Logger.warn("[KnownJsonResponse][validateJson - NRS] No JSON was returned")
+          logger.warn("[KnownJsonResponse][validateJson - NRS] No JSON was returned")
           None
       }
     }
@@ -39,7 +39,7 @@ trait WsParser {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
-        Logger.warn(s"[KnownJsonResponse][validateJson - NRS] Unable to parse JSON: $error")
+        logger.warn(s"[KnownJsonResponse][validateJson - NRS] Unable to parse JSON: $error")
         None
     }
   }

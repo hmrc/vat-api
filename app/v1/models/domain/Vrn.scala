@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package v1.models.request.viewReturn
+package v1.models.domain
 
-import v1.models.domain.Vrn
-
-case class ViewRequest(vrn: Vrn, periodKey: String)
+case class Vrn(vrn: String) {
+  override def toString: String = vrn
+  val name = "vrn"
+  def value: String = vrn
+}

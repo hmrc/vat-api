@@ -17,8 +17,12 @@
 package v1.connectors
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
+import v1.controllers.UserRequest
+import v1.models.auth.UserDetails
 
 import scala.concurrent.ExecutionContext
 
@@ -27,9 +31,48 @@ trait ConnectorSpec extends UnitSpec
   with MimeTypes
   with HeaderNames {
 
-  lazy val baseUrl = "test-BaseUrl"
+  lazy val baseUrl = "http://test-BaseUrl"
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  val otherHeaders: Seq[(String, String)] = Seq(
+    "Gov-Test-Scenario" -> "DEFAULT",
+    "AnotherHeader" -> "HeaderValue"
+  )
+
+  val dummyDesHeaderCarrierConfig: HeaderCarrier.Config =
+    HeaderCarrier.Config(
+      Seq("^not-test-BaseUrl?$".r),
+      Seq.empty[String],
+      Some("vat-api")
+    )
+
+  val requiredDesHeaders: Seq[(String, String)] = Seq(
+    "Environment" -> "des-environment",
+    "Authorization" -> "Bearer des-token",
+    "User-Agent" -> "vat-api",
+    "CorrelationId" -> correlationId,
+    "Gov-Test-Scenario" -> "DEFAULT"
+  )
+
+  val requiredDesHeadersPost: Seq[(String, String)] = Seq(
+    "Environment" -> "des-environment",
+    "Authorization" -> "Bearer des-token",
+    "User-Agent" -> "vat-api",
+    "OriginatorID" -> "MDTP",
+    "CorrelationId" -> correlationId,
+    "Gov-Test-Scenario" -> "DEFAULT"
+  )
+
+  val allowedDesHeaders: Seq[String] = Seq(
+    "Accept",
+    "Gov-Test-Scenario",
+    "Content-Type",
+    "Location",
+    "X-Request-Timestamp",
+    "X-Session-Id"
+  )
+
+  implicit val hc: HeaderCarrier = HeaderCarrier(requestId = Some(RequestId("123")), otherHeaders = otherHeaders)
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 }

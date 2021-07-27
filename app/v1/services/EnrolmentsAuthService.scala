@@ -18,7 +18,7 @@ package v1.services
 
 import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
-import play.api.Logger
+import utils.Logging
 import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
@@ -34,7 +34,7 @@ import v1.nrs.models.request.IdentityData
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
+class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logging {
 
   private val authFunction: AuthorisedFunctions = new AuthorisedFunctions {
     override def authConnector: AuthConnector = connector
@@ -47,7 +47,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
         case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
         case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
         case _ =>
-          Logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
+          logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(LegacyUnauthorisedError))
       }recoverWith unauthorisedError
     } else {
@@ -79,7 +79,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
         case _ =>
-          Logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group.")
+          logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group.")
           Future.successful(Left(LegacyUnauthorisedError))
 
       }recoverWith unauthorisedError
@@ -92,7 +92,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
                                            identityData: Option[IdentityData] = None): Future[Right[MtdError, UserDetails]] = {
 
     val clientReference = getClientReferenceFromEnrolments(enrolments)
-    Logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
+    logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
       s"fully-authorised organisation for VRN $clientReference.")
 
     val userDetails = UserDetails(
@@ -121,16 +121,16 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
 
   private def unauthorisedError: PartialFunction[Throwable, Future[AuthOutcome]] = {
     case _: InsufficientEnrolments =>
-      Logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
       Future.successful(Left(LegacyUnauthorisedError))
     case _: InsufficientConfidenceLevel =>
-      Logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
       Future.successful(Left(LegacyUnauthorisedError))
     case _: JsResultException =>
-      Logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
       Future.successful(Left(ForbiddenDownstreamError))
     case exception@_ =>
-      Logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
+      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
       Future.successful(Left(DownstreamError))
   }
 }

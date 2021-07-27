@@ -18,12 +18,14 @@ package routing
 
 import config.{AppConfig, FeatureSwitch}
 import definition.Versions
+
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
 import play.api.http.{DefaultHttpRequestHandler, HttpConfiguration, HttpErrorHandler, HttpFilters}
 import play.api.libs.json.Json
 import play.api.mvc.{DefaultActionBuilder, Handler, RequestHeader, Results}
 import play.api.routing.Router
+import play.core.DefaultWebCommands
+import utils.Logging
 import v1.controllers.requestParsers.validators.validations.VrnValidation
 import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError, VrnFormatError}
 
@@ -34,19 +36,24 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
                                              config: AppConfig,
                                              filters: HttpFilters,
                                              action: DefaultActionBuilder)
-  extends DefaultHttpRequestHandler(versionRoutingMap.defaultRouter, errorHandler, httpConfiguration, filters) {
+  extends DefaultHttpRequestHandler(
+    webCommands = new DefaultWebCommands,
+    optDevContext = None,
+    router = versionRoutingMap.defaultRouter,
+    errorHandler = errorHandler,
+    configuration = httpConfiguration,
+    filters = filters.filters
+  ) with Logging {
 
   private val featureSwitch = FeatureSwitch(config.featureSwitch)
-
   private val unsupportedVersionAction = action(Results.NotFound(Json.toJson(UnsupportedVersionError)))
-
   private val invalidAcceptHeaderError = action(Results.NotAcceptable(Json.toJson(InvalidAcceptHeaderError)))
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
 
-    def documentHandler = routeWith(versionRoutingMap.defaultRouter)(request)
+    def documentHandler: Option[Handler] = routeWith(versionRoutingMap.defaultRouter)(request)
 
-    def apiHandler = Versions.getFromRequest(request) match {
+    def apiHandler: Option[Handler] = Versions.getFromRequest(request) match {
       case Some(version) =>
         versionRoutingMap.versionRouter(version) match {
           case Some(versionRouter) if featureSwitch.isVersionEnabled(version) =>
@@ -55,14 +62,14 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
           case None => Some(invalidAcceptHeaderError)
         }
       case None =>
-        Logger.warn(s"\n$request\n")
+        logger.warn(s"\n$request\n")
         Some(invalidAcceptHeaderError)
     }
 
     documentHandler orElse apiHandler
   }
 
-  private def routeWith(router: Router)(request: RequestHeader) =
+  private def routeWith(router: Router)(request: RequestHeader): Option[Handler] =
     router
       .handlerFor(request)
       .orElse {
@@ -79,7 +86,7 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
         }
       }
 
-  private def validatePath(path: String) = {
+  private def validatePath(path: String): Boolean = {
     val vrn = path.split("/")(1)
     if(VrnValidation.validate(vrn) == Nil)
       true

@@ -16,7 +16,7 @@
 
 package v1.models.request.liabilities
 
-import uk.gov.hmrc.domain.Vrn
+import v1.models.domain.Vrn
 import v1.models.request.RawData
 
 case class LiabilitiesRequest(vrn: Vrn,

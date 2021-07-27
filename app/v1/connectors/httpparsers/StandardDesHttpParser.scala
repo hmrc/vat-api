@@ -16,7 +16,6 @@
 
 package v1.connectors.httpparsers
 
-import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
@@ -29,8 +28,6 @@ import v1.models.outcomes.ResponseWrapper
 object StandardDesHttpParser extends HttpParser {
 
   case class SuccessCode(status: Int) extends AnyVal
-
-  val logger: Logger = Logger(getClass)
 
   // Return Right[DesResponse[Unit]] as success response has no body - no need to assign it a value
   implicit def readsEmpty(implicit successCode: SuccessCode = SuccessCode(NO_CONTENT),

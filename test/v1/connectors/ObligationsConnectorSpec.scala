@@ -17,14 +17,8 @@
 package v1.connectors
 
 import mocks.MockAppConfig
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.RequestId
-import v1.controllers.UserRequest
+import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
-import v1.models.auth.UserDetails
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -33,7 +27,6 @@ import scala.concurrent.Future
 
 class ObligationsConnectorSpec extends ConnectorSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
   val vrn: Vrn = Vrn("123456789")
 
   val obligationsResponse: ObligationsResponse =
@@ -53,11 +46,11 @@ class ObligationsConnectorSpec extends ConnectorSpec {
   class Test extends MockHttpClient with MockAppConfig {
 
     val connector: ObligationsConnector = new ObligationsConnector(http = mockHttpClient, appConfig = mockAppConfig)
-    val desRequestHeaders: Seq[(String, String)] = Seq("Environment" -> "des-environment", "Authorization" -> s"Bearer des-token")
 
     MockedAppConfig.desBaseUrl returns baseUrl
     MockedAppConfig.desToken returns "des-token"
     MockedAppConfig.desEnvironment returns "des-environment"
+    MockedAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
   }
 
   "ObligationsConnector" when {
@@ -84,12 +77,12 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
-          )
-          .returns(Future.successful(outcome))
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(outcome))
 
-        await(connector.retrieveObligations(request)
-        (hc = HeaderCarrier(requestId = Some(RequestId("123"))), ec = ec, userRequest = userRequest, correlationId = correlationId)) shouldBe outcome
+        await(connector.retrieveObligations(request)) shouldBe outcome
       }
 
       "not add query parameters if not supplied" in new Test {
@@ -102,9 +95,10 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
-          )
-          .returns(Future.successful(outcome))
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
       }
@@ -119,9 +113,10 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
             queryParams = queryParams,
-            requiredHeaders = "Environment" -> "des-environment", "Authorization" -> s"Bearer des-token"
-          )
-          .returns(Future.successful(outcome))
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
       }

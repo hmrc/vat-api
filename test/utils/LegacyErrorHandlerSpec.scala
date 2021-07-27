@@ -41,9 +41,8 @@ class LegacyErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with Moc
     val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(versionHeader)
 
     val env: Environment = mock[Environment]
-    val sourceMapper: OptionalSourceMapper = mock[OptionalSourceMapper]
+    val sourceMapper: OptionalSourceMapper = new OptionalSourceMapper(None)
     val provider: Provider[Router] = mock[Provider[Router]]
-
 
     val configuration: Configuration = Configuration("appName" -> "myApp")
     val handler = new LegacyErrorHandler(env, configuration, sourceMapper, provider)
@@ -129,4 +128,3 @@ class LegacyErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite  with Moc
     }
   }
 }
-
