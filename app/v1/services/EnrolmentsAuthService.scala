@@ -17,8 +17,6 @@
 package v1.services
 
 import javax.inject.{Inject, Singleton}
-import org.joda.time.LocalDate
-import utils.Logging
 import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
@@ -26,6 +24,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, _}
 import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.Logging
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import v1.models.outcomes.AuthOutcome
@@ -56,25 +55,25 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
         and confidenceLevel and nino and saUtr and name and dateOfBirth
         and email and agentInformation and groupIdentifier and credentialRole
         and mdtpInformation and credentialStrength and loginTimes
+        and itmpName and itmpDateOfBirth and itmpAddress
       ) {
         case affGroup ~ enrolments ~ inId ~ exId ~ agCode ~ creds
           ~ confLevel ~ ni ~ saRef ~ nme ~ dob
           ~ eml ~ agInfo ~ groupId ~ credRole
           ~ mdtpInfo ~ credStrength ~ logins
+          ~ itmpName ~ itmpDateOfBirth ~ itmpAddress
           if affGroup.contains(AffinityGroup.Organisation) || affGroup.contains(AffinityGroup.Individual) || affGroup.contains(AffinityGroup.Agent) =>
 
-          // setup dummy data for ITMP data
-          val dummyItmpName: ItmpName = ItmpName(None, None, None)
-          val dummyItmpDob: Option[LocalDate] = None
-          val dummyItmpAddress: ItmpAddress = ItmpAddress(None, None, None, None, None, None, None, None)
+          val emptyItmpName: ItmpName = ItmpName(None, None, None)
+          val emptyItmpAddress: ItmpAddress = ItmpAddress(None, None, None, None, None, None, None, None)
 
           val identityData =
             IdentityData(
               inId, exId, agCode, creds,
               confLevel, ni, saRef, nme, dob,
               eml, agInfo, groupId,
-              credRole, mdtpInfo, dummyItmpName, dummyItmpDob,
-              dummyItmpAddress, affGroup, credStrength, logins
+              credRole, mdtpInfo, itmpName.getOrElse(emptyItmpName), itmpDateOfBirth,
+              itmpAddress.getOrElse(emptyItmpAddress), affGroup, credStrength, logins
             )
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
