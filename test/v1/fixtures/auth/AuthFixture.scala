@@ -91,7 +91,7 @@ object AuthFixture {
         givenName = Some("TestUser"),
         familyName = Some("TestUser"),
         middleName = None),
-      itmpDateOfBirth = None,
+      itmpDateOfBirth = Some(LocalDate.parse("1990-04-16")),
       itmpAddress = ItmpAddress(
         line1 = Some("Add1"),
         line2 = None,
@@ -169,7 +169,7 @@ object AuthFixture {
           givenName = Some("TestUser"),
           familyName = Some("TestUser"),
           middleName = None),
-        itmpDateOfBirth = None,
+        itmpDateOfBirth = Some(LocalDate.parse("1990-04-16")),
         itmpAddress = ItmpAddress(
           line1 = Some("Add1"),
           line2 = None,
