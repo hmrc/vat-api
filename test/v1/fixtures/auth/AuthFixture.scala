@@ -16,7 +16,7 @@
 
 package v1.fixtures.auth
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import v1.models.auth.UserDetails
@@ -88,20 +88,19 @@ object AuthFixture {
       credentialRole = Some(User),
       mdtpInformation = None,
       itmpName = ItmpName(
-        givenName = None,
-        middleName = None,
-        familyName = None
-      ),
-      itmpDateOfBirth = None,
+        givenName = Some("TestUser"),
+        familyName = Some("TestUser"),
+        middleName = None),
+      itmpDateOfBirth = Some(LocalDate.parse("1990-04-16")),
       itmpAddress = ItmpAddress(
-        line1 = None,
+        line1 = Some("Add1"),
         line2 = None,
         line3 = None,
         line4 = None,
         line5 = None,
-        postCode = None,
+        postCode = Some("T11 S33"),
         countryName = None,
-        countryCode = None
+        countryCode = Some("UK")
       ),
       affinityGroup = Some(AffinityGroup.Organisation),
       credentialStrength = Some("strong"),
@@ -119,8 +118,8 @@ object AuthFixture {
     agentId = Some("987654321")
   ))
 
-  val authResponse: (IdentityData, Enrolments) => Option[AffinityGroup] ~ Enrolments ~ Option[String] ~ Option[String] ~ Option[String] ~ Option[Credentials] ~ ConfidenceLevel ~ None.type ~ None.type ~ Option[Name] ~ None.type ~ Option[String] ~ AgentInformation ~ Option[String] ~ Option[CredentialRole] ~ None.type ~ Option[String] ~ LoginTimes =
-    (data, enrolments) => new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+  val authResponse: (IdentityData, Enrolments) => Option[AffinityGroup] ~ Enrolments ~ Option[String] ~ Option[String] ~ Option[String] ~ Option[Credentials] ~ ConfidenceLevel ~ None.type ~ None.type ~ Option[Name] ~ None.type ~ Option[String] ~ AgentInformation ~ Option[String] ~ Option[CredentialRole] ~ None.type ~ Option[String] ~ LoginTimes ~ Option[ItmpName] ~ Option[LocalDate] ~ Option[ItmpAddress] =
+    (data, enrolments) => new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
       data.affinityGroup,
       enrolments),
       data.internalId),
@@ -138,7 +137,10 @@ object AuthFixture {
       data.credentialRole),
       None),
       data.credentialStrength),
-      data.loginTimes
+      data.loginTimes),
+      Some(data.itmpName)),
+      data.itmpDateOfBirth),
+      Some(data.itmpAddress)
     )
 
   val userDetails: (AffinityGroup, AgentInformation) => UserDetails = (Individual, agentInformation) => UserDetails(userType = Individual.toString,
@@ -164,19 +166,19 @@ object AuthFixture {
         credentialRole = Some(User),
         mdtpInformation = None,
         itmpName = ItmpName(
-          givenName = None,
-          familyName = None,
+          givenName = Some("TestUser"),
+          familyName = Some("TestUser"),
           middleName = None),
-        itmpDateOfBirth = None,
+        itmpDateOfBirth = Some(LocalDate.parse("1990-04-16")),
         itmpAddress = ItmpAddress(
-          line1 = None,
+          line1 = Some("Add1"),
           line2 = None,
           line3 = None,
           line4 = None,
           line5 = None,
-          postCode = None,
+          postCode = Some("T11 S33"),
           countryName = None,
-          countryCode = None),
+          countryCode = Some("UK")),
         affinityGroup = Some(Individual),
         credentialStrength = Some("strong"),
         loginTimes = LoginTimes(
