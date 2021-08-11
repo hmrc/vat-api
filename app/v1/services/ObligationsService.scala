@@ -18,11 +18,13 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
+
 import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{ EndpointLogContext, Logging }
 import v1.connectors.ObligationsConnector
 import v1.controllers.UserRequest
+import v1.models.errors.DesErrorCode.NOT_FOUND_BP_KEY
 import v1.models.errors._
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse

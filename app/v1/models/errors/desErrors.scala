@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{ Json, Reads }
 
 case class DesErrorCode(code: String) {
   def toMtd: MtdError = MtdError(code = code, message = "")
@@ -24,6 +24,8 @@ case class DesErrorCode(code: String) {
 
 object DesErrorCode {
   implicit val reads: Reads[DesErrorCode] = Json.reads[DesErrorCode]
+
+  final val NOT_FOUND_BP_KEY = "NOT_FOUND_BP_KEY"
 }
 
 sealed trait DesError

@@ -25,8 +25,6 @@ import v1.models.response.payments.PaymentsResponse
 trait DesResponseMappingSupport {
   self: Logging =>
 
-  final val NOT_FOUND_BP_KEY = "NOT_FOUND_BP_KEY"
-
   final def validatePaymentsSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
     desResponseWrapper.responseData match {
       case paymentsResponse: PaymentsResponse if paymentsResponse.payments.isEmpty =>
@@ -44,7 +42,7 @@ trait DesResponseMappingSupport {
   }
 
   final def mapDesErrors[D](errorCodeMap: PartialFunction[String, MtdError])(desResponseWrapper: ResponseWrapper[DesError])(
-    implicit logContext: EndpointLogContext): ErrorWrapper = {
+      implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
       logger.info(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
@@ -53,9 +51,6 @@ trait DesResponseMappingSupport {
 
     desResponseWrapper match {
       case ResponseWrapper(correlationId, DesErrors(error :: Nil)) =>
-        if (error.code == NOT_FOUND_BP_KEY) {
-          logger.warn(s"[ObligationsService] [desErrorMap] - Backend returned $NOT_FOUND_BP_KEY error")
-        }
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
       case ResponseWrapper(correlationId, DesErrors(errorCodes)) =>
@@ -67,9 +62,6 @@ trait DesResponseMappingSupport {
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
-          if (errorCodes.exists(_.code == NOT_FOUND_BP_KEY)) {
-            logger.warn(s"[ObligationsService] [desErrorMap] - Backend returned $NOT_FOUND_BP_KEY error")
-          }
           ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
         }
 
