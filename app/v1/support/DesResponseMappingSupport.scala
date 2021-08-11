@@ -16,7 +16,7 @@
 
 package v1.support
 
-import utils.{EndpointLogContext, Logging}
+import utils.{ EndpointLogContext, Logging }
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.response.liabilities.LiabilitiesResponse
@@ -24,6 +24,8 @@ import v1.models.response.payments.PaymentsResponse
 
 trait DesResponseMappingSupport {
   self: Logging =>
+
+  final val NOT_FOUND_BP_KEY = "NOT_FOUND_BP_KEY"
 
   final def validatePaymentsSuccessResponse[T](desResponseWrapper: ResponseWrapper[T]): Either[ErrorWrapper, ResponseWrapper[T]] = {
     desResponseWrapper.responseData match {
@@ -51,6 +53,9 @@ trait DesResponseMappingSupport {
 
     desResponseWrapper match {
       case ResponseWrapper(correlationId, DesErrors(error :: Nil)) =>
+        if (error.code == NOT_FOUND_BP_KEY) {
+          logger.warn(s"[ObligationsService] [desErrorMap] - Backend returned $NOT_FOUND_BP_KEY error")
+        }
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
       case ResponseWrapper(correlationId, DesErrors(errorCodes)) =>
@@ -62,6 +67,9 @@ trait DesResponseMappingSupport {
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
+          if (errorCodes.exists(_.code == NOT_FOUND_BP_KEY)) {
+            logger.warn(s"[ObligationsService] [desErrorMap] - Backend returned $NOT_FOUND_BP_KEY error")
+          }
           ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
         }
 

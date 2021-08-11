@@ -18,9 +18,9 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{EndpointLogContext, Logging}
+import utils.{ EndpointLogContext, Logging }
 import v1.connectors.ViewReturnConnector
 import v1.controllers.UserRequest
 import v1.models.errors._
@@ -28,17 +28,16 @@ import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
 import v1.support.DesResponseMappingSupport
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesResponseMappingSupport with Logging {
 
-  def viewReturn(request: ViewRequest)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext,
-    logContext: EndpointLogContext,
-    userRequest: UserRequest[_],
-    correlationId: String): Future[ServiceOutcome[ViewReturnResponse]] = {
+  def viewReturn(request: ViewRequest)(implicit hc: HeaderCarrier,
+                                       ec: ExecutionContext,
+                                       logContext: EndpointLogContext,
+                                       userRequest: UserRequest[_],
+                                       correlationId: String): Future[ServiceOutcome[ViewReturnResponse]] = {
 
     val result = for {
       desResponseWrapper <- EitherT(connector.viewReturn(request)).leftMap(mapDesErrors(desErrorMap))
@@ -47,17 +46,17 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
     result.value
   }
 
-  private def desErrorMap: Map[String, MtdError] =
+  private val desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN" -> VrnFormatErrorDes,
-      "INVALID_PERIODKEY" -> PeriodKeyFormatErrorDes,
-      "INVALID_IDENTIFIER" -> PeriodKeyFormatErrorDesNotFound,
-      "NOT_FOUND_VRN" -> DownstreamError,
+      "INVALID_VRN"          -> VrnFormatErrorDes,
+      "INVALID_PERIODKEY"    -> PeriodKeyFormatErrorDes,
+      "INVALID_IDENTIFIER"   -> PeriodKeyFormatErrorDesNotFound,
+      "NOT_FOUND_VRN"        -> DownstreamError,
       "DATE_RANGE_TOO_LARGE" -> RuleDateRangeTooLargeError,
-      "INVALID_INPUTDATA" -> InvalidInputDataError,
-      "INSOLVENT_TRADER" -> RuleInsolventTraderError,
-      "NOT_FOUND" -> EmptyNotFoundError,
-      "SERVICE_ERROR" -> DownstreamError,
-      "SERVICE_UNAVAILABLE" -> DownstreamError
+      "INVALID_INPUTDATA"    -> InvalidInputDataError,
+      "INSOLVENT_TRADER"     -> RuleInsolventTraderError,
+      "NOT_FOUND"            -> EmptyNotFoundError,
+      "SERVICE_ERROR"        -> DownstreamError,
+      "SERVICE_UNAVAILABLE"  -> DownstreamError
     )
 }
