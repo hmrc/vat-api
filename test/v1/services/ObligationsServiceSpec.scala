@@ -91,7 +91,7 @@ class ObligationsServiceSpec extends ServiceSpec {
           ("INVALID_IDTYPE", DownstreamError),
           ("INVALID_IDNUMBER", VrnFormatErrorDes),
           ("INVALID_REGIME", DownstreamError),
-          ("NOT_FOUND_BP_KEY", DownstreamError),
+          ("NOT_FOUND_BPKEY", DownstreamError),
           ("NOT_FOUND", LegacyNotFoundError),
           ("INVALID_STATUS", InvalidStatusErrorDes),
           ("INVALID_DATE_FROM", InvalidDateFromErrorDes),

@@ -17,17 +17,17 @@
 package v1.connectors
 
 import config.AppConfig
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
-import utils.pagerDutyLogging.{ Endpoint, LoggerMessages }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
 import v1.controllers.UserRequest
-import v1.models.errors.DesErrorCode.NOT_FOUND_BP_KEY
-import v1.models.errors.{ ConnectorError, DesErrors }
+import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
+import v1.models.errors.{ConnectorError, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
 @Singleton
@@ -61,8 +61,8 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
       uri = DesUri[ObligationsResponse](s"enterprise/obligation-data/vrn/$vrn/VATC"),
       queryParams = queryParams
     ).andThen {
-      case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BP_KEY) =>
-        self.logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BP_KEY error")
+      case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BPKEY) =>
+        self.logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
     }
   }
 }

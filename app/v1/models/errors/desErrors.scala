@@ -25,7 +25,7 @@ case class DesErrorCode(code: String) {
 object DesErrorCode {
   implicit val reads: Reads[DesErrorCode] = Json.reads[DesErrorCode]
 
-  final val NOT_FOUND_BP_KEY = "NOT_FOUND_BP_KEY"
+  final val NOT_FOUND_BPKEY = "NOT_FOUND_BPKEY"
 }
 
 sealed trait DesError
