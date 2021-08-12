@@ -25,14 +25,14 @@ import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
-import v1.models.response.obligations.{Obligation, ObligationsResponse}
+import v1.models.response.obligations.{ Obligation, ObligationsResponse }
 
 import scala.concurrent.Future
 
 class ObligationsServiceSpec extends ServiceSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
-  private val vrn: String = "123456789"
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual", None, "id"), FakeRequest())
+  private val vrn: String                                       = "123456789"
 
   private val obligationsRequest: ObligationsRequest =
     ObligationsRequest(
@@ -43,16 +43,17 @@ class ObligationsServiceSpec extends ServiceSpec {
     )
 
   private val obligationsResponse: ObligationsResponse =
-    ObligationsResponse(Seq(
-      Obligation(
-        periodKey = "18A2",
-        start = "2018-04-06",
-        end = "2018-04-05",
-        due = "2017-05-05",
-        status = "O",
-        received  = None
-      )
-    ))
+    ObligationsResponse(
+      Seq(
+        Obligation(
+          periodKey = "18A2",
+          start = "2018-04-06",
+          end = "2018-04-05",
+          due = "2017-05-05",
+          status = "O",
+          received = None
+        )
+      ))
 
   trait Test extends MockObligationsConnector {
 
@@ -65,7 +66,8 @@ class ObligationsServiceSpec extends ServiceSpec {
     "service call successful" must {
       "return the mapped result" in new Test {
 
-        MockObligationsConnector.retrieveObligations(obligationsRequest)
+        MockObligationsConnector
+          .retrieveObligations(obligationsRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, obligationsResponse))))
 
         await(service.retrieveObligations(obligationsRequest)) shouldBe Right(ResponseWrapper(correlationId, obligationsResponse))
@@ -78,7 +80,8 @@ class ObligationsServiceSpec extends ServiceSpec {
         def serviceError(desErrorCode: String, error: MtdError): Unit =
           s"a $desErrorCode error is returned from the service" in new Test {
 
-            MockObligationsConnector.retrieveObligations(obligationsRequest)
+            MockObligationsConnector
+              .retrieveObligations(obligationsRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
             await(service.retrieveObligations(obligationsRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
@@ -88,7 +91,7 @@ class ObligationsServiceSpec extends ServiceSpec {
           ("INVALID_IDTYPE", DownstreamError),
           ("INVALID_IDNUMBER", VrnFormatErrorDes),
           ("INVALID_REGIME", DownstreamError),
-          ("NOT_FOUND_BPKEY", DownstreamError),
+          ("NOT_FOUND_BP_KEY", DownstreamError),
           ("NOT_FOUND", LegacyNotFoundError),
           ("INVALID_STATUS", InvalidStatusErrorDes),
           ("INVALID_DATE_FROM", InvalidDateFromErrorDes),
