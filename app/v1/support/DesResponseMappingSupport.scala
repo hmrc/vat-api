@@ -16,7 +16,7 @@
 
 package v1.support
 
-import utils.{EndpointLogContext, Logging}
+import utils.{ EndpointLogContext, Logging }
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.response.liabilities.LiabilitiesResponse
@@ -42,7 +42,7 @@ trait DesResponseMappingSupport {
   }
 
   final def mapDesErrors[D](errorCodeMap: PartialFunction[String, MtdError])(desResponseWrapper: ResponseWrapper[DesError])(
-    implicit logContext: EndpointLogContext): ErrorWrapper = {
+      implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
       logger.info(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
