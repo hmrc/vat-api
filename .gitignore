@@ -2,6 +2,7 @@
 !.github
 !.gitignore
 !.scalafmt.conf
+!.travis.yml
 
 .cache
 /.classpath
@@ -35,4 +36,4 @@ test-result
 tmp
 .idea_modules
 bin
-./bsp
+.bsp

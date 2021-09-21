@@ -16,25 +16,12 @@
 
 package utils.pagerDutyLogging
 
-import org.joda.time.DateTime
-
 object PagerDutyLogging {
-
-  def timeOfDay(now: Int = DateTime.now().getHourOfDay): TimeOfDay.Value = {
-    val beforeStartOfWorkDay: Boolean = now < 9
-    val afterEndOfWorkDay: Boolean = now >= 17
-    if (beforeStartOfWorkDay || afterEndOfWorkDay) {
-      TimeOfDay.OUT_OF_HOURS
-    } else {
-      TimeOfDay.IN_HOURS
-    }
-  }
-
   def logError(loggerMessage: LoggerMessages.Value, status: Int, body: String,
                f: String => Unit, affinityGroup: String): Unit = {
     val message = s"DES error occurred. User type: $affinityGroup\n" + s"Status code: $status\nBody: $body"
     status.toString.head match {
-      case '5' => f(s"$message ( ${loggerMessage.toString}_${timeOfDay().toString} )")
+      case '5' => f(s"$message ( ${loggerMessage.toString} )")
       case _   => f(message)
     }
   }
