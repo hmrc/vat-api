@@ -49,8 +49,8 @@ object StandardDesHttpParser extends HttpParser {
 
   private def doRead[A](url: String, response: HttpResponse,
                        )(successOutcomeFactory: String => DesOutcome[A])(
-    implicit successCode: SuccessCode, connectorError: ConnectorError,
-    userRequest: UserRequest[_], logMessage: LoggerMessages.Value): DesOutcome[A] = {
+                         implicit successCode: SuccessCode, connectorError: ConnectorError,
+                         userRequest: UserRequest[_], logMessage: LoggerMessages.Value): DesOutcome[A] = {
 
     val responseCorrelationId = retrieveCorrelationId(response)
 
@@ -60,8 +60,6 @@ object StandardDesHttpParser extends HttpParser {
           s"Error response received from DES with status: ${response.status} and body\n" +
           s"${response.body} and correlationId: $responseCorrelationId when calling $url - " +
           s"vrn: ${connectorError.vrn}, requestId: ${connectorError.requestId}")
-
-      PagerDutyLogging.logError(logMessage, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
     }
     response.status match {
       case successCode.status =>
@@ -69,8 +67,16 @@ object StandardDesHttpParser extends HttpParser {
           "[StandardDesHttpParser][read] - " +
             s"Success response received from DES with correlationId: $responseCorrelationId when calling $url")
         successOutcomeFactory(responseCorrelationId)
-      case BAD_REQUEST | NOT_FOUND | FORBIDDEN | CONFLICT | UNPROCESSABLE_ENTITY => Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
-      case _                                                                     => Left(ResponseWrapper(responseCorrelationId, OutboundError(DownstreamError)))
+      case BAD_REQUEST |
+           NOT_FOUND |
+           FORBIDDEN |
+           CONFLICT |
+           UNPROCESSABLE_ENTITY =>
+        PagerDutyLogging.logError(logMessage, response.status, response.body, logger.warn(_), userRequest.userDetails.userType)
+        Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
+      case _ =>
+        PagerDutyLogging.logError(logMessage, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
+        Left(ResponseWrapper(responseCorrelationId, OutboundError(DownstreamError)))
     }
   }
 }
