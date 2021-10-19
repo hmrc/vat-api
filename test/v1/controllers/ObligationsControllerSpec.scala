@@ -165,6 +165,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
         status(result) shouldBe OK
         contentAsJson(result) shouldBe mtdJson
+        contentType(result) shouldBe Some("application/json")
         header("X-CorrelationId", result) shouldBe Some(correlationId)
 
         val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))

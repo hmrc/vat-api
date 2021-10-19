@@ -77,7 +77,6 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
-            .as(MimeTypes.JSON)
         }
 
       result.leftMap { errorWrapper =>

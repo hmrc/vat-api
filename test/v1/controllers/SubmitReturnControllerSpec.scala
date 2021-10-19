@@ -162,6 +162,7 @@ class SubmitReturnControllerSpec
 
         status(result) shouldBe CREATED
         contentAsJson(result) shouldBe submitReturnResponseJson
+        contentType(result) shouldBe Some("application/json")
         header("X-CorrelationId", result) shouldBe Some(correlationId)
         header("Receipt-Timestamp", result).getOrElse("No Header") should fullyMatch.regex(DateUtils.isoInstantDateRegex)
 

@@ -92,7 +92,6 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
             "Receipt-ID" -> nrsId,
             "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> NrsResponse.deprecatedString)
-          .as(MimeTypes.JSON)
       }
 
       result.leftMap { errorWrapper =>
