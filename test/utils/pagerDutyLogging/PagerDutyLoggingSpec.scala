@@ -16,20 +16,20 @@
 
 package utils.pagerDutyLogging
 
-import support.UnitSpec
 import play.api.http.Status._
+import support.UnitSpec
 
 class PagerDutyLoggingSpec extends UnitSpec {
   "generateMessage" should {
     "generate a message without the LoggerMessages value" when {
       "inputted status is not 5xx" in {
-        PagerDutyLogging.generateMessage(LoggerMessages.SUBMIT_RETURN_500, NOT_FOUND, "DEF", "ABC") shouldBe
+        PagerDutyLogging.generateMessage(PagerDutyLoggingEndpointName.SUBMIT_RETURN_500, NOT_FOUND, "DEF", "ABC") shouldBe
           s"DES error occurred. User type: ABC\n" + s"Status code: 404\nBody: DEF"
       }
     }
     "generate a message with the LoggerMessages value" when {
       "inputted status is 5xx" in {
-        PagerDutyLogging.generateMessage(LoggerMessages.SUBMIT_RETURN_500, INTERNAL_SERVER_ERROR, "DEF", "ABC") shouldBe
+        PagerDutyLogging.generateMessage(PagerDutyLoggingEndpointName.SUBMIT_RETURN_500, INTERNAL_SERVER_ERROR, "DEF", "ABC") shouldBe
           s"DES error occurred. User type: ABC\n" + s"Status code: 500\nBody: DEF ( SUBMIT_RETURN_500 )"
       }
     }

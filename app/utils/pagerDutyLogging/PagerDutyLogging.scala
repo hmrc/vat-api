@@ -17,20 +17,20 @@
 package utils.pagerDutyLogging
 
 object PagerDutyLogging {
-  def logError(loggerMessage: LoggerMessages.Value, status: Int, body: String,
-               f: String => Unit, affinityGroup: String): Unit = {
+  def log(pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value, status: Int, body: String,
+          f: String => Unit, affinityGroup: String): Unit = {
     f(generateMessage(
-      loggerMessage = loggerMessage,
+      pagerDutyLoggingEndpointName = pagerDutyLoggingEndpointName,
       status = status,
       body = body,
       affinityGroup = affinityGroup
     ))
   }
 
-  private[pagerDutyLogging] def generateMessage(loggerMessage: LoggerMessages.Value, status: Int, body: String, affinityGroup: String): String = {
+  private[pagerDutyLogging] def generateMessage(pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value, status: Int, body: String, affinityGroup: String): String = {
     val message = s"DES error occurred. User type: $affinityGroup\n" + s"Status code: $status\nBody: $body"
     status.toString.head match {
-      case '5' => s"$message ( ${loggerMessage.toString} )"
+      case '5' => s"$message ( ${pagerDutyLoggingEndpointName.toString} )"
       case _   => message
     }
   }

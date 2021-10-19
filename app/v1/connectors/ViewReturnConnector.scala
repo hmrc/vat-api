@@ -19,7 +19,7 @@ package v1.connectors
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.viewReturn.ViewRequest
@@ -42,7 +42,7 @@ class ViewReturnConnector @Inject()(val http: HttpClient,
     val vrn = request.vrn.vrn
     implicit val connectorError: ConnectorError =
       ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
-    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveReturns.toLoggerMessage
+    implicit val pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value = Endpoint.RetrieveReturns.toLoggerMessage
 
     val queryParams: Seq[(String, String)] =
       Seq(

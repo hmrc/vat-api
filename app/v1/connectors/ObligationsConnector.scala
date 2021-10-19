@@ -18,7 +18,7 @@ package v1.connectors
 
 import config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
 import v1.models.errors.{ConnectorError, DesErrors}
@@ -46,7 +46,7 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
       ConnectorError(vrn, hc.requestId.fold("") { requestId =>
         requestId.value
       })
-    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveObligations.toLoggerMessage
+    implicit val pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value = Endpoint.RetrieveObligations.toLoggerMessage
 
     val queryParams: Seq[(String, String)] =
       Seq(

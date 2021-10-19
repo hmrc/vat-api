@@ -16,7 +16,7 @@
 
 package utils.pagerDutyLogging
 
-object LoggerMessages extends Enumeration {
+object PagerDutyLoggingEndpointName extends Enumeration {
   val RETRIEVE_OBLIGATIONS_500,
   SUBMIT_RETURN_500,
   RETRIEVE_RETURN_500,

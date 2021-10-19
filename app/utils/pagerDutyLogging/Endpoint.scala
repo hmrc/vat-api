@@ -17,24 +17,24 @@
 package utils.pagerDutyLogging
 
 sealed trait Endpoint {
-  def toLoggerMessage: LoggerMessages.Value
+  def toLoggerMessage: PagerDutyLoggingEndpointName.Value
 }
 
 object Endpoint {
 
   case object RetrieveObligations extends Endpoint {
-    override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.RETRIEVE_OBLIGATIONS_500
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_OBLIGATIONS_500
   }
   case object SubmitReturn extends Endpoint {
-    override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.SUBMIT_RETURN_500
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.SUBMIT_RETURN_500
   }
   case object RetrieveReturns extends Endpoint {
-    override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.RETRIEVE_RETURN_500
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_RETURN_500
   }
   case object RetrieveLiabilities extends Endpoint {
-    override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.RETRIEVE_LIABILITIES_500
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_LIABILITIES_500
   }
   case object RetrievePayments extends Endpoint {
-    override def toLoggerMessage: LoggerMessages.Value = LoggerMessages.RETRIEVE_PAYMENTS_500
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_PAYMENTS_500
   }
 }
