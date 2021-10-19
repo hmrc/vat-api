@@ -22,7 +22,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import support.UnitSpec
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.connectors.DesOutcome
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
@@ -46,7 +46,7 @@ class StandardDesHttpParserSpec extends UnitSpec {
   import v1.connectors.httpparsers.StandardDesHttpParser._
   implicit val connectorError: ConnectorError = ConnectorError("vrn","requestId")
   implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
-  implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
+  implicit val pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
 
   val httpReads: HttpReads[DesOutcome[Unit]] = implicitly
 

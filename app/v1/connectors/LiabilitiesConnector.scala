@@ -16,17 +16,16 @@
 
 package v1.connectors
 
-import java.time.LocalDate
-
 import config.AppConfig
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, LoggerMessages}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.ConnectorError
 import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.LiabilitiesResponse
 
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -42,8 +41,8 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
     implicit val requestToDate: LocalDate = LocalDate.parse(request.to)
     val vrn = request.vrn.vrn
     implicit val connectorError: ConnectorError =
-      ConnectorError(vrn, hc.requestId.fold(""){ requestId => requestId.value})
-    implicit val logMessage: LoggerMessages.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
+      ConnectorError(vrn, hc.requestId.fold("") { requestId => requestId.value })
+    implicit val pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value = Endpoint.RetrieveLiabilities.toLoggerMessage
     val queryParams: Seq[(String, String)] = Seq(
       ("dateFrom", request.from),
       ("dateTo", request.to),
