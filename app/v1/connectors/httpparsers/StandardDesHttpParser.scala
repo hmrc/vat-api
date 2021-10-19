@@ -72,7 +72,7 @@ object StandardDesHttpParser extends HttpParser {
            FORBIDDEN |
            CONFLICT |
            UNPROCESSABLE_ENTITY =>
-        PagerDutyLogging.logError(logMessage, response.status, response.body, logger.warn(_), userRequest.userDetails.userType)
+        PagerDutyLogging.logError(logMessage, response.status, response.body, logger.info(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
       case _ =>
         PagerDutyLogging.logError(logMessage, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
