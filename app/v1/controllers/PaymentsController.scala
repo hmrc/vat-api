@@ -19,7 +19,6 @@ package v1.controllers
 import cats.data.EitherT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.http.MimeTypes
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import utils.{EndpointLogContext, IdGenerator, Logging}
