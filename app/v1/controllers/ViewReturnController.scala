@@ -21,7 +21,6 @@ import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import play.mvc.Http.MimeTypes
 import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.ViewReturnRequestParser
@@ -73,7 +72,6 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
 
           Ok(Json.toJson(serviceResponse.responseData))
             .withApiHeaders(serviceResponse.correlationId)
-            .as(MimeTypes.JSON)
         }
 
       result.leftMap { errorWrapper =>

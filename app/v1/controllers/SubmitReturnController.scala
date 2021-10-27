@@ -21,7 +21,6 @@ import cats.implicits._
 import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import play.mvc.Http.MimeTypes
 import utils._
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.SubmitReturnRequestParser
@@ -92,7 +91,6 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
             "Receipt-ID" -> nrsId,
             "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> NrsResponse.deprecatedString)
-          .as(MimeTypes.JSON)
       }
 
       result.leftMap { errorWrapper =>
