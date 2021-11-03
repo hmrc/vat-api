@@ -1,7 +1,5 @@
 # vat-api
 
-[![Build Status](https://travis-ci.org/hmrc/vat-api.svg)](https://travis-ci.org/hmrc/vat-api) [ ![Download](https://api.bintray.com/packages/hmrc/releases/vat-api/images/download.svg) ](https://bintray.com/hmrc/releases/vat-api/_latestVersion)
-
 vat-api has five endpoints:
   - GET obligations
   - POST returns
