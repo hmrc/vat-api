@@ -198,6 +198,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         private val response = await(request.post(requestJsonNotFinalised))
         response.status shouldBe FORBIDDEN
         response.json shouldBe Json.toJson(FinalisedValueRuleError)
+        response.header("Content-Type") shouldBe Some("application/json")
       }
     }
 
@@ -243,6 +244,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
         response.status shouldBe BAD_REQUEST
         response.json shouldBe expectedError
+        response.header("Content-Type") shouldBe Some("application/json")
       }
     }
 
@@ -275,6 +277,7 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         private val response = await(request.post(submitRequestBodyJsonWithInvalidFinalisedFormat))
         response.status shouldBe BAD_REQUEST
         response.json shouldBe Json.toJson(VrnFormatError)
+        response.header("Content-Type") shouldBe Some("application/json")
       }
     }
 
