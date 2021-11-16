@@ -28,8 +28,7 @@ trait BaseController {
 
       val newHeaders: Seq[(String, String)] = responseHeaders ++ Seq(
         "X-CorrelationId" -> correlationId,
-        "X-Content-Type-Options" -> "nosniff",
-        "Content-Type" -> "application/json"
+        "X-Content-Type-Options" -> "nosniff"
       )
 
       result.copy(header = result.header.copy(headers = result.header.headers ++ newHeaders))
