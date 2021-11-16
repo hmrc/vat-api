@@ -55,10 +55,6 @@ trait HttpParser extends Logging {
 
   def parseErrors(response: HttpResponse): DesError = {
     val singleError         = response.validateJson[DesErrorCode].map(err => DesErrors(List(err)))
-    // Note: In 1.0, multiple errors are not supported as adding them would be a breaking change.
-    // Something to add in 2.0:
-    // lazy val multipleErrorReads: Reads[List[DesErrorCode]] = (__ \ "failures").read[List[DesErrorCode]]
-    // lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
     lazy val bvrErrors      = response.validateJson(bvrErrorReads).map(errs => OutboundError(BVRError, Some(errs.map(_.toMtd))))
     lazy val unableToParseJsonError = {
       logger.warn(s"unable to parse errors from response: ${response.body}")
