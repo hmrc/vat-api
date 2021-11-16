@@ -16,11 +16,7 @@
 
 package v1.controllers
 
-import akka.http.javadsl.model.{ContentType, MediaTypes}
-import akka.http.scaladsl.model.HttpEntity
 import play.api.mvc.Result
-import sttp.model.MediaType
-import uk.gov.hmrc.http.HttpResponse
 import utils.Logging
 
 trait BaseController {
