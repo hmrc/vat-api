@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,7 +168,7 @@ class SubmitReturnControllerSpec
 
         val auditResponse: AuditResponse = AuditResponse(CREATED, None, Some(submitReturnResponseJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-          UserDetails("Individual", None, "N/A"), auditResponse)).once
+          UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJson.toString)).once
       }
     }
 
@@ -196,7 +196,7 @@ class SubmitReturnControllerSpec
 
         val auditResponse: AuditResponse = AuditResponse(CREATED, None, Some(submitReturnResponseJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-          UserDetails("Individual", None, "N/A"), auditResponse)).once
+          UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJson.toString)).once
       }
     }
 
@@ -248,7 +248,7 @@ class SubmitReturnControllerSpec
 
         val auditResponse: AuditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError("UNMAPPED_PLAY_ERROR"))), None)
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-          UserDetails("Individual", None, "N/A"), auditResponse)).once
+          UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJsonWithInvalidFinalisedFormat.toString())).once
       }
     }
 
@@ -302,7 +302,7 @@ class SubmitReturnControllerSpec
 
         val auditResponse: AuditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError("VAT_TOTAL_VALUE"), AuditError("VAT_NET_VALUE"))), None)
         MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-          UserDetails("Individual", None, "N/A"), auditResponse)).once
+          UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJsonWithInvalidFinalisedFormat.toString())).once
       }
     }
 
@@ -323,7 +323,7 @@ class SubmitReturnControllerSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(error.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-              UserDetails("Individual", None, "N/A"), auditResponse)).once
+              UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJson.toString())).once
           }
         }
 
@@ -359,7 +359,7 @@ class SubmitReturnControllerSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditSubmit(correlationId,
-              UserDetails("Individual", None, "N/A"), auditResponse)).once
+              UserDetails("Individual", None, "N/A"), auditResponse, submitRequestBodyJson.toString())).once
           }
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package v1.audit
 
-import v1.models.audit.{AuditDetail, AuditEvent, AuditResponse, NrsAuditDetail}
+import v1.models.audit.{AuditDetail, AuditEvent, AuditResponse, NrsAuditDetail, SubmitAuditDetail}
 import v1.models.auth.UserDetails
 
 object AuditEvents {
@@ -37,9 +37,9 @@ object AuditEvents {
     AuditEvent("retrieveVatObligations","retrieve-vat-obligations",
       AuditDetail(userDetails, correlationId, auditResponse))
 
-  def auditSubmit(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
+  def auditSubmit(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse, rawData: String): AuditEvent[SubmitAuditDetail] =
     AuditEvent("submitVatReturn","submit-vat-return",
-      AuditDetail(userDetails, correlationId, auditResponse))
+      SubmitAuditDetail(userDetails, correlationId, auditResponse, rawData))
 
   def auditNrsSubmit(auditType: String, nrsAuditDetail: NrsAuditDetail): AuditEvent[NrsAuditDetail] =
     AuditEvent(auditType,"submit-vat-return",nrsAuditDetail)
