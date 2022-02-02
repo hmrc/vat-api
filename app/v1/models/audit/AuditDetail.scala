@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,33 @@ object AuditDetail {
       response = response,
       `X-CorrelationId` = `X-CorrelationId`,
       clientId = userDetails.clientId
+    )
+  }
+}
+
+case class SubmitAuditDetail(userType: String,
+                       agentReferenceNumber: Option[String],
+                       response: AuditResponse,
+                       `X-CorrelationId`: String,
+                       clientId: String,
+                       submitRawData: String)
+
+object SubmitAuditDetail {
+
+  implicit val writes: OWrites[SubmitAuditDetail] = Json.writes[SubmitAuditDetail]
+
+  def apply(userDetails: UserDetails,
+            `X-CorrelationId`: String,
+            response: AuditResponse,
+            submitRawData: String): SubmitAuditDetail = {
+
+    SubmitAuditDetail(
+      userType = userDetails.userType,
+      agentReferenceNumber = userDetails.agentReferenceNumber,
+      response = response,
+      `X-CorrelationId` = `X-CorrelationId`,
+      clientId = userDetails.clientId,
+      submitRawData = submitRawData
     )
   }
 }

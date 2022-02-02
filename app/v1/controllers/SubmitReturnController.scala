@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
-          request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData))))))
+          request.userDetails, AuditResponse(CREATED, Right(Some(Json.toJson(serviceResponse.responseData)))), request.body.toString()))
 
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
@@ -99,7 +99,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
         auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
-          request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper)))))
+          request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper))), request.body.toString()))
 
         leftResult
       }.merge
