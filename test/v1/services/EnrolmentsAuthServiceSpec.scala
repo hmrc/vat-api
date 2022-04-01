@@ -16,7 +16,6 @@
 
 package v1.services
 
-import org.joda.time.LocalDate
 import play.api.libs.json.JsResultException
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
@@ -27,6 +26,7 @@ import v1.mocks.connectors.MockAuthConnector
 import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 
+import java.time.LocalDate
 import scala.collection.Seq
 import scala.concurrent.Future
 

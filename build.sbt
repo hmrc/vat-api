@@ -51,7 +51,7 @@ lazy val microservice = Project(appName, file("."))
     FuncTest / parallelExecution := false,
     addTestReportOption(FuncTest, "int-test-reports")
   )
-  .settings(resolvers += Resolver.bintrayRepo("hmrc", "releases"), resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
+  .settings(resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)
   .settings(SilencerSettings())
 

@@ -16,18 +16,19 @@
 
 package v1.services
 
-import org.joda.time.DateTime
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import v1.models.domain.Vrn
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockSubmitReturnConnector
 import v1.models.auth.UserDetails
+import v1.models.domain.Vrn
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
 
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class SubmitReturnServiceSpec extends ServiceSpec {
@@ -57,8 +58,8 @@ class SubmitReturnServiceSpec extends ServiceSpec {
       vrn = Vrn(vrn),
       body = submitRequestBody
     )
-
-  val submitReturnResponse: SubmitResponse = SubmitResponse(processingDate = new DateTime("2018-01-16T08:20:27.895+0000"),
+  val dateTimePattern = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  val submitReturnResponse: SubmitResponse = SubmitResponse(processingDate = OffsetDateTime.parse("2018-01-16T08:20:27.895Z"),
     paymentIndicator = Some("BANK"),
     formBundleNumber = "256660290587",
     chargeRefNumber = Some("aCxFaNx0FZsCvyWF"))

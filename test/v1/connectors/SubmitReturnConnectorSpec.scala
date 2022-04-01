@@ -17,14 +17,14 @@
 package v1.connectors
 
 import mocks.MockAppConfig
-import org.joda.time.DateTime
-import v1.models.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
 import v1.mocks.MockHttpClient
+import v1.models.domain.Vrn
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
 
+import java.time.OffsetDateTime
 import scala.concurrent.Future
 
 class SubmitReturnConnectorSpec extends ConnectorSpec {
@@ -51,7 +51,7 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
       )
     )
 
-  val submitReturnResponse: SubmitResponse = SubmitResponse(processingDate = new DateTime("2018-01-16T08:20:27.895+0000"),
+  val submitReturnResponse: SubmitResponse = SubmitResponse(processingDate = OffsetDateTime.parse("2018-01-16T08:20:27.895Z"),
     paymentIndicator = Some("BANK"),
     formBundleNumber = "256660290587",
     chargeRefNumber = Some("aCxFaNx0FZsCvyWF"))

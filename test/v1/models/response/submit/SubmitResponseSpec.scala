@@ -16,9 +16,10 @@
 
 package v1.models.response.submit
 
-import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
+
+import java.time.OffsetDateTime
 
 class SubmitResponseSpec extends UnitSpec {
 
@@ -74,15 +75,16 @@ class SubmitResponseSpec extends UnitSpec {
       |}
       |""".stripMargin)
 
-  val maxSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = new DateTime("2018-01-16T08:20:27.895+0000"),
+
+  val maxSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = OffsetDateTime.parse("2018-01-16T08:20:27.895Z"),
     paymentIndicator = Some("BANK"),
     formBundleNumber = "256660290587",
     chargeRefNumber = Some("aCxFaNx0FZsCvyWF"))
 
-  val minSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = new DateTime("2018-01-16T08:20:27.895+0000"),
+  val minSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = OffsetDateTime.parse("2018-01-16T08:20:27.895Z"),
     formBundleNumber = "256660290587", None , None)
 
-  val noMilliSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = new DateTime("2018-01-16T08:20:27.89Z"),
+  val noMilliSubmitResponseModel: SubmitResponse = SubmitResponse(processingDate = OffsetDateTime.parse("2018-01-16T08:20:27.89Z"),
     formBundleNumber = "256660290587", None , None)
 
 

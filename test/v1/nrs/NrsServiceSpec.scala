@@ -17,22 +17,22 @@
 package v1.nrs
 
 import com.kenshoo.play.metrics.Metrics
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import v1.models.domain.Vrn
-import utils.{MockHashUtil, MockMetrics}
+import utils.{DateUtils, MockHashUtil, MockMetrics}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.mocks.nrs.MockNrsConnector
 import v1.mocks.services.MockAuditService
 import v1.models.audit.NrsAuditDetail
 import v1.models.auth.UserDetails
+import v1.models.domain.Vrn
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.nrs.models.NrsTestData.IdentityDataTestData
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
 import v1.nrs.models.response.{NrsFailure, NrsResponse}
 import v1.services.ServiceSpec
+import java.time.{LocalDateTime, OffsetDateTime}
 
 import scala.concurrent.Future
 
@@ -42,7 +42,8 @@ class NrsServiceSpec extends ServiceSpec {
 
   private val vrn: Vrn = Vrn("123456789")
 
-  private val timestamp: DateTime = DateTime.parse("2018-04-07T12:13:25.156Z")
+  private val timestamp: OffsetDateTime = OffsetDateTime.parse("2018-04-07T12:13:25.156Z")
+  private val formattedDate: String = timestamp.format(DateUtils.isoInstantDatePattern)
 
   private val submitRequestBody: SubmitRequestBody =
     SubmitRequestBody(
@@ -82,7 +83,7 @@ class NrsServiceSpec extends ServiceSpec {
         notableEvent = "vat-return",
         payloadContentType = "application/json",
         payloadSha256Checksum = checksum,
-        userSubmissionTimestamp = timestamp,
+        userSubmissionTimestamp = formattedDate,
         identityData = Some(IdentityDataTestData.correctModel),
         userAuthToken = "Bearer aaaa",
         headerData = Json.toJson(Map(

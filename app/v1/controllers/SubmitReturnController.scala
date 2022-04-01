@@ -27,12 +27,12 @@ import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.errors.ControllerError._
 import v1.models.errors._
-import v1.models.request.submit.SubmitRawData
+import v1.models.request.submit.{SubmitRawData, SubmitRequest}
 import v1.nrs.NrsService
 import v1.nrs.models.response.NrsResponse
 import v1.services.{AuditService, EnrolmentsAuthService, SubmitReturnService}
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -76,7 +76,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
           //Submit Return to ETMP
           EitherT(service.submitReturn(parsedRequest.copy(body =
             parsedRequest.body.copy(receivedAt =
-              Some(submissionTimestamp.toString(DateUtils.dateTimePattern)), agentReference = arn))))
+              Some(submissionTimestamp.format(DateUtils.dateTimePattern)), agentReference = arn))))
         }
       } yield {
 
@@ -89,7 +89,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
             "Receipt-ID" -> nrsId,
-            "Receipt-Timestamp" -> submissionTimestamp.toString(DateUtils.isoInstantDatePattern),
+            "Receipt-Timestamp" -> submissionTimestamp.format(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> NrsResponse.deprecatedString)
       }
 

@@ -18,12 +18,12 @@ package v1.endpoints
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
+import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.fixtures.PaymentsFixture
 import v1.models.errors._
@@ -65,7 +65,10 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
       setupStubs()
       buildRequest(uri)
         .addQueryStringParameters(mtdQueryParams: _*)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
+        .withHttpHeaders(
+          (ACCEPT, "application/vnd.hmrc.1.0+json"),
+          (AUTHORIZATION, "Bearer 123")
+        )
 
     }
 

@@ -17,11 +17,10 @@
 package v1.nrs
 
 import com.kenshoo.play.metrics.Metrics
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{HashUtil, Logging, Timer}
+import utils.{DateUtils, HashUtil, Logging, Timer}
 import v1.audit.AuditEvents
 import v1.controllers.UserRequest
 import v1.models.audit.NrsAuditDetail
@@ -29,8 +28,10 @@ import v1.models.request.submit.SubmitRequest
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
 import v1.nrs.models.response.NrsResponse
 import v1.services.AuditService
+import java.time.{LocalDateTime, OffsetDateTime}
 
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -39,7 +40,7 @@ class NrsService @Inject()(auditService: AuditService,
                            hashUtil: HashUtil,
                            override val metrics: Metrics) extends Timer with Logging {
 
-  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: DateTime)(
+  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
@@ -79,7 +80,7 @@ class NrsService @Inject()(auditService: AuditService,
   }
 
   def buildNrsSubmission(vatSubmission: SubmitRequest,
-                         submissionTimestamp: DateTime,
+                         submissionTimestamp: OffsetDateTime,
                          request: UserRequest[_]): NrsSubmission = {
 
     import vatSubmission._
@@ -87,6 +88,7 @@ class NrsService @Inject()(auditService: AuditService,
     val payloadString = Json.toJson(body).toString()
     val encodedPayload = hashUtil.encode(payloadString)
     val sha256Checksum = hashUtil.getHash(payloadString)
+    val formattedDate = submissionTimestamp.format(DateUtils.isoInstantDatePattern)
 
     NrsSubmission(
       payload = encodedPayload,
@@ -95,7 +97,7 @@ class NrsService @Inject()(auditService: AuditService,
         notableEvent = "vat-return",
         payloadContentType = "application/json",
         payloadSha256Checksum = sha256Checksum,
-        userSubmissionTimestamp = submissionTimestamp,
+        userSubmissionTimestamp = formattedDate,
         identityData = request.userDetails.identityData,
         userAuthToken = request.headers.get("Authorization").get,
         headerData = Json.toJson(request.headers.toMap.map { h => h._1 -> h._2.head }),
