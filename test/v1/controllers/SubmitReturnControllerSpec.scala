@@ -17,10 +17,8 @@
 package v1.controllers
 
 import com.kenshoo.play.metrics.Metrics
-import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
-import v1.models.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{DateUtils, MockMetrics}
 import v1.audit.AuditEvents
@@ -30,12 +28,15 @@ import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockSubmi
 import v1.mocks.{MockCurrentDateTime, MockIdGenerator}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
+import v1.models.domain.Vrn
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
 import v1.nrs.models.response.NrsResponse
 
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 
@@ -49,8 +50,10 @@ class SubmitReturnControllerSpec
     with MockNrsService
     with MockIdGenerator {
 
-  val date: DateTime = DateTime.parse("2017-01-01T00:00:00.000Z")
-  val fmt: String = DateUtils.dateTimePattern
+  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  def dateString(localDateTime: OffsetDateTime): String = localDateTime.format(formatter)
+  val date: OffsetDateTime = OffsetDateTime.parse("2020-01-01T00:00:00.000Z")
+
   val vrn: String = "123456789"
   val correlationId: String = "X-ID"
   val uid: String = "a5894863-9cd7-4d0d-9eee-301ae79cbae6"
@@ -120,12 +123,18 @@ class SubmitReturnControllerSpec
   val submitReturnRequest: SubmitRequest =
     SubmitRequest(
       vrn = Vrn(vrn),
-      submitRequestBody.copy(receivedAt = Some(date.toString(fmt)))
+      submitRequestBody.copy(receivedAt = Some(dateString(date)))
+    )
+
+  val submitReturnRequest2020: SubmitRequest =
+    SubmitRequest(
+      vrn = Vrn(vrn),
+      submitRequestBody.copy(receivedAt = Some(date.toString))
     )
 
   val submitReturnResponse: SubmitResponse =
     SubmitResponse(
-      processingDate = DateTime.parse("2017-01-01T00:00:00.000Z"),
+      processingDate = OffsetDateTime.parse("2020-01-01T00:00:00.000Z"),
       paymentIndicator = Some("DD"),
       formBundleNumber = "123456789012",
       chargeRefNumber = Some("SKDJGFH9URGT")
@@ -134,7 +143,7 @@ class SubmitReturnControllerSpec
   val submitReturnResponseJson: JsValue = Json.parse(
     """
       |{
-      |   "processingDate": "2017-01-01T00:00:00.000Z",
+      |   "processingDate": "2020-01-01T00:00:00.000Z",
       |   "formBundleNumber": "123456789012",
       |   "paymentIndicator": "DD",
       |   "chargeRefNumber": "SKDJGFH9URGT"

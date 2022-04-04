@@ -16,12 +16,12 @@
 
 package v1.fixtures.auth
 
-import org.joda.time.{DateTime, LocalDate}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import v1.models.auth.UserDetails
 import v1.nrs.models.request.IdentityData
 
+import java.time.{Instant, LocalDate}
 import scala.collection.Seq
 
 object AuthFixture {
@@ -105,7 +105,7 @@ object AuthFixture {
       affinityGroup = Some(AffinityGroup.Organisation),
       credentialStrength = Some("strong"),
       loginTimes = LoginTimes(
-        currentLogin = DateTime.parse("2018-04-16T11:00:55Z"),
+        currentLogin = Instant.parse("2018-04-16T11:00:55Z"),
         previousLogin = None
       )
     )
@@ -182,6 +182,6 @@ object AuthFixture {
         affinityGroup = Some(Individual),
         credentialStrength = Some("strong"),
         loginTimes = LoginTimes(
-          currentLogin = DateTime.parse("2018-04-16T11:00:55.000Z"),
+          currentLogin = Instant.parse("2018-04-16T11:00:55.000Z"),
           previousLogin = None))))
 }

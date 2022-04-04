@@ -16,12 +16,13 @@
 
 package v1.models.response.submit
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import utils.DateUtils._
+import utils.DateUtils.{dateTimeFormat, defaultDateTimeFormat}
 
-case class SubmitResponse(processingDate: DateTime,
+import java.time.OffsetDateTime
+
+case class SubmitResponse(processingDate: OffsetDateTime,
                           formBundleNumber: String,
                           paymentIndicator: Option[String],
                           chargeRefNumber: Option[String])
@@ -29,14 +30,20 @@ case class SubmitResponse(processingDate: DateTime,
 object SubmitResponse {
 
   implicit val reads: Reads[SubmitResponse] = (
-    ((__ \ "processingDate").read[DateTime](dateTimeFormat) or
-      (__ \ "processingDate").read[DateTime](defaultDateTimeFormat)) and
+    ((__ \ "processingDate").read[OffsetDateTime](dateTimeFormat) or
+      (__ \ "processingDate").read[OffsetDateTime](defaultDateTimeFormat)) and
       (__ \ "formBundleNumber").read[String] and
       (__ \ "paymentIndicator").readNullable[String] and
       (__ \ "chargeRefNumber").readNullable[String]
     ) (SubmitResponse.apply _)
 
-  implicit val dateFormats: Format[DateTime] = dateTimeFormat
-  implicit val writes: Writes[SubmitResponse] = Json.writes[SubmitResponse]
+
+  implicit val dateFormats: Format[OffsetDateTime] = dateTimeFormat
+  implicit val writes: Writes[SubmitResponse] = (
+    (JsPath \ "processingDate").write[OffsetDateTime](dateFormats) and
+      (JsPath \ "formBundleNumber").write[String] and
+      (JsPath \ "paymentIndicator").writeNullable[String] and
+      (JsPath \ "chargeRefNumber").writeNullable[String]
+    ) (unlift(SubmitResponse.unapply))
 
 }

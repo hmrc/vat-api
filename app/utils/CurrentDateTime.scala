@@ -16,11 +16,17 @@
 
 package utils
 
+import java.time.{LocalDateTime, OffsetDateTime}
+import java.time.format.DateTimeFormatter
+
 import javax.inject.{Inject, Singleton}
-import org.joda.time.{DateTime, DateTimeZone}
 
 @Singleton
 class CurrentDateTime @Inject()() {
-
-  def getDateTime: DateTime = DateTime.now(DateTimeZone.UTC)
+  def getDateTime: OffsetDateTime = OffsetDateTime.now()
+  def dateString(currentDatetime: OffsetDateTime): OffsetDateTime = {
+    val formatted = currentDatetime.format(DateUtils.dateTimePattern)
+    val formatter = DateUtils.dateTimePattern.format(OffsetDateTime.parse(currentDatetime.toString))
+    OffsetDateTime.parse(formatted)
+  }
 }

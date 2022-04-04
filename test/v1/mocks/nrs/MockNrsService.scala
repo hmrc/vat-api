@@ -16,7 +16,6 @@
 
 package v1.mocks.nrs
 
-import org.joda.time.DateTime
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
@@ -24,6 +23,7 @@ import v1.controllers.UserRequest
 import v1.models.request.submit.SubmitRequest
 import v1.nrs.NrsService
 import v1.nrs.models.response.NrsResponse
+import java.time.{LocalDateTime, OffsetDateTime}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,9 +33,9 @@ trait MockNrsService extends MockFactory {
 
   object MockNrsService {
 
-    def submit(request: SubmitRequest, nrsId: String, dateTime: DateTime): CallHandler[Future[Option[NrsResponse]]] = {
+    def submit(request: SubmitRequest, nrsId: String, dateTime: OffsetDateTime): CallHandler[Future[Option[NrsResponse]]] = {
       (mockNrsService
-        .submit(_: SubmitRequest, _: String, _: DateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: String))
+        .submit(_: SubmitRequest, _: String, _: OffsetDateTime)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: String))
         .expects(request, *, *, *, *, *, *)
     }
   }
