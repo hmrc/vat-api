@@ -1,0 +1,57 @@
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package v1.constants
+
+import play.api.libs.json.{JsObject, Json}
+import v1.models.response.penalties.{FinancialData, PenaltiesData, PenaltiesResponse}
+
+object PenaltiesConstants {
+  
+  val testPenaltiesData: PenaltiesData = PenaltiesData(
+    dummyPenaltyData1 = "testData1",
+    dummyPenaltyData2 = "testData2",
+    dummyPenaltyData3 = "testData3"
+  )
+
+  val testPenaltiesDataJson: JsObject = Json.obj(
+    "dummyPenaltyData1" -> "testData1",
+    "dummyPenaltyData2" -> "testData2",
+    "dummyPenaltyData3" -> "testData3"
+  )
+
+  val testFinancialData: FinancialData = FinancialData(
+    dummyFinancialData1 = "testData1",
+    dummyFinancialData2 = "testData2",
+    dummyFinancialData3 = "testData3"
+  )
+
+  val testFinancialDataJson: JsObject = Json.obj(
+    "dummyFinancialData1" -> "testData1",
+    "dummyFinancialData2" -> "testData2",
+    "dummyFinancialData3" -> "testData3"
+  )
+
+  val testPenaltiesResponse: PenaltiesResponse = PenaltiesResponse(
+    getPenaltiesData = testPenaltiesData,
+    financialData = testFinancialData
+  )
+
+  val testPenaltiesResponseJson: JsObject = Json.obj(
+    "getPenaltiesData" -> testPenaltiesDataJson,
+    "financialData" -> testFinancialDataJson
+  )
+}
