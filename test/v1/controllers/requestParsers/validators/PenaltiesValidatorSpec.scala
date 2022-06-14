@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.controllers.requestParsers.validators
 
-import play.api.libs.json.Json
 import support.UnitSpec
-import v1.constants.PenaltiesConstants
 import v1.constants.PenaltiesConstants._
+import v1.models.errors.VrnFormatError
 
-class FinancialDataSpec extends UnitSpec {
+class PenaltiesValidatorSpec extends UnitSpec {
 
-  "FinancialData" must {
+  val validator = new PenaltiesValidator
 
-    "read data from json" in {
+  "validate" when {
 
-      Json.toJson(testFinancialData) shouldBe testFinancialDataJson
+    "PenaltiesRawData is valid" must {
+
+      "return no errors" in {
+
+        validator.validate(rawData) shouldBe Nil
+      }
     }
 
-    "write to json" in {
+    "PenaltiesRawData is invalid" must {
 
-      testFinancialDataJson.as[FinancialData] shouldBe testFinancialData
+      "return no errors" in {
+
+        validator.validate(invalidRawData) shouldBe List(VrnFormatError)
+      }
     }
   }
 }

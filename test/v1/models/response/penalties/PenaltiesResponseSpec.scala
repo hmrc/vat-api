@@ -19,6 +19,7 @@ package v1.models.response.penalties
 import play.api.libs.json.Json
 import support.UnitSpec
 import v1.constants.PenaltiesConstants
+import v1.constants.PenaltiesConstants._
 
 class PenaltiesResponseSpec extends UnitSpec {
 
@@ -26,12 +27,12 @@ class PenaltiesResponseSpec extends UnitSpec {
 
     "read data from json" in {
 
-      Json.toJson(PenaltiesConstants.testPenaltiesResponse) shouldBe PenaltiesConstants.testPenaltiesResponseJson
+      Json.toJson(testPenaltiesResponse) shouldBe testPenaltiesResponseJson
     }
 
     "write to json" in {
 
-      PenaltiesConstants.testPenaltiesResponseJson.as[PenaltiesResponse] shouldBe PenaltiesConstants.testPenaltiesResponse
+      testPenaltiesResponseJson.as[PenaltiesResponse] shouldBe testPenaltiesResponse
     }
   }
 }

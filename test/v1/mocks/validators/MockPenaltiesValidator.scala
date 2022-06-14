@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.mocks.validators
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.constants.PenaltiesConstants
-import v1.constants.PenaltiesConstants._
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.validators.PenaltiesValidator
+import v1.models.errors.MtdError
+import v1.models.request.penalties.PenaltiesRawData
 
-class FinancialDataSpec extends UnitSpec {
+class MockPenaltiesValidator extends MockFactory {
 
-  "FinancialData" must {
+  val mockValidator: PenaltiesValidator = mock[PenaltiesValidator]
 
-    "read data from json" in {
+  object MockVrnValidator {
 
-      Json.toJson(testFinancialData) shouldBe testFinancialDataJson
-    }
-
-    "write to json" in {
-
-      testFinancialDataJson.as[FinancialData] shouldBe testFinancialData
+    def validate(data: PenaltiesRawData): CallHandler1[PenaltiesRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: PenaltiesRawData))
+        .expects(data)
     }
   }
 }

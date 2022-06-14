@@ -17,10 +17,20 @@
 package v1.constants
 
 import play.api.libs.json.{JsObject, Json}
+import v1.models.domain.Vrn
+import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
 import v1.models.response.penalties.{FinancialData, PenaltiesData, PenaltiesResponse}
 
 object PenaltiesConstants {
-  
+
+  implicit val correlationId: String = "abc123-789xyz"
+
+  val vrn: String = "123456789"
+  val rawData: PenaltiesRawData = PenaltiesRawData(vrn)
+  val penaltiesRequest: PenaltiesRequest = PenaltiesRequest(Vrn(vrn))
+  val invalidVrn = "fakeVRN"
+  val invalidRawData: PenaltiesRawData = PenaltiesRawData(invalidVrn)
+
   val testPenaltiesData: PenaltiesData = PenaltiesData(
     dummyPenaltyData1 = "testData1",
     dummyPenaltyData2 = "testData2",
