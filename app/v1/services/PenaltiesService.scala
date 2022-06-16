@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package v1.connectors
+package v1.services
 
-import config.AppConfig
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
-import v1.connectors.httpparsers.PenaltiesHttpParser.{PenaltiesHttpReads, PenaltiesHttpResponse}
-import v1.controllers.UserRequest
+import v1.connectors.PenaltiesConnector
+import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpResponse
 import v1.models.request.penalties.PenaltiesRequest
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PenaltiesConnector @Inject()(val http: HttpClient,
-                                   val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
+class PenaltiesService @Inject()(connector: PenaltiesConnector) extends Logging {
 
-  def retrievePenalties(request: PenaltiesRequest)(implicit hc: HeaderCarrier,
-                                                   ec: ExecutionContext): Future[PenaltiesHttpResponse] = {
-    val vrn = request.vrn.vrn
-    val url = appConfig.penaltiesBaseUrl +  s"/penalties/vat/penalties/full-data/$vrn"
-    http.GET[PenaltiesHttpResponse](url)
+  def retrievePenalties(request: PenaltiesRequest)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PenaltiesHttpResponse] = {
+    connector.retrievePenalties(request)
   }
 }

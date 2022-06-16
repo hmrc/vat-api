@@ -40,5 +40,4 @@ trait GuiceBox extends UnitSpec with GuiceOneAppPerSuite with Injecting {
     .build()
 
   implicit lazy val appConfig: AppConfig = inject[AppConfig]
-
 }
