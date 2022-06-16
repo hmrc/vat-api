@@ -42,6 +42,9 @@ trait AppConfig {
   def nrsRetries: List[FiniteDuration]
   def appName: String
   def nrsBaseUrl: String
+
+  //Penalties config items
+  def penaltiesBaseUrl: String
 }
 
 @Singleton
@@ -66,6 +69,9 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   val nrsBaseUrl: String = config.baseUrl("non-repudiation")
   lazy val nrsRetries: List[FiniteDuration] =
     Retrying.fibonacciDelays(getFiniteDuration(nrsConfig, "initialDelay"), nrsConfig.get[Int]("numberOfRetries"))
+
+  //Penalties Config
+  val penaltiesBaseUrl: String = config.baseUrl("penalties")
 
   private final def getFiniteDuration(config: Configuration, path: String): FiniteDuration = {
     val string = config.get[String](path)

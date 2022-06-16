@@ -47,6 +47,13 @@ trait ConnectorSpec extends UnitSpec
       Some("vat-api")
     )
 
+  val dummyHeaderCarrierConfig: HeaderCarrier.Config =
+    HeaderCarrier.Config(
+      Seq("^not-test-BaseUrl?$".r),
+      Seq.empty[String],
+      Some("vat-api")
+    )
+
   val requiredDesHeaders: Seq[(String, String)] = Seq(
     "Environment" -> "des-environment",
     "Authorization" -> "Bearer des-token",

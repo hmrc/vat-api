@@ -18,6 +18,7 @@ package v1.models.response.penalties
 
 import play.api.libs.json.{Format, Json}
 
+//TODO this data structure is just a placeholder
 case class PenaltiesResponse(getPenaltiesData: PenaltiesData,
                              financialData: FinancialData
                             )
