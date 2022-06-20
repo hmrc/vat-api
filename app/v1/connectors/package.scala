@@ -16,9 +16,10 @@
 
 package v1
 
-import v1.models.errors.DesError
+import v1.models.errors.{DesError, ErrorWrapper}
 import v1.models.outcomes.ResponseWrapper
 
 package object connectors {
   type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
+  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
 }

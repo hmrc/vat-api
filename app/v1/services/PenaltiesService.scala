@@ -18,9 +18,10 @@ package v1.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
-import v1.connectors.PenaltiesConnector
-import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpResponse
+import v1.connectors.{Outcome, PenaltiesConnector}
+import v1.controllers.UserRequest
 import v1.models.request.penalties.PenaltiesRequest
+import v1.models.response.penalties.PenaltiesResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class PenaltiesService @Inject()(connector: PenaltiesConnector) extends Logging {
 
   def retrievePenalties(request: PenaltiesRequest)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PenaltiesHttpResponse] = {
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext,
+                        userRequest: UserRequest[_],
+                        correlationId: String): Future[ServiceOutcome[PenaltiesResponse]] = {
     connector.retrievePenalties(request)
   }
 }

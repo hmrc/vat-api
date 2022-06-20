@@ -47,15 +47,18 @@
     <logger name="org.asynchttpclient.netty" level="OFF"/>
     <logger name="io.netty.buffer" level="OFF"/>
     <logger name="play.core.netty" level="OFF"/>
+    <logger name="uk.gov" level="ERROR"/>
+    <logger name="play.core.server.AkkaHttpServer" level="ERROR"/>
+    <logger name="play.api.internal.libs.concurrent.CoordinatedShutdownSupport" level="ERROR"/>
 
 
-    <logger name="application" level="INFO"/>
+    <logger name="v1" level="DEBUG"/>
 
     <logger name="connector" level="ERROR">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="INFO">
-        <appender-ref ref="FILE"/>
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

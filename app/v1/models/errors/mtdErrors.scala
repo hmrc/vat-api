@@ -55,6 +55,7 @@ object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NR
 // Format Errors
 object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
 object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is invalid")
+object VrnNotFound extends MtdError("VRN_NOT_FOUND", "The provided VRN was not found")
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
@@ -66,6 +67,10 @@ object DownstreamError extends MtdError("INTERNAL_SERVER_ERROR", "An internal se
 object BadRequestError extends MtdError("INVALID_REQUEST", "Invalid request")
 object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
+object InvalidJson extends MtdError("INVALID_JSON", "Invalid JSON received")
+object UnexpectedFailure {
+  def mtdError(status: Int, body: String): MtdError = MtdError("UNEXPECTED_FAILURE", s"Unexpected failure. Status $status, body $body")
+}
 
 // Authorisation Errors
 object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")

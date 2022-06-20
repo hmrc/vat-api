@@ -19,8 +19,9 @@ package v1.services
 import play.api.http.Status
 import support.GuiceBox
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.httpparsers.{InvalidJson, InvalidVrn, UnexpectedFailure, VrnNotFound}
+import v1.models.errors.{InvalidJson, UnexpectedFailure, VrnFormatError, VrnNotFound}
 import v1.constants.PenaltiesConstants
+import v1.constants.PenaltiesConstants.{correlationId, userRequest}
 import v1.mocks.connectors.MockPenaltiesConnector
 
 import scala.concurrent.ExecutionContext
@@ -30,7 +31,6 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
   object TestService extends PenaltiesService(mockPenaltiesConnector)
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-
 
   "PenaltiesService" when {
 
@@ -42,11 +42,11 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
 
           mockRetrievePenalties(
             PenaltiesConstants.penaltiesRequest,
-            Right(PenaltiesConstants.testPenaltiesResponse)
+            Right(PenaltiesConstants.wrappedPenaltiesResponse())
           )
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Right(PenaltiesConstants.testPenaltiesResponse)
+          val expectedResult = Right(PenaltiesConstants.wrappedPenaltiesResponse())
 
           await(result) shouldBe expectedResult
         }
@@ -54,31 +54,31 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
 
       "a invalid json response is returned" must {
 
-        "return Future(Left(InvalidJson)" in {
+        "return Future(Left(PenaltiesConstants.errorWrapper(InvalidJson))" in {
 
           mockRetrievePenalties(
             PenaltiesConstants.penaltiesRequest,
-            Left(InvalidJson)
+            Left(PenaltiesConstants.errorWrapper(InvalidJson))
           )
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(InvalidJson)
+          val expectedResult = Left(PenaltiesConstants.errorWrapper(InvalidJson))
 
           await(result) shouldBe expectedResult
         }
       }
 
-      "a InvalidVrn response is returned" must {
+      "a VrnFormatError response is returned" must {
 
-        "return Future(Left(InvalidVrn)" in {
+        "return Future(Left(VrnFormatError)" in {
 
           mockRetrievePenalties(
             PenaltiesConstants.penaltiesRequest,
-            Left(InvalidVrn)
+            Left(PenaltiesConstants.errorWrapper(VrnFormatError))
           )
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(InvalidVrn)
+          val expectedResult = Left(PenaltiesConstants.errorWrapper(VrnFormatError))
 
           await(result) shouldBe expectedResult
         }
@@ -90,11 +90,11 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
 
           mockRetrievePenalties(
             PenaltiesConstants.penaltiesRequest,
-            Left(VrnNotFound)
+            Left(PenaltiesConstants.errorWrapper(VrnNotFound))
           )
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(VrnNotFound)
+          val expectedResult = Left(PenaltiesConstants.errorWrapper(VrnNotFound))
 
           await(result) shouldBe expectedResult
         }
@@ -106,11 +106,11 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
 
           mockRetrievePenalties(
             PenaltiesConstants.penaltiesRequest,
-            Left(UnexpectedFailure(Status.INTERNAL_SERVER_ERROR, "error"))
+            Left(PenaltiesConstants.errorWrapper(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
           )
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(UnexpectedFailure(Status.INTERNAL_SERVER_ERROR, "error"))
+          val expectedResult = Left(PenaltiesConstants.errorWrapper(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
 
           await(result) shouldBe expectedResult
         }

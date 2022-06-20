@@ -18,9 +18,9 @@ package v1.connectors
 
 import play.api.http.Status
 import support.GuiceBox
-import v1.connectors.httpparsers.{InvalidJson, InvalidVrn, UnexpectedFailure, VrnNotFound}
 import v1.constants.PenaltiesConstants
 import v1.mocks.MockHttpClient
+import v1.models.errors.{InvalidJson, VrnNotFound, UnexpectedFailure, VrnFormatError}
 
 import scala.concurrent.Future
 
@@ -79,11 +79,11 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
             config = dummyHeaderCarrierConfig,
             queryParams = Seq()
           ).returns(
-            Future.successful(Left(InvalidVrn))
+            Future.successful(Left(VrnFormatError))
           )
 
           val result = TestConnector.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(InvalidVrn)
+          val expectedResult = Left(VrnFormatError)
 
           await(result) shouldBe expectedResult
         }
@@ -117,11 +117,11 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
             config = dummyHeaderCarrierConfig,
             queryParams = Seq()
           ).returns(
-            Future.successful(Left(UnexpectedFailure(Status.INTERNAL_SERVER_ERROR, "error")))
+            Future.successful(Left(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
           )
 
           val result = TestConnector.retrievePenalties(PenaltiesConstants.penaltiesRequest)
-          val expectedResult = Left(UnexpectedFailure(Status.INTERNAL_SERVER_ERROR, "error"))
+          val expectedResult = Left(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error"))
 
           await(result) shouldBe expectedResult
         }

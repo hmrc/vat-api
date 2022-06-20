@@ -22,6 +22,7 @@ import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpReads
 import play.api.http.Status
 import play.api.libs.json.Json
 import v1.constants.PenaltiesConstants
+import v1.models.errors.{InvalidJson, VrnNotFound, UnexpectedFailure, VrnFormatError}
 
 class PenaltiesHttpParserSpec extends UnitSpec {
 
@@ -39,11 +40,13 @@ class PenaltiesHttpParserSpec extends UnitSpec {
               HttpResponse(
                 status = Status.OK,
                 json = PenaltiesConstants.testPenaltiesResponseJson,
-                headers = Map()
+                headers = Map(
+                  "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+                )
               )
             )
 
-            result shouldBe Right(PenaltiesConstants.testPenaltiesResponse)
+            result shouldBe Right(PenaltiesConstants.wrappedPenaltiesResponse())
           }
         }
 
@@ -57,11 +60,13 @@ class PenaltiesHttpParserSpec extends UnitSpec {
                 json = Json.obj(
                   "invalid" -> "json"
                 ),
-                headers = Map()
+                headers = Map(
+                  "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+                )
               )
             )
 
-            result shouldBe Left(InvalidJson)
+            result shouldBe Left(PenaltiesConstants.errorWrapper(InvalidJson))
           }
         }
       }
@@ -74,10 +79,12 @@ class PenaltiesHttpParserSpec extends UnitSpec {
             HttpResponse(
               status = Status.BAD_REQUEST,
               json = Json.obj(),
-              headers = Map()
+              headers = Map(
+                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+              )
             )
           )
-          result shouldBe Left(InvalidVrn)
+          result shouldBe Left(PenaltiesConstants.errorWrapper(VrnFormatError))
         }
       }
 
@@ -89,10 +96,12 @@ class PenaltiesHttpParserSpec extends UnitSpec {
             HttpResponse(
               status = Status.NOT_FOUND,
               json = Json.obj(),
-              headers = Map()
+              headers = Map(
+                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+              )
             )
           )
-          result shouldBe Left(VrnNotFound)
+          result shouldBe Left(PenaltiesConstants.errorWrapper(VrnNotFound))
         }
       }
 
@@ -106,13 +115,14 @@ class PenaltiesHttpParserSpec extends UnitSpec {
             HttpResponse(
               status = status,
               json = Json.obj(),
-              headers = Map()
+              headers = Map(
+                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+              )
             )
           )
-          result shouldBe Left(UnexpectedFailure(status, s"unexpected response: status: $status"))
+          result shouldBe Left(PenaltiesConstants.errorWrapper(UnexpectedFailure.mtdError(status, "{ }")))
         }
       }
     }
   }
-
 }

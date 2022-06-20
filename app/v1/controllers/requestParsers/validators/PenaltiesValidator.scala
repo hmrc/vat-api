@@ -22,7 +22,7 @@ import v1.models.request.penalties.PenaltiesRawData
 
 class PenaltiesValidator extends Validator[PenaltiesRawData] {
 
-  private val validationSet = List(
+  private val validationSet: List[PenaltiesRawData => List[List[MtdError]]] = List(
     vrnFormatValidation
   )
 

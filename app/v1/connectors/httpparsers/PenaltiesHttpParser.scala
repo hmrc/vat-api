@@ -20,57 +20,38 @@ import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.Logging
+import v1.connectors.Outcome
+import v1.models.errors._
+import v1.models.outcomes.ResponseWrapper
 import v1.models.response.penalties.PenaltiesResponse
 
 object PenaltiesHttpParser extends Logging {
 
-  type PenaltiesHttpResponse = Either[ErrorResponse, PenaltiesResponse]
+  implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
-  implicit object PenaltiesHttpReads extends HttpReads[PenaltiesHttpResponse] {
+    //TODO more error handling can be added once scenarios confirmed by Penalties team
+    //TODO may want to add pager duty logging
 
-    //TODO response may need to be wrapped in a ResponseWrapper if Payments team decide to pass the correlation id through
-    def read(method: String, url: String, response: HttpResponse): PenaltiesHttpResponse = {
+    def read(method: String, url: String, response: HttpResponse): Outcome[PenaltiesResponse] = {
+      //TODO may not be needed
+      val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
         case OK => response.json.validate[PenaltiesResponse] match {
-          case JsSuccess(model, _) => Right(model)
+          case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
           case JsError(errors) =>
             logger.error(s"[PenaltiesHttpParser][read] invalid JSON errors: $errors")
-            Left(InvalidJson)
+            Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case BAD_REQUEST =>
           logger.error(s"[PenaltiesHttpParser][read] Invalid VRN ${response.body}")
-          Left(InvalidVrn)
+          Left(ErrorWrapper(responseCorrelationId, VrnFormatError))
         case NOT_FOUND =>
           logger.error(s"[PenaltiesHttpParser][read] VRN could not be found ${response.body}")
-          Left(VrnNotFound)
-        //TODO more error handling can be added once scenarios confirmed by Payments team
+          Left(ErrorWrapper(responseCorrelationId, VrnNotFound))
         case status =>
           logger.error(s"[PenaltiesHttpParser][read] unexpected response: status: $status")
-          Left(UnexpectedFailure(status, s"unexpected response: status: $status"))
+          Left(ErrorWrapper(responseCorrelationId, UnexpectedFailure.mtdError(status, response.body)))
       }
     }
   }
 }
-
-trait ErrorResponse {
-  val status: Int
-  val body: String
-}
-
-case object InvalidJson extends ErrorResponse {
-  override val status: Int = INTERNAL_SERVER_ERROR
-  override val body = "Invalid JSON received"
-}
-
-case object InvalidVrn extends ErrorResponse {
-  override val status: Int = BAD_REQUEST
-  override val body = "VRN provided is invalid"
-}
-
-case object VrnNotFound extends ErrorResponse {
-  override val status: Int = NOT_FOUND
-  override val body = "VRN could not be found"
-}
-
-case class UnexpectedFailure(override val status: Int, override val body: String) extends ErrorResponse
-

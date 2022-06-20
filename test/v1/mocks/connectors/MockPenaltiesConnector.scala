@@ -16,12 +16,13 @@
 
 package v1.mocks.connectors
 
-import org.scalamock.handlers.CallHandler3
+import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.PenaltiesConnector
-import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpResponse
+import v1.connectors.{Outcome, PenaltiesConnector}
+import v1.controllers.UserRequest
 import v1.models.request.penalties.PenaltiesRequest
+import v1.models.response.penalties.PenaltiesResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,11 +30,12 @@ trait MockPenaltiesConnector extends MockFactory {
 
   val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
 
-  def mockRetrievePenalties(penaltiesRequest: PenaltiesRequest, penaltiesHttpResponse: PenaltiesHttpResponse): CallHandler3[PenaltiesRequest, HeaderCarrier, ExecutionContext, Future[PenaltiesHttpResponse]] = {
+  def mockRetrievePenalties(penaltiesRequest: PenaltiesRequest,
+                            penaltiesResponse: Outcome[PenaltiesResponse]
+                           ): CallHandler5[PenaltiesRequest, HeaderCarrier, ExecutionContext, UserRequest[_], String, Future[Outcome[PenaltiesResponse]]] = {
     (mockPenaltiesConnector
-      .retrievePenalties(_: PenaltiesRequest)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(penaltiesRequest, *, *)
-      .returns(Future.successful(penaltiesHttpResponse))
+      .retrievePenalties(_: PenaltiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+      .expects(penaltiesRequest, *, *, *, *)
+      .returns(Future.successful(penaltiesResponse))
   }
-
 }

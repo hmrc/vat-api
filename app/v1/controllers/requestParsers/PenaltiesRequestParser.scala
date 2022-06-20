@@ -22,11 +22,9 @@ import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
 
 import javax.inject.Inject
 
-class PenaltiesRequestParser @Inject()(val validator: PenaltiesValidator
-                                      ) extends RequestParser[PenaltiesRawData, PenaltiesRequest] {
+class PenaltiesRequestParser @Inject()(val validator: PenaltiesValidator) extends RequestParser[PenaltiesRawData, PenaltiesRequest] {
 
-  override protected def requestFor(data: PenaltiesRawData): PenaltiesRequest = {
-
+  protected def requestFor(data: PenaltiesRawData): PenaltiesRequest = {
     PenaltiesRequest(Vrn(data.vrn))
   }
 }
