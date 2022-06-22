@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package v1.services
+package v1.mocks.services
 
+import org.scalamock.handlers.CallHandler5
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.Logging
-import v1.connectors.PenaltiesConnector
 import v1.controllers.UserRequest
 import v1.models.request.penalties.PenaltiesRequest
 import v1.models.response.penalties.PenaltiesResponse
+import v1.services.{PenaltiesService, ServiceOutcome}
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class PenaltiesService @Inject()(connector: PenaltiesConnector) extends Logging {
+trait MockPenaltiesService extends MockFactory {
 
-  def retrievePenalties(request: PenaltiesRequest)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext,
-                        userRequest: UserRequest[_],
-                        correlationId: String): Future[ServiceOutcome[PenaltiesResponse]] = {
-    connector.retrievePenalties(request)
+  val mockPenaltiesService: PenaltiesService = mock[PenaltiesService]
+
+  object MockPenaltiesService {
+
+    def retrievePenalties(request: PenaltiesRequest)(response: ServiceOutcome[PenaltiesResponse]): CallHandler5[PenaltiesRequest, HeaderCarrier, ExecutionContext, UserRequest[_], String, Future[ServiceOutcome[PenaltiesResponse]]] = {
+      (mockPenaltiesService.retrievePenalties(_: PenaltiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+        .expects(request, *, *, *, *)
+        .returns(Future.successful(response))
+    }
   }
 }

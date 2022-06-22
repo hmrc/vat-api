@@ -16,4 +16,6 @@
 
 package utils
 
-case class EndpointLogContext(controllerName: String, endpointName: String)
+case class EndpointLogContext(controllerName: String, endpointName: String) {
+  override def toString = s"[$controllerName][$endpointName]"
+}

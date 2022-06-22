@@ -30,7 +30,8 @@ import v1.models.response.penalties.{FinancialData, PenaltiesData, PenaltiesResp
 object PenaltiesConstants {
 
   implicit val correlationId: String = "abc123-789xyz"
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
+val userDetails = UserDetails("Individual", None, "client-Id")
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(userDetails,FakeRequest())
 
   val vrn: String = "123456789"
   val rawData: PenaltiesRawData = PenaltiesRawData(vrn)

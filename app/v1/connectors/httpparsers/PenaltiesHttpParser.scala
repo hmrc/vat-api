@@ -30,10 +30,7 @@ object PenaltiesHttpParser extends Logging {
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
     //TODO more error handling can be added once scenarios confirmed by Penalties team
-    //TODO may want to add pager duty logging
-
     def read(method: String, url: String, response: HttpResponse): Outcome[PenaltiesResponse] = {
-      //TODO may not be needed
       val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
         case OK => response.json.validate[PenaltiesResponse] match {

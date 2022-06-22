@@ -7,7 +7,6 @@ import play.api.test.FakeRequest
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
-import v1.models.errors.{ErrorWrapper, MtdError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
 import v1.models.response.penalties.{FinancialData, PenaltiesData, PenaltiesResponse}
@@ -60,7 +59,9 @@ trait PenaltiesFixture {
     ResponseWrapper(correlationId, penaltiesResponse)
   }
 
-  def errorWrapper(error: MtdError): ErrorWrapper = ErrorWrapper(correlationId, error)
+  def penaltiesURl(vrn: String = vrn)(implicit appConfig: AppConfig) = s"/penalties/vat/penalties/full-data/$vrn"
 
-  def penaltiesURl(vrn: String = vrn)(implicit appConfig: AppConfig) = appConfig.penaltiesBaseUrl + s"/penalties/vat/penalties/full-data/$vrn"
+  val invalidJson: JsObject = Json.obj(
+    "json" -> "invalid"
+  )
 }

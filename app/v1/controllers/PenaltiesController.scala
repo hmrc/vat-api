@@ -20,9 +20,11 @@ import cats.data.EitherT
 import cats.implicits._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import utils.{IdGenerator, Logging}
+import utils.{EndpointLogContext, IdGenerator, Logging}
+import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PenaltiesRequestParser
-import v1.models.errors.{ErrorWrapper, VrnFormatError, VrnNotFound}
+import v1.models.audit.AuditResponse
+import v1.models.errors.{ControllerError, ErrorWrapper, VrnFormatError, VrnNotFound}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.PenaltiesRawData
 import v1.models.response.penalties.PenaltiesResponse
@@ -43,11 +45,18 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
 
   //TODO feature switch
 
+  implicit val endpointLogContext: EndpointLogContext =
+    EndpointLogContext(
+      controllerName = "PenaltiesController",
+      endpointName = "retrievePenalties"
+    )
+
+
   def retrievePenalties(vrn: String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
 
     implicit val correlationId: String = idGenerator.getUid
 
-    logger.info(s"[PenaltiesController][retrievePenalties] correlationId: $correlationId: " +
+    logger.info(s"${endpointLogContext.toString} correlationId: $correlationId: " +
       s"attempting to retrieve penalties for VRN: $vrn")
 
 
@@ -56,10 +65,14 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(PenaltiesRawData(vrn)))
         serviceResponse <- EitherT(service.retrievePenalties(parsedRequest))
       } yield {
-        logger.info(s"[PenaltiesController][retrievePenalties] correlationId : $correlationId: " +
-          s"successfully received penalties from Penalties")
 
-        //TODO auditing
+        logger.info(s"${endpointLogContext.toString} " +
+          s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
+
+
+        auditService.auditEvent(AuditEvents.auditPenalties(serviceResponse.correlationId,
+          request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))
+        ))
 
         Ok(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId)
@@ -68,8 +81,11 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
     result.leftMap { errorWrapper: ErrorWrapper =>
       val resCorrelationId: String = errorWrapper.correlationId
       val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+      logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-      //TODO auditing
+      auditService.auditEvent(AuditEvents.auditPenalties(resCorrelationId,
+        request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))
+      ))
 
       leftResult
     }.merge

@@ -22,26 +22,33 @@ import v1.models.auth.UserDetails
 object AuditEvents {
 
   def auditReturns(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
-    AuditEvent("retrieveVatReturns","retrieve-vat-returns",
+    AuditEvent("retrieveVatReturns", "retrieve-vat-returns",
       AuditDetail(userDetails, correlationId, auditResponse))
 
   def auditLiabilities(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
-    AuditEvent("retrieveVatLiabilities","retrieve-vat-liabilities",
+    AuditEvent("retrieveVatLiabilities", "retrieve-vat-liabilities",
       AuditDetail(userDetails, correlationId, auditResponse))
 
   def auditPayments(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
-    AuditEvent("retrieveVatPayments","retrieve-vat-payments",
+    AuditEvent("retrieveVatPayments", "retrieve-vat-payments",
       AuditDetail(userDetails, correlationId, auditResponse))
 
   def auditObligations(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
-    AuditEvent("retrieveVatObligations","retrieve-vat-obligations",
+    AuditEvent("retrieveVatObligations", "retrieve-vat-obligations",
       AuditDetail(userDetails, correlationId, auditResponse))
 
   def auditSubmit(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse, rawData: String): AuditEvent[SubmitAuditDetail] =
-    AuditEvent("submitVatReturn","submit-vat-return",
+    AuditEvent("submitVatReturn", "submit-vat-return",
       SubmitAuditDetail(userDetails, correlationId, auditResponse, rawData))
 
   def auditNrsSubmit(auditType: String, nrsAuditDetail: NrsAuditDetail): AuditEvent[NrsAuditDetail] =
-    AuditEvent(auditType,"submit-vat-return",nrsAuditDetail)
+    AuditEvent(auditType, "submit-vat-return", nrsAuditDetail)
 
+  //TODO sign off with Alison
+  def auditPenalties(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
+    AuditEvent(
+      auditType = "retrieveVatPenalties",
+      transactionName = "retrieve-vat-penalties",
+      detail = AuditDetail(userDetails, correlationId, auditResponse)
+    )
 }
