@@ -44,7 +44,7 @@ object AuditEvents {
   def auditNrsSubmit(auditType: String, nrsAuditDetail: NrsAuditDetail): AuditEvent[NrsAuditDetail] =
     AuditEvent(auditType, "submit-vat-return", nrsAuditDetail)
 
-  //TODO sign off with Alison
+  //TODO sign off with Alison after we know what the two endpoints will look like
   def auditPenalties(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent(
       auditType = "retrieveVatPenalties",

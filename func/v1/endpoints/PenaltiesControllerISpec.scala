@@ -50,7 +50,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec with PenaltiesFixture
           val response: WSResponse = await(request.get())
           response.status shouldBe BAD_REQUEST
           response.json shouldBe Json.toJson(VrnFormatError)
-          response.header("Content-Type")  shouldBe Some("application/json")
+          response.header("Content-Type") shouldBe Some("application/json")
         }
       }
 
@@ -107,7 +107,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec with PenaltiesFixture
           }
         }
 
-        "unexcpected error" must {
+        "unexpected error" must {
 
           "return 500" in new Test {
 
