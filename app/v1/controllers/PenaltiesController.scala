@@ -18,7 +18,7 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import config.{AppConfig, FeatureSwitch, PenaltiesEndpointsFeature}
+import config.AppConfig
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import utils.{EndpointLogContext, IdGenerator, Logging}
@@ -52,47 +52,41 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
 
   def retrievePenalties(vrn: String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
 
-    if (FeatureSwitch(appConfig.featureSwitch).isEnabled(PenaltiesEndpointsFeature)) {
+    implicit val correlationId: String = idGenerator.getUid
 
-      implicit val correlationId: String = idGenerator.getUid
-
-      logger.info(s"${endpointLogContext.toString} correlationId: $correlationId: " +
-        s"attempting to retrieve penalties for VRN: $vrn")
+    logger.info(s"${endpointLogContext.toString} correlationId: $correlationId: " +
+      s"attempting to retrieve penalties for VRN: $vrn")
 
 
-      val result: EitherT[Future, ErrorWrapper, Result] = {
-        for {
-          parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(PenaltiesRawData(vrn)))
-          serviceResponse <- EitherT(service.retrievePenalties(parsedRequest))
-        } yield {
+    val result: EitherT[Future, ErrorWrapper, Result] = {
+      for {
+        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(PenaltiesRawData(vrn)))
+        serviceResponse <- EitherT(service.retrievePenalties(parsedRequest))
+      } yield {
 
-          logger.info(s"${endpointLogContext.toString} " +
-            s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
+        logger.info(s"${endpointLogContext.toString} " +
+          s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
 
 
-          auditService.auditEvent(AuditEvents.auditPenalties(serviceResponse.correlationId,
-            request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))
-          ))
-
-          Ok(Json.toJson(serviceResponse.responseData))
-            .withApiHeaders(serviceResponse.correlationId)
-        }
-      }
-      result.leftMap { errorWrapper: ErrorWrapper =>
-        val resCorrelationId: String = errorWrapper.correlationId
-        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-        logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
-
-        auditService.auditEvent(AuditEvents.auditPenalties(resCorrelationId,
-          request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))
+        auditService.auditEvent(AuditEvents.auditPenalties(serviceResponse.correlationId,
+          request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))
         ))
 
-        leftResult
-      }.merge
-    } else {
-      logger.error(s"${endpointLogContext.toString} vrn: $vrn. Penalties endpoint feature is disabled ")
-      Future.successful(BadRequest(Json.toJson(BadRequestError)))
+        Ok(Json.toJson(serviceResponse.responseData))
+          .withApiHeaders(serviceResponse.correlationId)
+      }
     }
+    result.leftMap { errorWrapper: ErrorWrapper =>
+      val resCorrelationId: String = errorWrapper.correlationId
+      val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+      logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
+
+      auditService.auditEvent(AuditEvents.auditPenalties(resCorrelationId,
+        request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))
+      ))
+
+      leftResult
+    }.merge
   }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
