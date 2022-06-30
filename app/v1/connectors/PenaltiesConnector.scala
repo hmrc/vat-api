@@ -31,6 +31,20 @@ import scala.concurrent.{ExecutionContext, Future}
 class PenaltiesConnector @Inject()(val http: HttpClient,
                                    val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
 
+  private def headerCarrier(additionalHeaders: Seq[String] = Seq.empty)(implicit hc: HeaderCarrier,
+                                                                           correlationId: String): HeaderCarrier =
+    HeaderCarrier(
+      extraHeaders = hc.extraHeaders ++
+        // Contract headers
+        Seq(
+          "Authorization" -> s"Bearer ${appConfig.desToken}",
+          "Environment" -> appConfig.desEnv,
+          "CorrelationId" -> correlationId
+        ) ++
+        // Other headers (i.e Gov-Test-Scenario, Content-Type)
+        hc.headers(additionalHeaders ++ appConfig.desEnvironmentHeaders.getOrElse(Seq.empty))
+    )
+
   def retrievePenalties(request: PenaltiesRequest)(implicit hc: HeaderCarrier,
                                                    ec: ExecutionContext,
                                                    userRequest: UserRequest[_],
@@ -38,6 +52,10 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
     val vrn = request.vrn.vrn
     val url = appConfig.penaltiesBaseUrl + s"/penalties/vat/penalties/full-data/$vrn"
     logger.debug(s"[PenaltiesConnector][retrievePenalties] url: $url")
-    http.GET[Outcome[PenaltiesResponse]](url)
+
+    def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
+      http.GET[Outcome[PenaltiesResponse]](url)
+    }
+    doGet(headerCarrier())
   }
 }
