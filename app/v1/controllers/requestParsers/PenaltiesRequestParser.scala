@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package v1
+package v1.controllers.requestParsers
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import v1.controllers.requestParsers.validators.PenaltiesValidator
+import v1.models.domain.Vrn
+import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+import javax.inject.Inject
+
+class PenaltiesRequestParser @Inject()(val validator: PenaltiesValidator) extends RequestParser[PenaltiesRawData, PenaltiesRequest] {
+
+  protected def requestFor(data: PenaltiesRawData): PenaltiesRequest = {
+    PenaltiesRequest(Vrn(data.vrn))
+  }
 }

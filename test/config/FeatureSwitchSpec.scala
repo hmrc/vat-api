@@ -22,9 +22,6 @@ import support.UnitSpec
 
 class FeatureSwitchSpec extends UnitSpec {
 
-  private def createFeatureSwitch(config: String) =
-    FeatureSwitch(Some(Configuration(ConfigFactory.parseString(config))))
-
   "version enabled" when {
     "no config" must {
       val featureSwitch = FeatureSwitch(None)
@@ -43,9 +40,10 @@ class FeatureSwitchSpec extends UnitSpec {
     }
 
     "config set" must {
-      val featureSwitch = createFeatureSwitch("""
-                                                |version-1.enabled = false
-                                                |version-2.enabled = true
+      val featureSwitch = createFeatureSwitch(
+        """
+          |version-1.enabled = false
+          |version-2.enabled = true
         """.stripMargin)
 
       "return false for disabled versions" in {
@@ -60,6 +58,45 @@ class FeatureSwitchSpec extends UnitSpec {
         featureSwitch.isVersionEnabled("x.x") shouldBe false
         featureSwitch.isVersionEnabled("2x") shouldBe false
         featureSwitch.isVersionEnabled("2.x") shouldBe false
+      }
+    }
+  }
+
+  "isEnabled" when {
+
+    "feature is enabled in config" must {
+
+      "return true" in {
+
+        val featureSwitch = createFeatureSwitch(
+          """
+            |auth.enabled = true
+        """.stripMargin)
+
+        featureSwitch.isEnabled(AuthFeature) shouldBe true
+      }
+    }
+
+    "feature is disabled in config" must {
+
+      "return false" in {
+
+        val featureSwitch = createFeatureSwitch(
+          """
+            |auth.enabled = false
+        """.stripMargin)
+
+        featureSwitch.isEnabled(AuthFeature) shouldBe false
+      }
+    }
+
+    "feature does not exist in config" must {
+
+      "return false" in {
+
+        val featureSwitch = createFeatureSwitch("")
+
+        featureSwitch.isEnabled(AuthFeature) shouldBe false
       }
     }
   }

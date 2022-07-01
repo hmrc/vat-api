@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package v1
+package v1.models.request.penalties
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import v1.models.request.RawData
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
-}
+case class PenaltiesRawData(vrn: String) extends RawData

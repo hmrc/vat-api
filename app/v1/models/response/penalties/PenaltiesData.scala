@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package v1
+package v1.models.response.penalties
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import play.api.libs.json.{Format, Json}
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+//TODO this data structure is just a placeholder
+case class PenaltiesData(dummyPenaltyData1: String,
+                         dummyPenaltyData2: String,
+                         dummyPenaltyData3: String
+                        )
+
+object PenaltiesData {
+  implicit val format: Format[PenaltiesData] = Json.format[PenaltiesData]
 }

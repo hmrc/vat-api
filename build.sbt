@@ -43,7 +43,7 @@ lazy val microservice = Project(appName, file("."))
   .configs(FuncTest)
   .settings(inConfig(FuncTest)(Defaults.testSettings): _*)
   .settings(
-    FuncTest / fork := false,
+    FuncTest / fork := true,
     FuncTest / unmanagedSourceDirectories := Seq((FuncTest / baseDirectory).value / "func"),
     FuncTest / unmanagedClasspath += baseDirectory.value / "resources",
     Runtime / unmanagedClasspath += baseDirectory.value / "resources",

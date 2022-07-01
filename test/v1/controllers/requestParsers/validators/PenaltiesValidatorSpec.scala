@@ -14,12 +14,32 @@
  * limitations under the License.
  */
 
-package v1
+package v1.controllers.requestParsers.validators
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import support.UnitSpec
+import v1.constants.PenaltiesConstants._
+import v1.models.errors.VrnFormatError
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+class PenaltiesValidatorSpec extends UnitSpec {
+
+  val validator = new PenaltiesValidator
+
+  "validate" when {
+
+    "PenaltiesRawData is valid" must {
+
+      "return no errors" in {
+
+        validator.validate(rawData) shouldBe Nil
+      }
+    }
+
+    "PenaltiesRawData is invalid" must {
+
+      "return no errors" in {
+
+        validator.validate(invalidRawData) shouldBe List(VrnFormatError)
+      }
+    }
+  }
 }

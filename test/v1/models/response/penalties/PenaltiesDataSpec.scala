@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-package v1
+package v1.models.response.penalties
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import play.api.libs.json.Json
+import support.UnitSpec
+import v1.constants.PenaltiesConstants
+import v1.constants.PenaltiesConstants._
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+class PenaltiesDataSpec extends UnitSpec {
+
+  "PenaltiesData" must {
+
+    "read data from json" in {
+
+      Json.toJson(testPenaltiesData) shouldBe testPenaltiesDataJson
+    }
+
+    "write to json" in {
+
+      testPenaltiesDataJson.as[PenaltiesData] shouldBe testPenaltiesData
+    }
+  }
 }

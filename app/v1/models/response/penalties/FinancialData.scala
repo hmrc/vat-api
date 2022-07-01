@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package v1
+package v1.models.response.penalties
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import play.api.libs.json.{Json, OFormat}
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+//TODO this data structure is just a placeholder
+case class FinancialData(dummyFinancialData1: String,
+                         dummyFinancialData2: String,
+                         dummyFinancialData3: String
+                        )
+
+object FinancialData {
+  implicit val format: OFormat[FinancialData] = Json.format[FinancialData]
 }

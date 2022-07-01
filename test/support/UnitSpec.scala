@@ -16,10 +16,13 @@
 
 package support
 
+import com.typesafe.config.ConfigFactory
+import config.FeatureSwitch
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import play.api.Configuration
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 trait UnitSpec extends AnyWordSpecLike
@@ -42,4 +45,7 @@ trait UnitSpec extends AnyWordSpecLike
 
   // Convenience to avoid having to wrap andThen() parameters in Future.successful
   implicit def liftFuture[A](v: A): Future[A] = Future.successful(v)
+
+  def createFeatureSwitch(config: String): FeatureSwitch =
+    FeatureSwitch(Some(Configuration(ConfigFactory.parseString(config))))
 }

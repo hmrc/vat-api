@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package v1
+package v1.mocks.validators
 
-import v1.models.errors.{DesError, ErrorWrapper}
-import v1.models.outcomes.ResponseWrapper
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
+import v1.controllers.requestParsers.validators.PenaltiesValidator
+import v1.models.errors.MtdError
+import v1.models.request.penalties.PenaltiesRawData
 
-package object connectors {
-  type DesOutcome[A] = Either[ResponseWrapper[DesError], ResponseWrapper[A]]
-  type Outcome[A] = Either[ErrorWrapper, ResponseWrapper[A]]
+class MockPenaltiesValidator extends MockFactory {
+
+  val mockValidator: PenaltiesValidator = mock[PenaltiesValidator]
+
+  object MockVrnValidator {
+
+    def validate(data: PenaltiesRawData): CallHandler1[PenaltiesRawData, List[MtdError]] = {
+      (mockValidator
+        .validate(_: PenaltiesRawData))
+        .expects(data)
+    }
+  }
 }

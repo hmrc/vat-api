@@ -18,6 +18,7 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
+
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
@@ -26,7 +27,9 @@ import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PaymentsRequestParser
 import v1.models.audit.AuditResponse
 import v1.models.errors._
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRawData
+import v1.models.response.payments.PaymentsResponse
 import v1.services.{AuditService, EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.{ExecutionContext, Future}

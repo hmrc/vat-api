@@ -17,17 +17,18 @@
 package routing
 
 import com.google.inject.ImplementedBy
-import config.AppConfig
+import config.{AppConfig, FeatureSwitch, PenaltiesEndpointsFeature}
 import definition.Versions.VERSION_1
-import javax.inject.Inject
-import utils.Logging
 import play.api.routing.Router
+import utils.Logging
+
+import javax.inject.Inject
 
 // So that we can have API-independent implementations of
 // VersionRoutingRequestHandler and VersionRoutingRequestHandlerSpec
 // implement this for the specific API...
 @ImplementedBy(classOf[VersionRoutingMapImpl])
-trait VersionRoutingMap extends Logging{
+trait VersionRoutingMap extends Logging {
 
   val defaultRouter: Router
 
@@ -39,12 +40,27 @@ trait VersionRoutingMap extends Logging{
 // Add routes corresponding to available versions...
 case class VersionRoutingMapImpl @Inject()(appConfig: AppConfig,
                                            defaultRouter: Router,
-                                           v1Router: v1.Routes) extends VersionRoutingMap {
+                                           v1Router: v1.Routes,
+                                           v1RoutesWithPenalties: v1WithPenalties.Routes
+                                          ) extends VersionRoutingMap {
+
+  val featureSwitch: FeatureSwitch = FeatureSwitch(appConfig.featureSwitch)
+
+  println(Console.YELLOW)
+  println("***********************************************")
+  println(s"${}")
+  println("***********************************************")
+  println(Console.RESET)
 
   val map: Map[String, Router] = Map(
-    VERSION_1 ->  {
-          logger.info("[VersionRoutingMap][map] using v1Router - pointing to new packages")
-          v1Router
+    VERSION_1 -> {
+      if (featureSwitch.isEnabled(PenaltiesEndpointsFeature)) {
+        logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages including penalties")
+        v1RoutesWithPenalties
+      } else {
+        logger.info("[VersionRoutingMap][map] using v1Router - pointing to new packages")
+        v1Router
+      }
     }
   )
 }
