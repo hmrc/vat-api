@@ -25,14 +25,22 @@ class PenaltiesDataSpec extends UnitSpec {
 
   "PenaltiesData" must {
 
-    "read data from json" in {
+    "read data from json min" in {
 
-      Json.toJson(testPenaltiesData) shouldBe testPenaltiesDataJson
+      Json.toJson(testPenaltiesResponseMin) shouldBe testPenaltiesResponseJsonMin
     }
 
-    "write to json" in {
+    "write to json min" in {
+      testPenaltiesResponseJsonMin.as[PenaltiesResponse] shouldBe testPenaltiesResponseMin
+    }
 
-      testPenaltiesDataJson.as[PenaltiesData] shouldBe testPenaltiesData
+    "read data from json max" in {
+
+      Json.toJson(testPenaltiesResponseMax) shouldBe testPenaltiesResponseJsonMax
+    }
+
+    "write to json max" in {
+      testPenaltiesResponseJsonMax.as[PenaltiesResponse] shouldBe testPenaltiesResponseMax
     }
   }
 }

@@ -20,7 +20,7 @@ import play.api.http.Status
 import support.GuiceBox
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.errors.{InvalidJson, UnexpectedFailure, VrnFormatError, VrnNotFound}
-import v1.constants.PenaltiesConstants
+import v1.constants.{FinancialDataConstants, PenaltiesConstants}
 import v1.constants.PenaltiesConstants.{correlationId, userRequest}
 import v1.mocks.connectors.MockPenaltiesConnector
 
@@ -111,6 +111,90 @@ class PenaltiesServiceSpec extends GuiceBox with MockPenaltiesConnector {
 
           val result = TestService.retrievePenalties(PenaltiesConstants.penaltiesRequest)
           val expectedResult = Left(PenaltiesConstants.errorWrapper(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
+
+          await(result) shouldBe expectedResult
+        }
+      }
+    }
+
+
+    "retrieveFinancialData" when {
+
+      "a valid response is returned" must {
+
+        "return Future(Right(FinancialDataResponse)" in {
+
+          mockRetrieveFinancialData(
+            FinancialDataConstants.financialRequest,
+            Right(FinancialDataConstants.wrappedFinancialDataResponse())
+          )
+
+          val result = TestService.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Right(FinancialDataConstants.wrappedFinancialDataResponse())
+
+          await(result) shouldBe expectedResult
+        }
+      }
+
+      "a invalid json response is returned" must {
+
+        "return Future(Left(PenaltiesConstants.errorWrapper(InvalidJson))" in {
+
+          mockRetrieveFinancialData(
+            FinancialDataConstants.financialRequest,
+            Left(FinancialDataConstants.errorWrapper(InvalidJson))
+          )
+
+          val result = TestService.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Left(FinancialDataConstants.errorWrapper(InvalidJson))
+
+          await(result) shouldBe expectedResult
+        }
+      }
+
+      "a VrnFormatError response is returned" must {
+
+        "return Future(Left(VrnFormatError)" in {
+
+          mockRetrieveFinancialData(
+            FinancialDataConstants.financialRequest,
+            Left(FinancialDataConstants.errorWrapper(VrnFormatError))
+          )
+
+          val result = TestService.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Left(FinancialDataConstants.errorWrapper(VrnFormatError))
+
+          await(result) shouldBe expectedResult
+        }
+      }
+
+      "a VrnNotFound response is returned" must {
+
+        "return Future(Left(VrnNotFound)" in {
+
+          mockRetrieveFinancialData(
+            FinancialDataConstants.financialRequest,
+            Left(FinancialDataConstants.errorWrapper(VrnNotFound))
+          )
+
+          val result = TestService.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Left(FinancialDataConstants.errorWrapper(VrnNotFound))
+
+          await(result) shouldBe expectedResult
+        }
+      }
+
+      "a UnexpectedFailure response is returned" must {
+
+        "return Future(Left(UnexpectedFailure)" in {
+
+          mockRetrieveFinancialData(
+            FinancialDataConstants.financialRequest,
+            Left(FinancialDataConstants.errorWrapper(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
+          )
+
+          val result = TestService.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Left(FinancialDataConstants.errorWrapper(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error")))
 
           await(result) shouldBe expectedResult
         }

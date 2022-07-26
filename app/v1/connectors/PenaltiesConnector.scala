@@ -19,12 +19,13 @@ package v1.connectors
 import config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.Logging
-import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpReads
+import v1.connectors.httpparsers.PenaltiesHttpParser._
+import v1.connectors.httpparsers.FinancialDataHttpParser._
 import v1.controllers.UserRequest
-import v1.models.request.penalties.PenaltiesRequest
-import v1.models.response.penalties.PenaltiesResponse
-
+import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
+import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -50,11 +51,26 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
                                                    userRequest: UserRequest[_],
                                                    correlationId: String): Future[Outcome[PenaltiesResponse]] = {
     val vrn = request.vrn.vrn
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/vat/penalties/full-data/$vrn"
+    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty-details/VAT/VRN/$vrn"
     logger.debug(s"[PenaltiesConnector][retrievePenalties] url: $url")
 
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
       http.GET[Outcome[PenaltiesResponse]](url)
+    }
+    doGet(headerCarrier())
+  }
+
+
+  def retrieveFinancialData(request: FinancialRequest)(implicit hc: HeaderCarrier,
+                                                   ec: ExecutionContext,
+                                                   userRequest: UserRequest[_],
+                                                   correlationId: String): Future[Outcome[FinancialDataResponse]] = {
+    val vrn = request.vrn.vrn
+    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
+    logger.debug(s"[PenaltiesConnector][retrieveFinancialData] url: $url")
+
+    def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
+      http.GET[Outcome[FinancialDataResponse]](url)
     }
     doGet(headerCarrier())
   }

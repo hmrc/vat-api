@@ -17,19 +17,42 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess}
+import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.penalties.PenaltiesResponse
+import v1.models.response.penalties.{PenaltiesErrors, PenaltiesResponse}
 
 object PenaltiesHttpParser extends Logging {
 
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
-    //TODO more error handling can be added once scenarios confirmed by Penalties team
+    //TODO change content after user research
+    def errorHelper(jsonString: JsValue, status: Int): (MtdError, Option[List[MtdError]]) = {
+      val penaltiesErrors = jsonString.as[PenaltiesErrors]
+      val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
+        (error.code, status) match {
+          case ("INVALID_IDTYPE", BAD_REQUEST) => PenaltiesInvalidIdType
+          case ("INVALID_IDVALUE", BAD_REQUEST) => PenaltiesInvalidIdValue
+          case ("INVALID_DATELIMIT", BAD_REQUEST) => PenaltiesInvalidDataLimit
+          case ("INVALID_CORRELATIONID", BAD_REQUEST) => PenaltiesInvalidCorrelationId
+          case ("NO_DATA_FOUND", NOT_FOUND) => PenaltiesNotDataFound
+          case ("DUPLICATE_SUBMISSION", CONFLICT) => PenaltiesDuplicateSubmission
+          case ("INVALID_IDTYPE", UNPROCESSABLE_ENTITY) => PenaltiesInvalidIdTypeUnprocessEntity
+          case ("INVALID_ID", UNPROCESSABLE_ENTITY) => PenaltiesInvalidIdValueUnprocessEntity
+          case ("REQUEST_NOT_PROCESSED", UNPROCESSABLE_ENTITY) => PenaltiesRequestNotProcessedUnprocessEntity
+          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE) => PenaltiesServiceUnavailable
+          case _ => MtdError(error.code, error.reason)
+        }
+      }
+
+      val head = mtdErrorsConvert.head
+      val tail = if(mtdErrorsConvert.tail.isEmpty) None else Some(mtdErrorsConvert.tail)
+      (head, tail)
+    }
+
     def read(method: String, url: String, response: HttpResponse): Outcome[PenaltiesResponse] = {
       val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
@@ -39,16 +62,12 @@ object PenaltiesHttpParser extends Logging {
             logger.error(s"[PenaltiesHttpParser][read] invalid JSON errors: $errors")
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
-        case BAD_REQUEST =>
-          logger.error(s"[PenaltiesHttpParser][read] Invalid VRN ${response.body}")
-          Left(ErrorWrapper(responseCorrelationId, VrnFormatError))
-        case NOT_FOUND =>
-          logger.error(s"[PenaltiesHttpParser][read] VRN could not be found ${response.body}")
-          Left(ErrorWrapper(responseCorrelationId, VrnNotFound))
         case status =>
-          logger.error(s"[PenaltiesHttpParser][read] unexpected response: status: $status")
-          Left(ErrorWrapper(responseCorrelationId, UnexpectedFailure.mtdError(status, response.body)))
+          val mtdErrors = errorHelper(response.json, status)
+          logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors._1} ${mtdErrors._2}")
+          Left(ErrorWrapper(responseCorrelationId, mtdErrors._1, mtdErrors._2))
       }
     }
   }
+
 }

@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.models.request.penalties
 
-import play.api.libs.json.{Format, Json}
+import v1.models.domain.Vrn
+import v1.models.request.RawData
 
-//TODO this data structure is just a placeholder
-case class PenaltiesData(dummyPenaltyData1: String,
-                         dummyPenaltyData2: String,
-                         dummyPenaltyData3: String
-                        )
-
-object PenaltiesData {
-  implicit val format: Format[PenaltiesData] = Json.format[PenaltiesData]
-}
+case class FinancialRequest(vrn: Vrn) extends RawData

@@ -15,3 +15,6 @@ GET         /:vrn/payments                  v1.controllers.PaymentsController.re
 
 # VAT Penalties
 GET         /:vrn/penalties                 v1.controllers.PenaltiesController.retrievePenalties(vrn)
+
+# VAT Financial Details
+GET         /:vrn/financial-details          v1.controllers.FinancialDataController.retrieveFinancialData(vrn)

@@ -28,7 +28,7 @@ import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockPenaltiesRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
 import v1.models.audit.{AuditError, AuditResponse}
-import v1.models.errors.{BadRequestError, MtdError, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.models.errors.{BadRequestError, MtdError, PenaltiesInvalidIdType, PenaltiesNotDataFound, UnexpectedFailure, VrnFormatError, VrnNotFound}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -61,7 +61,7 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
 
         "valid penalties data is returned" must {
 
-          "return 200 and the penalties data" in new Test {
+          "return 200 and the penalties min data" in new Test {
 
             MockPenaltiesRequestParser.parse(PenaltiesConstants.rawData)(Right(PenaltiesConstants.penaltiesRequest))
 
@@ -70,14 +70,34 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
             val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
 
             status(result) shouldBe OK
-            contentAsJson(result) shouldBe PenaltiesConstants.testPenaltiesResponseJson
+            contentAsJson(result) shouldBe PenaltiesConstants.testPenaltiesResponseJsonMin
             contentType(result) shouldBe Some("application/json")
             header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
 
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
               correlationId = PenaltiesConstants.correlationId,
               userDetails = PenaltiesConstants.userDetails,
-              auditResponse = AuditResponse(OK, None, Some(PenaltiesConstants.testPenaltiesResponseJson))
+              auditResponse = AuditResponse(OK, None, Some(PenaltiesConstants.testPenaltiesResponseJsonMin))
+            ))
+          }
+
+          "return 200 and the penalties max data" in new Test {
+
+            MockPenaltiesRequestParser.parse(PenaltiesConstants.rawData)(Right(PenaltiesConstants.penaltiesRequest))
+
+            MockPenaltiesService.retrievePenalties(PenaltiesConstants.penaltiesRequest)(Right(PenaltiesConstants.wrappedPenaltiesResponse(PenaltiesConstants.testPenaltiesResponseMax)))
+
+            val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
+
+            status(result) shouldBe OK
+            contentAsJson(result) shouldBe PenaltiesConstants.testPenaltiesResponseJsonMax
+            contentType(result) shouldBe Some("application/json")
+            header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
+
+            MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
+              correlationId = PenaltiesConstants.correlationId,
+              userDetails = PenaltiesConstants.userDetails,
+              auditResponse = AuditResponse(OK, None, Some(PenaltiesConstants.testPenaltiesResponseJsonMax))
             ))
           }
         }
@@ -85,8 +105,8 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
         "errors are returned from Penalties" when {
 
           val errors: Seq[(MtdError, Int)] = Seq(
-            (VrnFormatError, BAD_REQUEST),
-            (VrnNotFound, NOT_FOUND),
+            (PenaltiesInvalidIdType, BAD_REQUEST),
+            (PenaltiesNotDataFound, NOT_FOUND),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 

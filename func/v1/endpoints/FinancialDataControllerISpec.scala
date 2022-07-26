@@ -8,17 +8,17 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
-import v1.constants.PenaltiesConstants
-import v1.models.errors.{MtdError, PenaltiesInvalidCorrelationId, PenaltiesInvalidDataLimit, PenaltiesNotDataFound, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.constants.FinancialDataConstants
+import v1.models.errors.{FinancialInvalidCorrelationId, FinancialNotDataFound, MtdError, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
-class PenaltiesControllerISpec extends IntegrationBaseSpec {
+class FinancialDataControllerISpec extends IntegrationBaseSpec {
 
-  implicit val appConfig = app.injector.instanceOf[AppConfig]
+  implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   private trait Test {
 
-    def uri: String = s"/${PenaltiesConstants.vrn}/penalties"
+    def uri: String = s"/${FinancialDataConstants.vrn}/financial-details"
 
     def setupStubs(): StubMapping
 
@@ -32,15 +32,15 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
     }
   }
 
-  "PenaltiesController" when {
+  "FinancialDataController" when {
 
-    "GET /[VRN]/penalties" when {
+    "GET /[VRN]/financial-details" when {
 
       "raw vrn cannot be parsed" must {
 
         "return BadRequest" in new Test {
 
-          override def uri: String = s"/${PenaltiesConstants.invalidVrn}/penalties"
+          override def uri: String = s"/${FinancialDataConstants.invalidVrn}/penalties"
 
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
@@ -63,12 +63,12 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onSuccess(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), OK, PenaltiesConstants.testPenaltiesResponseJsonMax)
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testFinancialResponseJsonMax)
             }
 
             val response: WSResponse = await(request.get())
             response.status shouldBe OK
-            response.json shouldBe PenaltiesConstants.testPenaltiesResponseJsonMax
+            response.json shouldBe FinancialDataConstants.testFinancialResponseJsonMax
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }
@@ -76,7 +76,6 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
         "VRN is invalid" must {
 
           "return 400" in new Test {
-
             val errorBody: JsValue = Json.parse(
               """
                 |{
@@ -86,53 +85,50 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
                 |}]
                 |}
                 |""".stripMargin)
-
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
             }
 
             val response: WSResponse = await(request.get())
             response.status shouldBe BAD_REQUEST
-            response.json shouldBe Json.toJson(PenaltiesInvalidCorrelationId)
+            response.json shouldBe Json.toJson(FinancialInvalidCorrelationId)
             response.header("Content-Type") shouldBe Some("application/json")
           }
 
-          "return multiple 400 errors" in new Test {
-
+          "return multi 400 errors" in new Test {
             val errorBody: JsValue = Json.parse(
               """
                 |{
                 |"failures": [{
-                | "code":"INVALID_CORRELATIONID",
+                | "code":"INVALID_DATE_FROM",
                 | "reason":"Some Reason"
                 |},
                 |{
-                | "code":"INVALID_DATELIMIT",
+                | "code":"INVALID_DATE_TO",
                 | "reason":"Some Reason"
-                |}
-                |]
+                |}]
                 |}
                 |""".stripMargin)
 
             val expectedJson: JsValue = Json.parse(
               """
                 |{
-                |"code":"INVALID_CORRELATIONID",
-                |"message":"Invalid correlation ID",
-                |"errors": [{
-                | "code":"INVALID_DATELIMIT",
-                | "message":"Invalid Date Limit"
-                |}]
+                | "code":"INVALID_DATE_FROM",
+                | "message":"Invalid Date From",
+                | "errors": [{
+                | "code":"INVALID_DATE_TO",
+                | "message": "Invalid Date to"
+                | }]
+                |
                 |}
                 |""".stripMargin
             )
-
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -159,12 +155,12 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), NOT_FOUND, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), NOT_FOUND, errorBody)
             }
 
             val response: WSResponse = await(request.get())
             response.status shouldBe NOT_FOUND
-            response.json shouldBe Json.toJson(PenaltiesNotDataFound)
+            response.json shouldBe Json.toJson(FinancialNotDataFound)
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }
@@ -178,7 +174,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
                 |{
                 |"failures": [{
                 | "code":"REASON",
-                | "reason":"Some Reason"
+                | "reason":"error"
                 |}]
                 |}
                 |""".stripMargin)
@@ -186,12 +182,12 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())
             response.status shouldBe INTERNAL_SERVER_ERROR
-            response.json shouldBe Json.toJson(MtdError("REASON", "Some Reason"))
+            response.json shouldBe Json.toJson(MtdError("REASON", "error"))
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }
