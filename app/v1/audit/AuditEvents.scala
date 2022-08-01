@@ -51,4 +51,11 @@ object AuditEvents {
       transactionName = "retrieve-vat-penalties",
       detail = AuditDetail(userDetails, correlationId, auditResponse)
     )
+
+  def auditFinancialData(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
+    AuditEvent(
+      auditType = "retrieveFinancialData",
+      transactionName = "retrieve-financial-data-penalties",
+      detail = AuditDetail(userDetails, correlationId, auditResponse)
+    )
 }

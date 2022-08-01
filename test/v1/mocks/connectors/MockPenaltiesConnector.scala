@@ -21,8 +21,8 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{Outcome, PenaltiesConnector}
 import v1.controllers.UserRequest
-import v1.models.request.penalties.PenaltiesRequest
-import v1.models.response.penalties.PenaltiesResponse
+import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
+import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,5 +37,14 @@ trait MockPenaltiesConnector extends MockFactory {
       .retrievePenalties(_: PenaltiesRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
       .expects(penaltiesRequest, *, *, *, *)
       .returns(Future.successful(penaltiesResponse))
+  }
+
+  def mockRetrieveFinancialData(financialRequest: FinancialRequest,
+                                financialDataResponse: Outcome[FinancialDataResponse]
+                           ): CallHandler5[FinancialRequest, HeaderCarrier, ExecutionContext, UserRequest[_], String, Future[Outcome[FinancialDataResponse]]] = {
+    (mockPenaltiesConnector
+      .retrieveFinancialData(_: FinancialRequest)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: String))
+      .expects(financialRequest, *, *, *, *)
+      .returns(Future.successful(financialDataResponse))
   }
 }

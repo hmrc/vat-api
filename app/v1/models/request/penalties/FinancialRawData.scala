@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.models.request.penalties
 
-import play.api.libs.json.{Json, OFormat}
+import v1.models.request.RawData
 
-//TODO this data structure is just a placeholder
-case class FinancialData(dummyFinancialData1: String,
-                         dummyFinancialData2: String,
-                         dummyFinancialData3: String
-                        )
-
-object FinancialData {
-  implicit val format: OFormat[FinancialData] = Json.format[FinancialData]
-}
+case class FinancialRawData(vrn: String) extends RawData

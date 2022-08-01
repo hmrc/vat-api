@@ -57,6 +57,45 @@ object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is inval
 object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 object VrnNotFound extends MtdError("VRN_NOT_FOUND", "The provided VRN was not found")
 
+//Penalties Errors
+object PenaltiesInvalidIdType extends MtdError("INVALID_IDTYPE", "Invalid Id Type")
+object PenaltiesInvalidIdValue extends MtdError("INVALID_IDVALUE", "Invalid Id value")
+object PenaltiesInvalidDataLimit extends MtdError("INVALID_DATELIMIT", "Invalid Date Limit")
+object PenaltiesInvalidCorrelationId extends MtdError("INVALID_CORRELATIONID", "Invalid correlation ID")
+object PenaltiesNotDataFound extends MtdError("NO_DATA_FOUND", "No data found")
+object PenaltiesDuplicateSubmission extends MtdError("DUPLICATE_SUBMISSION", "Duplicate Submission")
+object PenaltiesInvalidIdTypeUnprocessEntity extends MtdError("INVALID_IDTYPE", "Invalid Id Type")
+object PenaltiesInvalidIdValueUnprocessEntity extends MtdError("INVALID_ID", "Invalid Id value")
+object PenaltiesRequestNotProcessedUnprocessEntity extends MtdError("REQUEST_NOT_PROCESSED", "Request not processed")
+object PenaltiesServiceUnavailable extends MtdError("SERVICE_UNAVAILABLE", "Service Unavailable")
+
+
+
+//Financial Data Errors
+object FinancialInvalidCorrelationId extends MtdError("INVALID_CORRELATIONID", "Invalid Correlation Id")
+object FinancialInvalidIdType extends MtdError("INVALID_IDTYPE", "Invalid Id type")
+object FinancialInvalidIdNumber extends MtdError("INVALID_IDNUMBER", "Invalid Id Number")
+object FinancialInvalidRegimeType extends MtdError("INVALID_REGIME_TYPE", "Invalid Regime Type")
+object FinancialInvalidDocNumber extends MtdError("INVALID_DOC_NUMBER", "Invalid Doc Number")
+object FinancialInvalidOnlyOpenItems extends MtdError("INVALID_ONLY_OPEN_ITEMS", "Invalid Only Open Items")
+object FinancialInvalidIncludeLocks extends MtdError("INVALID_INCLUDE_LOCKS", "Invalid Include Locks")
+object FinancialInvalidIncludeAccruedInterest extends MtdError("INVALID_CALCULATE_ACCRUED_INTEREST", "Invalid Calculate Accrued Interest")
+object FinancialInvalidIncludeCustomerPaymentInfo extends MtdError("INVALID_CUSTOMER_PAYMENT_INFORMATION", "Invalid Customer Payment Information")
+object FinancialInvalidDateFrom extends MtdError("INVALID_DATE_FROM", "Invalid Date From")
+object FinancialInvalidDateTo extends MtdError("INVALID_DATE_TO", "Invalid Date to")
+object FinancialInvalidDateRange extends MtdError("INVALID_DATE_RANGE", "Invalid Date Range")
+object FinancialInvalidRemovePaymentOnAccount extends MtdError("INVALID_REMOVE_PAYMENT_ON_ACCOUNT", "Invalid Remove Payment On Account")
+object FinancialInvalidIncludeStats extends MtdError("INVALID_INCLUDE_STATISTICAL", "Invalid Include Statistical")
+object FinancialInvalidRequest extends MtdError("INVALID_REQUEST", "Invalid Request")
+object FinancialNotDataFound extends MtdError("NO_DATA_FOUND", "No data found")
+object FinancialDuplicateSubmission extends MtdError("DUPLICATE_SUBMISSION", "Duplicate Submission")
+object FinancialInvalidIdTypeUnprocessEntity extends MtdError("INVALID_IDTYPE", "Invalid Id Type")
+object FinancialInvalidIdValueUnprocessEntity extends MtdError("INVALID_ID", "Invalid Id value")
+object FinancialInvalidRegimeUnprocessEntity extends MtdError("INVALID_REGIME_TYPE", "Invalid Regime type")
+object FinancialInvalidDocNumberUnprocessEntity extends MtdError("INVALID_DOC_NUMBER", "Invalid Doc Number")
+object FinancialInvalidRequestUnprocessEntity extends MtdError("REQUEST_NOT_PROCESSED", "Request Not Processed")
+object FinancialServiceUnavailable extends MtdError("SERVICE_UNAVAILABLE", "Service Unavailable")
+
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
 object RuleInsolventTraderError extends MtdError("RULE_INSOLVENT_TRADER", "The remote endpoint has indicated that the Trader is insolvent")

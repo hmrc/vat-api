@@ -16,14 +16,14 @@
 
 package v1.services
 
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
 import v1.connectors.PenaltiesConnector
 import v1.controllers.UserRequest
-import v1.models.request.penalties.PenaltiesRequest
-import v1.models.response.penalties.PenaltiesResponse
+import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
+import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -34,5 +34,13 @@ class PenaltiesService @Inject()(connector: PenaltiesConnector) extends Logging 
                         userRequest: UserRequest[_],
                         correlationId: String): Future[ServiceOutcome[PenaltiesResponse]] = {
     connector.retrievePenalties(request)
+  }
+
+
+  def retrieveFinancialData(request: FinancialRequest)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext,
+                        userRequest: UserRequest[_],
+                        correlationId: String): Future[ServiceOutcome[FinancialDataResponse]] = {
+    connector.retrieveFinancialData(request)
   }
 }

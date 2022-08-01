@@ -18,8 +18,7 @@ package v1.models.response.penalties
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import v1.constants.PenaltiesConstants
-import v1.constants.PenaltiesConstants._
+import v1.constants.FinancialDataConstants
 
 class FinancialDataSpec extends UnitSpec {
 
@@ -27,12 +26,11 @@ class FinancialDataSpec extends UnitSpec {
 
     "read data from json" in {
 
-      Json.toJson(testFinancialData) shouldBe testFinancialDataJson
+      Json.toJson(FinancialDataConstants.testFinancialResponseMin) shouldBe FinancialDataConstants.testFinancialResponseJsonMin
     }
 
     "write to json" in {
-
-      testFinancialDataJson.as[FinancialData] shouldBe testFinancialData
+      FinancialDataConstants.testFinancialResponseJsonMin.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialResponseMin
     }
   }
 }

@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.controllers.requestParsers
 
-import play.api.libs.json.Json
-import support.UnitSpec
-import v1.constants.PenaltiesConstants
-import v1.constants.PenaltiesConstants._
+import javax.inject.Inject
+import v1.controllers.requestParsers.validators.{FinancialDataValidator, PenaltiesValidator}
+import v1.models.domain.Vrn
+import v1.models.request.penalties.{FinancialRawData, FinancialRequest, PenaltiesRawData, PenaltiesRequest}
 
-class PenaltiesResponseSpec extends UnitSpec {
+class FinancialDataRequestParser @Inject()(val validator: FinancialDataValidator) extends RequestParser[FinancialRawData, FinancialRequest] {
 
-  "PenaltiesResponse" must {
-
-    "read data from json" in {
-
-      Json.toJson(testPenaltiesResponse) shouldBe testPenaltiesResponseJson
-    }
-
-    "write to json" in {
-
-      testPenaltiesResponseJson.as[PenaltiesResponse] shouldBe testPenaltiesResponse
-    }
+  protected def requestFor(data: FinancialRawData): FinancialRequest = {
+    FinancialRequest(Vrn(data.vrn))
   }
 }

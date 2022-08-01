@@ -15,4 +15,9 @@ object PenaltiesStub extends WireMockMethods {
     when(method = method, uri = uri)
       .thenReturn(status = errorStatus, errorBody)
   }
+
+  def onError(method: HTTPMethod, uri: String, errorStatus: Int, errorBody: JsValue): StubMapping = {
+    when(method = method, uri = uri)
+      .thenReturn(status = errorStatus, errorBody)
+  }
 }

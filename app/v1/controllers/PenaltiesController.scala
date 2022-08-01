@@ -91,8 +91,17 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
-      case VrnFormatError => BadRequest(Json.toJson(errorWrapper))
-      case VrnNotFound => NotFound(Json.toJson(errorWrapper))
+      case PenaltiesInvalidIdType |
+           PenaltiesInvalidIdValue |
+           PenaltiesInvalidDataLimit |
+           PenaltiesInvalidCorrelationId |
+           VrnFormatError => BadRequest(Json.toJson(errorWrapper))
+      case PenaltiesNotDataFound => NotFound(Json.toJson(errorWrapper))
+      case PenaltiesDuplicateSubmission => Conflict(Json.toJson(errorWrapper))
+      case PenaltiesInvalidIdTypeUnprocessEntity |
+           PenaltiesInvalidIdValueUnprocessEntity |
+           PenaltiesRequestNotProcessedUnprocessEntity => UnprocessableEntity(Json.toJson(errorWrapper))
+      case PenaltiesServiceUnavailable => ServiceUnavailable(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }
   }
