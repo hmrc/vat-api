@@ -425,3 +425,45 @@ traits:
                       description: The remote endpoint has indicated that no associated data is found
                       value:
                         code: NOT_FOUND
+    /penalties:
+      displayName: Retrieve VAT penalties
+      description: Retrieve VAT penalties
+      get:
+        displayName: Retrieve VAT penalties
+        description: Retrieve VAT penalties
+        (annotations.sandboxData): !include scenarios/vat-penalties-scenarios.md
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
+        (annotations.scope): "read:vat"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
+        responses:
+          200:
+            headers:
+              X-CorrelationId:
+                example: c75f40a6-a3df-4429-a697-471eeec46435
+                description: Unique id for operation tracking <br> String, 36 characters.
+            body:
+              application/json:
+                type: !include schemas/penalties/Penalties.json
+                examples:
+                  example-1:
+                    description: all fields example
+                    value: !include examples/penalties/Penalties.json
+          400:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  invalidVrn:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+          404:
+            body:
+              application/json:
+                type: types.errorResponse
+                examples:
+                  notFound:
+                    description: The remote endpoint has indicated that no associated data is found
+                    value:
+                      code: NOT_FOUND
+
