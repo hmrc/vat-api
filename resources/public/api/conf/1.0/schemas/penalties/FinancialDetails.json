@@ -529,10 +529,10 @@
                   "type": "string",
                   "example": "C"
                 },
-                "testInterestLock": {
-                  "description": "Test Interest Lock",
+                "interestLock": {
+                  "description": "Interest Lock",
                   "type": "string",
-                  "example": "Test Interest Lock"
+                  "example": "C"
                 },
                 "dunningLock": {
                   "description": "Dunning Lock",
