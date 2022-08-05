@@ -16,16 +16,15 @@
 
 package routing
 
-import config.{AppConfig, FeatureSwitch}
+import config.{AppConfig, FeatureSwitch, FeatureToggleSupport}
 import definition.Versions
-
 import javax.inject.{Inject, Singleton}
+import play.api.Logging
 import play.api.http.{DefaultHttpRequestHandler, HttpConfiguration, HttpErrorHandler, HttpFilters}
 import play.api.libs.json.Json
 import play.api.mvc.{DefaultActionBuilder, Handler, RequestHeader, Results}
 import play.api.routing.Router
 import play.core.DefaultWebCommands
-import utils.Logging
 import v1.controllers.requestParsers.validators.validations.VrnValidation
 import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError, VrnFormatError}
 
@@ -33,9 +32,9 @@ import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError, VrnF
 class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMap,
                                              errorHandler: HttpErrorHandler,
                                              httpConfiguration: HttpConfiguration,
-                                             config: AppConfig,
                                              filters: HttpFilters,
-                                             action: DefaultActionBuilder)
+                                             action: DefaultActionBuilder,
+                                             implicit val config: AppConfig)
   extends DefaultHttpRequestHandler(
     webCommands = new DefaultWebCommands,
     optDevContext = None,
@@ -43,9 +42,8 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
     errorHandler = errorHandler,
     configuration = httpConfiguration,
     filters = filters.filters
-  ) with Logging {
+  ) with Logging with FeatureToggleSupport {
 
-  private val featureSwitch = FeatureSwitch(config.featureSwitch)
   private val unsupportedVersionAction = action(Results.NotFound(Json.toJson(UnsupportedVersionError)))
   private val invalidAcceptHeaderError = action(Results.NotAcceptable(Json.toJson(InvalidAcceptHeaderError)))
 
@@ -56,7 +54,7 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
     def apiHandler: Option[Handler] = Versions.getFromRequest(request) match {
       case Some(version) =>
         versionRoutingMap.versionRouter(version) match {
-          case Some(versionRouter) if featureSwitch.isVersionEnabled(version) =>
+          case Some(versionRouter) if isVersionEnabled(version) =>
             routeWith(versionRouter)(request)
           case Some(_) => Some(unsupportedVersionAction)
           case None => Some(invalidAcceptHeaderError)

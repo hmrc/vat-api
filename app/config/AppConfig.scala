@@ -25,6 +25,8 @@ import scala.concurrent.duration._
 
 trait AppConfig {
 
+  val servicesConfig: ServicesConfig
+
   // DES Config
   def desBaseUrl: String
   def desEnv: String
@@ -49,6 +51,8 @@ trait AppConfig {
 
 @Singleton
 class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configuration) extends AppConfig {
+
+  override val servicesConfig: ServicesConfig = config
 
   // DES Config
   val desBaseUrl: String = config.baseUrl("des")

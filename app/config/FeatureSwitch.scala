@@ -16,35 +16,45 @@
 
 package config
 
-import play.api.Configuration
 
-case class FeatureSwitch(value: Option[Configuration]) {
+object FeatureSwitch {
 
-  private val versionRegex = """(\d)\.\d""".r
+  val prefix = "feature-switch"
 
-  def isVersionEnabled(version: String): Boolean = {
-    val versionNoIfPresent: Option[String] =
-      version match {
-        case versionRegex(v) => Some(v)
-        case _               => None
-      }
+  val featureSwitches: Seq[FeatureSwitch] = Seq(
+    AuthFeature,
+    PenaltiesEndpointsFeature,
+    FinancialDataRamlFeature
+  )
 
-    val enabled = for {
-      versionNo <- versionNoIfPresent
-      config    <- value
-      enabled   <- config.getOptional[Boolean](s"version-$versionNo.enabled")
-    } yield enabled
+  def apply(str: String): FeatureSwitch =
+    featureSwitches find (_.name == str) match {
+      case Some(switch) => switch
+      case None => throw new IllegalArgumentException("Invalid feature switch: " + str)
+    }
 
-    enabled.getOrElse(false)
+  def get(string: String): Option[FeatureSwitch] = featureSwitches find (_.name == string)
+
+
+  sealed trait FeatureSwitch {
+    val name: String
+    val hint: Option[String] = None
   }
 
-  def isEnabled(feature: Feature): Boolean = {
-
-    val enabled = for {
-      config <- value
-      enabled <- config.getOptional[Boolean](s"${feature.name}.enabled")
-    } yield enabled
-
-    enabled.getOrElse(false)
+  case object Version1Feature extends FeatureSwitch {
+    override val name: String = s"$prefix.version-1.enabled"
   }
+
+  case object AuthFeature extends FeatureSwitch {
+    override val name: String = s"$prefix.auth.enabled"
+  }
+
+  case object PenaltiesEndpointsFeature extends FeatureSwitch {
+    override val name: String = s"$prefix.penaltiesEndpoints.enabled"
+  }
+
+  case object FinancialDataRamlFeature extends FeatureSwitch {
+    override val name: String = s"$prefix.financialDataRamlFeature.enabled"
+  }
+
 }

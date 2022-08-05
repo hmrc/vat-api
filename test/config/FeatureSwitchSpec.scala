@@ -17,47 +17,36 @@
 package config
 
 import com.typesafe.config.ConfigFactory
+import config.FeatureSwitch.{AuthFeature, Version1Feature, featureSwitches}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Configuration
 import support.UnitSpec
 
-class FeatureSwitchSpec extends UnitSpec {
-
+class FeatureSwitchSpec extends UnitSpec with FeatureToggleSupport with GuiceOneAppPerSuite {
+  implicit val mockAppConfig: AppConfig = app.injector.instanceOf[AppConfig]
   "version enabled" when {
-    "no config" must {
-      val featureSwitch = FeatureSwitch(None)
+    "doesnt pass regex" must {
 
       "return false" in {
-        featureSwitch.isVersionEnabled("1.0") shouldBe false
+        isVersionEnabled("test") shouldBe false
       }
     }
 
     "no config value" must {
-      val featureSwitch = createFeatureSwitch("")
-
       "return false" in {
-        featureSwitch.isVersionEnabled("1.0") shouldBe false
+        isVersionEnabled("10.0") shouldBe false
       }
     }
 
     "config set" must {
-      val featureSwitch = createFeatureSwitch(
-        """
-          |version-1.enabled = false
-          |version-2.enabled = true
-        """.stripMargin)
-
-      "return false for disabled versions" in {
-        featureSwitch.isVersionEnabled("1.0") shouldBe false
-      }
 
       "return true for enabled versions" in {
-        featureSwitch.isVersionEnabled("2.0") shouldBe true
+        isVersionEnabled("1.0") shouldBe true
       }
 
-      "return false for non-version strings" in {
-        featureSwitch.isVersionEnabled("x.x") shouldBe false
-        featureSwitch.isVersionEnabled("2x") shouldBe false
-        featureSwitch.isVersionEnabled("2.x") shouldBe false
+      "return false for disabled versions" in {
+        disable(Version1Feature)
+        isVersionEnabled("2.0") shouldBe false
       }
     }
   }
@@ -65,39 +54,17 @@ class FeatureSwitchSpec extends UnitSpec {
   "isEnabled" when {
 
     "feature is enabled in config" must {
-
       "return true" in {
-
-        val featureSwitch = createFeatureSwitch(
-          """
-            |auth.enabled = true
-        """.stripMargin)
-
-        featureSwitch.isEnabled(AuthFeature) shouldBe true
+        isEnabled(AuthFeature) shouldBe true
       }
     }
 
     "feature is disabled in config" must {
-
       "return false" in {
-
-        val featureSwitch = createFeatureSwitch(
-          """
-            |auth.enabled = false
-        """.stripMargin)
-
-        featureSwitch.isEnabled(AuthFeature) shouldBe false
-      }
-    }
-
-    "feature does not exist in config" must {
-
-      "return false" in {
-
-        val featureSwitch = createFeatureSwitch("")
-
-        featureSwitch.isEnabled(AuthFeature) shouldBe false
+        disable(AuthFeature)
+        isEnabled(AuthFeature) shouldBe false
       }
     }
   }
+
 }

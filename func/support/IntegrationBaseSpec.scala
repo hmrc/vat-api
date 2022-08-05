@@ -28,6 +28,7 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
 
   lazy val mockHost: String = WireMockHelper.host
   lazy val mockPort: String = WireMockHelper.wireMockPort.toString
+  var mockFinancialDataRamlFeature: Boolean = true
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
@@ -42,6 +43,7 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.non-repudiation.host" -> mockHost,
     "microservice.services.non-repudiation.port" -> mockPort,
     "feature-switch.refactor.enabled" -> true,
+    "feature-switch.financialDataRamlFeature.enabled" -> mockFinancialDataRamlFeature,
     "feature-switch.refactor.prod.enabled" -> false,
     "microservice.services.non-repudiation.numberOfRetries" -> 1,
     "microservice.services.non-repudiation.initialDelays" -> "5 milliseconds",
