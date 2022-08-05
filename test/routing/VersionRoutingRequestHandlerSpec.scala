@@ -18,6 +18,8 @@ package routing
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import config.FeatureSwitch.Version1Feature
+import config.{AppConfig, FeatureToggleSupport}
 import mocks.MockAppConfig
 import org.scalatest.Inside
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -32,7 +34,7 @@ import play.api.test.Helpers._
 import support.UnitSpec
 import v1.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError}
 
-class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockAppConfig with GuiceOneAppPerSuite {
+class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockAppConfig with GuiceOneAppPerSuite with FeatureToggleSupport {
   test =>
 
   implicit private val actorSystem: ActorSystem = ActorSystem("test")
@@ -44,7 +46,6 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
   object DefaultHandler extends Handler
   object V1Handler extends Handler
   object V2Handler extends Handler
-  object V3Handler extends Handler
 
   private val defaultRouter = Router.from {
     case GET(p"") => DefaultHandler
@@ -55,28 +56,21 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
   private val v2Router      = Router.from {
     case GET(p"/123456789/path") => V2Handler
   }
-  private val v3Router = Router.from {
-    case GET(p"/123456789/path") => V3Handler
-  }
 
   private val routingMap = new VersionRoutingMap {
     override val defaultRouter: Router = test.defaultRouter
-    override val map: Map[String, Router] = Map("1.0" -> v1Router, "2.0" -> v2Router, "3.0" -> v3Router)
+    override val map: Map[String, Router] = Map("1.0" -> v1Router, "2.0" -> v2Router)
   }
 
   class Test(implicit acceptHeader: Option[String]) {
     val httpConfiguration: HttpConfiguration = HttpConfiguration("context")
     private val errorHandler      = mock[HttpErrorHandler]
     private val filters           = mock[HttpFilters]
+    implicit val mockImpAppConfig: AppConfig = app.injector.instanceOf[AppConfig]
     (filters.filters _).stubs().returns(Seq.empty)
 
-    MockedAppConfig.featureSwitch.returns(Some(Configuration(ConfigFactory.parseString("""
-                                                                                         |version-1.enabled = true
-                                                                                         |version-2.enabled = true
-                                                                         """.stripMargin))))
-
     val requestHandler: VersionRoutingRequestHandler =
-      new VersionRoutingRequestHandler(routingMap, errorHandler, httpConfiguration, mockAppConfig, filters, action)
+      new VersionRoutingRequestHandler(routingMap, errorHandler, httpConfiguration, filters, action, mockImpAppConfig)
 
     def buildRequest(path: String): RequestHeader =
       acceptHeader
@@ -115,13 +109,7 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
 
   "Routing requests with v1" should {
     implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.1.0+json")
-
     handleWithVersionRoutes("/123456789/path", V1Handler)
-  }
-
-  "Routing requests with v2" should {
-    implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.2.0+json")
-    handleWithVersionRoutes("/123456789/path", V2Handler)
   }
 
   "Routing requests with unsupported version" should {
@@ -141,7 +129,7 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
   }
 
   "Routing requests for supported version but not enabled" when {
-    implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.3.0+json")
+    implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.2.0+json")
 
     "the version has a route for the resource" must {
       "return 404 Not Found" in new Test {

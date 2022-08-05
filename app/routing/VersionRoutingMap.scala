@@ -17,12 +17,12 @@
 package routing
 
 import com.google.inject.ImplementedBy
-import config.{AppConfig, FeatureSwitch, PenaltiesEndpointsFeature}
+import config.FeatureSwitch.PenaltiesEndpointsFeature
+import config.{AppConfig, FeatureToggleSupport}
 import definition.Versions.VERSION_1
-import play.api.routing.Router
-import utils.Logging
-
 import javax.inject.Inject
+import play.api.Logging
+import play.api.routing.Router
 
 // So that we can have API-independent implementations of
 // VersionRoutingRequestHandler and VersionRoutingRequestHandlerSpec
@@ -38,23 +38,16 @@ trait VersionRoutingMap extends Logging {
 }
 
 // Add routes corresponding to available versions...
-case class VersionRoutingMapImpl @Inject()(appConfig: AppConfig,
-                                           defaultRouter: Router,
+case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
                                            v1Router: v1.Routes,
-                                           v1RoutesWithPenalties: v1WithPenalties.Routes
-                                          ) extends VersionRoutingMap {
-
-  val featureSwitch: FeatureSwitch = FeatureSwitch(appConfig.featureSwitch)
-
-  println(Console.YELLOW)
-  println("***********************************************")
-  println(s"${}")
-  println("***********************************************")
-  println(Console.RESET)
+                                           v1RoutesWithPenalties: v1WithPenalties.Routes,
+                                           implicit val appConfig: AppConfig
+                                          ) extends VersionRoutingMap with FeatureToggleSupport {
+  
 
   val map: Map[String, Router] = Map(
     VERSION_1 -> {
-      if (featureSwitch.isEnabled(PenaltiesEndpointsFeature)) {
+      if (isEnabled(PenaltiesEndpointsFeature)) {
         logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages including penalties")
         v1RoutesWithPenalties
       } else {

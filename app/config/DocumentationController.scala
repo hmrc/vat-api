@@ -16,6 +16,7 @@
 
 package config
 
+import config.FeatureSwitch.FinancialDataRamlFeature
 import controllers.Assets
 import definition.ApiDefinitionFactory
 import javax.inject.{Inject, Singleton}
@@ -26,14 +27,20 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton
 class DocumentationController @Inject()(vatApiDefinition: ApiDefinitionFactory,
-                                        cc: ControllerComponents, assets: Assets, errorHandler: HttpErrorHandler)
-  extends BackendController(cc) {
+                                        cc: ControllerComponents,
+                                        assets: Assets,
+                                        implicit val appConfig: AppConfig)
+  extends BackendController(cc) with FeatureToggleSupport {
 
   def definition(): Action[AnyContent] = Action {
     Ok(Json.toJson(vatApiDefinition.definition))
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    assets.at(s"/public/api/conf/$version", file)
+    if (isEnabled(FinancialDataRamlFeature)) {
+      assets.at(s"/public/api/conf/$version", "applicationWithFinancialDetailsEndPoint.raml")
+    } else {
+      assets.at(s"/public/api/conf/$version", file)
+    }
   }
 }

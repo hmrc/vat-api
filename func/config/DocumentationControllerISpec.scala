@@ -15,12 +15,17 @@ package config
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.typesafe.config.ConfigFactory
+import config.FeatureSwitch.FinancialDataRamlFeature
+import mocks.MockAppConfig
+import play.api.Configuration
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
 import support.IntegrationBaseSpec
 
-class DocumentationControllerISpec extends IntegrationBaseSpec {
+class DocumentationControllerISpec extends IntegrationBaseSpec with FeatureToggleSupport {
+
 
   val apiDefinitionJson: JsValue = Json.parse(
     """
@@ -63,9 +68,19 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
 
   "a documentation request" must {
     "return the documentation" in {
+      disable(FinancialDataRamlFeature)
       val response: WSResponse = await(buildRequest("/api/conf/1.0/application.raml").get())
       response.status shouldBe Status.OK
       response.body[String] should startWith("#%RAML 1.0")
+      response.body[String] should not include("/financial-details:")
+    }
+
+    "return the documentation with financial endpoint" in {
+      enable(FinancialDataRamlFeature)
+      val response: WSResponse = await(buildRequest("/api/conf/1.0/application.raml").get())
+      response.status shouldBe Status.OK
+      response.body[String] should startWith("#%RAML 1.0")
+      response.body[String] should include("/financial-details:")
     }
   }
 

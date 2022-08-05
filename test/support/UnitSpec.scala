@@ -18,6 +18,7 @@ package support
 
 import com.typesafe.config.ConfigFactory
 import config.FeatureSwitch
+import config.FeatureSwitch.FeatureSwitch
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
@@ -46,6 +47,4 @@ trait UnitSpec extends AnyWordSpecLike
   // Convenience to avoid having to wrap andThen() parameters in Future.successful
   implicit def liftFuture[A](v: A): Future[A] = Future.successful(v)
 
-  def createFeatureSwitch(config: String): FeatureSwitch =
-    FeatureSwitch(Some(Configuration(ConfigFactory.parseString(config))))
 }

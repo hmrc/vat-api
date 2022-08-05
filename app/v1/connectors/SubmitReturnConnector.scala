@@ -21,7 +21,8 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
-import v1.models.errors.ConnectorError
+import v1.models.errors.{ConnectorError, DesError, DesErrorCode, DesErrors}
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
 
