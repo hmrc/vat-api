@@ -77,6 +77,14 @@ trait RetrieveLiabilitiesFixture {
     """.stripMargin
   )
 
+  val downStreamJson: JsValue = Json.parse(
+    s"""
+       |{
+       |"code":"INTERNAL_SERVER_ERROR",
+       |"message":"An internal server error occurred"
+       |}""".stripMargin
+  )
+
   val liabilityResponse: LiabilitiesResponse =
     LiabilitiesResponse(
       Seq(

@@ -19,6 +19,7 @@ package v1.connectors
 import mocks.MockAppConfig
 import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
+import v1.models.errors.{DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.common.TaxPeriod
@@ -118,6 +119,21 @@ class PaymentsConnectorSpec extends ConnectorSpec {
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
           ).returns(Future.successful(outcome))
+
+        await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
+      }
+
+      "return a downstream error when backend fails" in new Test {
+        val outcome = Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR")))))
+
+        MockedHttpClient
+          .get(
+            url = s"$baseUrl/enterprise/financial-data/VRN/$vrn/VATC",
+            queryParams = queryParams,
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.failed(new Exception("test exception")))
 
         await(connector.retrievePayments(retrievePaymentsRequest)) shouldBe outcome
       }

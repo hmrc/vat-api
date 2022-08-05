@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.PenaltiesConstants
-import v1.models.errors.{MtdError, PenaltiesInvalidCorrelationId, PenaltiesInvalidDataLimit, PenaltiesNotDataFound, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.models.errors.{MtdError, PenaltiesInvalidCorrelationId, PenaltiesNotDataFound, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class PenaltiesControllerISpec extends IntegrationBaseSpec {
@@ -69,6 +69,31 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             val response: WSResponse = await(request.get())
             response.status shouldBe OK
             response.json shouldBe PenaltiesConstants.testPenaltiesResponseJsonMax
+            response.header("Content-Type") shouldBe Some("application/json")
+          }
+        }
+
+        "an invalid request is made" must {
+
+          "return 500" in new Test {
+            val errorBody: JsValue = Json.parse(
+              """
+                |{
+                |"failures": [{
+                | "code":"DOWNSTREAM_ERROR",
+                | "reason":"test exception"
+                |}]
+                |}
+                |""".stripMargin)
+            override def setupStubs(): StubMapping = {
+              AuditStub.audit()
+              AuthStub.authorised()
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+            }
+
+            val response: WSResponse = await(request.get())
+            response.status shouldBe INTERNAL_SERVER_ERROR
+            response.json shouldBe Json.toJson(PenaltiesConstants.errorWrapper(MtdError("DOWNSTREAM_ERROR", "test exception")))
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }

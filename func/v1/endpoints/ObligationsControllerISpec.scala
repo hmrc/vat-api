@@ -138,6 +138,31 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
     }
 
     "return a 500 status code with expected body" when {
+      "downstream is not available" in new Test {
+
+        val downStreamJson: JsValue = Json.parse(
+          s"""
+             |{
+             |"code":"INTERNAL_SERVER_ERROR",
+             |"message":"An internal server error occurred"
+             |}""".stripMargin
+        )
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, INTERNAL_SERVER_ERROR, "An internal server error occurred")
+        }
+
+        private val response = await(request.get())
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe downStreamJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+    }
+
+    "return a 500 status code with expected body" when {
       "des returns multiple errors" in new Test{
 
         val multipleErrors: String =

@@ -19,6 +19,7 @@ package v1.connectors
 import mocks.MockAppConfig
 import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
+import v1.models.errors.{DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.{Obligation, ObligationsResponse}
@@ -119,6 +120,24 @@ class ObligationsConnectorSpec extends ConnectorSpec {
           ).returns(Future.successful(outcome))
 
         await(connector.retrieveObligations(request)) shouldBe outcome
+      }
+
+      "return a downstream error when backend fails" in new Test {
+
+        val queryParams: Seq[(String, String)] = Seq("status" -> "O")
+
+        val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = Some("O"))
+
+        MockedHttpClient
+          .get(
+            url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
+            queryParams = queryParams,
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.failed(new Exception("test exception")))
+
+        await(connector.retrieveObligations(request)) shouldBe Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR")))))
       }
     }
   }

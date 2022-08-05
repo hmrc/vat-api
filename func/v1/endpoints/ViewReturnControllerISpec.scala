@@ -114,6 +114,34 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
       }
     }
 
+    "return a 500 status code" when {
+      "downstream not available" in new Test{
+
+        val multipleErrors: String =
+          """
+            |{
+            |   "failures": [
+            |        {
+            |            "code": "INTERNAL_SERVER_ERROR",
+            |            "reason": "An internal server error occurred"
+            |        }
+            |    ]
+            |}
+          """.stripMargin
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl, queryParams, BAD_REQUEST, multipleErrors)
+        }
+
+        private val response = await(request.get)
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe Json.toJson(DownstreamError)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
+
     "return error according to spec" when {
 
       def validationErrorTest(requestVrn: String, requestPeriodKey: String,

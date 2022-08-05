@@ -62,6 +62,7 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
       "INSOLVENT_TRADER"                   -> RuleInsolventTraderError,
       "NOT_FOUND"                          -> LegacyNotFoundError,
       "SERVER_ERROR"                       -> DownstreamError,
-      "SERVICE_UNAVAILABLE"                -> DownstreamError
+      "SERVICE_UNAVAILABLE"                -> DownstreamError,
+      "DOWNSTREAM_ERROR"                   -> DownstreamError
     )
 }

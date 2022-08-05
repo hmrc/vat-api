@@ -20,6 +20,7 @@ import mocks.MockAppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
 import v1.mocks.MockHttpClient
 import v1.models.domain.Vrn
+import v1.models.errors.{DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
 import v1.models.response.submit.SubmitResponse
@@ -89,6 +90,27 @@ class SubmitReturnConnectorSpec extends ConnectorSpec {
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
             ).returns(Future.successful(outcome))
+
+        await(connector.submitReturn(submitReturnRequest)) shouldBe outcome
+      }
+
+        "return a downstream error when backend fails" in new Test {
+        val outcome = Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR")))))
+
+          implicit val hc: HeaderCarrier = HeaderCarrier(
+            requestId = Some(RequestId("123")),
+            otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json")
+          )
+          val requiredDesHeaders: Seq[(String, String)] = requiredDesHeadersPost ++ Seq("Content-Type" -> "application/json")
+
+        MockedHttpClient
+          .post(
+            url = s"$baseUrl/enterprise/return/vat/$vrn",
+            config = dummyDesHeaderCarrierConfig,
+            body = submitReturnRequest.body,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+            ).returns(Future.failed(new Exception("test exception")))
 
         await(connector.submitReturn(submitReturnRequest)) shouldBe outcome
       }

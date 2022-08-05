@@ -21,7 +21,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
-import v1.models.errors.{ConnectorError, DesErrors}
+import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
@@ -63,6 +63,7 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
     ).andThen {
       case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BPKEY) =>
         self.logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
-    }
+    }.recover {
+      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }
