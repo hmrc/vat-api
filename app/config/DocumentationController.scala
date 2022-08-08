@@ -37,7 +37,7 @@ class DocumentationController @Inject()(vatApiDefinition: ApiDefinitionFactory,
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    if (isEnabled(FinancialDataRamlFeature)) {
+    if (appConfig.FinancialDataRamlFeature) {
       assets.at(s"/public/api/conf/$version", "applicationWithFinancialDetailsEndPoint.raml")
     } else {
       assets.at(s"/public/api/conf/$version", file)

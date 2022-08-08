@@ -68,16 +68,14 @@ class DocumentationControllerISpec extends IntegrationBaseSpec with FeatureToggl
 
   "a documentation request" must {
     "return the documentation" in {
-      disable(FinancialDataRamlFeature)
       val response: WSResponse = await(buildRequest("/api/conf/1.0/application.raml").get())
       response.status shouldBe Status.OK
       response.body[String] should startWith("#%RAML 1.0")
-      response.body[String] should not include("/financial-details:")
     }
 
     "return the documentation with financial endpoint" in {
       enable(FinancialDataRamlFeature)
-      val response: WSResponse = await(buildRequest("/api/conf/1.0/application.raml").get())
+      val response: WSResponse = await(buildRequest("/api/conf/1.0/applicationWithFinancialDetailsEndPoint.raml").get())
       response.status shouldBe Status.OK
       response.body[String] should startWith("#%RAML 1.0")
       response.body[String] should include("/financial-details:")
