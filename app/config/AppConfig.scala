@@ -47,7 +47,6 @@ trait AppConfig {
 
   //Penalties config items
   def penaltiesBaseUrl: String
-  def FinancialDataRamlFeature: Boolean
 }
 
 @Singleton
@@ -66,7 +65,6 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   def apiStatus(version: String): String = config.getString(s"api.$version.status")
   def featureSwitch: Option[Configuration] = configuration.getOptional[Configuration](s"feature-switch")
   def endpointsEnabled(version: String): Boolean = config.getBoolean(s"api.$version.endpoints.enabled")
-  def FinancialDataRamlFeature() = config.getBoolean("feature-switch.financialDataRamlFeature.enabled")
 
   // NRS config items
   val nrsApiKey: String = config.getString("access-keys.xApiKey")
