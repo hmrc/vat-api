@@ -20,7 +20,6 @@ import config.FeatureSwitch.FinancialDataRamlFeature
 import controllers.Assets
 import definition.ApiDefinitionFactory
 import javax.inject.{Inject, Singleton}
-import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -37,8 +36,12 @@ class DocumentationController @Inject()(vatApiDefinition: ApiDefinitionFactory,
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    if (appConfig.FinancialDataRamlFeature) {
-      assets.at(s"/public/api/conf/$version", "applicationWithFinancialDetailsEndPoint.raml")
+    if (isEnabled(FinancialDataRamlFeature)) {
+      if(file.equals("application.raml")) {
+        assets.at(s"/public/api/conf/$version", "applicationWithFinancialDetailsEndPoint.raml")
+      } else {
+        assets.at(s"/public/api/conf/$version", file)
+      }
     } else {
       assets.at(s"/public/api/conf/$version", file)
     }
