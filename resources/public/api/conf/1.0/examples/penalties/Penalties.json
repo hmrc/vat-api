@@ -1,29 +1,29 @@
 {
   "totalisations": {
-    "LSPTotalValue": 1234.56,
-    "penalisedPrincipalTotal": 23415.32,
-    "LPPPostedTotal": 124.43,
-    "LPPEstimatedTotal": 135.53,
-    "LPIPostedTotal": 642.23,
-    "LPIEstimatedTotal": 54214.53
+    "LSPTotalValue": 200,
+    "penalisedPrincipalTotal": 2000,
+    "LPPPostedTotal": 165.25,
+    "LPPEstimatedTotal": 15.26,
+    "LPIPostedTotal": 1968.20,
+    "LPIEstimatedTotal": 7
   },
   "lateSubmissionPenalty": {
     "summary": {
       "activePenaltyPoints": 2,
-      "inactivePenaltyPoints": 1,
+      "inactivePenaltyPoints": 10,
       "PoCAchievementDate": "2023-10-30",
-      "regimeThreshold": 24,
-      "penaltyChargeAmount": 23423.53
+      "regimeThreshold": 10,
+      "penaltyChargeAmount": 684.25
     },
     "details": [
       {
         "penaltyNumber": "12345678901234",
         "penaltyOrder": "01",
         "penaltyCategory": "point",
-        "penaltyStatus": "active",
+        "penaltyStatus": "inactive",
         "FAPIndicator": "X",
         "penaltyCreationDate": "2023-10-30",
-        "penaltyExpiryDate": "2023-10-30",
+        "penaltyExpiryDate": "2024-04-31",
         "expiryReason": "FAP",
         "communicationsDate": "2023-10-30",
         "lateSubmissions": [
@@ -44,17 +44,16 @@
           }
         ],
         "chargeReference": "12345678901234",
-        "chargeAmount": 423534.34,
-        "chargeOutstandingAmount": 25432.26,
+        "chargeAmount": 424.34,
         "chargeDueDate": "2023-06-30"
       },
       {
         "penaltyNumber": "43210987654321",
         "penaltyOrder": "02",
         "penaltyCategory": "point",
-        "penaltyStatus": "inactive",
+        "penaltyStatus": "active",
         "penaltyCreationDate": "2023-10-30",
-        "penaltyExpiryDate": "2023-10-30",
+        "penaltyExpiryDate": "2025-10-30",
         "expiryReason": "FAP",
         "communicationsDate": "2023-10-30" ,
         "lateSubmissions": [
@@ -69,8 +68,8 @@
           }
         ],
         "chargeReference": "12345678901234",
-        "chargeAmount": 423534.34,
-        "chargeOutstandingAmount": 25432.26,
+        "chargeAmount": 534.34,
+        "chargeOutstandingAmount": 132.26,
         "chargeDueDate": "2023-06-30"
       }
     ]
@@ -81,10 +80,10 @@
         "principalChargeReference": "12345678901234",
         "penaltyCategory": "LPP1",
         "penaltyStatus": "accruing",
-        "penaltyAmountAccruing": 48735.21,
+        "penaltyAmountAccruing": 1435.21,
         "penaltyAmountPosted": 832.35,
         "penaltyAmountPaid": 529.35,
-        "penaltyAmountOutstanding": 364.35,
+        "penaltyAmountOutstanding": 303,
         "LPP1LRCalculationAmount": 754.43,
         "LPP1LRPercentage": 2.00,
         "LPP1HRCalculationAmount": 724.24,
@@ -104,7 +103,7 @@
         "principalChargeDocNumber": "123456789012",
         "principalChargeMainTransaction": "4700",
         "principalChargeSubTransaction": "1174",
-        "principalChargeBillingFrom": "2023-01-30",
+        "principalChargeBillingFrom": "2023-01-01",
         "principalChargeBillingTo": "2023-03-30",
         "principalChargeDueDate": "2023-04-30",
         "principalChargeLatestClearing": "2023-05-30",
