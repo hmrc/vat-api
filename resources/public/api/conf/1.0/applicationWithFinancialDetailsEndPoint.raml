@@ -429,7 +429,7 @@ traits:
       displayName: Retrieve VAT penalties
       description: Retrieves details of all the penalties that have been applied to a VAT account.
       get:
-        displayName: Retrieve VAT penalties
+        displayName: Retrieve VAT penalties [test only]
         description: Retrieves details of all the penalties that have been applied to a VAT account.
         (annotations.sandboxData): !include scenarios/vat-penalties-scenarios.md
         is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
@@ -471,7 +471,7 @@ traits:
       displayName: Retrieve VAT financial-details
       description: Retrieve VAT financial-details
       get:
-        displayName: Retrieve VAT financial-details
+        displayName: Retrieve VAT financial-details [test only]
         description: Retrieve VAT financial-details
         (annotations.sandboxData): !include scenarios/vat-financial-details-scenarios.md
         is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
