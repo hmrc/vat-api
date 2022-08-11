@@ -96,6 +96,22 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
       }
     }
 
+    "return a 500 status code" when {
+      "downstream is not accessible" in new Test{
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, "An internal server error occurred")
+        }
+
+        private val response = await(request.get)
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe downStreamJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
+
     "return a 500 status code with expected body" when {
       "des returns multiple errors" in new Test{
 

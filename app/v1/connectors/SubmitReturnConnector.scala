@@ -17,6 +17,7 @@
 package v1.connectors
 
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
@@ -48,6 +49,7 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
     post(
       body = request.body,
       uri = DesUri[SubmitResponse](s"enterprise/return/vat/$vrn")
-    )
+    ).recover {
+      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }

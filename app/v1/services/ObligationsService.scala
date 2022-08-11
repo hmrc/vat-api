@@ -63,6 +63,7 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
       NOT_FOUND_BPKEY      -> DownstreamError,
       "NOT_FOUND"           -> LegacyNotFoundError,
       "SERVICE_ERROR"       -> DownstreamError,
-      "SERVICE_UNAVAILABLE" -> DownstreamError
+      "SERVICE_UNAVAILABLE" -> DownstreamError,
+      "DOWNSTREAM_ERROR"    -> DownstreamError
     )
 }

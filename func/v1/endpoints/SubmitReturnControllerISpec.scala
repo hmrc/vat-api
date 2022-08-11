@@ -206,6 +206,40 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
       }
     }
 
+    "return a 500 status code" when {
+      "downstream is not available" in new Test {
+        val error: String =
+          """
+            |{
+            |   "failures": [
+            |        {
+            |            "code": "INTERNAL_SERVER_ERROR",
+            |            "reason": "An internal server error occurred"
+            |        }
+            |    ]
+            |}
+          """.stripMargin
+
+        val downStreamJson: JsValue = Json.parse(
+          s"""
+             |{
+             |"code":"INTERNAL_SERVER_ERROR",
+             |"message":"An internal server error occurred"
+             |}""".stripMargin
+        )
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorisedWithNrs()
+          DesStub.onError(DesStub.POST, desUrl, INTERNAL_SERVER_ERROR, error)
+        }
+
+        private val response = await(request.post(requestJson))
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.json shouldBe downStreamJson
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
+
     "return a 400 status code" when {
       "a request is made with invalid monetary value" in new Test {
 

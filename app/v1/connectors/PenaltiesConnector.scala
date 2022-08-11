@@ -22,10 +22,12 @@ import utils.Logging
 import v1.connectors.httpparsers.PenaltiesHttpParser._
 import v1.connectors.httpparsers.FinancialDataHttpParser._
 import v1.controllers.UserRequest
+import v1.models.errors.{DesErrorCode, DesErrors, ErrorWrapper, MtdError}
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
 import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -57,7 +59,8 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
       http.GET[Outcome[PenaltiesResponse]](url)
     }
-    doGet(headerCarrier())
+    doGet(headerCarrier()).recover {
+      case e => Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage))) }
   }
 
 
@@ -72,6 +75,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
       http.GET[Outcome[FinancialDataResponse]](url)
     }
-    doGet(headerCarrier())
+    doGet(headerCarrier()).recover {
+      case e => Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage))) }
   }
 }

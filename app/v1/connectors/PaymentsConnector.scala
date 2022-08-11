@@ -17,13 +17,14 @@
 package v1.connectors
 
 import java.time.LocalDate
-
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
-import v1.models.errors.ConnectorError
+import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.payments.PaymentsResponse
 
@@ -57,6 +58,7 @@ class PaymentsConnector @Inject()(val http: HttpClient,
     get(
       uri = DesUri[PaymentsResponse](s"enterprise/financial-data/VRN/$vrn/VATC"),
       queryParams = queryParams
-    )
+    ).recover {
+      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }

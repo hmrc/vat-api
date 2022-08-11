@@ -62,6 +62,7 @@ class LiabilitiesService @Inject()(connector: LiabilitiesConnector) extends DesR
       "INVALID_DATA"                       -> InvalidDataError,
       "INSOLVENT_TRADER"                   -> RuleInsolventTraderError,
       "SERVER_ERROR"                       -> DownstreamError,
-      "SERVICE_UNAVAILABLE"                -> DownstreamError
+      "SERVICE_UNAVAILABLE"                -> DownstreamError,
+      "DOWNSTREAM_ERROR"                   -> DownstreamError
     )
 }

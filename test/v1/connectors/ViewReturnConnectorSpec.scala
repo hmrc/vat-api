@@ -19,6 +19,7 @@ package v1.connectors
 import mocks.MockAppConfig
 import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
+import v1.models.errors.{DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.viewReturn.ViewRequest
 import v1.models.response.viewReturn.ViewReturnResponse
@@ -82,6 +83,26 @@ class ViewReturnConnectorSpec extends ConnectorSpec {
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
           ).returns(Future.successful(outcome))
+
+        await(connector.viewReturn(viewReturnRequest)) shouldBe outcome
+      }
+
+      "return a downstream error when backend fails" in new Test {
+        val outcome = Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR")))))
+
+        val queryParams: Seq[(String, String)] =
+          Seq(
+            "period-key" -> periodKey
+          )
+
+        MockedHttpClient
+          .get(
+            url = s"$baseUrl/vat/returns/vrn/$vrn",
+            queryParams = queryParams,
+            config = dummyDesHeaderCarrierConfig,
+            requiredHeaders = requiredDesHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.failed(new Exception("test exception")))
 
         await(connector.viewReturn(viewReturnRequest)) shouldBe outcome
       }

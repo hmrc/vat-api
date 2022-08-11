@@ -20,7 +20,7 @@ import play.api.http.Status
 import support.GuiceBox
 import v1.constants.{FinancialDataConstants, PenaltiesConstants}
 import v1.mocks.MockHttpClient
-import v1.models.errors.{InvalidJson, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.models.errors.{ErrorWrapper, InvalidJson, MtdError, UnexpectedFailure, VrnFormatError, VrnNotFound}
 
 import scala.concurrent.Future
 
@@ -256,6 +256,20 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
 
           val result = testConnector.retrieveFinancialData(FinancialDataConstants.financialRequest)
           val expectedResult = Left(UnexpectedFailure.mtdError(Status.INTERNAL_SERVER_ERROR, "error"))
+
+          await(result) shouldBe expectedResult
+        }
+
+        "return return a downstream error when backend fails" in {
+
+          MockedHttpClient.get(
+            url = FinancialDataConstants.financialDataUrlWithConfig(),
+            config = dummyHeaderCarrierConfig,
+            queryParams = Seq()
+          ).returns(Future.failed(new Exception("test exception")))
+
+          val result = testConnector.retrieveFinancialData(FinancialDataConstants.financialRequest)
+          val expectedResult = Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", "test exception")))
 
           await(result) shouldBe expectedResult
         }
