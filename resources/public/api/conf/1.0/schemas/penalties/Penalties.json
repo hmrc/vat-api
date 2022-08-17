@@ -138,9 +138,19 @@
                 "example": "2024-07-01"
               },
               "expiryReason": {
-                "description": "Reason why a penalty point has expired.",
+                "description": "The reason why a penalty point has expired.",
                 "type": "string",
-                "example": "FAP"
+                "example": "appeal",
+                "oneOf": [
+                  { "enum": ["appeal"], "description": "The penalty point has expired due to a successful appeal." },
+                  { "enum": ["submission-frequency-change"], "description": "The penalty point has expired due to a change in the user's submission frequency." },
+                  { "enum": ["obligations-reversed"], "description": "A change has resulted in the user's obligations being reversed. For example, a user might have deregistered for VAT before a submission was due." },
+                  { "enum": ["HMRC-removed"], "description": "An HMRC officer has removed the penalty. This might happen, for example, following a decision made by a tribunal." },
+                  { "enum": ["natural-expiry"], "description": "The penalty point has expired naturally. For example, it has reached the end of its 24-month lifetime." },
+                  { "enum": ["penalty-removed"], "description": "The penalty has been removed because the submission was deemed to be on time." },
+                  { "enum": ["expiry-conditions-met"], "description": "The penalty point has expired because the user has met the conditions for the expiry of all active penalty points." },
+                  { "enum": ["HMRC-reset"], "description": "An HMRC officer has reset the user's penalty points to zero." }
+                ]
               },
               "communicationsDate": {
                 "description": "This is the date that letters about a penalty are sent to users.",
