@@ -21,7 +21,8 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
-import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
+import v1.models.response.financialData.FinancialDataResponse
+import v1.models.response.penalties.PenaltiesResponse
 import v1.services.{PenaltiesService, ServiceOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}

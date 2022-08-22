@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.models.response.financialData
 
 import play.api.libs.json._
 

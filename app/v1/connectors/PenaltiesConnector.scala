@@ -25,7 +25,9 @@ import v1.controllers.UserRequest
 import v1.models.errors.{DesErrorCode, DesErrors, ErrorWrapper, MtdError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
-import v1.models.response.penalties.{FinancialDataResponse, PenaltiesResponse}
+import v1.models.response.penalties.PenaltiesResponse
+import v1.models.response.financialData.FinancialDataResponse
+import v1.models.response.penalties.PenaltiesResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

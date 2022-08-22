@@ -30,7 +30,7 @@ object PenaltiesHttpParser extends Logging {
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
     //TODO change content after user research
-    def errorHelper(jsonString: JsValue, status: Int): (MtdError, Option[List[MtdError]]) = {
+    def errorHelper(jsonString: JsValue, status: Int): (MtdError, Option[Seq[MtdError]]) = {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code, status) match {

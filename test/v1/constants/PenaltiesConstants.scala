@@ -26,7 +26,7 @@ import v1.models.domain.Vrn
 import v1.models.errors.{ErrorWrapper, MtdError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
-import v1.models.response.penalties.{AppealInformation, LatePaymentPenalty, LatePaymentPenaltyDetails, LateSubmissionPenalty, LateSubmissionPenaltyDetails, LateSubmissionPenaltySummary, LateSubmissions, PenaltiesResponse, TimeToPay, Totalisations}
+import v1.models.response.penalties._
 
 object PenaltiesConstants {
 
@@ -49,8 +49,6 @@ object PenaltiesConstants {
     penalisedPrincipalTotal = None,
     LPPPostedTotal = None,
     LPPEstimatedTotal = None,
-    LPIPostedTotal = None,
-    LPIEstimatedTotal = None
   )
 
   val testPenaltiesTotalisationDataJsonMin: JsObject = Json.obj()
@@ -60,8 +58,6 @@ object PenaltiesConstants {
     penalisedPrincipalTotal = Some(11),
     LPPPostedTotal = Some(12),
     LPPEstimatedTotal = Some(13),
-    LPIPostedTotal = Some(14),
-    LPIEstimatedTotal = Some(15)
   )
 
   val testPenaltiesTotalisationDataJsonMax: JsObject = Json.obj(
@@ -69,8 +65,6 @@ object PenaltiesConstants {
     "penalisedPrincipalTotal" -> 11,
     "LPPPostedTotal" -> 12,
     "LPPEstimatedTotal" -> 13,
-    "LPIPostedTotal" -> 14,
-    "LPIEstimatedTotal" -> 15
 
   )
 
@@ -78,8 +72,8 @@ object PenaltiesConstants {
     LateSubmissionPenaltyDetails(
       penaltyNumber = "123",
       penaltyOrder = "123",
-      penaltyCategory = "123",
-      penaltyStatus = "123",
+      penaltyCategory = LateSubmissionPenaltyCategoryUpstream.`point`,
+      penaltyStatus = LateSubmissionPenaltyStatusUpstream.`active`,
       FAPIndicator = Some("123"),
       penaltyCreationDate = "123",
       triggeringProcess = "123",
@@ -89,7 +83,7 @@ object PenaltiesConstants {
       lateSubmissions = Some(List(LateSubmissions(
         lateSubmissionID = "123",
         taxPeriod = Some("123"),
-        taxReturnStatus = "123",
+        taxReturnStatus = TaxReturnStatus.`Open`,
         taxPeriodStartDate = Some("123"),
         taxPeriodEndDate = Some("2022-10-11"),
         taxPeriodDueDate = Some("2022-10-11"),
@@ -97,9 +91,8 @@ object PenaltiesConstants {
       ))),
       appealInformation = Some(List(
         AppealInformation(
-          appealStatus = "123",
-          appealDescription = "123",
-          appealLevel = "123"
+          appealStatus = AppealStatusUpstream.`under appeal`,
+          appealLevel = AppealLevelUpstream.`review`
         )
       )),
       chargeReference = Some(testChargeRef),
@@ -113,16 +106,14 @@ object PenaltiesConstants {
     LatePaymentPenaltyDetails(
       principalChargeReference = testPrincipalChargeReference,
       penaltyCategory = "123",
-      penaltyStatus = "123",
+      penaltyStatus = LatePaymentPenaltyStatusUpstream.`posted`,
       penaltyAmountAccruing = 123,
       penaltyAmountPosted = 123,
       penaltyAmountPaid = Some(123),
       penaltyAmountOutstanding = Some(123),
       LPP1LRCalculationAmount = Some(123),
-      LPP1LRDays = Some("123"),
       LPP1LRPercentage = Some(123),
       LPP1HRCalculationAmount = Some(123),
-      LPP1HRDays = Some("123"),
       LPP1HRPercentage = Some(123),
       LPP2Days = Some("123"),
       LPP2Percentage = Some(123),
@@ -132,9 +123,8 @@ object PenaltiesConstants {
       penaltyChargeDueDate = "2022-10-11",
       appealInformation = Some(Seq(
         AppealInformation(
-          appealStatus = "123",
-          appealDescription = "123",
-          appealLevel = "123"
+          appealStatus = AppealStatusUpstream.`under appeal`,
+          appealLevel = AppealLevelUpstream.`review`
         )
       )),
       principalChargeDocNumber = "123",
@@ -167,13 +157,13 @@ object PenaltiesConstants {
     )
   )
 
-  val testLateSubmissionDetailsJson: JsValue = {
+  val downstreamTestLateSubmissionDetailsJson: JsValue = {
     Json.parse(
     """|[{
       |            "penaltyNumber":"123",
       |            "penaltyOrder":"123",
-      |            "penaltyCategory":"123",
-      |            "penaltyStatus":"123",
+      |            "penaltyCategory":"P",
+      |            "penaltyStatus":"ACTIVE",
       |            "FAPIndicator":"123",
       |            "penaltyCreationDate":"123",
       |            "triggeringProcess":"123",
@@ -184,7 +174,7 @@ object PenaltiesConstants {
       |               {
       |                  "lateSubmissionID":"123",
       |                  "taxPeriod":"123",
-      |                  "taxReturnStatus":"123",
+      |                  "taxReturnStatus":"Open",
       |                  "taxPeriodStartDate":"123",
       |                  "taxPeriodEndDate":"2022-10-11",
       |                  "taxPeriodDueDate":"2022-10-11",
@@ -193,9 +183,8 @@ object PenaltiesConstants {
       |            ],
       |            "appealInformation":[
       |               {
-      |                  "appealStatus":"123",
-      |                  "appealLevel":"123",
-      |                  "appealDescription":"123"
+      |                  "appealStatus":"A",
+      |                  "appealLevel":"02"
       |               }
       |            ],
       |            "chargeReference":"123",
@@ -206,8 +195,8 @@ object PenaltiesConstants {
       |         {
        |            "penaltyNumber":"123",
        |            "penaltyOrder":"123",
-       |            "penaltyCategory":"123",
-       |            "penaltyStatus":"123",
+       |            "penaltyCategory":"P",
+       |            "penaltyStatus":"ACTIVE",
        |            "FAPIndicator":"123",
        |            "penaltyCreationDate":"123",
        |            "triggeringProcess":"123",
@@ -218,7 +207,7 @@ object PenaltiesConstants {
        |               {
        |                  "lateSubmissionID":"123",
        |                  "taxPeriod":"123",
-       |                  "taxReturnStatus":"123",
+       |                  "taxReturnStatus":"Open",
        |                  "taxPeriodStartDate":"123",
        |                  "taxPeriodEndDate":"2022-10-11",
        |                  "taxPeriodDueDate":"2022-10-11",
@@ -227,9 +216,80 @@ object PenaltiesConstants {
        |            ],
        |            "appealInformation":[
        |               {
-       |                  "appealStatus":"123",
-       |                  "appealLevel":"123",
-       |                  "appealDescription":"123"
+       |                  "appealStatus":"A",
+       |                  "appealLevel":"02"
+       |               }
+       |            ],
+       |            "chargeReference":"1234",
+       |            "chargeAmount":123,
+       |            "chargeOutstandingAmount":123,
+       |            "chargeDueDate":"2022-10-11"
+       |         }
+      |      ]
+      |""".stripMargin)
+  }
+
+  val upstreamTestLateSubmissionDetailsJson: JsValue = {
+    Json.parse(
+    """|[{
+      |            "penaltyNumber":"123",
+      |            "penaltyOrder":"123",
+      |            "penaltyCategory":"point",
+      |            "penaltyStatus":"active",
+      |            "FAPIndicator":"123",
+      |            "penaltyCreationDate":"123",
+      |            "triggeringProcess":"123",
+      |            "penaltyExpiryDate":"123",
+      |            "expiryReason": "123",
+      |            "communicationsDate":"123",
+      |            "lateSubmissions":[
+      |               {
+      |                  "lateSubmissionID":"123",
+      |                  "taxPeriod":"123",
+      |                  "taxReturnStatus":"Open",
+      |                  "taxPeriodStartDate":"123",
+      |                  "taxPeriodEndDate":"2022-10-11",
+      |                  "taxPeriodDueDate":"2022-10-11",
+      |                  "returnReceiptDate":"2022-10-11"
+      |               }
+      |            ],
+      |            "appealInformation":[
+      |               {
+      |                  "appealStatus":"under appeal",
+      |                  "appealLevel":"review"
+      |               }
+      |            ],
+      |            "chargeReference":"123",
+      |            "chargeAmount":123,
+      |            "chargeOutstandingAmount":123,
+      |            "chargeDueDate":"2022-10-11"
+      |         },
+      |         {
+       |            "penaltyNumber":"123",
+       |            "penaltyOrder":"123",
+       |            "penaltyCategory":"point",
+       |            "penaltyStatus":"active",
+       |            "FAPIndicator":"123",
+       |            "penaltyCreationDate":"123",
+       |            "triggeringProcess":"123",
+       |            "penaltyExpiryDate":"123",
+       |            "expiryReason":"123",
+       |            "communicationsDate":"123",
+       |            "lateSubmissions":[
+       |               {
+       |                  "lateSubmissionID":"123",
+       |                  "taxPeriod":"123",
+       |                  "taxReturnStatus":"Open",
+       |                  "taxPeriodStartDate":"123",
+       |                  "taxPeriodEndDate":"2022-10-11",
+       |                  "taxPeriodDueDate":"2022-10-11",
+       |                  "returnReceiptDate":"2022-10-11"
+       |               }
+       |            ],
+       |            "appealInformation":[
+       |               {
+       |                  "appealStatus":"under appeal",
+       |                  "appealLevel":"review"
        |               }
        |            ],
        |            "chargeReference":"1234",
@@ -242,13 +302,13 @@ object PenaltiesConstants {
   }
 
 
-  val testLatePaymentPenaltyDetailsJson: JsValue = {
+  val downstreamTestLatePaymentPenaltyDetailsJson: JsValue = {
     Json.parse(
       """
         |[{
         |"principalChargeReference": "123",
         |    "penaltyCategory": "123",
-        |    "penaltyStatus": "123",
+        |    "penaltyStatus": "P",
         |    "penaltyAmountAccruing": 123,
         |    "penaltyAmountPosted": 123,
         |    "penaltyAmountPaid": 123,
@@ -257,7 +317,6 @@ object PenaltiesConstants {
         |    "LPP1LRDays": "123",
         |    "LPP1LRPercentage": 123,
         |    "LPP1HRCalculationAmount": 123,
-        |    "LPP1HRDays": "123",
         |    "LPP1HRPercentage": 123,
         |    "LPP2Days": "123",
         |    "LPP2Percentage": 123,
@@ -266,9 +325,8 @@ object PenaltiesConstants {
         |    "penaltyChargeReference": "123",
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
-        |        "appealStatus":  "123",
-        |        "appealDescription": "123",
-        |        "appealLevel": "123"
+        |        "appealStatus":  "A",
+        |        "appealLevel": "02"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
@@ -285,7 +343,7 @@ object PenaltiesConstants {
         |{
         |"principalChargeReference": "1234",
         |    "penaltyCategory": "123",
-        |    "penaltyStatus": "123",
+        |    "penaltyStatus": "P",
         |    "penaltyAmountAccruing": 123,
         |    "penaltyAmountPosted": 123,
         |    "penaltyAmountPaid": 123,
@@ -294,7 +352,6 @@ object PenaltiesConstants {
         |    "LPP1LRDays": "123",
         |    "LPP1LRPercentage": 123,
         |    "LPP1HRCalculationAmount": 123,
-        |    "LPP1HRDays": "123",
         |    "LPP1HRPercentage": 123,
         |    "LPP2Days": "123",
         |    "LPP2Percentage": 123,
@@ -303,9 +360,84 @@ object PenaltiesConstants {
         |    "penaltyChargeReference": "123",
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
-        |        "appealStatus":  "123",
-        |        "appealDescription": "123",
-        |        "appealLevel": "123"
+        |        "appealStatus":  "A",
+        |        "appealLevel": "02"
+        |      }],
+        |    "principalChargeDocNumber": "123",
+        |    "principalChargeMainTransaction": "123",
+        |    "principalChargeSubTransaction": "123",
+        |    "principalChargeBillingFrom": "2022-10-11",
+        |    "principalChargeBillingTo": "2022-10-11",
+        |    "principalChargeDueDate": "2022-10-11",
+        |    "principalChargeLatestClearing": "123",
+        |    "timeToPay": [{
+        |        "TTPStartDate": "2022-10-11",
+        |        "TTPEndDate": "2022-10-11"
+        |        }]
+        |}
+        | ]
+        |""".stripMargin
+    )
+  }
+
+  val upstreamTestLatePaymentPenaltyDetailsJson: JsValue = {
+    Json.parse(
+      """
+        |[{
+        |"principalChargeReference": "123",
+        |    "penaltyCategory": "123",
+        |    "penaltyStatus": "posted",
+        |    "penaltyAmountAccruing": 123,
+        |    "penaltyAmountPosted": 123,
+        |    "penaltyAmountPaid": 123,
+        |    "penaltyAmountOutstanding": 123,
+        |    "LPP1LRCalculationAmount": 123,
+        |    "LPP1LRPercentage": 123,
+        |    "LPP1HRCalculationAmount": 123,
+        |    "LPP1HRPercentage": 123,
+        |    "LPP2Days": "123",
+        |    "LPP2Percentage": 123,
+        |    "penaltyChargeCreationDate": "2022-10-11",
+        |    "communicationsDate": "2022-10-11",
+        |    "penaltyChargeReference": "123",
+        |    "penaltyChargeDueDate": "2022-10-11",
+        |    "appealInformation": [{
+        |        "appealStatus":  "under appeal",
+        |        "appealLevel": "review"
+        |      }],
+        |    "principalChargeDocNumber": "123",
+        |    "principalChargeMainTransaction": "123",
+        |    "principalChargeSubTransaction": "123",
+        |    "principalChargeBillingFrom": "2022-10-11",
+        |    "principalChargeBillingTo": "2022-10-11",
+        |    "principalChargeDueDate": "2022-10-11",
+        |    "principalChargeLatestClearing": "123",
+        |    "timeToPay": [{
+        |        "TTPStartDate": "2022-10-11",
+        |        "TTPEndDate": "2022-10-11"
+        |        }]
+        |},
+        |{
+        |"principalChargeReference": "1234",
+        |    "penaltyCategory": "123",
+        |    "penaltyStatus": "posted",
+        |    "penaltyAmountAccruing": 123,
+        |    "penaltyAmountPosted": 123,
+        |    "penaltyAmountPaid": 123,
+        |    "penaltyAmountOutstanding": 123,
+        |    "LPP1LRCalculationAmount": 123,
+        |    "LPP1LRPercentage": 123,
+        |    "LPP1HRCalculationAmount": 123,
+        |    "LPP1HRPercentage": 123,
+        |    "LPP2Days": "123",
+        |    "LPP2Percentage": 123,
+        |    "penaltyChargeCreationDate": "2022-10-11",
+        |    "communicationsDate": "2022-10-11",
+        |    "penaltyChargeReference": "123",
+        |    "penaltyChargeDueDate": "2022-10-11",
+        |    "appealInformation": [{
+        |        "appealStatus":  "under appeal",
+        |        "appealLevel": "review"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
@@ -346,13 +478,22 @@ object PenaltiesConstants {
     "penaltyChargeAmount" -> 123
   )
 
-  val testLatePaymentPenaltyJson: JsObject = Json.obj(
-    "details" -> testLatePaymentPenaltyDetailsJson
+  val upstreamTestLatePaymentPenaltyJson: JsObject = Json.obj(
+    "details" -> upstreamTestLatePaymentPenaltyDetailsJson
   )
 
-  val testLateSubmissionPenaltyJson: JsObject = Json.obj(
+  val downstreamTestLatePaymentPenaltyJson: JsObject = Json.obj(
+    "details" -> downstreamTestLatePaymentPenaltyDetailsJson
+  )
+
+  val downstreamTestLateSubmissionPenaltyJson: JsObject = Json.obj(
     "summary" -> testLateSubmissionPenaltySummaryJson,
-    "details" -> testLateSubmissionDetailsJson
+    "details" -> downstreamTestLateSubmissionDetailsJson
+  )
+
+  val upstreamTestLateSubmissionPenaltyJson: JsObject = Json.obj(
+    "summary" -> testLateSubmissionPenaltySummaryJson,
+    "details" -> upstreamTestLateSubmissionDetailsJson
   )
 
 
@@ -364,10 +505,16 @@ object PenaltiesConstants {
 
   val testPenaltiesResponseJsonMin: JsObject = Json.obj()
 
-  val testPenaltiesResponseJsonMax: JsObject = Json.obj(
+  val upstreamTestPenaltiesResponseJsonMax: JsObject = Json.obj(
     "totalisations" -> Some(testPenaltiesTotalisationDataJsonMax),
-    "lateSubmissionPenalty" -> Some(testLateSubmissionPenaltyJson),
-    "latePaymentPenalty" -> Some(testLatePaymentPenaltyJson)
+    "lateSubmissionPenalty" -> Some(upstreamTestLateSubmissionPenaltyJson),
+    "latePaymentPenalty" -> Some(upstreamTestLatePaymentPenaltyJson)
+  )
+
+  val downstreamTestPenaltiesResponseJsonMax: JsObject = Json.obj(
+    "totalisations" -> Some(testPenaltiesTotalisationDataJsonMax),
+    "lateSubmissionPenalty" -> Some(downstreamTestLateSubmissionPenaltyJson),
+    "latePaymentPenalty" -> Some(downstreamTestLatePaymentPenaltyJson)
   )
 
   def wrappedPenaltiesResponse(penaltiesResponse: PenaltiesResponse = testPenaltiesResponseMin): ResponseWrapper[PenaltiesResponse] = {

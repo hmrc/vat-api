@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.response.penalties
+package v1.models.response.financialData
 
 import play.api.libs.json.Json
 import support.UnitSpec
 import v1.constants.FinancialDataConstants
 
-class FinancialDataSpec extends UnitSpec {
+class FinancialDataResponseSpec extends UnitSpec {
 
   "FinancialData" must {
 

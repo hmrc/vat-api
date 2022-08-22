@@ -28,6 +28,8 @@ import v1.models.domain.Vrn
 import v1.models.errors.{ErrorWrapper, MtdError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{FinancialRawData, FinancialRequest}
+import v1.models.response.financialData
+import v1.models.response.financialData.{BalanceDetails, CodingDetails, DocumentDetails, FinancialDataResponse, FinancialDetails, Items, TaxPayerDetails}
 import v1.models.response.penalties._
 
 object FinancialDataConstants {
@@ -702,7 +704,7 @@ object FinancialDataConstants {
   )
 
 
-  val testFinancialResponseMax: FinancialDataResponse = FinancialDataResponse(
+  val testFinancialResponseMax: FinancialDataResponse = financialData.FinancialDataResponse(
     taxPayerDetails = testTaxPayerDetails,
     balanceDetails = testBalanceDetailsMax,
     codingDetails = Some(Seq(testCodingDetails("123"), testCodingDetails("1234"))),
