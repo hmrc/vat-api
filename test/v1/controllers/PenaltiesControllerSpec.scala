@@ -90,14 +90,14 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
             val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
 
             status(result) shouldBe OK
-            contentAsJson(result) shouldBe PenaltiesConstants.testPenaltiesResponseJsonMax
+            contentAsJson(result) shouldBe PenaltiesConstants.upstreamTestPenaltiesResponseJsonMax
             contentType(result) shouldBe Some("application/json")
             header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
 
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
               correlationId = PenaltiesConstants.correlationId,
               userDetails = PenaltiesConstants.userDetails,
-              auditResponse = AuditResponse(OK, None, Some(PenaltiesConstants.testPenaltiesResponseJsonMax))
+              auditResponse = AuditResponse(OK, None, Some(PenaltiesConstants.upstreamTestPenaltiesResponseJsonMax))
             ))
           }
         }

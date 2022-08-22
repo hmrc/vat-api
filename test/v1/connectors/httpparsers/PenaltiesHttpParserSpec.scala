@@ -55,7 +55,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
             val result = PenaltiesHttpReads.read("", "",
               HttpResponse(
                 status = Status.OK,
-                json = PenaltiesConstants.testPenaltiesResponseJsonMax,
+                json = PenaltiesConstants.downstreamTestPenaltiesResponseJsonMax,
                 headers = Map(
                   "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
                 )

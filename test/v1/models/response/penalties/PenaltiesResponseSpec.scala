@@ -21,26 +21,26 @@ import support.UnitSpec
 import v1.constants.PenaltiesConstants
 import v1.constants.PenaltiesConstants._
 
-class PenaltiesDataSpec extends UnitSpec {
+class PenaltiesResponseSpec extends UnitSpec {
 
   "PenaltiesData" must {
 
-    "read data from json min" in {
+    "write data from json min" in {
 
       Json.toJson(testPenaltiesResponseMin) shouldBe testPenaltiesResponseJsonMin
     }
 
-    "write to json min" in {
+    "read to json min" in {
       testPenaltiesResponseJsonMin.as[PenaltiesResponse] shouldBe testPenaltiesResponseMin
     }
 
-    "read data from json max" in {
+    "write data from json max" in {
 
-      Json.toJson(testPenaltiesResponseMax) shouldBe testPenaltiesResponseJsonMax
+      Json.toJson(testPenaltiesResponseMax) shouldBe upstreamTestPenaltiesResponseJsonMax
     }
 
-    "write to json max" in {
-      testPenaltiesResponseJsonMax.as[PenaltiesResponse] shouldBe testPenaltiesResponseMax
+    "read to json max" in {
+      downstreamTestPenaltiesResponseJsonMax.as[PenaltiesResponse] shouldBe testPenaltiesResponseMax
     }
   }
 }

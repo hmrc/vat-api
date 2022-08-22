@@ -23,7 +23,7 @@ import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.penalties.{FinancialDataErrors, FinancialDataResponse}
+import v1.models.response.financialData.{FinancialDataErrors, FinancialDataResponse}
 
 object FinancialDataHttpParser extends Logging {
 

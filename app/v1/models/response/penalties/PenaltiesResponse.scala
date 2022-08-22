@@ -18,10 +18,10 @@ package v1.models.response.penalties
 
 import play.api.libs.json._
 import v1.models.errors.MtdError
-
+import play.api.libs.functional.syntax._
 
 case class LatePaymentPenalty(
-                             details: Option[List[LatePaymentPenaltyDetails]]
+                             details: Option[Seq[LatePaymentPenaltyDetails]]
                              )
 
 object LatePaymentPenalty {
@@ -33,16 +33,14 @@ object LatePaymentPenalty {
 case class LatePaymentPenaltyDetails(
                                       principalChargeReference: String,
                                       penaltyCategory: String,
-                                      penaltyStatus: String,
+                                      penaltyStatus: LatePaymentPenaltyStatusUpstream,
                                       penaltyAmountAccruing: BigDecimal,
                                       penaltyAmountPosted: BigDecimal,
                                       penaltyAmountPaid: Option[BigDecimal],
                                       penaltyAmountOutstanding: Option[BigDecimal],
                                       LPP1LRCalculationAmount: Option[BigDecimal],
-                                      LPP1LRDays: Option[String],
                                       LPP1LRPercentage: Option[BigDecimal],
                                       LPP1HRCalculationAmount: Option[BigDecimal],
-                                      LPP1HRDays: Option[String],
                                       LPP1HRPercentage: Option[BigDecimal],
                                       LPP2Days: Option[String],
                                       LPP2Percentage: Option[BigDecimal],
@@ -66,16 +64,14 @@ object LatePaymentPenaltyDetails {
   implicit val reads: Reads[LatePaymentPenaltyDetails] = for {
     principalChargeReference        <- (JsPath \ "principalChargeReference").read[String]
     penaltyCategory                 <- (JsPath \ "penaltyCategory").read[String]
-    penaltyStatus                   <- (JsPath \ "penaltyStatus").read[String]
+    penaltyStatus                   <- (JsPath \ "penaltyStatus").read[LatePaymentPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus)
     penaltyAmountAccruing           <- (JsPath \ "penaltyAmountAccruing").read[BigDecimal]
     penaltyAmountPosted             <- (JsPath \ "penaltyAmountPosted").read[BigDecimal]
     penaltyAmountPaid               <- (JsPath \ "penaltyAmountPaid").readNullable[BigDecimal]
     penaltyAmountOutstanding        <- (JsPath \ "penaltyAmountOutstanding").readNullable[BigDecimal]
     lPP1LRCalculationAmount         <- (JsPath \ "LPP1LRCalculationAmount").readNullable[BigDecimal]
-    lPP1LRDays                      <- (JsPath \ "LPP1LRDays").readNullable[String]
     lPP1LRPercentage                <- (JsPath \ "LPP1LRPercentage").readNullable[BigDecimal]
     lPP1HRCalculationAmount         <- (JsPath \ "LPP1HRCalculationAmount").readNullable[BigDecimal]
-    lPP1HRDays                      <- (JsPath \ "LPP1HRDays").readNullable[String]
     lPP1HRPercentage                <- (JsPath \ "LPP1HRPercentage").readNullable[BigDecimal]
     lPP2Days                        <- (JsPath \ "LPP2Days").readNullable[String]
     lPP2Percentage                  <- (JsPath \ "LPP2Percentage").readNullable[BigDecimal]
@@ -102,10 +98,8 @@ object LatePaymentPenaltyDetails {
       penaltyAmountPaid = penaltyAmountPaid,
       penaltyAmountOutstanding = penaltyAmountOutstanding,
       LPP1LRCalculationAmount = lPP1LRCalculationAmount,
-      LPP1LRDays = lPP1LRDays,
       LPP1LRPercentage = lPP1LRPercentage,
       LPP1HRCalculationAmount = lPP1HRCalculationAmount,
-      LPP1HRDays = lPP1HRDays,
       LPP1HRPercentage = lPP1HRPercentage,
       LPP2Days = lPP2Days,
       LPP2Percentage = lPP2Percentage,
@@ -137,10 +131,8 @@ object LatePaymentPenaltyDetails {
           "penaltyAmountPaid" -> Json.toJson(o.penaltyAmountPaid),
           "penaltyAmountOutstanding" -> Json.toJson(o.penaltyAmountOutstanding),
           "LPP1LRCalculationAmount" -> Json.toJson(o.LPP1LRCalculationAmount),
-          "LPP1LRDays" -> Json.toJson(o.LPP1LRDays),
           "LPP1LRPercentage" -> Json.toJson(o.LPP1LRPercentage),
           "LPP1HRCalculationAmount" -> Json.toJson(o.LPP1HRCalculationAmount),
-          "LPP1HRDays" -> Json.toJson(o.LPP1HRDays),
           "LPP1HRPercentage" -> Json.toJson(o.LPP1HRPercentage),
           "LPP2Days" -> Json.toJson(o.LPP2Days),
           "LPP2Percentage" -> Json.toJson(o.LPP2Percentage),
@@ -177,9 +169,7 @@ case class Totalisations (
                            LSPTotalValue: Option[BigDecimal],
                            penalisedPrincipalTotal: Option[BigDecimal],
                            LPPPostedTotal: Option[BigDecimal],
-                           LPPEstimatedTotal: Option[BigDecimal],
-                           LPIPostedTotal: Option[BigDecimal],
-                           LPIEstimatedTotal: Option[BigDecimal]
+                           LPPEstimatedTotal: Option[BigDecimal]
                          )
 
 object Totalisations {
@@ -189,7 +179,7 @@ object Totalisations {
 
 case class LateSubmissionPenalty (
                                  summary: LateSubmissionPenaltySummary,
-                                 details: List[LateSubmissionPenaltyDetails]
+                                 details: Seq[LateSubmissionPenaltyDetails]
                                  )
 
 object LateSubmissionPenalty {
@@ -209,32 +199,51 @@ object LateSubmissionPenaltySummary {
 }
 
 case class LateSubmissionPenaltyDetails(
-                    penaltyNumber: String,
-                    penaltyOrder: String,
-                    penaltyCategory: String,
-                    penaltyStatus: String,
-                    FAPIndicator: Option[String],
-                    penaltyCreationDate: String,
-                    triggeringProcess: String,
-                    penaltyExpiryDate: String,
-                    expiryReason: Option[String],
-                    communicationsDate: String,
-                    lateSubmissions: Option[List[LateSubmissions]],
-                    appealInformation: Option[List[AppealInformation]],
-                    chargeReference: Option[String],
-                    chargeAmount: Option[BigDecimal],
-                    chargeOutstandingAmount: Option[BigDecimal],
-                    chargeDueDate: Option[String]
+                                         penaltyNumber: String,
+                                         penaltyOrder: String,
+                                         penaltyCategory: LateSubmissionPenaltyCategoryUpstream,
+                                         penaltyStatus: LateSubmissionPenaltyStatusUpstream,
+                                         FAPIndicator: Option[String],
+                                         penaltyCreationDate: String,
+                                         triggeringProcess: String,
+                                         penaltyExpiryDate: String,
+                                         expiryReason: Option[String],
+                                         communicationsDate: String,
+                                         lateSubmissions: Option[Seq[LateSubmissions]],
+                                         appealInformation: Option[Seq[AppealInformation]],
+                                         chargeReference: Option[String],
+                                         chargeAmount: Option[BigDecimal],
+                                         chargeOutstandingAmount: Option[BigDecimal],
+                                         chargeDueDate: Option[String]
                   )
 
 object LateSubmissionPenaltyDetails {
-  implicit val format: OFormat[LateSubmissionPenaltyDetails] = Json.format[LateSubmissionPenaltyDetails]
+  implicit val reads: Reads[LateSubmissionPenaltyDetails] = (
+    (JsPath \ "penaltyNumber").read[String] and
+      (JsPath \ "penaltyOrder").read[String] and
+      (JsPath \ "penaltyCategory").read[LateSubmissionPenaltyCategoryDownstream].map(_.toUpstreamPenaltyCategory) and
+      (JsPath \ "penaltyStatus").read[LateSubmissionPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus) and
+      (JsPath \ "FAPIndicator").readNullable[String] and
+      (JsPath \ "penaltyCreationDate").read[String] and
+      (JsPath \ "triggeringProcess").read[String] and
+      (JsPath \ "penaltyExpiryDate").read[String] and
+      (JsPath \ "expiryReason").readNullable[String] and
+      (JsPath \ "communicationsDate").read[String] and
+      (JsPath \ "lateSubmissions").readNullable[Seq[LateSubmissions]] and
+      (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]] and
+      (JsPath \ "chargeReference").readNullable[String] and
+      (JsPath \ "chargeAmount").readNullable[BigDecimal] and
+      (JsPath \ "chargeOutstandingAmount").readNullable[BigDecimal] and
+      (JsPath \ "chargeDueDate").readNullable[String]
+    )(LateSubmissionPenaltyDetails.apply _)
+
+  implicit val writes: OWrites[LateSubmissionPenaltyDetails] = Json.writes[LateSubmissionPenaltyDetails]
 }
 
 case class LateSubmissions(
                             lateSubmissionID: String,
                             taxPeriod: Option[String],
-                            taxReturnStatus: String,
+                            taxReturnStatus: TaxReturnStatus,
                             taxPeriodStartDate: Option[String],
                             taxPeriodEndDate: Option[String],
                             taxPeriodDueDate: Option[String],
@@ -247,13 +256,17 @@ object LateSubmissions {
 
 
 case class AppealInformation (
-                               appealStatus: String,
-                               appealLevel: String,
-                               appealDescription: String
+                               appealStatus: AppealStatusUpstream,
+                               appealLevel: AppealLevelUpstream
                              )
 
 object AppealInformation {
-  implicit val format: OFormat[AppealInformation] = Json.format[AppealInformation]
+  implicit val reads: Reads[AppealInformation] = (
+    (JsPath \ "appealStatus").read[AppealStatusDownstream].map(_.toUpstreamAppealStatus) and
+      (JsPath \ "appealLevel").read[AppealLevelDownstream].map(_.toUpstreamAppealLevel)
+    )(AppealInformation.apply _)
+
+  implicit val writes: OWrites[AppealInformation] = Json.writes[AppealInformation]
 }
 
 
@@ -269,7 +282,7 @@ object PenaltiesResponse {
 
 
 case class PenaltiesErrors(
-                         failures: List[PenaltyError]
+                         failures: Seq[PenaltyError]
                          )
 
 object PenaltiesErrors {
