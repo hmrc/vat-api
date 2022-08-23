@@ -17,8 +17,8 @@
 package v1.connectors
 
 import mocks.MockAppConfig
-import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
+import v1.models.domain.Vrn
 import v1.models.errors.{DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest

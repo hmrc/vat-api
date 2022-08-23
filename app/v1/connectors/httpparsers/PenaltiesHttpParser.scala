@@ -17,7 +17,7 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.Logging
 import v1.connectors.Outcome
@@ -30,7 +30,7 @@ object PenaltiesHttpParser extends Logging {
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
     //TODO change content after user research
-    def errorHelper(jsonString: JsValue, status: Int): (MtdError, Option[Seq[MtdError]]) = {
+    def errorHelper(jsonString: JsValue, status: Int): MtdError = {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code, status) match {
@@ -49,8 +49,12 @@ object PenaltiesHttpParser extends Logging {
       }
 
       val head = mtdErrorsConvert.head
-      val tail = if(mtdErrorsConvert.tail.isEmpty) None else Some(mtdErrorsConvert.tail)
-      (head, tail)
+      val error = if(mtdErrorsConvert.tail.isEmpty) {
+        head
+      } else {
+        MtdError("INVALID_REQUEST", "Invalid request penalties", Some(Json.toJson(mtdErrorsConvert)))
+      }
+       error
     }
 
     def read(method: String, url: String, response: HttpResponse): Outcome[PenaltiesResponse] = {
@@ -64,8 +68,8 @@ object PenaltiesHttpParser extends Logging {
         }
         case status =>
           val mtdErrors = errorHelper(response.json, status)
-          logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors._1} ${mtdErrors._2}")
-          Left(ErrorWrapper(responseCorrelationId, mtdErrors._1, mtdErrors._2))
+          logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors}")
+          Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
     }
   }
