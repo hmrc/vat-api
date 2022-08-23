@@ -95,7 +95,8 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
            PenaltiesInvalidIdValue |
            PenaltiesInvalidDataLimit |
            PenaltiesInvalidCorrelationId |
-           VrnFormatError => BadRequest(Json.toJson(errorWrapper))
+           VrnFormatError |
+           MtdError("INVALID_REQUEST", _, _)=> BadRequest(Json.toJson(errorWrapper))
       case PenaltiesNotDataFound => NotFound(Json.toJson(errorWrapper))
       case PenaltiesDuplicateSubmission => Conflict(Json.toJson(errorWrapper))
       case PenaltiesInvalidIdTypeUnprocessEntity |

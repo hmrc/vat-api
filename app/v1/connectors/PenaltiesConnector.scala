@@ -17,19 +17,17 @@
 package v1.connectors
 
 import config.AppConfig
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.Logging
-import v1.connectors.httpparsers.PenaltiesHttpParser._
 import v1.connectors.httpparsers.FinancialDataHttpParser._
+import v1.connectors.httpparsers.PenaltiesHttpParser._
 import v1.controllers.UserRequest
-import v1.models.errors.{DesErrorCode, DesErrors, ErrorWrapper, MtdError}
-import v1.models.outcomes.ResponseWrapper
+import v1.models.errors.{ErrorWrapper, MtdError}
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
-import v1.models.response.penalties.PenaltiesResponse
 import v1.models.response.financialData.FinancialDataResponse
 import v1.models.response.penalties.PenaltiesResponse
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

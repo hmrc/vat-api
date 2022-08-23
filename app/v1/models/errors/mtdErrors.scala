@@ -28,6 +28,7 @@ case class MtdError(code: String, message: String, customJson: Option[JsValue] =
 object MtdError {
   implicit val writes: Writes[MtdError] = {
     case o@MtdError(_, _, None) => o.toJson
+    case MtdError("INVALID_REQUEST", "Invalid request penalties", Some(customJson)) => BadRequestErrorPenalties.toJson.as[JsObject] + ("errors" -> Json.toJson(customJson))
     case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
     case MtdError(_, _, Some(customJson)) => customJson
   }
@@ -104,6 +105,7 @@ object RuleInsolventTraderError extends MtdError("RULE_INSOLVENT_TRADER", "The r
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
 object DownstreamError extends MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")
 object BadRequestError extends MtdError("INVALID_REQUEST", "Invalid request")
+object BadRequestErrorPenalties extends MtdError("INVALID_REQUEST", "Invalid request penalties")
 object BVRError extends MtdError("BUSINESS_ERROR", "Business validation error")
 object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
 object InvalidJson extends MtdError("INVALID_JSON", "Invalid JSON received")
