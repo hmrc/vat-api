@@ -37,8 +37,8 @@
         ],
         "appealInformation": [
           {
-            "appealStatus": "appeal Upheld",
-            "appealLevel": "appeal First Tier Tribunal"
+            "appealStatus": "appeal-upheld",
+            "appealLevel": "appeal-first-tier-tribunal"
           }
         ],
         "chargeReference": "12345678901234",
@@ -93,8 +93,8 @@
         "penaltyChargeDueDate": "2023-04-30",
         "appealInformation": [
           {
-            "appealStatus": "cannot be appealed",
-            "appealLevel": "review"
+            "appealStatus": "cannot-be-appealed",
+            "appealLevel": "statutory-review"
           }
         ],
         "principalChargeDocNumber": "123456789012",
