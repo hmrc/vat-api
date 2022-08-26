@@ -114,13 +114,20 @@
                 "description": "This shows the category of the penalty object.",
                 "type": "string",
                 "example": "point",
-                "enum": ["point", "charge", "threshold"]
+                "oneOf": [
+                  { "enum": ["point"] },
+                  { "enum": ["charge"] },
+                  { "enum": ["threshold"] }
+                ]
               },
               "penaltyStatus": {
                 "description": "Shows if the penalty has been paid, or not been paid.",
                 "type": "string",
                 "example": "active",
-                "enum": ["active", "inactive"]
+                "oneOf": [
+                  { "enum": ["active"] },
+                  { "enum": ["inactive"] }
+                ]
               },
               "FAPIndicator": {
                 "description": "Indicates if there's been an adjustment to your penalty point because of a change to your submission frequency. For example, changing from quarterly submissions to monthly submissions.",
@@ -212,16 +219,16 @@
                   "type": "object",
                   "properties": {
                     "appealStatus": {
-                      "description": "The status of a penalty if it has been appealed.",
+                      "description": "The appeal status of a penalty.",
                       "type": "string",
                       "example": "under appeal",
-                      "enum": ["under appeal", "appeal Upheld", "appeal Rejected", "cannot be appealed"]
+                      "enum": ["under-appeal", "appeal-upheld", "appeal-rejected", "cannot-be-appealed"]
                     },
                     "appealLevel": {
-                      "description": "Level of appeal.",
+                      "description": "The level of appeal.",
                       "type": "string",
                       "example": "",
-                      "enum": ["appeal to HMRC", "review", "appeal First Tier Tribunal"]
+                      "enum": ["appeal-to-HMRC", "statutory-review", "appeal-first-tier-tribunal"]
                     }
                   },
                   "required": ["appealStatus", "appealLevel"],
@@ -393,16 +400,16 @@
                   "type": "object",
                   "properties": {
                     "appealStatus": {
-                      "description": "This shows the status of an appealed penalty.",
+                      "description": "The appeal status of a penalty.",
                       "type": "string",
                       "example": "under appeal",
-                      "enum": ["under appeal", "appeal upheld", "appeal rejected", "cannot be appealed"]
+                      "enum": ["under-appeal", "appeal-upheld", "appeal-rejected", "cannot-be-appealed"]
                     },
                     "appealLevel": {
-                      "description": "This is the level of appeal.",
+                      "description": "The level of appeal.",
                       "type": "string",
                       "example": "appeal to HMRC",
-                      "enum": ["appeal to HMRC", "review", "appeal First Tier Tribunal"]
+                      "enum": ["appeal-to-HMRC", "statutory-review", "appeal-first-tier-tribunal"]
                     }
                   },
                   "required": ["appealStatus", "appealLevel"],
