@@ -78,7 +78,7 @@ object PenaltiesConstants {
       penaltyCreationDate = "123",
       triggeringProcess = "123",
       penaltyExpiryDate = "123",
-      expiryReason = Some("123"),
+      expiryReason = Some(ExpiryReasonUpstream.`appeal`),
       communicationsDate = "123",
       lateSubmissions = Some(List(LateSubmissions(
         lateSubmissionID = "123",
@@ -168,7 +168,7 @@ object PenaltiesConstants {
       |            "penaltyCreationDate":"123",
       |            "triggeringProcess":"123",
       |            "penaltyExpiryDate":"123",
-      |            "expiryReason": "123",
+      |            "expiryReason": "APP",
       |            "communicationsDate":"123",
       |            "lateSubmissions":[
       |               {
@@ -201,7 +201,7 @@ object PenaltiesConstants {
        |            "penaltyCreationDate":"123",
        |            "triggeringProcess":"123",
        |            "penaltyExpiryDate":"123",
-       |            "expiryReason":"123",
+       |            "expiryReason":"APP",
        |            "communicationsDate":"123",
        |            "lateSubmissions":[
        |               {
@@ -240,7 +240,7 @@ object PenaltiesConstants {
       |            "penaltyCreationDate":"123",
       |            "triggeringProcess":"123",
       |            "penaltyExpiryDate":"123",
-      |            "expiryReason": "123",
+      |            "expiryReason": "appeal",
       |            "communicationsDate":"123",
       |            "lateSubmissions":[
       |               {
@@ -273,7 +273,7 @@ object PenaltiesConstants {
        |            "penaltyCreationDate":"123",
        |            "triggeringProcess":"123",
        |            "penaltyExpiryDate":"123",
-       |            "expiryReason":"123",
+       |            "expiryReason":"appeal",
        |            "communicationsDate":"123",
        |            "lateSubmissions":[
        |               {
