@@ -207,7 +207,7 @@ case class LateSubmissionPenaltyDetails(
                                          penaltyCreationDate: String,
                                          triggeringProcess: String,
                                          penaltyExpiryDate: String,
-                                         expiryReason: Option[String],
+                                         expiryReason: Option[ExpiryReasonUpstream],
                                          communicationsDate: String,
                                          lateSubmissions: Option[Seq[LateSubmissions]],
                                          appealInformation: Option[Seq[AppealInformation]],
@@ -218,24 +218,43 @@ case class LateSubmissionPenaltyDetails(
                   )
 
 object LateSubmissionPenaltyDetails {
-  implicit val reads: Reads[LateSubmissionPenaltyDetails] = (
-    (JsPath \ "penaltyNumber").read[String] and
-      (JsPath \ "penaltyOrder").read[String] and
-      (JsPath \ "penaltyCategory").read[LateSubmissionPenaltyCategoryDownstream].map(_.toUpstreamPenaltyCategory) and
-      (JsPath \ "penaltyStatus").read[LateSubmissionPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus) and
-      (JsPath \ "FAPIndicator").readNullable[String] and
-      (JsPath \ "penaltyCreationDate").read[String] and
-      (JsPath \ "triggeringProcess").read[String] and
-      (JsPath \ "penaltyExpiryDate").read[String] and
-      (JsPath \ "expiryReason").readNullable[String] and
-      (JsPath \ "communicationsDate").read[String] and
-      (JsPath \ "lateSubmissions").readNullable[Seq[LateSubmissions]] and
-      (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]] and
-      (JsPath \ "chargeReference").readNullable[String] and
-      (JsPath \ "chargeAmount").readNullable[BigDecimal] and
-      (JsPath \ "chargeOutstandingAmount").readNullable[BigDecimal] and
-      (JsPath \ "chargeDueDate").readNullable[String]
-    )(LateSubmissionPenaltyDetails.apply _)
+  implicit val reads: Reads[LateSubmissionPenaltyDetails] = for {
+    penaltyNumber           <- (JsPath \ "penaltyNumber").read[String]
+    penaltyOrder            <- (JsPath \ "penaltyOrder").read[String]
+    penaltyCategory         <- (JsPath \ "penaltyCategory").read[LateSubmissionPenaltyCategoryDownstream].map(_.toUpstreamPenaltyCategory)
+    penaltyStatus           <- (JsPath \ "penaltyStatus").read[LateSubmissionPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus)
+    fAPIndicator            <- (JsPath \ "FAPIndicator").readNullable[String]
+    penaltyCreationDate     <- (JsPath \ "penaltyCreationDate").read[String]
+    triggeringProcess       <- (JsPath \ "triggeringProcess").read[String]
+    penaltyExpiryDate       <- (JsPath \ "penaltyExpiryDate").read[String]
+    expiryReason            <- (JsPath \ "expiryReason").readNullable[ExpiryReasonDownstream]
+    communicationsDate      <- (JsPath \ "communicationsDate").read[String]
+    lateSubmissions         <- (JsPath \ "lateSubmissions").readNullable[Seq[LateSubmissions]]
+    appealInformation       <- (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]]
+    chargeReference         <- (JsPath \ "chargeReference").readNullable[String]
+    chargeAmount            <- (JsPath \ "chargeAmount").readNullable[BigDecimal]
+    chargeOutstandingAmount <- (JsPath \ "chargeOutstandingAmount").readNullable[BigDecimal]
+    chargeDueDate           <- (JsPath \ "chargeDueDate").readNullable[String]
+  } yield {
+      LateSubmissionPenaltyDetails(
+      penaltyNumber = penaltyNumber,
+      penaltyOrder = penaltyOrder,
+      penaltyCategory = penaltyCategory,
+      penaltyStatus = penaltyStatus,
+      FAPIndicator = fAPIndicator,
+      penaltyCreationDate = penaltyCreationDate,
+      triggeringProcess = triggeringProcess,
+      penaltyExpiryDate = penaltyExpiryDate,
+      expiryReason = if (expiryReason.isDefined) Some(expiryReason.get.toUpstreamExpiryReason) else None,
+      communicationsDate = communicationsDate,
+      lateSubmissions = lateSubmissions,
+      appealInformation = appealInformation,
+      chargeReference = chargeReference,
+      chargeAmount = chargeAmount,
+      chargeOutstandingAmount = chargeOutstandingAmount,
+      chargeDueDate = chargeDueDate
+    )
+  }
 
   implicit val writes: OWrites[LateSubmissionPenaltyDetails] = Json.writes[LateSubmissionPenaltyDetails]
 }
