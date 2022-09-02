@@ -17,13 +17,17 @@
 package v1.connectors
 
 import config.AppConfig
+import play.api.http.Status
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.Logging
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
 import v1.connectors.httpparsers.FinancialDataHttpParser._
 import v1.connectors.httpparsers.PenaltiesHttpParser._
+import v1.connectors.httpparsers.StandardDesHttpParser.logger
 import v1.controllers.UserRequest
-import v1.models.errors.{ErrorWrapper, MtdError}
+import v1.models.errors.{ConnectorError, ErrorWrapper, MtdError}
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
 import v1.models.response.financialData.FinancialDataResponse
 import v1.models.response.penalties.PenaltiesResponse
@@ -35,7 +39,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
                                    val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
 
   private def headerCarrier(additionalHeaders: Seq[String] = Seq.empty)(implicit hc: HeaderCarrier,
-                                                                           correlationId: String): HeaderCarrier =
+                                                                        correlationId: String): HeaderCarrier =
     HeaderCarrier(
       extraHeaders = hc.extraHeaders ++
         // Contract headers
@@ -59,23 +63,61 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
       http.GET[Outcome[PenaltiesResponse]](url)
     }
+
     doGet(headerCarrier()).recover {
-      case e => Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage))) }
+      case e =>
+        val logDetails = s"request failed. ${e.getMessage}"
+
+        logger.error(ConnectorError.log(
+          logContext = "[PenaltiesConnector][retrieveFinancialData]",
+          vrn = vrn,
+          details = logDetails,
+        ))
+
+        PagerDutyLogging.log(
+          pagerDutyLoggingEndpointName = Endpoint.RetrievePenalties.requestFailedMessage,
+          status = Status.INTERNAL_SERVER_ERROR,
+          body = logDetails,
+          f = logger.error(_),
+          affinityGroup = userRequest.userDetails.userType
+        )
+        Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
+    }
   }
 
 
   def retrieveFinancialData(request: FinancialRequest)(implicit hc: HeaderCarrier,
-                                                   ec: ExecutionContext,
-                                                   userRequest: UserRequest[_],
-                                                   correlationId: String): Future[Outcome[FinancialDataResponse]] = {
+                                                       ec: ExecutionContext,
+                                                       userRequest: UserRequest[_],
+                                                       correlationId: String): Future[Outcome[FinancialDataResponse]] = {
     val vrn = request.vrn.vrn
     val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
     logger.debug(s"[PenaltiesConnector][retrieveFinancialData] url: $url")
 
+
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
       http.GET[Outcome[FinancialDataResponse]](url)
     }
+
     doGet(headerCarrier()).recover {
-      case e => Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage))) }
+      case e =>
+        val logDetails = s"request failed. ${e.getMessage}"
+
+        logger.error(ConnectorError.log(
+          logContext = "[PenaltiesConnector][retrieveFinancialData]",
+          vrn = vrn,
+          details = logDetails,
+        ))
+
+        PagerDutyLogging.log(
+          pagerDutyLoggingEndpointName = Endpoint.RetrieveFinancialData.requestFailedMessage,
+          status = Status.INTERNAL_SERVER_ERROR,
+          body = logDetails,
+          f = logger.error(_),
+          affinityGroup = userRequest.userDetails.userType
+        )
+
+        Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
+    }
   }
 }

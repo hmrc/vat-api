@@ -17,16 +17,16 @@
 package v1.connectors
 
 import config.AppConfig
-
-import javax.inject.{Inject, Singleton}
+import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
-import v1.models.errors.{ConnectorError, DesError, DesErrorCode, DesErrors}
+import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -50,6 +50,22 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
       body = request.body,
       uri = DesUri[SubmitResponse](s"enterprise/return/vat/$vrn")
     ).recover {
-      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
+      case e =>
+        val logDetails = s"request failed. ${e.getMessage}"
+
+        ConnectorError.log(
+          logContext = "[SubmitReturnConnector][submitReturn]",
+          vrn = vrn,
+          details = logDetails,
+        )
+
+        PagerDutyLogging.log(
+          pagerDutyLoggingEndpointName = Endpoint.SubmitReturn.requestFailedMessage,
+          status = Status.INTERNAL_SERVER_ERROR,
+          body = logDetails,
+          f = logger.error(_),
+          affinityGroup = userRequest.userDetails.userType
+        )
+        Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }
