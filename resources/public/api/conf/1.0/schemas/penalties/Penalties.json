@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "totalisations": {
-      "description": "",
+      "description": "Totals that relate to the penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "LSPTotalValue": {
@@ -43,11 +43,11 @@
       "additionalProperties": false
     },
     "lateSubmissionPenalty": {
-      "description": "",
+      "description": "Information about the late submission penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "summary": {
-          "description": "",
+          "description": "A summary of the individual's or organisation's late submission penalty status.",
           "type": "object",
           "properties": {
             "activePenaltyPoints": {
@@ -95,7 +95,7 @@
           "additionalProperties": false
         },
         "details": {
-          "description": "",
+          "description": "Details of each late submission penalty that the individual or organisation has accrued.",
           "type": "array",
           "items": {
             "type": "object",
@@ -165,7 +165,7 @@
                 "example": "2022-07-01"
               },
               "lateSubmissions": {
-                "description": "",
+                "description": "The late submissions that relate to the period for which the penalty was levied. Note that although only one penalty point will be levied for a particular period, more than one late submission could be made for that period. All late submissions that relate to the period will affect the period of compliance.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -213,7 +213,7 @@
                 "additionalProperties": false
               },
               "appealInformation":{
-                "description": "",
+                "description": "Details of any appeals that the individual or organisation has made against the penalty point.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -271,11 +271,11 @@
       "additionalProperties": false
     },
     "latePaymentPenalty": {
-      "description": "",
+      "description": "Information about the late payment penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "details": {
-          "description": "",
+          "description": "Details of all the late payment penalties that the individual or organisation has accrued.",
           "type": "array",
           "items": {
             "type": "object",
@@ -452,7 +452,7 @@
                 "example": ""
               },
               "timeToPay": {
-                "description": "",
+                "description": "Details of the Time to Pay arrangement that has been made.",
                 "type": "array",
                 "items": {
                   "type": "object",
