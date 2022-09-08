@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "totalisations": {
-      "description": "",
+      "description": "Totals that relate to the penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "LSPTotalValue": {
@@ -43,11 +43,11 @@
       "additionalProperties": false
     },
     "lateSubmissionPenalty": {
-      "description": "",
+      "description": "Information about the late submission penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "summary": {
-          "description": "",
+          "description": "A summary of the individual's or organisation's late submission penalty status.",
           "type": "object",
           "properties": {
             "activePenaltyPoints": {
@@ -95,7 +95,7 @@
           "additionalProperties": false
         },
         "details": {
-          "description": "",
+          "description": "Details of each late submission penalty that the individual or organisation has accrued.",
           "type": "array",
           "items": {
             "type": "object",
@@ -115,9 +115,9 @@
                 "type": "string",
                 "example": "point",
                 "oneOf": [
-                  { "enum": ["point"] },
-                  { "enum": ["charge"] },
-                  { "enum": ["threshold"] }
+                  { "enum": ["point"], "description": "The penalty represents a point that has not met the threshold for a charge." },
+                  { "enum": ["charge"], "description": "The penalty represents a charge that has been levied because the point threshold has been exceeded. Although this penalty will not be added to the point total because the threshold has already been met, it will affect the period of compliance." },
+                  { "enum": ["threshold"], "description": "The penalty represents a point that has met the threshold for a charge. The penalty thus consists of a point and a charge." }
                 ]
               },
               "penaltyStatus": {
@@ -125,8 +125,8 @@
                 "type": "string",
                 "example": "active",
                 "oneOf": [
-                  { "enum": ["active"] },
-                  { "enum": ["inactive"] }
+                  { "enum": ["active"], "description": "If the penalty category is 'point', it counts towards the individual's or organisation's point balance. If the penalty category is 'threshold', it counts towards the individual's or organisation's point balance. It has also triggered a penalty charge. If the penalty category is 'charge', then it represents a charge that has been levied because the threshold has been exceeded." },
+                  { "enum": ["inactive"], "description": "If the penalty category is 'point', it no longer counts towards the individual's or organisation's point balance. This might be because the point has expired, been successfully appealed against, or been removed due to an adjustment. If the penalty category is 'threshold', then it no longer counts towards the individual's or organisation's point balance for the same reasons. Alternatively, a 'threshold' penalty could be inactive because the charge that is associated with it has been reversed. If the penalty category is 'charge', then the charge has been reversed." }
                 ]
               },
               "FAPIndicator": {
@@ -165,7 +165,7 @@
                 "example": "2022-07-01"
               },
               "lateSubmissions": {
-                "description": "",
+                "description": "The late submissions that relate to the period for which the penalty was levied. Note that although only one penalty point will be levied for a particular period, more than one late submission could be made for that period. All late submissions that relate to the period will affect the period of compliance.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -213,7 +213,7 @@
                 "additionalProperties": false
               },
               "appealInformation":{
-                "description": "",
+                "description": "Details of any appeals that the individual or organisation has made against the penalty point.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -271,11 +271,11 @@
       "additionalProperties": false
     },
     "latePaymentPenalty": {
-      "description": "",
+      "description": "Information about the late payment penalties that HMRC has levied.",
       "type": "object",
       "properties": {
         "details": {
-          "description": "",
+          "description": "Details of all the late payment penalties that the individual or organisation has accrued.",
           "type": "array",
           "items": {
             "type": "object",
@@ -452,7 +452,7 @@
                 "example": ""
               },
               "timeToPay": {
-                "description": "",
+                "description": "Details of the Time to Pay arrangement that has been made.",
                 "type": "array",
                 "items": {
                   "type": "object",
