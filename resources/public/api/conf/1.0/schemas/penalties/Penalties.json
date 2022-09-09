@@ -132,7 +132,8 @@
               "FAPIndicator": {
                 "description": "Indicates if there's been an adjustment to your penalty point because of a change to your submission frequency. For example, changing from quarterly submissions to monthly submissions.",
                 "type": "string",
-                "example": "X"
+                "example": "X",
+                "enum": ["X"]
               },
               "penaltyCreationDate": {
                 "description": "Date that the penalty point was created.",
@@ -422,12 +423,12 @@
                 "example": "123456789012"
               },
               "principalChargeMainTransaction": {
-                "description": "",
+                "description": "Used to identify the type of charge.",
                 "type": "string",
                 "example": ""
               },
               "principalChargeSubTransaction": {
-                "description": "",
+                "description": "Used to identify the type of charge that the penalty was applied to.",
                 "type": "string",
                 "example": ""
               },
