@@ -53,11 +53,11 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        ConnectorError.log(
+        logger.error(ConnectorError.log(
           logContext = "[SubmitReturnConnector][submitReturn]",
           vrn = vrn,
           details = logDetails,
-        )
+        ))
 
         PagerDutyLogging.log(
           pagerDutyLoggingEndpointName = Endpoint.SubmitReturn.requestFailedMessage,
