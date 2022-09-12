@@ -18,10 +18,11 @@ package v1.connectors
 
 import java.time.LocalDate
 import config.AppConfig
+import play.api.http.Status
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
 import v1.models.outcomes.ResponseWrapper
@@ -59,6 +60,24 @@ class PaymentsConnector @Inject()(val http: HttpClient,
       uri = DesUri[PaymentsResponse](s"enterprise/financial-data/VRN/$vrn/VATC"),
       queryParams = queryParams
     ).recover {
-      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
+      case e =>
+
+        val logDetails = s"request failed. ${e.getMessage}"
+
+        logger.error(ConnectorError.log(
+          logContext = "[PaymentsConnector][retrievePayments]",
+          vrn = vrn,
+          details = logDetails,
+        ))
+
+        PagerDutyLogging.log(
+          pagerDutyLoggingEndpointName = Endpoint.RetrievePayments.requestFailedMessage,
+          status = Status.INTERNAL_SERVER_ERROR,
+          body = logDetails,
+          f = logger.error(_),
+          affinityGroup = userRequest.userDetails.userType
+        )
+
+        Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }

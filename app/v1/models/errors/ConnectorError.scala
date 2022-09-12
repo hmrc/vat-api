@@ -16,4 +16,23 @@
 
 package v1.models.errors
 
+import play.api.http.Status
+import v1.controllers.UserRequest
+
 case class ConnectorError(vrn: String, requestId: String)
+
+object ConnectorError {
+
+  def log[A](logContext: String,
+             vrn: String,
+             status: Int = Status.INTERNAL_SERVER_ERROR,
+             details: String,
+            )(implicit request: UserRequest[A],
+              correlationId: String): String = {
+    s"$logContext " +
+      s"VRN: $vrn, X-Request-Id: ${request.id.toString}, " +
+      s"X-Client-Id: ${request.userDetails.clientId}, errorStatus: ${status.toString}, " +
+      s"errorMessage: $details, " +
+      s"correlationId: $correlationId"
+  }
+}

@@ -19,11 +19,10 @@ package v1.connectors
 import config.AppConfig
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
-import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseDownstreamConnector extends Logging {
+trait BaseDownstreamConnector {
   val http: HttpClient
   val appConfig: AppConfig
 

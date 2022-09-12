@@ -17,8 +17,9 @@
 package v1.connectors
 
 import config.AppConfig
+import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLoggingEndpointName}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
 import v1.controllers.UserRequest
 import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
 import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
@@ -62,8 +63,26 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
       queryParams = queryParams
     ).andThen {
       case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BPKEY) =>
-        self.logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
+        logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
     }.recover {
-      case e => Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
+      case e =>
+
+        val logDetails = s"request failed. ${e.getMessage}"
+
+        logger.error(ConnectorError.log(
+          logContext = "[ObligationsConnector][retrieveObligations]",
+          vrn = vrn,
+          details = logDetails,
+        ))
+
+        PagerDutyLogging.log(
+          pagerDutyLoggingEndpointName = Endpoint.RetrieveObligations.requestFailedMessage,
+          status = Status.INTERNAL_SERVER_ERROR,
+          body = logDetails,
+          f = logger.error(_),
+          affinityGroup = userRequest.userDetails.userType
+        )
+
+        Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
   }
 }
