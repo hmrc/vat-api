@@ -3,618 +3,130 @@
   "title": "FinancialDetails",
   "type": "object",
   "properties": {
-    "taxPayerDetails": {
-      "description": "",
+    "totalisations": {
+      "description": "Totals that relate to the charge.",
       "type": "object",
       "properties": {
-        "idType": {
-          "description": "Type of identifier provided",
-          "type": "string",
-          "example": "VRN"
-        },
-        "idNumber": {
-          "description": "Identifier number",
-          "type": "string",
-          "example": "GB000000002"
-        },
-        "regimeType": {
-          "description": "Regime Type",
-          "type": "string",
-          "example": "VATC"
-        }
-      },
-      "required": [
-        "idType",
-        "idNumber",
-        "regimeType"
-      ],
-      "additionalProperties": false
-    },
-    "balanceDetails": {
-      "description": "",
-      "type": "object",
-      "properties": {
-        "balanceDueWithin30Days": {
-          "description": "Balance Due Within 30Days",
+        "totalOverdue": {
+          "description": "The charge amount that is overdue (collectable now). The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
-          "example": "171.46",
-          "minimum": -9999999999999.99,
-          "maximum": 9999999999999.99,
-          "multipleOf": 0.01
+          "example": "5009.99"
         },
-        "nextPaymentDateForChargesDueIn30Days": {
-          "description": "Next Payment Date For Charges Due In 30Days",
-          "type": "string",
-          "example": "04-09-2022"
-        },
-        "balanceNotDueIn30Days": {
-          "description": "Balance Not Due In 30Days",
+        "totalNotYetDue": {
+          "description": "The charge amount that has been posted to the account, but is not yet payable. The due date is in the future. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
-          "example": "171.46",
-          "minimum": -9999999999999.99,
-          "maximum": 9999999999999.99,
-          "multipleOf": 0.01
-        },
-        "nextPaymentDateBalanceNotDue": {
-          "description": "Next Payment Date Balance Not Due",
-          "type": "string",
-          "example": "04-09-2022"
-        },
-        "overDueAmount": {
-          "description": "Overdue Amount",
-          "type": "number",
-          "example": "171.46",
-          "minimum": -9999999999999.99,
-          "maximum": 9999999999999.99,
-          "multipleOf": 0.01
-        },
-        "earliestPaymentDateOverDue": {
-          "description": "Earliest Payment Date OverDue",
-          "type": "string",
-          "example": "04-09-2022"
+          "example": "5009.99"
         },
         "totalBalance": {
-          "description": "Total Balance",
+          "description": "The net charge amount (the amount that is overdue, minus any credit that is in the account). The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
-          "example": "171.46",
-          "minimum": -9999999999999.99,
-          "maximum": 9999999999999.99,
-          "multipleOf": 0.01
+          "example": "5009.99"
         },
-        "amountCodedOut": {
-          "description": "Amount CodedOut",
+        "totalCredit": {
+          "description": "Credit that is in the individual's or organisation's account, which has not yet been allocated to any charges. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
-          "example": "171.46",
-          "minimum": -9999999999999.99,
-          "maximum": 9999999999999.99,
-          "multipleOf": 0.01
+          "example": "5009.99"
+        },
+        "totalCleared": {
+          "description": "The amount that the individual or organisation has paid towards the charge already. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
+          "type": "number",
+          "example": "5009.99"
         }
       },
-      "required": [
-        "balanceDueWithin30Days",
-        "balanceNotDueIn30Days",
-        "overDueAmount",
-        "totalBalance",
-        "amountCodedOut"
-      ],
       "additionalProperties": false
     },
-    "codingDetails": {
-      "description": "",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "taxYearReturn": {
-            "description": "TaxYear Return",
-            "type": "string",
-            "example": "04-09-2022"
-          },
-          "totalReturnAmount": {
-            "description": "Total Return Amount",
-            "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "amountNotCoded": {
-            "description": "Amount Not Coded",
-            "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "amountNotCodedDueDate": {
-            "description": "Amount Not Coded Due Date",
-            "type": "string",
-            "example": "04-09-2022"
-          },
-          "amountCodedOut": {
-            "description": "Amount Coded Out",
-            "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "taxYearCoding": {
-            "description": "TaxYear Coding",
-            "type": "string",
-            "example": "04-09-2022"
-          }
-        },
-        "required": [
-          "taxYearReturn",
-          "totalReturnAmount",
-          "amountNotCoded",
-          "amountNotCodedDueDate"
-        ],
-        "additionalProperties": false
-      }
-    },
     "documentDetails": {
-      "description": "",
+      "description": "All the documents that refer to the charge. An individual document will only contain one charge reference, but that charge reference could appear in multiple documents. For example, this might be the case if a charge has been levied and subsequently reversed, or if multiple periodic interest charges share the same charge reference.",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "taxYear": {
-            "description": "Tax Year",
+          "postingDate": {
+            "description": "The date that the charge was posted to the individual's or organisation's account.",
             "type": "string",
-            "example": "04-09-2022"
+            "example": "2022-08-16"
           },
-          "documentId": {
-            "description": "Document Id",
+          "issueDate": {
+            "description": "The date that correspondence about the charge was sent to the individual or organisation.",
             "type": "string",
-            "example": "123"
+            "example": "2022-08-16"
           },
-          "documentDate": {
-            "description": "Document Date",
-            "type": "string",
-            "example": "04-09-2022"
-          },
-          "documentText": {
-            "description": "Document Text",
-            "type": "string",
-            "example": "Document text"
-          },
-          "documentDueDate": {
-            "description": "Document Due Date",
-            "type": "string",
-            "example": "Document text"
-          },
-          "totalAmount": {
-            "description": "Total Amount",
+          "documentTotalAmount": {
+            "description": "The total sum of the line items within the document. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
             "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
+            "example": "5009.99"
+          },
+          "documentClearedAmount": {
+            "description": "The amount that has been paid, reversed, removed or cleared. For example, this could be the portion of a charge that has already been paid. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
+            "type": "number",
+            "example": "5009.99"
           },
           "documentOutstandingAmount": {
-            "description": "Document Outstanding Amount",
+            "description": "The remaining balance. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
             "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
+            "example": "5009.99"
           },
-          "statisticalFlag": {
-            "description": "Statistical Flag",
-            "type": "boolean",
-            "example": "false"
-          },
-          "documentDescription": {
-            "description": "Document Description",
-            "type": "string",
-            "example": "Document Description"
-          },
-          "formBundleNumber": {
-            "description": "FormBundle Number",
-            "type": "string",
-            "example": "00012"
-          },
-          "lastClearingDate": {
-            "description": "Last Clearing Date",
-            "type": "string",
-            "example": "2022-11-01"
-          },
-          "lastClearingReason": {
-            "description": "Last Clearing Reason",
-            "type": "string",
-            "example": "Last Clearing Reason"
-          },
-          "lastClearedAmount": {
-            "description": "Last Cleared Amount",
+          "documentInterestTotal": {
+            "description": "The total amount of interest that is associated with the document. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
             "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
+            "example": "5009.99"
           },
-          "informationCode": {
-            "description": "Information Code",
-            "type": "string",
-            "example": "44444"
-          },
-          "paymentLot": {
-            "description": "Payment Lot",
-            "type": "string",
-            "example": "1054021"
-          },
-          "paymentLotItem": {
-            "description": "Payment Lot Item",
-            "type": "string",
-            "example": "01"
-          },
-          "accruingInterestAmount": {
-            "description": "Accruing Interest Amount",
-            "type": "number",
-            "example": "171.46",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "interestRate": {
-            "description": "Interest Rate",
-            "type": "number",
-            "example": "7",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "interestFromDate": {
-            "description": "Interest From Date",
-            "type": "string",
-            "example": "2022-05-01"
-          },
-          "interestEndDate": {
-            "description": "Interest End Date",
-            "type": "string",
-            "example": "2022-05-01"
-          },
-          "latePaymentInterestID": {
-            "description": "Late Payment Interest ID",
-            "type": "string",
-            "example": "66666"
-          },
-          "latePaymentInterestAmount": {
-            "description": "Late Payment Interest Amount",
-            "type": "number",
-            "example": "12",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "lpiWithDunningBlock": {
-            "description": "Lpi With Dunning Block",
-            "type": "number",
-            "example": "407",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "interestOutstandingAmount": {
-            "description": "Interest Outstanding Amount",
-            "type": "number",
-            "example": "407",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "accruingPenaltyLPP1": {
-            "description": "Accruing Penalty LPP1",
-            "type": "string",
-            "example": "123.40"
-          },
-          "lpp1Amount": {
-            "description": "Lpp1 Amount",
-            "type": "number",
-            "example": "407",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "lpp1ID": {
-            "description": "Lpp1 ID",
-            "type": "string",
-            "example": "22222"
-          },
-          "accruingPenaltyLPP2": {
-            "description": "Accruing Penalty LPP2",
-            "type": "string",
-            "example": "47.89"
-          },
-          "lpp2Amount": {
-            "description": "Lpp2 Amount",
-            "type": "number",
-            "example": "407",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "lpp2ID": {
-            "description": "Lpp2 ID",
-            "type": "string",
-            "example": "33333"
-          }
-        },
-        "required": [
-          "documentId",
-          "documentDate",
-          "documentText",
-          "documentDueDate",
-          "totalAmount",
-          "statisticalFlag"
-        ],
-        "additionalProperties": false
-      }
-    },
-    "financialDetails": {
-      "description": "",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "taxYear": {
-            "description": "Tax Year",
-            "type": "string",
-            "example": "2022"
-          },
-          "documentId": {
-            "description": "Document Id",
-            "type": "string",
-            "example": "00002"
-          },
-          "chargeType": {
-            "description": "Charge Type",
-            "type": "string",
-            "example": "charge type"
-          },
-          "mainType": {
-            "description": "Main Type",
-            "type": "string",
-            "example": "Main Type"
-          },
-          "periodKey": {
-            "description": "Period Key",
-            "type": "string",
-            "example": "Period Key"
-          },
-          "periodKeyDescription": {
-            "description": "Period Key Description",
-            "type": "string",
-            "example": "Period Key Description"
-          },
-          "taxPeriodFrom": {
-            "description": "Tax Period From",
-            "type": "string",
-            "example": "2022-04-01"
-          },
-          "taxPeriodTo": {
-            "description": "Tax Period To",
-            "type": "string",
-            "example": "2022-04-01"
-          },
-          "businessPartner": {
-            "description": "Business Partner",
-            "type": "string",
-            "example": "Business Partner"
-          },
-          "contractAccountCategory": {
-            "description": "Contract Account Category",
-            "type": "string",
-            "example": "31"
-          },
-          "contractAccount": {
-            "description": "Contract Account",
-            "type": "string",
-            "example": "Contract Account"
-          },
-          "contractObjectType": {
-            "description": "Contract Object Type",
-            "type": "string",
-            "example": "ZVAT"
-          },
-          "contractObject": {
-            "description": "Contract Object",
-            "type": "string",
-            "example": "1000845411"
-          },
-          "sapDocumentNumber": {
-            "description": "Sap Document Number",
-            "type": "string",
-            "example": "0000001"
-          },
-          "sapDocumentNumberItem": {
-            "description": "Sap Document Number Item",
-            "type": "string",
-            "example": "9999999"
-          },
-          "chargeReference": {
-            "description": "Charge Reference",
-            "type": "string",
-            "example": "100511010"
-          },
-          "mainTransaction": {
-            "description": "Main Transaction",
-            "type": "string",
-            "example": "1906"
-          },
-          "subTransaction": {
-            "description": "Sub Transaction",
-            "type": "string",
-            "example": "2504"
-          },
-          "originalAmount": {
-            "description": "Original Amount",
-            "type": "number",
-            "example": "7084.25",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "outstandingAmount": {
-            "description": "Outstanding Amount",
-            "type": "number",
-            "example": "1560.32",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "clearedAmount": {
-            "description": "Cleared Amount",
-            "type": "number",
-            "example": "4360.27",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "accruedInterest": {
-            "description": "AccruedInterest",
-            "type": "number",
-            "example": "567.25",
-            "minimum": -9999999999999.99,
-            "maximum": 9999999999999.99,
-            "multipleOf": 0.01
-          },
-          "items": {
-            "description": "",
+          "lineItemDetails": {
+            "description": "The line items that make up the document. A document can contain more than one line item. For example, an individual or organisation might submit an amendment form that contains multiple corrections (perhaps the individual or organisation paid too much VAT for one tax period, but not enough for the next). Each correction will comprise an individual line item. HMRC will take all of the line items into account when it calculates the charge.",
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "subItem": {
-                  "description": "Sub Item",
+                "periodFromDate": {
+                  "description": "The start date of this period.",
                   "type": "string",
-                  "example": "00001"
+                  "example": "2022-08-16"
                 },
-                "dueDate": {
-                  "description": "Sub Item",
+                "periodToDate": {
+                  "description": "The end date of this period.",
                   "type": "string",
-                  "example": "2023-04-01"
+                  "example": "2022-08-16"
+                },
+                "periodKey": {
+                  "description": "A four-digit reference containing characters and numbers that identify a specific period of the due date.",
+                  "type": "string",
+                  "example": "13RL"
+                },
+                "netDueDate": {
+                  "description": "Net due date relates to multiple line items.",
+                  "type": "string",
+                  "example": "2022-08-16"
                 },
                 "amount": {
-                  "description": "Amount",
+                  "description": "The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
                   "type": "number",
-                  "example": "8025.32",
-                  "minimum": -9999999999999.99,
-                  "maximum": 9999999999999.99,
-                  "multipleOf": 0.01
+                  "example": "5009.99"
                 },
-                "clearingDate": {
-                  "description": "Clearing Date",
-                  "type": "string",
-                  "example": "2023-04-01"
-                },
-                "clearingReason": {
-                  "description": "Clearing Reason",
-                  "type": "string",
-                  "example": "Clearing Reason"
-                },
-                "outgoingPaymentMethod": {
-                  "description": "Outgoing Payment Method",
-                  "type": "string",
-                  "example": "B"
-                },
-                "paymentLock": {
-                  "description": "Payment Lock",
-                  "type": "string",
-                  "example": "A"
-                },
-                "clearingLock": {
-                  "description": "Clearing Lock",
-                  "type": "string",
-                  "example": "C"
-                },
-                "interestLock": {
-                  "description": "Interest Lock",
-                  "type": "string",
-                  "example": "C"
-                },
-                "dunningLock": {
-                  "description": "Dunning Lock",
-                  "type": "string",
-                  "example": "1"
-                },
-                "returnFlag": {
-                  "description": "Return Flag",
-                  "type": "boolean",
-                  "example": "false"
-                },
-                "paymentReference": {
-                  "description": "Payment Reference",
-                  "type": "string",
-                  "example": "9999999"
-                },
-                "paymentAmount": {
-                  "description": "Payment Amount",
-                  "type": "number",
-                  "example": "38025.39",
-                  "minimum": -9999999999999.99,
-                  "maximum": 9999999999999.99,
-                  "multipleOf": 0.01
-                },
-                "paymentMethod": {
-                  "description": "Payment Method",
-                  "type": "string",
-                  "example": "A"
-                },
-                "paymentLot": {
-                  "description": "Payment Lot",
-                  "type": "string",
-                  "example": "1054021"
-                },
-                "paymentLotItem": {
-                  "description": "Payment Lot Item",
-                  "type": "string",
-                  "example": "03"
-                },
-                "clearingSAPDocument": {
-                  "description": "Clearing SAP Document",
-                  "type": "string",
-                  "example": "11540541"
-                },
-                "codingInitiationDate": {
-                  "description": "Coding Initiation Date",
-                  "type": "string",
-                  "example": "2022-07-01"
-                },
-                "statisticalDocument": {
-                  "description": "Statistical Document",
-                  "type": "string",
-                  "example": "10541510"
-                },
-                "DDCollectionInProgress": {
-                  "description": "DD Collection In Progress",
-                  "type": "boolean",
-                  "example": "false"
-                },
-                "returnReason": {
-                  "description": "Return Reason",
-                  "type": "string",
-                  "example": "Return Reason"
-                },
-                "promisetoPay": {
-                  "description": "Promise to Pay",
-                  "type": "string",
-                  "example": "Promise to Pay"
+                "lineItemInterestDetails": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "interestKey": {
+                      "description": "A specific line item that has been locked, rather than the entirety of the document. A two-digit reference to identify the interest key.",
+                      "type": "string",
+                      "example": "01"
+                    },
+                    "interestStartDate": {
+                      "description": "The date that the interest charges started.",
+                      "type": "string",
+                      "example": "2022-08-16"
+                    }
+                  },
+                  "additionalProperties": false
                 }
               },
               "additionalProperties": false
             }
           }
         },
-
-        "required": [
-          "taxYear",
-          "documentId",
-          "items"
-        ],
         "additionalProperties": false
       }
     }
-  }
+  },
+  "additionalProperties": false
 }
