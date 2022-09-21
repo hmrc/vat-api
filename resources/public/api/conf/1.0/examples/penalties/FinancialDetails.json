@@ -1,115 +1,32 @@
 {
- "taxPayerDetails": {
-        "idType": "VRN",
-        "idNumber": "GB000000002",
-        "regimeType": "VATC"
-      },
-      "balanceDetails": {
-        "balanceDueWithin30Days": 904.52,
-        "nextPaymentDateForChargesDueIn30Days": "04-09-2022",
-        "balanceNotDueIn30Days": 20004.97,
-        "nextPaymentDateBalanceNotDue": "22-10-2022",
-        "overDueAmount": 457.01,
-        "earliestPaymentDateOverDue": "04-07-2022",
-        "totalBalance": 21366.5,
-        "amountCodedOut": 24.78
-      },
-      "codingDetails": [
+  "totalisations": {
+    "totalOverdue": 123.45,
+    "totalNotYetDue": 12.34,
+    "totalBalance": 12.45,
+    "totalCredit": 13.46,
+    "totalCleared": 12.35
+  },
+  "documentDetails": [
+    {
+      "postingDate": "2022-03-01",
+      "issueDate": "2022-03-01",
+      "documentTotalAmount": 123.45,
+      "documentClearedAmount": 111.11,
+      "documentOutstandingAmount": 12.34,
+      "documentInterestTotal": 1.23,
+      "lineItemDetails": [
         {
-          "taxYearReturn": "2022",
-          "totalReturnAmount": 1048.72,
-          "amountNotCoded": 360.15,
-          "amountNotCodedDueDate": "2022-10-11",
-          "amountCodedOut": 102.36,
-          "taxYearCoding": "456.32"
-        }
-      ],
-      "documentDetails": [
-        {
-          "taxYear": "2022",
-          "documentId": "22222",
-          "documentDate": "2022-10-11",
-          "documentText": "test document text",
-          "documentDueDate": "2023-01-11",
-          "totalAmount": 81054.24,
-          "documentOutstandingAmount": 10203.32,
-          "statisticalFlag": false,
-          "documentDescription": "test document description",
-          "formBundleNumber": "00012",
-          "lastClearingDate": "2022-11-01",
-          "lastClearingReason": "test last clearing reason",
-          "lastClearedAmount": 4980.04,
-          "informationCode": "44444",
-          "paymentLot": "1054021",
-          "paymentLotItem": "01",
-          "accruingInterestAmount": 236.3,
-          "interestRate": 7,
-          "interestFromDate": "2022-05-01",
-          "interestEndDate": "2022-12-01",
-          "latePaymentInterestID": "66666",
-          "latePaymentInterestAmount": 12,
-          "lpiWithDunningBlock": 407,
-          "interestOutstandingAmount": 4520.12,
-          "accruingPenaltyLPP1": "123.40",
-          "lpp1Amount": 805.23,
-          "lpp1ID": "22222",
-          "accruingPenaltyLPP2": "47.89",
-          "lpp2Amount": 410.08,
-          "lpp2ID": "33333"
-        }
-      ],
-      "financialDetails": [
-        {
-          "taxYear": "2023",
-          "documentId": "00003",
-          "chargeType": "testChargeType",
-          "mainType": "testMainType",
-          "periodKey": "testPeriodKey",
-          "periodKeyDescription": "test period key description",
-          "taxPeriodFrom": "2023-04-01",
-          "taxPeriodTo": "2024-04-01",
-          "businessPartner": "test business partner",
-          "contractAccountCategory": "31",
-          "contractAccount": "testContractAccount",
-          "contractObjectType": "ZVAT",
-          "contractObject": "000015400054100",
-          "sapDocumentNumber": "0000002",
-          "sapDocumentNumberItem": "99999991",
-          "chargeReference": "7812",
-          "mainTransaction": "1025",
-          "subTransaction": "3650",
-          "originalAmount": 8520.25,
-          "outstandingAmount": 841.72,
-          "clearedAmount": 1407.28,
-          "accruedInterest": 274.26,
-          "items": [
-            {
-              "subItem": "00003",
-              "dueDate": "2024-04-01",
-              "amount": 7010.41,
-              "clearingDate": "2024-01-01",
-              "clearingReason": "test clearing reason",
-              "outgoingPaymentMethod": "B",
-              "paymentLock": "A",
-              "clearingLock": "C",
-              "interestLock": "D",
-              "dunningLock": "1",
-              "returnFlag": false,
-              "paymentReference": "99999992",
-              "paymentAmount": 4052.05,
-              "paymentMethod": "A",
-              "paymentLot": "1054021",
-              "paymentLotItem": "05",
-              "clearingSAPDocument": "100145401",
-              "codingInitiationDate": "2023-07-01",
-              "statisticalDocument": "12054879",
-              "DDCollectionInProgress": false,
-              "returnReason": "test return reason",
-              "promisetoPay": "Y"
-            }
-          ]
+          "periodFromDate": "2022-03-01",
+          "periodToDate": "2022-03-01",
+          "periodKey": "13RL",
+          "netDueDate": "2022-03-01",
+          "amount": 123.45,
+          "lineItemInterestDetails": {
+            "interestKey": "01",
+            "interestStartDate": "2022-03-01"
+          }
         }
       ]
     }
-  }
+  ]
 }
