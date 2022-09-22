@@ -1,20 +1,20 @@
 # microservice specific routes
 
 # VAT Obligations
-GET         /:vrn/obligations               v1.controllers.ObligationsController.retrieveObligations(vrn, from: Option[String], to: Option[String], status: Option[String])
+GET         /:vrn/obligations                           v1.controllers.ObligationsController.retrieveObligations(vrn, from: Option[String], to: Option[String], status: Option[String])
 
 # VAT Returns
-POST        /:vrn/returns                   v1.controllers.SubmitReturnController.submitReturn(vrn)
-GET         /:vrn/returns/:periodKey        v1.controllers.ViewReturnController.viewReturn(vrn, periodKey)
+POST        /:vrn/returns                               v1.controllers.SubmitReturnController.submitReturn(vrn)
+GET         /:vrn/returns/:periodKey                    v1.controllers.ViewReturnController.viewReturn(vrn, periodKey)
 
 # VAT Liabilities
-GET         /:vrn/liabilities               v1.controllers.LiabilitiesController.retrieveLiabilities(vrn, from: Option[String], to: Option[String])
+GET         /:vrn/liabilities                           v1.controllers.LiabilitiesController.retrieveLiabilities(vrn, from: Option[String], to: Option[String])
 
 # VAT Payments
-GET         /:vrn/payments                  v1.controllers.PaymentsController.retrievePayments(vrn, from: Option[String], to: Option[String])
+GET         /:vrn/payments                              v1.controllers.PaymentsController.retrievePayments(vrn, from: Option[String], to: Option[String])
 
 # VAT Penalties
-GET         /:vrn/penalties                 v1.controllers.PenaltiesController.retrievePenalties(vrn)
+GET         /:vrn/penalties                             v1.controllers.PenaltiesController.retrievePenalties(vrn)
 
 # VAT Financial Details
-GET         /:vrn/financial-details          v1.controllers.FinancialDataController.retrieveFinancialData(vrn)
+GET         /:vrn/financial-details/:searhItem          v1.controllers.FinancialDataController.retrieveFinancialData(vrn, searhItem)
