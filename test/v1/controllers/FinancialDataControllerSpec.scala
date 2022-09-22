@@ -65,7 +65,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
             MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse()))
 
-            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn)(fakeGetRequest)
+            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
             contentAsJson(result) shouldBe FinancialDataConstants.testFinancialResponseJsonMin
@@ -85,7 +85,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
             MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialResponseMax)))
 
-            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn)(fakeGetRequest)
+            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
             contentAsJson(result) shouldBe FinancialDataConstants.testFinancialResponseJsonMax
@@ -120,7 +120,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
                 MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Left(FinancialDataConstants.errorWrapper(mtdError)))
 
-                val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn)(fakeGetRequest)
+                val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
                 status(result) shouldBe expectedStatus
                 contentAsJson(result) shouldBe Json.toJson(mtdError)
@@ -144,7 +144,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
           MockPenaltiesRequestParser.parse(FinancialDataConstants.rawData)(Left(FinancialDataConstants.errorWrapper(VrnFormatError)))
 
-          val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn)(fakeGetRequest)
+          val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
           status(result) shouldBe BAD_REQUEST
           contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
