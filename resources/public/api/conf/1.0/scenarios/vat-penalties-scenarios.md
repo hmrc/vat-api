@@ -8,14 +8,19 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>LATE_SUBMISSION_PENALTY</p></td>
+            <td><p>DEFAULT</p></td>
+            <td><p>The default scenario which has multiple penalties in the last 2 years.</p></td>
+        </tr> 
+    </tbody>
+    <tbody>
+        <tr>
+            <td><p>LATE_SUBMISSION</p></td>
             <td><p>The scenario where there is a single late submission penalty in the last 2 years.</p></td>
         </tr> 
     </tbody>
-    </thead>
     <tbody>
         <tr>
-            <td><p>LATE_PAYMENT_PENALTY</p></td>
+            <td><p>LATE_PAYMENT</p></td>
             <td><p>The scenario where there is a single late payment penalty in the last 2 years.</p></td>
         </tr> 
     </tbody>
