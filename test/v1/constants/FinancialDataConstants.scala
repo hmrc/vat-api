@@ -39,6 +39,7 @@ object FinancialDataConstants {
   implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(userDetails, FakeRequest())
 
   val vrn: String = "123456789"
+  val searchItem = "XC00178236592"
   val rawData: FinancialRawData = FinancialRawData(vrn)
   val financialRequest: FinancialRequest = FinancialRequest(Vrn(vrn))
   val invalidVrn = "fakeVRN"

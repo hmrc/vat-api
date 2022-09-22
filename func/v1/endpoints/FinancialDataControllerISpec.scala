@@ -18,7 +18,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    def uri: String = s"/${FinancialDataConstants.vrn}/financial-details"
+    def uri: String = s"/${FinancialDataConstants.vrn}/financial-details/${FinancialDataConstants.searchItem}"
 
     def setupStubs(): StubMapping
 
