@@ -93,7 +93,7 @@
                   "example": "13RL"
                 },
                 "netDueDate": {
-                  "description": "Net due date relates to multiple line items.",
+                  "description": "Net due date relates to multiple line items. For example: a penalty relates to an Officer's Assessment or Error Correction Notification which covers multiple periods and therefore does not have a standard ‘from’ and ‘to’ date.",
                   "type": "string",
                   "example": "2022-08-16"
                 },

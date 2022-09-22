@@ -473,11 +473,11 @@ traits:
             description: The charge reference, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
             type: string
             example: "XC00178236592"
-        displayName: Retrieve VAT financial-details
-        description: Retrieve VAT financial-details
+        displayName: Retrieve financial details of a penalty charge
+        description: Retrieves the financial details of a penalty charge that has been applied to a VAT account.
         get:
-          displayName: Retrieve VAT financial-details [test only]
-          description: Retrieve VAT financial-details
+          displayName: Retrieve financial details of a penalty charge [test only]
+          description: Retrieves the financial details of a penalty charge that has been applied to a VAT account.
           (annotations.sandboxData): !include scenarios/vat-financial-details-scenarios.md
           is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
           (annotations.scope): "read:vat"
