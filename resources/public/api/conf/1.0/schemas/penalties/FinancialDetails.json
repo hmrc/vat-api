@@ -13,7 +13,7 @@
           "example": "5009.99"
         },
         "totalNotYetDue": {
-          "description": "The charge amount that has been posted to the account, but is not yet payable. The due date is in the future. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
+          "description": "The charge amount that has been posted to the account, but is not yet overdue. The due date is in the future. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
           "example": "5009.99"
         },
@@ -28,7 +28,7 @@
           "example": "5009.99"
         },
         "totalCleared": {
-          "description": "The amount that the individual or organisation has paid towards the charge already. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
+          "description": "The amount that has been paid, reversed, removed or cleared. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
           "example": "5009.99"
         }
@@ -93,7 +93,7 @@
                   "example": "13RL"
                 },
                 "netDueDate": {
-                  "description": "Net due date relates to multiple line items.",
+                  "description": "The due date for payment.",
                   "type": "string",
                   "example": "2022-08-16"
                 },
