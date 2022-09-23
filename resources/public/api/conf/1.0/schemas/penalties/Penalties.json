@@ -166,7 +166,7 @@
                 "example": "2022-07-01"
               },
               "lateSubmissions": {
-                "description": "The late submissions that relate to the period for which the penalty was levied. Note that although only one penalty point will be levied for a particular period, more than one late submission could be made for that period. All late submissions that relate to the period will affect the period of compliance.",
+                "description": "The late submissions that relate to the period for which the penalty was levied. Note that although only one penalty point will be levied for late submissions of a particular type of obligation during a calendar month, more than one late submission of that type could be made during the month. In that case, the lateSubmissions array will contain more than one object. All of these late submissions are incorporated within the single penalty point and affect the period of compliance and expiry date (which will be set by the date of the most recent failure).",
                 "type": "array",
                 "items": {
                   "type": "object",
