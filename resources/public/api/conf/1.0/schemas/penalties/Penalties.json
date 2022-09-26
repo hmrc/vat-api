@@ -222,14 +222,14 @@
                     "appealStatus": {
                       "description": "The appeal status of a penalty.",
                       "type": "string",
-                      "example": "under appeal",
+                      "example": "under-appeal",
                       "enum": ["under-appeal", "appeal-upheld", "appeal-rejected", "cannot-be-appealed"]
                     },
                     "appealLevel": {
                       "description": "The level of appeal.",
                       "type": "string",
-                      "example": "",
-                      "enum": ["appeal-to-HMRC", "statutory-review", "appeal-first-tier-tribunal"]
+                      "example": "statutory-review",
+                      "enum": ["statutory-review", "appeal-first-tier-tribunal"]
                     }
                   },
                   "required": ["appealStatus", "appealLevel"],

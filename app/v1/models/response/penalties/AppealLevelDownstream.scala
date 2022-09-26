@@ -24,16 +24,13 @@ sealed trait AppealLevelDownstream {
 }
 
 object AppealLevelDownstream {
+
   case object `01` extends AppealLevelDownstream {
-    override def toUpstreamAppealLevel: AppealLevelUpstream = AppealLevelUpstream.`appeal to HMRC`
+    override def toUpstreamAppealLevel: AppealLevelUpstream = AppealLevelUpstream.`statutory-review`
   }
 
   case object `02` extends AppealLevelDownstream {
-    override def toUpstreamAppealLevel: AppealLevelUpstream = AppealLevelUpstream.`review`
-  }
-
-  case object `03` extends AppealLevelDownstream {
-    override def toUpstreamAppealLevel: AppealLevelUpstream = AppealLevelUpstream.`appeal First Tier Tribunal`
+    override def toUpstreamAppealLevel: AppealLevelUpstream = AppealLevelUpstream.`appeal-first-tier-tribunal`
   }
 
   implicit val format: json.Format[AppealLevelDownstream] = Enums.format[AppealLevelDownstream]
