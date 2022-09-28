@@ -205,7 +205,6 @@ case class LateSubmissionPenaltyDetails(
                                          penaltyStatus: LateSubmissionPenaltyStatusUpstream,
                                          FAPIndicator: Option[String],
                                          penaltyCreationDate: String,
-                                         triggeringProcess: String,
                                          penaltyExpiryDate: String,
                                          expiryReason: Option[ExpiryReasonUpstream],
                                          communicationsDate: String,
@@ -225,7 +224,6 @@ object LateSubmissionPenaltyDetails {
     penaltyStatus           <- (JsPath \ "penaltyStatus").read[LateSubmissionPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus)
     fAPIndicator            <- (JsPath \ "FAPIndicator").readNullable[String]
     penaltyCreationDate     <- (JsPath \ "penaltyCreationDate").read[String]
-    triggeringProcess       <- (JsPath \ "triggeringProcess").read[String]
     penaltyExpiryDate       <- (JsPath \ "penaltyExpiryDate").read[String]
     expiryReason            <- (JsPath \ "expiryReason").readNullable[ExpiryReasonDownstream]
     communicationsDate      <- (JsPath \ "communicationsDate").read[String]
@@ -243,7 +241,6 @@ object LateSubmissionPenaltyDetails {
       penaltyStatus = penaltyStatus,
       FAPIndicator = fAPIndicator,
       penaltyCreationDate = penaltyCreationDate,
-      triggeringProcess = triggeringProcess,
       penaltyExpiryDate = penaltyExpiryDate,
       expiryReason = if (expiryReason.isDefined) Some(expiryReason.get.toUpstreamExpiryReason) else None,
       communicationsDate = communicationsDate,
@@ -261,7 +258,6 @@ object LateSubmissionPenaltyDetails {
 
 case class LateSubmissions(
                             lateSubmissionID: String,
-                            taxPeriod: Option[String],
                             taxReturnStatus: TaxReturnStatus,
                             taxPeriodStartDate: Option[String],
                             taxPeriodEndDate: Option[String],

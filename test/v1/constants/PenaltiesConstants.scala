@@ -76,13 +76,11 @@ object PenaltiesConstants {
       penaltyStatus = LateSubmissionPenaltyStatusUpstream.`active`,
       FAPIndicator = Some("123"),
       penaltyCreationDate = "123",
-      triggeringProcess = "123",
       penaltyExpiryDate = "123",
       expiryReason = Some(ExpiryReasonUpstream.`appeal`),
       communicationsDate = "123",
       lateSubmissions = Some(List(LateSubmissions(
         lateSubmissionID = "123",
-        taxPeriod = Some("123"),
         taxReturnStatus = TaxReturnStatus.`Open`,
         taxPeriodStartDate = Some("123"),
         taxPeriodEndDate = Some("2022-10-11"),
@@ -238,14 +236,12 @@ object PenaltiesConstants {
       |            "penaltyStatus":"active",
       |            "FAPIndicator":"123",
       |            "penaltyCreationDate":"123",
-      |            "triggeringProcess":"123",
       |            "penaltyExpiryDate":"123",
       |            "expiryReason": "appeal",
       |            "communicationsDate":"123",
       |            "lateSubmissions":[
       |               {
       |                  "lateSubmissionID":"123",
-      |                  "taxPeriod":"123",
       |                  "taxReturnStatus":"Open",
       |                  "taxPeriodStartDate":"123",
       |                  "taxPeriodEndDate":"2022-10-11",
@@ -271,14 +267,12 @@ object PenaltiesConstants {
        |            "penaltyStatus":"active",
        |            "FAPIndicator":"123",
        |            "penaltyCreationDate":"123",
-       |            "triggeringProcess":"123",
        |            "penaltyExpiryDate":"123",
        |            "expiryReason":"appeal",
        |            "communicationsDate":"123",
        |            "lateSubmissions":[
        |               {
        |                  "lateSubmissionID":"123",
-       |                  "taxPeriod":"123",
        |                  "taxReturnStatus":"Open",
        |                  "taxPeriodStartDate":"123",
        |                  "taxPeriodEndDate":"2022-10-11",
