@@ -90,7 +90,7 @@ object PenaltiesConstants {
       appealInformation = Some(List(
         AppealInformation(
           appealStatus = AppealStatusUpstream.`under appeal`,
-          appealLevel = AppealLevelUpstream.`review`
+          appealLevel = AppealLevelUpstream.`statutory-review`
         )
       )),
       chargeReference = Some(testChargeRef),
@@ -122,7 +122,7 @@ object PenaltiesConstants {
       appealInformation = Some(Seq(
         AppealInformation(
           appealStatus = AppealStatusUpstream.`under appeal`,
-          appealLevel = AppealLevelUpstream.`review`
+          appealLevel = AppealLevelUpstream.`statutory-review`
         )
       )),
       principalChargeDocNumber = "123",
@@ -182,7 +182,7 @@ object PenaltiesConstants {
       |            "appealInformation":[
       |               {
       |                  "appealStatus":"A",
-      |                  "appealLevel":"02"
+      |                  "appealLevel":"01"
       |               }
       |            ],
       |            "chargeReference":"123",
@@ -215,7 +215,7 @@ object PenaltiesConstants {
        |            "appealInformation":[
        |               {
        |                  "appealStatus":"A",
-       |                  "appealLevel":"02"
+       |                  "appealLevel":"01"
        |               }
        |            ],
        |            "chargeReference":"1234",
@@ -252,7 +252,7 @@ object PenaltiesConstants {
       |            "appealInformation":[
       |               {
       |                  "appealStatus":"under appeal",
-      |                  "appealLevel":"review"
+      |                  "appealLevel":"statutory-review"
       |               }
       |            ],
       |            "chargeReference":"123",
@@ -283,7 +283,7 @@ object PenaltiesConstants {
        |            "appealInformation":[
        |               {
        |                  "appealStatus":"under appeal",
-       |                  "appealLevel":"review"
+       |                  "appealLevel":"statutory-review"
        |               }
        |            ],
        |            "chargeReference":"1234",
@@ -320,7 +320,7 @@ object PenaltiesConstants {
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
         |        "appealStatus":  "A",
-        |        "appealLevel": "02"
+        |        "appealLevel": "01"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
@@ -355,7 +355,7 @@ object PenaltiesConstants {
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
         |        "appealStatus":  "A",
-        |        "appealLevel": "02"
+        |        "appealLevel": "01"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
@@ -397,7 +397,7 @@ object PenaltiesConstants {
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
         |        "appealStatus":  "under appeal",
-        |        "appealLevel": "review"
+        |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
@@ -431,7 +431,7 @@ object PenaltiesConstants {
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
         |        "appealStatus":  "under appeal",
-        |        "appealLevel": "review"
+        |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",
         |    "principalChargeMainTransaction": "123",
