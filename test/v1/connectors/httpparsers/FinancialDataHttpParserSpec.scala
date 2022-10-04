@@ -40,7 +40,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
             val result = FinancialDataHttpReads.read("", "",
               HttpResponse(
                 status = Status.OK,
-                json = FinancialDataConstants.testFinancialResponseJsonMin,
+                json = FinancialDataConstants.testDownstreamFinancialDetails,
                 headers = Map(
                   "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
                 )
@@ -55,14 +55,14 @@ class FinancialDataHttpParserSpec extends UnitSpec {
             val result = FinancialDataHttpReads.read("", "",
               HttpResponse(
                 status = Status.OK,
-                json = FinancialDataConstants.testFinancialResponseJsonMax,
+                json = FinancialDataConstants.testDownstreamFinancialDetails,
                 headers = Map(
                   "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
                 )
               )
             )
 
-            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialResponseMax))
+            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse))
           }
         }
 

@@ -159,11 +159,11 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
             config = dummyHeaderCarrierConfig,
             queryParams = Seq()
           ).returns(
-            Future.successful(Right(FinancialDataConstants.testFinancialResponseMin))
+            Future.successful(Right(FinancialDataConstants.testFinancialDataResponse))
           )
 
           val result = testConnector.retrieveFinancialData(FinancialDataConstants.financialRequest)
-          val expectedResult = Right(FinancialDataConstants.testFinancialResponseMin)
+          val expectedResult = Right(FinancialDataConstants.testFinancialDataResponse)
 
           await(result) shouldBe expectedResult
         }
@@ -175,11 +175,11 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
             config = dummyHeaderCarrierConfig,
             queryParams = Seq()
           ).returns(
-            Future.successful(Right(FinancialDataConstants.testFinancialResponseMax))
+            Future.successful(Right(FinancialDataConstants.testFinancialDataResponse))
           )
 
           val result = testConnector.retrieveFinancialData(FinancialDataConstants.financialRequest)
-          val expectedResult = Right(FinancialDataConstants.testFinancialResponseMax)
+          val expectedResult = Right(FinancialDataConstants.testFinancialDataResponse)
 
           await(result) shouldBe expectedResult
         }

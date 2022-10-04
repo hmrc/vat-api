@@ -24,13 +24,13 @@ class FinancialDataResponseSpec extends UnitSpec {
 
   "FinancialData" must {
 
-    "read data from json" in {
+    "write data from json" in {
 
-      Json.toJson(FinancialDataConstants.testFinancialResponseMin) shouldBe FinancialDataConstants.testFinancialResponseJsonMin
+      Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
     }
 
-    "write to json" in {
-      FinancialDataConstants.testFinancialResponseJsonMin.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialResponseMin
+    "read to json" in {
+      FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
     }
   }
 }

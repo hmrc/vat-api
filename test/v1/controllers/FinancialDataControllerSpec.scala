@@ -68,14 +68,14 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
             val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
-            contentAsJson(result) shouldBe FinancialDataConstants.testFinancialResponseJsonMin
+            contentAsJson(result) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
             contentType(result) shouldBe Some("application/json")
             header("X-CorrelationId", result) shouldBe Some(FinancialDataConstants.correlationId)
 
             MockedAuditService.verifyAuditEvent(AuditEvents.auditFinancialData(
               correlationId = FinancialDataConstants.correlationId,
               userDetails = FinancialDataConstants.userDetails,
-              auditResponse = AuditResponse(OK, None, Some(FinancialDataConstants.testFinancialResponseJsonMin))
+              auditResponse = AuditResponse(OK, None, Some(FinancialDataConstants.testUpstreamFinancialDetails))
             ))
           }
 
@@ -83,19 +83,19 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
             MockPenaltiesRequestParser.parse(FinancialDataConstants.rawData)(Right(FinancialDataConstants.financialRequest))
 
-            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialResponseMax)))
+            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse)))
 
             val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
-            contentAsJson(result) shouldBe FinancialDataConstants.testFinancialResponseJsonMax
+            contentAsJson(result) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
             contentType(result) shouldBe Some("application/json")
             header("X-CorrelationId", result) shouldBe Some(FinancialDataConstants.correlationId)
 
             MockedAuditService.verifyAuditEvent(AuditEvents.auditFinancialData(
               correlationId = FinancialDataConstants.correlationId,
               userDetails = FinancialDataConstants.userDetails,
-              auditResponse = AuditResponse(OK, None, Some(FinancialDataConstants.testFinancialResponseJsonMax))
+              auditResponse = AuditResponse(OK, None, Some(FinancialDataConstants.testUpstreamFinancialDetails))
             ))
           }
         }
