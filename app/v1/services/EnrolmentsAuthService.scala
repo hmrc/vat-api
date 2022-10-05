@@ -45,8 +45,8 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
         case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
         case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
         case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
-        case _ =>
-          logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group.")
+        case affinityGroup =>
+          logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group. $affinityGroup")
           Future.successful(Left(LegacyUnauthorisedError))
       }recoverWith unauthorisedError
     } else {
@@ -77,8 +77,8 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
             )
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
-        case _ =>
-          logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group.")
+        case affinityGroup =>
+          logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group. $affinityGroup")
           Future.successful(Left(LegacyUnauthorisedError))
 
       }recoverWith unauthorisedError
@@ -91,7 +91,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
                                            identityData: Option[IdentityData] = None): Future[Right[MtdError, UserDetails]] = {
 
     val clientReference = getClientReferenceFromEnrolments(enrolments)
-    logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
+    logger.debug(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
       s"fully-authorised organisation for VRN $clientReference.")
 
     val userDetails = UserDetails(
