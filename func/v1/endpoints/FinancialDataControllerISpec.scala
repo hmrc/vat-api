@@ -63,12 +63,12 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testFinancialResponseJsonMax)
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testDownstreamFinancialDetails)
             }
 
             val response: WSResponse = await(request.get())
             response.status shouldBe OK
-            response.json shouldBe FinancialDataConstants.testFinancialResponseJsonMax
+            response.json shouldBe FinancialDataConstants.testUpstreamFinancialDetails
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }
