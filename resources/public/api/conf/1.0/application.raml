@@ -432,7 +432,7 @@ traits:
         displayName: Retrieve VAT penalties [test only]
         description: Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
         (annotations.sandboxData): !include scenarios/vat-penalties-scenarios.md
-        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised, ruleInsolventTrader]
+        is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
         (annotations.scope): "read:vat"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:vat" ] } ]
         responses:
