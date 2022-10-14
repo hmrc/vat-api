@@ -7,7 +7,7 @@
       "description": "Totals that relate to the penalties that HMRC has levied.",
       "type": "object",
       "properties": {
-        "LSPTotalValue": {
+        "lateSubmissionPenaltyTotalValue": {
           "description": "Total value of all unpaid late submission penalties. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "200.00",
@@ -23,7 +23,7 @@
           "maximum": 9999999999999.99,
           "multipleOf": 0.01
         },
-        "LPPPostedTotal": {
+        "latePaymentPenaltyPostedTotal": {
           "description": "Total value of Late Payment Penalty (LPP) charged. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "171.46",
@@ -31,7 +31,7 @@
           "maximum": 9999999999999.99,
           "multipleOf": 0.01
         },
-        "LPPEstimatedTotal": {
+        "latePaymentPenaltyEstimateTotal": {
           "description": "Estimated total value of uncharged Late Payment Penalty (LPP) with amount accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "171.46",
@@ -64,7 +64,7 @@
               "minimum": 0,
               "multipleOf": 1
             },
-            "PoCAchievementDate": {
+            "periodofComplianceAchievement": {
               "description": "This is the date that penalty points expire if customer meets requirements.",
               "type": "string",
               "example": "2023-04-01"
@@ -88,7 +88,7 @@
           "required": [
             "activePenaltyPoints",
             "inactivePenaltyPoints",
-            "PoCAchievementDate",
+            "periodofComplianceAchievement",
             "regimeThreshold",
             "penaltyChargeAmount"
           ],
@@ -129,7 +129,7 @@
                   { "enum": ["inactive"], "description": "If the penalty category is 'point', it no longer counts towards the individual's or organisation's point balance. This might be because the point has expired, been successfully appealed against, or been removed due to an adjustment. If the penalty category is 'threshold', then it no longer counts towards the individual's or organisation's point balance for the same reasons. Alternatively, a 'threshold' penalty could be inactive because the charge that is associated with it has been reversed. If the penalty category is 'charge', then the charge has been reversed." }
                 ]
               },
-              "FAPIndicator": {
+              "frequencyAdjustmentPointIndicator": {
                 "description": "Indicates if there's been an adjustment to your penalty point because of a change to your submission frequency. For example, changing from quarterly submissions to monthly submissions.",
                 "type": "string",
                 "example": "X",
@@ -329,7 +329,7 @@
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
               },
-              "LPP1LRCalculationAmount": {
+              "latePaymentPenalty1LowerRateCalculationAmount": {
                 "description": "Amount of unpaid tax on day 16, after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "3605.50",
@@ -337,7 +337,7 @@
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
               },
-              "LPP1LRPercentage": {
+              "latePaymentPenalty1LowerRatePercentage": {
                 "description": "The percentage used to calculate the lower rate part of the penalty.",
                 "type": "number",
                 "example": "2.00",
@@ -345,7 +345,7 @@
                 "maximum": 99.99,
                 "multipleOf": 0.01
               },
-              "LPP1HRCalculationAmount": {
+              "latePaymentPenalty1HigherRateCalculationAmount": {
                 "description": "Amount of unpaid tax on day 31, after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "10000.00",
@@ -353,7 +353,7 @@
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
               },
-              "LPP1HRPercentage": {
+              "latePaymentPenalty1HigherRatePercentage": {
                 "description": "The percentage used to calculate the higher rate part of the penalty.",
                 "type": "number",
                 "example": "2.00",
@@ -361,12 +361,12 @@
                 "maximum": 99.99,
                 "multipleOf": 0.01
               },
-              "LPP2Days": {
+              "latePaymentPenalty2Days": {
                 "description": "The number of days since day 31 of the late penalty payment.",
                 "type": "string",
                 "example": "14"
               },
-              "LPP2Percentage": {
+              "latePaymentPenalty2Percentage": {
                 "description": "The rate applied to unpaid tax to calculate the penalty payment.",
                 "type": "number",
                 "example": "2.00",
@@ -458,12 +458,12 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "TTPStartDate": {
+                    "timeToPayStartDate": {
                       "description": "This is the start date of the agreed time to pay the charge.",
                       "type": "string",
                       "example": ""
                     },
-                    "TTPEndDate": {
+                    "timeToPayEndDate": {
                       "description": "This is the last date of the agreed time to pay the charge.",
                       "type": "string",
                       "example": ""
