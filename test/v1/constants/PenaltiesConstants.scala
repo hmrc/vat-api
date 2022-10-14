@@ -45,27 +45,33 @@ object PenaltiesConstants {
 
 
   val testTotalisationMin: Totalisations = Totalisations(
-    LSPTotalValue = None,
+    lateSubmissionPenaltyTotalValue = None,
     penalisedPrincipalTotal = None,
-    LPPPostedTotal = None,
-    LPPEstimatedTotal = None,
+    latePaymentPenaltyPostedTotal = None,
+    latePaymentPenaltyEstimateTotal = None,
   )
 
   val testPenaltiesTotalisationDataJsonMin: JsObject = Json.obj()
 
   val testTotalisationMax: Totalisations = Totalisations(
-    LSPTotalValue = Some(10),
+    lateSubmissionPenaltyTotalValue = Some(10),
     penalisedPrincipalTotal = Some(11),
-    LPPPostedTotal = Some(12),
-    LPPEstimatedTotal = Some(13),
+    latePaymentPenaltyPostedTotal = Some(12),
+    latePaymentPenaltyEstimateTotal = Some(13),
   )
 
-  val testPenaltiesTotalisationDataJsonMax: JsObject = Json.obj(
+  val downstreamTestPenaltiesTotalisationDataJsonMax: JsObject = Json.obj(
     "LSPTotalValue" -> 10,
     "penalisedPrincipalTotal" -> 11,
     "LPPPostedTotal" -> 12,
     "LPPEstimatedTotal" -> 13,
+  )
 
+  val upstreamTestPenaltiesTotalisationDataJsonMax: JsObject = Json.obj(
+    "lateSubmissionPenaltyTotalValue" -> 10,
+    "penalisedPrincipalTotal" -> 11,
+    "latePaymentPenaltyPostedTotal" -> 12,
+    "latePaymentPenaltyEstimateTotal" -> 13,
   )
 
   def testlateSubmissionPenaltyDetails(testChargeRef: String): LateSubmissionPenaltyDetails = {
@@ -74,7 +80,7 @@ object PenaltiesConstants {
       penaltyOrder = "123",
       penaltyCategory = LateSubmissionPenaltyCategoryUpstream.`point`,
       penaltyStatus = LateSubmissionPenaltyStatusUpstream.`active`,
-      FAPIndicator = Some("123"),
+      frequencyAdjustmentPointIndicator = Some("123"),
       penaltyCreationDate = "123",
       penaltyExpiryDate = "123",
       expiryReason = Some(ExpiryReasonUpstream.`appeal`),
@@ -109,12 +115,12 @@ object PenaltiesConstants {
       penaltyAmountPosted = 123,
       penaltyAmountPaid = Some(123),
       penaltyAmountOutstanding = Some(123),
-      LPP1LRCalculationAmount = Some(123),
-      LPP1LRPercentage = Some(123),
-      LPP1HRCalculationAmount = Some(123),
-      LPP1HRPercentage = Some(123),
-      LPP2Days = Some("123"),
-      LPP2Percentage = Some(123),
+      latePaymentPenalty1LowerRateCalculationAmount = Some(123),
+      latePaymentPenalty1LowerRatePercentage = Some(123),
+      latePaymentPenalty1HigherRateCalculationAmount = Some(123),
+      latePaymentPenalty1HigherRatePercentage = Some(123),
+      latePaymentPenalty2Days = Some("123"),
+      latePaymentPenalty2Percentage = Some(123),
       penaltyChargeCreationDate = "2022-10-11",
       communicationsDate = "2022-10-11",
       penaltyChargeReference = Some("123"),
@@ -134,8 +140,8 @@ object PenaltiesConstants {
       principalChargeLatestClearing = Some("123"),
       timeToPay = Some(Seq(
         TimeToPay(
-          TTPStartDate = Some("2022-10-11"),
-          TTPEndDate = Some("2022-10-11")
+          timeToPayStartDate = Some("2022-10-11"),
+          timeToPayEndDate = Some("2022-10-11")
         )
       ))
     )
@@ -145,7 +151,7 @@ object PenaltiesConstants {
     summary = LateSubmissionPenaltySummary(
       activePoints = 2,
       inactivePenaltyPoints = 2,
-      PoCAchievementDate = "2022-10-11",
+      periodofComplianceAchievement = "2022-10-11",
       regimeThreshold = 2,
       penaltyChargeAmount = 123
     ),
@@ -234,7 +240,7 @@ object PenaltiesConstants {
       |            "penaltyOrder":"123",
       |            "penaltyCategory":"point",
       |            "penaltyStatus":"active",
-      |            "FAPIndicator":"123",
+      |            "frequencyAdjustmentPointIndicator":"123",
       |            "penaltyCreationDate":"123",
       |            "penaltyExpiryDate":"123",
       |            "expiryReason": "appeal",
@@ -265,7 +271,7 @@ object PenaltiesConstants {
        |            "penaltyOrder":"123",
        |            "penaltyCategory":"point",
        |            "penaltyStatus":"active",
-       |            "FAPIndicator":"123",
+       |            "frequencyAdjustmentPointIndicator":"123",
        |            "penaltyCreationDate":"123",
        |            "penaltyExpiryDate":"123",
        |            "expiryReason":"appeal",
@@ -300,7 +306,7 @@ object PenaltiesConstants {
     Json.parse(
       """
         |[{
-        |"principalChargeReference": "123",
+        |    "principalChargeReference": "123",
         |    "penaltyCategory": "123",
         |    "penaltyStatus": "P",
         |    "penaltyAmountAccruing": 123,
@@ -385,12 +391,12 @@ object PenaltiesConstants {
         |    "penaltyAmountPosted": 123,
         |    "penaltyAmountPaid": 123,
         |    "penaltyAmountOutstanding": 123,
-        |    "LPP1LRCalculationAmount": 123,
-        |    "LPP1LRPercentage": 123,
-        |    "LPP1HRCalculationAmount": 123,
-        |    "LPP1HRPercentage": 123,
-        |    "LPP2Days": "123",
-        |    "LPP2Percentage": 123,
+        |    "latePaymentPenalty1LowerRateCalculationAmount": 123,
+        |    "latePaymentPenalty1LowerRatePercentage": 123,
+        |    "latePaymentPenalty1HigherRateCalculationAmount": 123,
+        |    "latePaymentPenalty1HigherRatePercentage": 123,
+        |    "latePaymentPenalty2Days": "123",
+        |    "latePaymentPenalty2Percentage": 123,
         |    "penaltyChargeCreationDate": "2022-10-11",
         |    "communicationsDate": "2022-10-11",
         |    "penaltyChargeReference": "123",
@@ -407,8 +413,8 @@ object PenaltiesConstants {
         |    "principalChargeDueDate": "2022-10-11",
         |    "principalChargeLatestClearing": "123",
         |    "timeToPay": [{
-        |        "TTPStartDate": "2022-10-11",
-        |        "TTPEndDate": "2022-10-11"
+        |        "timeToPayStartDate": "2022-10-11",
+        |        "timeToPayEndDate": "2022-10-11"
         |        }]
         |},
         |{
@@ -419,12 +425,12 @@ object PenaltiesConstants {
         |    "penaltyAmountPosted": 123,
         |    "penaltyAmountPaid": 123,
         |    "penaltyAmountOutstanding": 123,
-        |    "LPP1LRCalculationAmount": 123,
-        |    "LPP1LRPercentage": 123,
-        |    "LPP1HRCalculationAmount": 123,
-        |    "LPP1HRPercentage": 123,
-        |    "LPP2Days": "123",
-        |    "LPP2Percentage": 123,
+        |    "latePaymentPenalty1LowerRateCalculationAmount": 123,
+        |    "latePaymentPenalty1LowerRatePercentage": 123,
+        |    "latePaymentPenalty1HigherRateCalculationAmount": 123,
+        |    "latePaymentPenalty1HigherRatePercentage": 123,
+        |    "latePaymentPenalty2Days": "123",
+        |    "latePaymentPenalty2Percentage": 123,
         |    "penaltyChargeCreationDate": "2022-10-11",
         |    "communicationsDate": "2022-10-11",
         |    "penaltyChargeReference": "123",
@@ -441,8 +447,8 @@ object PenaltiesConstants {
         |    "principalChargeDueDate": "2022-10-11",
         |    "principalChargeLatestClearing": "123",
         |    "timeToPay": [{
-        |        "TTPStartDate": "2022-10-11",
-        |        "TTPEndDate": "2022-10-11"
+        |        "timeToPayStartDate": "2022-10-11",
+        |        "timeToPayEndDate": "2022-10-11"
         |        }]
         |}
         | ]
@@ -464,7 +470,15 @@ object PenaltiesConstants {
     ))
   )
 
-  val testLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
+  val upstreamTestLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
+    "activePoints" -> 2,
+    "inactivePenaltyPoints" -> 2,
+    "periodofComplianceAchievement" -> "2022-10-11",
+    "regimeThreshold" -> 2,
+    "penaltyChargeAmount" -> 123
+  )
+
+  val downstreamTestLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
     "activePoints" -> 2,
     "inactivePenaltyPoints" -> 2,
     "PoCAchievementDate" -> "2022-10-11",
@@ -481,12 +495,12 @@ object PenaltiesConstants {
   )
 
   val downstreamTestLateSubmissionPenaltyJson: JsObject = Json.obj(
-    "summary" -> testLateSubmissionPenaltySummaryJson,
+    "summary" -> downstreamTestLateSubmissionPenaltySummaryJson,
     "details" -> downstreamTestLateSubmissionDetailsJson
   )
 
   val upstreamTestLateSubmissionPenaltyJson: JsObject = Json.obj(
-    "summary" -> testLateSubmissionPenaltySummaryJson,
+    "summary" -> upstreamTestLateSubmissionPenaltySummaryJson,
     "details" -> upstreamTestLateSubmissionDetailsJson
   )
 
@@ -500,13 +514,13 @@ object PenaltiesConstants {
   val testPenaltiesResponseJsonMin: JsObject = Json.obj()
 
   val upstreamTestPenaltiesResponseJsonMax: JsObject = Json.obj(
-    "totalisations" -> Some(testPenaltiesTotalisationDataJsonMax),
+    "totalisations" -> Some(upstreamTestPenaltiesTotalisationDataJsonMax),
     "lateSubmissionPenalty" -> Some(upstreamTestLateSubmissionPenaltyJson),
     "latePaymentPenalty" -> Some(upstreamTestLatePaymentPenaltyJson)
   )
 
   val downstreamTestPenaltiesResponseJsonMax: JsObject = Json.obj(
-    "totalisations" -> Some(testPenaltiesTotalisationDataJsonMax),
+    "totalisations" -> Some(downstreamTestPenaltiesTotalisationDataJsonMax),
     "lateSubmissionPenalty" -> Some(downstreamTestLateSubmissionPenaltyJson),
     "latePaymentPenalty" -> Some(downstreamTestLatePaymentPenaltyJson)
   )

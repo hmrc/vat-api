@@ -70,12 +70,17 @@ class PenaltiesHttpParserSpec extends UnitSpec {
 
           "return Left(InvalidJson)" in {
 
+            val jsonObject =
+              Json.parse("""
+                | "totalisations" {
+                |   "test": "test"
+                | }
+                |""".stripMargin)
+
             val result = PenaltiesHttpReads.read("", "",
               HttpResponse(
                 status = Status.OK,
-                json = Json.obj(
-                  "totalisations" -> "test"
-                ),
+                json = jsonObject,
                 headers = Map(
                   "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
                 )
