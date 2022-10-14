@@ -38,12 +38,12 @@ case class LatePaymentPenaltyDetails(
                                       penaltyAmountPosted: BigDecimal,
                                       penaltyAmountPaid: Option[BigDecimal],
                                       penaltyAmountOutstanding: Option[BigDecimal],
-                                      LPP1LRCalculationAmount: Option[BigDecimal],
-                                      LPP1LRPercentage: Option[BigDecimal],
-                                      LPP1HRCalculationAmount: Option[BigDecimal],
-                                      LPP1HRPercentage: Option[BigDecimal],
-                                      LPP2Days: Option[String],
-                                      LPP2Percentage: Option[BigDecimal],
+                                      latePaymentPenalty1LowerRateCalculationAmount: Option[BigDecimal],
+                                      latePaymentPenalty1LowerRatePercentage: Option[BigDecimal],
+                                      latePaymentPenalty1HigherRateCalculationAmount: Option[BigDecimal],
+                                      latePaymentPenalty1HigherRatePercentage: Option[BigDecimal],
+                                      latePaymentPenalty2Days: Option[String],
+                                      latePaymentPenalty2Percentage: Option[BigDecimal],
                                       penaltyChargeCreationDate: String,
                                       communicationsDate: String,
                                       penaltyChargeReference: Option[String],
@@ -97,12 +97,12 @@ object LatePaymentPenaltyDetails {
       penaltyAmountPosted = penaltyAmountPosted,
       penaltyAmountPaid = penaltyAmountPaid,
       penaltyAmountOutstanding = penaltyAmountOutstanding,
-      LPP1LRCalculationAmount = lPP1LRCalculationAmount,
-      LPP1LRPercentage = lPP1LRPercentage,
-      LPP1HRCalculationAmount = lPP1HRCalculationAmount,
-      LPP1HRPercentage = lPP1HRPercentage,
-      LPP2Days = lPP2Days,
-      LPP2Percentage = lPP2Percentage,
+      latePaymentPenalty1LowerRateCalculationAmount = lPP1LRCalculationAmount,
+      latePaymentPenalty1LowerRatePercentage = lPP1LRPercentage,
+      latePaymentPenalty1HigherRateCalculationAmount = lPP1HRCalculationAmount,
+      latePaymentPenalty1HigherRatePercentage = lPP1HRPercentage,
+      latePaymentPenalty2Days = lPP2Days,
+      latePaymentPenalty2Percentage = lPP2Percentage,
       penaltyChargeCreationDate = penaltyChargeCreationDate,
       communicationsDate = communicationsDate,
       penaltyChargeReference = penaltyChargeReference,
@@ -130,12 +130,12 @@ object LatePaymentPenaltyDetails {
           "penaltyAmountPosted" -> Json.toJson(o.penaltyAmountPosted),
           "penaltyAmountPaid" -> Json.toJson(o.penaltyAmountPaid),
           "penaltyAmountOutstanding" -> Json.toJson(o.penaltyAmountOutstanding),
-          "LPP1LRCalculationAmount" -> Json.toJson(o.LPP1LRCalculationAmount),
-          "LPP1LRPercentage" -> Json.toJson(o.LPP1LRPercentage),
-          "LPP1HRCalculationAmount" -> Json.toJson(o.LPP1HRCalculationAmount),
-          "LPP1HRPercentage" -> Json.toJson(o.LPP1HRPercentage),
-          "LPP2Days" -> Json.toJson(o.LPP2Days),
-          "LPP2Percentage" -> Json.toJson(o.LPP2Percentage),
+          "latePaymentPenalty1LowerRateCalculationAmount" -> Json.toJson(o.latePaymentPenalty1LowerRateCalculationAmount),
+          "latePaymentPenalty1LowerRatePercentage" -> Json.toJson(o.latePaymentPenalty1LowerRatePercentage),
+          "latePaymentPenalty1HigherRateCalculationAmount" -> Json.toJson(o.latePaymentPenalty1HigherRateCalculationAmount),
+          "latePaymentPenalty1HigherRatePercentage" -> Json.toJson(o.latePaymentPenalty1HigherRatePercentage),
+          "latePaymentPenalty2Days" -> Json.toJson(o.latePaymentPenalty2Days),
+          "latePaymentPenalty2Percentage" -> Json.toJson(o.latePaymentPenalty2Percentage),
           "penaltyChargeCreationDate" -> Json.toJson(o.penaltyChargeCreationDate),
           "communicationsDate" -> Json.toJson(o.communicationsDate),
           "penaltyChargeReference" -> Json.toJson(o.penaltyChargeReference),
@@ -157,23 +157,35 @@ object LatePaymentPenaltyDetails {
 
 
 case class TimeToPay(
-                      TTPStartDate: Option[String],
-                      TTPEndDate: Option[String]
+                      timeToPayStartDate: Option[String],
+                      timeToPayEndDate: Option[String]
                     )
 
 object TimeToPay {
-  implicit val format: OFormat[TimeToPay] = Json.format[TimeToPay]
+  implicit val reads: Reads[TimeToPay] = (
+    (JsPath \ "TTPStartDate").readNullable[String] and
+      (JsPath \ "TTPEndDate").readNullable[String]
+    )(TimeToPay.apply _)
+
+  implicit val writes: OWrites[TimeToPay] = Json.writes[TimeToPay]
 }
 
 case class Totalisations (
-                           LSPTotalValue: Option[BigDecimal],
+                           lateSubmissionPenaltyTotalValue: Option[BigDecimal],
                            penalisedPrincipalTotal: Option[BigDecimal],
-                           LPPPostedTotal: Option[BigDecimal],
-                           LPPEstimatedTotal: Option[BigDecimal]
+                           latePaymentPenaltyPostedTotal: Option[BigDecimal],
+                           latePaymentPenaltyEstimateTotal: Option[BigDecimal]
                          )
 
 object Totalisations {
-  implicit val format: OFormat[Totalisations] = Json.format[Totalisations]
+  implicit val reads: Reads[Totalisations] = (
+    (JsPath \ "LSPTotalValue").readNullable[BigDecimal] and
+      (JsPath \ "penalisedPrincipalTotal").readNullable[BigDecimal] and
+      (JsPath \ "LPPPostedTotal").readNullable[BigDecimal] and
+      (JsPath \ "LPPEstimatedTotal").readNullable[BigDecimal]
+    )(Totalisations.apply _)
+
+  implicit val writes: OWrites[Totalisations] = Json.writes[Totalisations]
 }
 
 
@@ -189,13 +201,21 @@ object LateSubmissionPenalty {
 case class LateSubmissionPenaltySummary(
                                          activePoints: BigDecimal,
                                          inactivePenaltyPoints: Int,
-                                         PoCAchievementDate: String,
+                                         periodofComplianceAchievement: String,
                                          regimeThreshold: Int,
                                          penaltyChargeAmount: BigDecimal
                                        )
 
 object LateSubmissionPenaltySummary {
-  implicit val format: OFormat[LateSubmissionPenaltySummary] = Json.format[LateSubmissionPenaltySummary]
+  implicit val reads: Reads[LateSubmissionPenaltySummary] = (
+    (JsPath \ "activePoints").read[BigDecimal] and
+      (JsPath \ "inactivePenaltyPoints").read[Int] and
+      (JsPath \ "PoCAchievementDate").read[String] and
+      (JsPath \ "regimeThreshold").read[Int] and
+      (JsPath \ "penaltyChargeAmount").read[BigDecimal]
+    )(LateSubmissionPenaltySummary.apply _)
+
+  implicit val writes: OWrites[LateSubmissionPenaltySummary] = Json.writes[LateSubmissionPenaltySummary]
 }
 
 case class LateSubmissionPenaltyDetails(
@@ -203,7 +223,7 @@ case class LateSubmissionPenaltyDetails(
                                          penaltyOrder: String,
                                          penaltyCategory: LateSubmissionPenaltyCategoryUpstream,
                                          penaltyStatus: LateSubmissionPenaltyStatusUpstream,
-                                         FAPIndicator: Option[String],
+                                         frequencyAdjustmentPointIndicator: Option[String],
                                          penaltyCreationDate: String,
                                          penaltyExpiryDate: String,
                                          expiryReason: Option[ExpiryReasonUpstream],
@@ -239,7 +259,7 @@ object LateSubmissionPenaltyDetails {
       penaltyOrder = penaltyOrder,
       penaltyCategory = penaltyCategory,
       penaltyStatus = penaltyStatus,
-      FAPIndicator = fAPIndicator,
+      frequencyAdjustmentPointIndicator = fAPIndicator,
       penaltyCreationDate = penaltyCreationDate,
       penaltyExpiryDate = penaltyExpiryDate,
       expiryReason = if (expiryReason.isDefined) Some(expiryReason.get.toUpstreamExpiryReason) else None,
