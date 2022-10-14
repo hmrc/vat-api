@@ -201,7 +201,7 @@ object LateSubmissionPenalty {
 case class LateSubmissionPenaltySummary(
                                          activePoints: BigDecimal,
                                          inactivePenaltyPoints: Int,
-                                         periodofComplianceAchievement: String,
+                                         periodOfComplianceAchievement: String,
                                          regimeThreshold: Int,
                                          penaltyChargeAmount: BigDecimal
                                        )

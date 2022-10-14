@@ -64,7 +64,7 @@
               "minimum": 0,
               "multipleOf": 1
             },
-            "periodofComplianceAchievement": {
+            "periodOfComplianceAchievement": {
               "description": "This is the date that penalty points expire if customer meets requirements.",
               "type": "string",
               "example": "2023-04-01"
@@ -88,7 +88,7 @@
           "required": [
             "activePenaltyPoints",
             "inactivePenaltyPoints",
-            "periodofComplianceAchievement",
+            "periodOfComplianceAchievement",
             "regimeThreshold",
             "penaltyChargeAmount"
           ],
