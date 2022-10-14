@@ -1,15 +1,15 @@
 {
   "totalisations": {
-    "LSPTotalValue": 200,
+    "lateSubmissionPenaltyTotalValue": 200,
     "penalisedPrincipalTotal": 2000,
-    "LPPPostedTotal": 165.25,
-    "LPPEstimatedTotal": 15.26
+    "latePaymentPenaltyPostedTotal": 165.25,
+    "latePaymentPenaltyEstimateTotal": 15.26
   },
   "lateSubmissionPenalty": {
     "summary": {
       "activePenaltyPoints": 2,
       "inactivePenaltyPoints": 10,
-      "PoCAchievementDate": "2023-10-30",
+      "periodofComplianceAchievement": "2023-10-30",
       "regimeThreshold": 10,
       "penaltyChargeAmount": 684.25
     },
@@ -19,7 +19,7 @@
         "penaltyOrder": "01",
         "penaltyCategory": "point",
         "penaltyStatus": "inactive",
-        "FAPIndicator": "X",
+        "frequencyAdjustmentPointIndicator": "X",
         "penaltyCreationDate": "2023-10-30",
         "penaltyExpiryDate": "2024-04-31",
         "expiryReason": "appeal",
@@ -81,12 +81,12 @@
         "penaltyAmountPosted": 832.35,
         "penaltyAmountPaid": 529.35,
         "penaltyAmountOutstanding": 303,
-        "LPP1LRCalculationAmount": 754.43,
-        "LPP1LRPercentage": 2.00,
-        "LPP1HRCalculationAmount": 724.24,
-        "LPP1HRPercentage": 2.00,
-        "LPP2Days": "12",
-        "LPP2Percentage": 85.35,
+        "latePaymentPenalty1LowerRateCalculationAmount": 754.43,
+        "latePaymentPenalty1LowerRatePercentage": 2.00,
+        "latePaymentPenalty1HigherRateCalculationAmount": 724.24,
+        "latePaymentPenalty1HigherRatePercentage": 2.00,
+        "latePaymentPenalty2Days": "12",
+        "latePaymentPenalty2Percentage": 85.35,
         "penaltyChargeCreationDate": "2023-03-30",
         "communicationsDate": "2023-03-30",
         "penaltyChargeReference": "12345678901234",
@@ -106,8 +106,8 @@
         "principalChargeLatestClearing": "2023-05-30",
         "timeToPay": [
           {
-            "TTPStartDate": "2023-5-01",
-            "TTPEndDate": "2023-5-30"
+            "timeToPayStartDate": "2023-5-01",
+            "timeToPayEndDate": "2023-5-30"
           }
         ]
       }
