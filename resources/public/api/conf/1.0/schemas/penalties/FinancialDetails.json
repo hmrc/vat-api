@@ -31,6 +31,23 @@
           "description": "The amount that has been paid, reversed, removed or cleared. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
           "type": "number",
           "example": "5009.99"
+        },
+        "additionalReceivableTotalisations" : {
+          "description": "Interest totals that relate to the VAT account.",
+          "type": "object",
+          "properties": {
+            "totalAccountPostedInterest": {
+              "description": "The total amount of interest that has been posted to the account.",
+              "type": "number",
+              "example": "5009.99"
+            },
+            "totalAccountAccruingInterest": {
+              "description": "The total amount of interest that the account has accrued since interest was last posted to it. This amount is yet to be posted to the account.",
+              "type": "number",
+              "example": "5009.99"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -50,6 +67,23 @@
             "description": "The date that correspondence about the charge was sent to the individual or organisation.",
             "type": "string",
             "example": "2022-08-16"
+          },
+          "documentInterestTotals": {
+            "description": "Interest totals that relate to the charge.",
+            "type": "object",
+            "properties": {
+              "interestPostedAmount": {
+              "description": "The amount of interest, relating to the charge, that has been posted to the account.",
+              "type": "number",
+              "example": "5009.99"
+              },
+            "interestAccruingAmount": {
+              "description": "The amount of interest that has accrued since interest on the charge was last posted to the account.",
+              "type": "number",
+              "example": "5009.99"
+              }
+            },
+            "additionalProperties": false
           },
           "documentTotalAmount": {
             "description": "The total sum of the line items within the document. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
@@ -77,6 +111,11 @@
             "items": {
               "type": "object",
               "properties": {
+                "chargeDescription": {
+                  "description": "Describes what the charge relates to.",
+                  "type": "string",
+                  "example": "VAT Return"
+                },
                 "periodFromDate": {
                   "description": "The start date of this period.",
                   "type": "string",
@@ -103,7 +142,7 @@
                   "example": "5009.99"
                 },
                 "lineItemInterestDetails": {
-                  "description": "",
+                  "description": "Details of the interest that relates to the line item.",
                   "type": "object",
                   "properties": {
                     "interestKey": {
@@ -115,6 +154,21 @@
                       "description": "The date that the interest charges started.",
                       "type": "string",
                       "example": "2022-08-16"
+                    },
+                    "currentInterestRate": {
+                      "description": "The rate of interest that currently applies to the line item.",
+                      "type": "number",
+                      "example": "2"
+                    },
+                    "interestPostedAmount": {
+                      "description": "The amount of interest, relating to the line item, that has been posted to the account.",
+                      "type": "number",
+                      "example": "10"
+                    },
+                    "interestAccruingAmount": {
+                      "description": "The amount of interest that has accrued since interest on the line item was last posted to the account.",
+                      "type": "number",
+                      "example": "10"
                     }
                   },
                   "additionalProperties": false

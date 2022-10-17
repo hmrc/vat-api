@@ -64,18 +64,38 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
             result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse))
           }
+
+          "return Right(FinancialDataResponse) No Document Details" in {
+
+            val result = FinancialDataHttpReads.read("", "",
+              HttpResponse(
+                status = Status.OK,
+                json = FinancialDataConstants.testDownstreamFinancialDetailsNoDocumentDetails,
+                headers = Map(
+                  "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                )
+              )
+            )
+
+            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialNoDocumentDetailsDataResponse))
+          }
         }
 
         "json is invalid" must {
 
           "return Left(InvalidJson)" in {
 
+            val jsonObject =
+              Json.parse("""
+                           | "totalisations" {
+                           |   "test": "test"
+                           | }
+                           |""".stripMargin)
+
             val result = FinancialDataHttpReads.read("", "",
               HttpResponse(
                 status = Status.OK,
-                json = Json.obj(
-                  "totalisations" -> "test"
-                ),
+                json = jsonObject,
                 headers = Map(
                   "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
                 )

@@ -17,18 +17,15 @@
 package v1.constants
 
 import config.AppConfig
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import v1.constants.FinancialDataConstants.vrn
-import v1.constants.PenaltiesConstants.correlationId
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
 import v1.models.errors.{ErrorWrapper, MtdError}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.penalties.{FinancialRawData, FinancialRequest}
-import v1.models.response.financialData
 import v1.models.response.financialData._
 
 object FinancialDataConstants {
@@ -44,9 +41,37 @@ object FinancialDataConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn)
 
-  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig) = s"/penalties/penalty/financial-data/VRN/${vrn}/VATC"
+  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig) = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/${vrn}/VATC"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
+
+
+  val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
+    Json.parse(
+      """{
+        |  "totalisation": {
+        |    "regimeTotalisation": {
+        |      "totalAccountOverdue": 1000.00,
+        |      "totalAccountNotYetDue": 250.00,
+        |      "totalAccountCredit": 40.00,
+        |      "totalAccountBalance": 1210.00
+        |    },
+        |    "targetedSearch_SelectionCriteriaTotalisation": {
+        |      "totalOverdue": 123.45,
+        |      "totalNotYetDue": 12.34,
+        |      "totalBalance": 12.45,
+        |      "totalCredit": 13.46,
+        |      "totalCleared": 12.35
+        |    },
+        |    "additionalReceivableTotalisations" :{
+        |     "totalAccountPostedInterest": 100,
+        |     "totalAccountAccruingInterest": 100
+        |    }
+        |  }
+        |}
+        |""".stripMargin
+    )
+  }
 
   val testDownstreamFinancialDetails: JsValue = {
     Json.parse(
@@ -58,12 +83,16 @@ object FinancialDataConstants {
         |      "totalAccountCredit": 40.00,
         |      "totalAccountBalance": 1210.00
         |    },
-        |    "targetedSearch": {
+        |    "targetedSearch_SelectionCriteriaTotalisation": {
         |      "totalOverdue": 123.45,
         |      "totalNotYetDue": 12.34,
         |      "totalBalance": 12.45,
         |      "totalCredit": 13.46,
         |      "totalCleared": 12.35
+        |    },
+        |    "additionalReceivableTotalisations" :{
+        |     "totalAccountPostedInterest": 100,
+        |     "totalAccountAccruingInterest": 100
         |    }
         |  },
         |  "documentDetails": [
@@ -100,6 +129,7 @@ object FinancialDataConstants {
         |      },
         |      "lineItemDetails": [
         |        {
+        |          "chargeDescription": "IN1",
         |          "itemNumber": "0001",
         |          "subItemNumber": "003",
         |          "mainTransaction": "4576",
@@ -122,7 +152,10 @@ object FinancialDataConstants {
         |          },
         |          "lineItemInterestDetails": {
         |            "interestKey": "01",
-        |            "interestStartDate": "2022-03-01"
+        |            "interestStartDate": "2022-03-01",
+        |            "currentInterestRate": 2,
+        |            "interestPostedAmount": 123,
+        |            "interestAccruingAmount": 123
         |          }
         |        }
         |      ]
@@ -141,18 +174,27 @@ object FinancialDataConstants {
         |    "totalNotYetDue": 12.34,
         |    "totalBalance": 12.45,
         |    "totalCredit": 13.46,
-        |    "totalCleared": 12.35
+        |    "totalCleared": 12.35,
+        |    "additionalReceivableTotalisations":{
+        |       "totalAccountPostedInterest": 100,
+        |       "totalAccountAccruingInterest": 100
+        |    }
         |  },
         |  "documentDetails": [
         |    {
         |      "postingDate": "2022-03-01",
         |      "issueDate": "2022-03-01",
         |      "documentTotalAmount": 123.45,
+        |      "documentInterestTotals": {
+        |       "interestPostedAmount": 13.12,
+        |       "interestAccruingAmount": 12.10
+        |      },
         |      "documentClearedAmount": 111.11,
         |      "documentOutstandingAmount": 12.34,
         |      "documentInterestTotal": 1.23,
         |      "lineItemDetails": [
         |        {
+        |          "chargeDescription": "IN1",
         |          "periodFromDate": "2022-03-01",
         |          "periodToDate": "2022-03-01",
         |          "periodKey": "13RL",
@@ -160,7 +202,10 @@ object FinancialDataConstants {
         |          "amount": 123.45,
         |          "lineItemInterestDetails": {
         |            "interestKey": "01",
-        |            "interestStartDate": "2022-03-01"
+        |            "interestStartDate": "2022-03-01",
+        |            "currentInterestRate": 2,
+        |            "interestPostedAmount": 123,
+        |            "interestAccruingAmount": 123
         |          }
         |        }
         |      ]
@@ -172,37 +217,56 @@ object FinancialDataConstants {
   }
 
   val testLineItemInterestDetails: LineItemInterestDetails = LineItemInterestDetails(
-    interestKey = "01",
-    interestStartDate = "2022-03-01"
+    interestKey = Some("01"),
+    currentInterestRate = Some(2),
+    interestPostedAmount = Some(123),
+    interestAccruingAmount = Some(123),
+    interestStartDate = Some("2022-03-01")
   )
 
   val testLineItemDetails: LineItemDetail = LineItemDetail(
-    periodFromDate = "2022-03-01",
-    periodToDate = "2022-03-01",
-    periodKey = "13RL",
-    netDueDate = "2022-03-01",
-    amount = 123.45,
-    lineItemInterestDetails = testLineItemInterestDetails
+    chargeDescription = Some("IN1"),
+    periodFromDate = Some("2022-03-01"),
+    periodToDate = Some("2022-03-01"),
+    periodKey = Some("13RL"),
+    netDueDate = Some("2022-03-01"),
+    amount = Some(123.45),
+    lineItemInterestDetails = Some(testLineItemInterestDetails)
   )
 
+  val testDocumentInterestTotals: DocumentInterestTotals = DocumentInterestTotals(
+    interestPostedAmount = Some(13.12),
+    interestAccruingAmount = Some(12.10)
+  )
+
+
   val testDocumentDetail: DocumentDetail = DocumentDetail(
-    postingDate = "2022-03-01",
-    issueDate = "2022-03-01",
-    documentTotalAmount = 123.45,
-    documentClearedAmount = 111.11,
-    documentOutstandingAmount = 12.34,
-    documentInterestTotal = 1.23,
-    lineItemDetails = Seq(testLineItemDetails)
+    postingDate = Some("2022-03-01"),
+    issueDate = Some("2022-03-01"),
+    documentTotalAmount = Some(123.45),
+    documentClearedAmount = Some(111.11),
+    documentInterestTotals = Some(testDocumentInterestTotals),
+    documentOutstandingAmount = Some(12.34),
+    documentInterestTotal = Some(1.23),
+    lineItemDetails = Some(Seq(testLineItemDetails))
+  )
+
+  val testAdditionalReceivableTotalisations: AdditionalReceivableTotalisations = AdditionalReceivableTotalisations(
+    totalAccountPostedInterest = Some(100),
+    totalAccountAccruingInterest = Some(100)
   )
 
   val testTotalisation: Totalisation = Totalisation(
-    totalOverdue = 123.45,
-    totalNotYetDue = 12.34,
-    totalBalance = 12.45,
-    totalCredit = 13.46,
-    totalCleared = 12.35)
+    totalOverdue = Some(123.45),
+    totalNotYetDue = Some(12.34),
+    totalBalance = Some(12.45),
+    totalCredit = Some(13.46),
+    totalCleared = Some(12.35),
+    additionalReceivableTotalisations = Some(testAdditionalReceivableTotalisations)
+  )
 
-  val testFinancialDataResponse: FinancialDataResponse = FinancialDataResponse(testTotalisation, Seq(testDocumentDetail))
+  val testFinancialNoDocumentDetailsDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
+  val testFinancialDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
 
   def wrappedFinancialDataResponse(financialResponse: FinancialDataResponse = testFinancialDataResponse): ResponseWrapper[FinancialDataResponse] = {
     ResponseWrapper(correlationId, financialResponse)
