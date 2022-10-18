@@ -43,7 +43,7 @@ class LegacyErrorHandler @Inject()(env: Environment,
             case _: NotImplementedException =>
               NotImplemented(Json.toJson(DownstreamError))
             case _ =>
-              logger.info(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
+              logger.warn(s"[LegacyErrorHandler][onServerError] uncaught 5xx Exception")
               result
           }
       }
