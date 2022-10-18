@@ -100,11 +100,6 @@
             "type": "number",
             "example": "5009.99"
           },
-          "documentInterestTotal": {
-            "description": "The total amount of interest that is associated with the document. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.",
-            "type": "number",
-            "example": "5009.99"
-          },
           "lineItemDetails": {
             "description": "The line items that make up the document. A document can contain more than one line item. For example, an individual or organisation might submit an amendment form that contains multiple corrections (perhaps the individual or organisation paid too much VAT for one tax period, but not enough for the next). Each correction will comprise an individual line item. HMRC will take all of the line items into account when it calculates the charge.",
             "type": "array",

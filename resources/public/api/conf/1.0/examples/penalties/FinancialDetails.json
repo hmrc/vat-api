@@ -21,7 +21,6 @@
         "interestPostedAmount": 13.12,
         "interestAccruingAmount": 12.10
       },
-      "documentInterestTotal": 1.23,
       "lineItemDetails": [
         {
           "chargeDescription": "VAT Return",
