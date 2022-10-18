@@ -191,7 +191,6 @@ object FinancialDataConstants {
         |      },
         |      "documentClearedAmount": 111.11,
         |      "documentOutstandingAmount": 12.34,
-        |      "documentInterestTotal": 1.23,
         |      "lineItemDetails": [
         |        {
         |          "chargeDescription": "IN1",
@@ -247,7 +246,6 @@ object FinancialDataConstants {
     documentClearedAmount = Some(111.11),
     documentInterestTotals = Some(testDocumentInterestTotals),
     documentOutstandingAmount = Some(12.34),
-    documentInterestTotal = Some(1.23),
     lineItemDetails = Some(Seq(testLineItemDetails))
   )
 

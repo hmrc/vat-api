@@ -56,7 +56,6 @@ case class DocumentDetail(postingDate: Option[String],
                           documentClearedAmount: Option[BigDecimal],
                           documentInterestTotals: Option[DocumentInterestTotals],
                           documentOutstandingAmount: Option[BigDecimal],
-                          documentInterestTotal: Option[BigDecimal],
                           lineItemDetails: Option[Seq[LineItemDetail]])
 
 object DocumentDetail {
@@ -67,7 +66,6 @@ object DocumentDetail {
       (JsPath \ "documentClearedAmount").readNullable[BigDecimal] and
       (JsPath \ "documentInterestTotals").readNullable[DocumentInterestTotals] and
       (JsPath \ "documentOutstandingAmount").readNullable[BigDecimal] and
-      (JsPath \ "documentInterestTotals" \ "interestTotalAmount").readNullable[BigDecimal] and
       (JsPath \ "lineItemDetails").readNullable[Seq[LineItemDetail]]
     )(DocumentDetail.apply _)
 
