@@ -50,7 +50,7 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
           await(result) shouldBe expectedResult
         }
 
-        "return Future(Right(PenaltiesResponse) max" in {
+        "return Future(Right(PenaltiesResponse)) max" in {
 
           MockedHttpClient.get(
             url = PenaltiesConstants.penaltiesURlWithConfig(),
@@ -72,7 +72,7 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
 
       "a invalid json response is returned" must {
 
-        "return Future(Left(InvalidJson)" in {
+        "return Future(Left(InvalidJson))" in {
 
           MockedHttpClient.get(
             url = PenaltiesConstants.penaltiesURlWithConfig(),
@@ -91,7 +91,7 @@ class PenaltiesConnectorSpec extends GuiceBox with ConnectorSpec with MockHttpCl
 
       "a InvalidVrn response is returned" must {
 
-        "return Future(Left(InvalidVrn)" in {
+        "return Future(Left(InvalidVrn))" in {
 
           MockedHttpClient.get(
             url = PenaltiesConstants.penaltiesURlWithConfig(),

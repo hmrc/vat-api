@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.PenaltiesConstants
-import v1.models.errors.{MtdError, PenaltiesInvalidCorrelationId, PenaltiesNotDataFound, VrnFormatError}
+import v1.models.errors.{MtdError, PenaltiesNotDataFound, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class PenaltiesControllerISpec extends IntegrationBaseSpec {
@@ -115,12 +115,12 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())
-            response.status shouldBe BAD_REQUEST
-            response.json shouldBe Json.toJson(PenaltiesInvalidCorrelationId)
+            response.status shouldBe INTERNAL_SERVER_ERROR
+            response.json shouldBe Json.toJson(MtdError("INVALID_CORRELATIONID","Some Reason"))
             response.header("Content-Type") shouldBe Some("application/json")
           }
 
@@ -148,11 +148,11 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
                 |"message":"Invalid request penalties",
                 |"errors": [{
                 | "code":"INVALID_CORRELATIONID",
-                | "message":"Invalid correlation ID"
+                | "message":"Some Reason"
                 |},
                 |{
                 | "code":"INVALID_DATELIMIT",
-                | "message":"Invalid Date Limit"
+                | "message":"Some Reason"
                 |}
                 |]
                 |}

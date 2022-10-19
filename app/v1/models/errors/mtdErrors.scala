@@ -59,18 +59,8 @@ object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is in
 object VrnNotFound extends MtdError("VRN_NOT_FOUND", "The provided VRN was not found")
 
 //Penalties Errors
-object PenaltiesInvalidIdType extends MtdError("INVALID_IDTYPE", "Invalid Id Type")
-object PenaltiesInvalidIdValue extends MtdError("INVALID_IDVALUE", "Invalid Id value")
-object PenaltiesInvalidDataLimit extends MtdError("INVALID_DATELIMIT", "Invalid Date Limit")
-object PenaltiesInvalidCorrelationId extends MtdError("INVALID_CORRELATIONID", "Invalid correlation ID")
-object PenaltiesNotDataFound extends MtdError("NO_DATA_FOUND", "No data found")
-object PenaltiesDuplicateSubmission extends MtdError("DUPLICATE_SUBMISSION", "Duplicate Submission")
-object PenaltiesInvalidIdTypeUnprocessEntity extends MtdError("INVALID_IDTYPE", "Invalid Id Type")
-object PenaltiesInvalidIdValueUnprocessEntity extends MtdError("INVALID_ID", "Invalid Id value")
-object PenaltiesRequestNotProcessedUnprocessEntity extends MtdError("REQUEST_NOT_PROCESSED", "Request not processed")
-object PenaltiesServiceUnavailable extends MtdError("SERVICE_UNAVAILABLE", "Service Unavailable")
-
-
+object PenaltiesInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid.")
+object PenaltiesNotDataFound extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "No penalties could be found in the last 24 months")
 
 //Financial Data Errors
 object FinancialInvalidCorrelationId extends MtdError("INVALID_CORRELATIONID", "Invalid Correlation Id")
