@@ -34,16 +34,8 @@ object PenaltiesHttpParser extends Logging {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code, status) match {
-          case ("INVALID_IDTYPE", BAD_REQUEST) => PenaltiesInvalidIdType
           case ("INVALID_IDVALUE", BAD_REQUEST) => PenaltiesInvalidIdValue
-          case ("INVALID_DATELIMIT", BAD_REQUEST) => PenaltiesInvalidDataLimit
-          case ("INVALID_CORRELATIONID", BAD_REQUEST) => PenaltiesInvalidCorrelationId
           case ("NO_DATA_FOUND", NOT_FOUND) => PenaltiesNotDataFound
-          case ("DUPLICATE_SUBMISSION", CONFLICT) => PenaltiesDuplicateSubmission
-          case ("INVALID_IDTYPE", UNPROCESSABLE_ENTITY) => PenaltiesInvalidIdTypeUnprocessEntity
-          case ("INVALID_ID", UNPROCESSABLE_ENTITY) => PenaltiesInvalidIdValueUnprocessEntity
-          case ("REQUEST_NOT_PROCESSED", UNPROCESSABLE_ENTITY) => PenaltiesRequestNotProcessedUnprocessEntity
-          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE) => PenaltiesServiceUnavailable
           case _ => MtdError(error.code, error.reason)
         }
       }

@@ -17,15 +17,13 @@
 package v1.connectors
 
 import config.AppConfig
-import play.api.http.Status
-
 import javax.inject.{Inject, Singleton}
+import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.Logging
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
+import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging}
 import v1.connectors.httpparsers.FinancialDataHttpParser._
 import v1.connectors.httpparsers.PenaltiesHttpParser._
-import v1.connectors.httpparsers.StandardDesHttpParser.logger
 import v1.controllers.UserRequest
 import v1.models.errors.{ConnectorError, ErrorWrapper, MtdError}
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}

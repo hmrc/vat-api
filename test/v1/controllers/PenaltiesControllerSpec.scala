@@ -16,9 +16,7 @@
 
 package v1.controllers
 
-import com.typesafe.config.ConfigFactory
 import mocks.MockAppConfig
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,7 +26,7 @@ import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockPenaltiesRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
 import v1.models.audit.{AuditError, AuditResponse}
-import v1.models.errors.{BadRequestError, MtdError, PenaltiesInvalidIdType, PenaltiesNotDataFound, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.models.errors._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -105,7 +103,7 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
         "errors are returned from Penalties" when {
 
           val errors: Seq[(MtdError, Int)] = Seq(
-            (PenaltiesInvalidIdType, BAD_REQUEST),
+            (PenaltiesInvalidIdValue, BAD_REQUEST),
             (PenaltiesNotDataFound, NOT_FOUND),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
@@ -142,13 +140,13 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
 
       "valid request is not supplied" must {
 
-        "return BadRequest" in new Test {
+        "return Internal Server Error" in new Test {
 
           MockPenaltiesRequestParser.parse(PenaltiesConstants.rawData)(Left(PenaltiesConstants.errorWrapper(VrnFormatError)))
 
           val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
 
-          status(result) shouldBe BAD_REQUEST
+          status(result) shouldBe INTERNAL_SERVER_ERROR
           contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
           contentType(result) shouldBe Some("application/json")
           header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
@@ -156,7 +154,7 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
           MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
             correlationId = PenaltiesConstants.correlationId,
             userDetails = PenaltiesConstants.userDetails,
-            auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
+            auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(VrnFormatError.code))), None)
           ))
         }
       }

@@ -115,7 +115,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
               )
             )
           )
-          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INVALID_IDTYPE", "Invalid Id Type")))
+          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.")))
         }
 
         "return Left(MultiErrors)" in {
@@ -144,7 +144,10 @@ class PenaltiesHttpParserSpec extends UnitSpec {
             )
           )
           result shouldBe Left(PenaltiesConstants.errorWrapper(
-            MtdError("INVALID_REQUEST", "Invalid request penalties", customJson = Some(Json.toJson(Seq(PenaltiesInvalidIdType, PenaltiesInvalidIdValue))))))
+            MtdError("INVALID_REQUEST", "Invalid request penalties",
+              customJson = Some(Json.toJson(Seq(
+                MtdError("INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType."),
+                PenaltiesInvalidIdValue))))))
         }
       }
 
@@ -242,10 +245,11 @@ class PenaltiesHttpParserSpec extends UnitSpec {
 
         "return multi errors when passed multiple errors" in {
           val expected: MtdError = MtdError("INVALID_REQUEST", "Invalid request penalties",
-            Some(Json.toJson(PenaltiesInvalidIdType,
+            Some(Json.toJson(
+              MtdError("INVALID_IDTYPE", "Some reason"),
             PenaltiesInvalidIdValue,
-            PenaltiesInvalidDataLimit,
-            PenaltiesInvalidCorrelationId
+              MtdError("INVALID_DATELIMIT", "Some reason"),
+                MtdError("INVALID_CORRELATIONID", "Some reason")
           )))
           val result = PenaltiesHttpReads.errorHelper(multiJsonString(), BAD_REQUEST)
           result shouldBe expected
@@ -258,31 +262,31 @@ class PenaltiesHttpParserSpec extends UnitSpec {
           }
 
           "return PenaltiesServiceUnavailable mtd error when passed a service unavailable and SERVICE_UNAVAILABLE json" in {
-            val expected: MtdError = PenaltiesServiceUnavailable
+            val expected: MtdError = MtdError("SERVICE_UNAVAILABLE","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("SERVICE_UNAVAILABLE"), SERVICE_UNAVAILABLE)
             result shouldBe expected
           }
 
           "return PenaltiesRequestNotProcessedUnprocessEntity mtd error when passed a Unprocess Entity and REQUEST_NOT_PROCESSED json" in {
-            val expected: MtdError = PenaltiesRequestNotProcessedUnprocessEntity
+            val expected: MtdError = MtdError("REQUEST_NOT_PROCESSED","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("REQUEST_NOT_PROCESSED"), UNPROCESSABLE_ENTITY)
             result shouldBe expected
           }
 
           "return PenaltiesInvalidIdValueUnprocessEntity mtd error when passed a Unprocess Entity and INVALID_ID json" in {
-            val expected: MtdError = PenaltiesInvalidIdValueUnprocessEntity
+            val expected: MtdError = MtdError("INVALID_ID","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("INVALID_ID"), UNPROCESSABLE_ENTITY)
             result shouldBe expected
           }
 
           "return PenaltiesInvalidIdTypeUnprocessEntity mtd error when passed a Unprocess Entity and INVALID_IDTYPE json" in {
-            val expected: MtdError = PenaltiesInvalidIdTypeUnprocessEntity
+            val expected: MtdError = MtdError("INVALID_IDTYPE","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("INVALID_IDTYPE"), UNPROCESSABLE_ENTITY)
             result shouldBe expected
           }
 
           "return PenaltiesDuplicateSubmission mtd error when passed a Conflict and DUPLICATE_SUBMISSION json" in {
-            val expected: MtdError = PenaltiesDuplicateSubmission
+            val expected: MtdError = MtdError("DUPLICATE_SUBMISSION","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("DUPLICATE_SUBMISSION"), CONFLICT)
             result shouldBe expected
           }
@@ -294,7 +298,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
           }
 
           "return PenaltiesInvalidIdType mtd error when passed a Bad Request and INVALID_IDTYPE json" in {
-            val expected: MtdError = PenaltiesInvalidIdType
+            val expected: MtdError = MtdError("INVALID_IDTYPE","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("INVALID_IDTYPE"), BAD_REQUEST)
             result shouldBe expected
           }
@@ -306,13 +310,13 @@ class PenaltiesHttpParserSpec extends UnitSpec {
           }
 
           "return PenaltiesInvalidDataLimit mtd error when passed a Bad Request and INVALID_DATELIMIT json" in {
-            val expected: MtdError = PenaltiesInvalidDataLimit
+            val expected: MtdError = MtdError("INVALID_DATELIMIT","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("INVALID_DATELIMIT"), BAD_REQUEST)
             result shouldBe expected
           }
 
           "return PenaltiesInvalidCorrelationId mtd error when passed a Bad Request and INVALID_CORRELATIONID json" in {
-            val expected: MtdError = PenaltiesInvalidCorrelationId
+            val expected: MtdError = MtdError("INVALID_CORRELATIONID","Some reason")
             val result = PenaltiesHttpReads.errorHelper(jsonString("INVALID_CORRELATIONID"), BAD_REQUEST)
             result shouldBe expected
           }
