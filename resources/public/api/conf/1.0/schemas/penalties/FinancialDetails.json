@@ -37,14 +37,14 @@
           "type": "object",
           "properties": {
             "totalAccountPostedInterest": {
-              "description": "The total amount of interest that has been posted to the account.",
+              "description": "The total amount of interest that HMRC has actually posted to the account.",
               "type": "number",
-              "example": "5009.99"
+              "example": "200.00"
             },
             "totalAccountAccruingInterest": {
-              "description": "The total amount of interest that the account has accrued since interest was last posted to it. This amount is yet to be posted to the account.",
+              "description": "The total amount of unposted interest that the account has currently accrued.",
               "type": "number",
-              "example": "5009.99"
+              "example": "45.35"
             }
           },
           "additionalProperties": false
@@ -73,14 +73,14 @@
             "type": "object",
             "properties": {
               "interestPostedAmount": {
-              "description": "The amount of interest, relating to the charge, that has been posted to the account.",
+              "description": "The amount of interest, relating to the charge, that HMRC has actually posted to the account.",
               "type": "number",
-              "example": "5009.99"
+              "example": "13.12"
               },
             "interestAccruingAmount": {
-              "description": "The amount of interest that has accrued since interest on the charge was last posted to the account.",
+              "description": "The amount of unposted interest that has currently accrued on the charge.",
               "type": "number",
-              "example": "5009.99"
+              "example": "12.10"
               }
             },
             "additionalProperties": false
@@ -153,17 +153,17 @@
                     "currentInterestRate": {
                       "description": "The rate of interest that currently applies to the line item.",
                       "type": "number",
-                      "example": "2"
+                      "example": "2.00"
                     },
                     "interestPostedAmount": {
-                      "description": "The amount of interest, relating to the line item, that has been posted to the account.",
+                      "description": "The amount of interest, relating to the line item, that HMRC has actually posted to the account.",
                       "type": "number",
-                      "example": "10"
+                      "example": "13.12"
                     },
                     "interestAccruingAmount": {
-                      "description": "The amount of interest that has accrued since interest on the line item was last posted to the account.",
+                      "description": "The amount of unposted interest that has currently accrued on the line item.",
                       "type": "number",
-                      "example": "10"
+                      "example": "12.10"
                     }
                   },
                   "additionalProperties": false
