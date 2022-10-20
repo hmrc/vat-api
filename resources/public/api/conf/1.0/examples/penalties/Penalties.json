@@ -106,8 +106,8 @@
         "principalChargeLatestClearing": "2023-05-30",
         "timeToPay": [
           {
-            "timeToPayStartDate": "2023-5-01",
-            "timeToPayEndDate": "2023-5-30"
+            "timeToPayStartDate": "2023-05-01",
+            "timeToPayEndDate": "2023-05-30"
           }
         ]
       }
