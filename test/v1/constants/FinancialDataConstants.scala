@@ -36,14 +36,14 @@ object FinancialDataConstants {
 
   val vrn: String = "123456789"
   val searchItem = "XC00178236592"
-  val rawData: FinancialRawData = FinancialRawData(vrn)
-  val financialRequest: FinancialRequest = FinancialRequest(Vrn(vrn))
+  val rawData: FinancialRawData = FinancialRawData(vrn, searchItem)
+  val financialRequest: FinancialRequest = FinancialRequest(Vrn(vrn), searchItem)
   val invalidVrn = "fakeVRN"
-  val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn)
+  val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn, searchItem)
 
   def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC?searchItem=${searchItem}"
 
 
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {

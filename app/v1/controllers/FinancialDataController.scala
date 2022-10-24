@@ -50,7 +50,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
     )
 
 
-  def retrieveFinancialData(vrn: String, searhItem:String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
+  def retrieveFinancialData(vrn: String, searchItem:String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
 
     implicit val correlationId: String = idGenerator.getUid
 
@@ -60,7 +60,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
 
     val result: EitherT[Future, ErrorWrapper, Result] = {
       for {
-        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(FinancialRawData(vrn)))
+        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(FinancialRawData(vrn, searchItem)))
         serviceResponse <- EitherT(service.retrieveFinancialData(parsedRequest))
       } yield {
 

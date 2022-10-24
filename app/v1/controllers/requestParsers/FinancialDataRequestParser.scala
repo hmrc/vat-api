@@ -24,6 +24,6 @@ import v1.models.request.penalties.{FinancialRawData, FinancialRequest, Penaltie
 class FinancialDataRequestParser @Inject()(val validator: FinancialDataValidator) extends RequestParser[FinancialRawData, FinancialRequest] {
 
   protected def requestFor(data: FinancialRawData): FinancialRequest = {
-    FinancialRequest(Vrn(data.vrn))
+    FinancialRequest(Vrn(data.vrn), data.searchItem)
   }
 }
