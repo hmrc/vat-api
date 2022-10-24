@@ -18,4 +18,4 @@ package v1.models.request.penalties
 
 import v1.models.request.RawData
 
-case class FinancialRawData(vrn: String) extends RawData
+case class FinancialRawData(vrn: String, searchItem: String) extends RawData

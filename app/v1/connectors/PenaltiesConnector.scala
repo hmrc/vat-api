@@ -67,7 +67,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
         val logDetails = s"request failed. ${e.getMessage}"
 
         logger.error(ConnectorError.log(
-          logContext = "[PenaltiesConnector][retrieveFinancialData]",
+          logContext = "[PenaltiesConnector][retrievePenaltiesData]",
           vrn = vrn,
           details = logDetails,
         ))
@@ -89,8 +89,8 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
                                                        userRequest: UserRequest[_],
                                                        correlationId: String): Future[Outcome[FinancialDataResponse]] = {
     val vrn = request.vrn.vrn
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
-    logger.debug(s"[PenaltiesConnector][retrieveFinancialData] url: $url")
+    val searchItem = request.searchItem
+    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC?searchItem=${searchItem}"
 
 
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
