@@ -50,7 +50,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
     )
 
 
-  def retrieveFinancialData(vrn: String, searchItem:String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
+  def retrieveFinancialData(vrn: String, chargeReference: String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
 
     implicit val correlationId: String = idGenerator.getUid
 
@@ -60,7 +60,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
 
     val result: EitherT[Future, ErrorWrapper, Result] = {
       for {
-        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(FinancialRawData(vrn, searchItem)))
+        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(FinancialRawData(vrn, chargeReference)))
         serviceResponse <- EitherT(service.retrieveFinancialData(parsedRequest))
       } yield {
 
@@ -92,29 +92,9 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError |
-           FinancialInvalidCorrelationId |
-           FinancialInvalidIdType |
            FinancialInvalidIdNumber |
-           FinancialInvalidRegimeType |
-           FinancialInvalidDocNumber |
-           FinancialInvalidOnlyOpenItems |
-           FinancialInvalidIncludeLocks |
-           FinancialInvalidIncludeAccruedInterest |
-           FinancialInvalidIncludeCustomerPaymentInfo |
-           FinancialInvalidDateFrom |
-           FinancialInvalidDateTo |
-           FinancialInvalidDateRange |
-           FinancialInvalidRemovePaymentOnAccount |
-           FinancialInvalidIncludeStats |
-           FinancialInvalidRequest => BadRequest(Json.toJson(errorWrapper))
+           FinancialInvalidSearchItem => BadRequest(Json.toJson(errorWrapper))
       case FinancialNotDataFound => NotFound(Json.toJson(errorWrapper))
-      case FinancialDuplicateSubmission => Conflict(Json.toJson(errorWrapper))
-      case FinancialInvalidIdTypeUnprocessEntity |
-           FinancialInvalidIdValueUnprocessEntity |
-           FinancialInvalidRegimeUnprocessEntity |
-           FinancialInvalidDocNumberUnprocessEntity |
-           FinancialInvalidRequestUnprocessEntity => UnprocessableEntity(Json.toJson(errorWrapper))
-      case FinancialServiceUnavailable => ServiceUnavailable(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }
   }

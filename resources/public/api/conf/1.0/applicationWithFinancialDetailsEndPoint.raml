@@ -454,7 +454,7 @@ traits:
                 type: types.errorResponse
                 examples:
                   invalidVrn:
-                    description: Invalid VRN
+                    description: Invalid VRN.
                     value:
                       code: VRN_INVALID
           404:
@@ -463,21 +463,21 @@ traits:
                 type: types.errorResponse
                 examples:
                   notFound:
-                    description: The remote endpoint has indicated that no associated data is found
+                    description: The remote endpoint has indicated that no associated data is found.
                     value:
                       code: NOT_FOUND
     /financial-details:
-      /{searchItem}:
+      /{penaltyChargeReference}:
         uriParameters:
-          searchItem:
-            description: The charge reference, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
+          penaltyChargeReference:
+            description: The penalty charge reference, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
             type: string
             example: "XC00178236592"
         displayName: Retrieve financial details
-        description: Retrieves the financial details relating to a penalty that has been applied to a VAT account.
+        description: Retrieves the financial details relating to a late payment penalty that has been applied to a VAT account.
         get:
           displayName: Retrieve financial details [test only]
-          description: Retrieves the financial details relating to a penalty that has been applied to a VAT account.
+          description: Retrieves the financial details relating to a late payment penalty that has been applied to a VAT account.
           (annotations.sandboxData): !include scenarios/vat-financial-details-scenarios.md
           is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
           (annotations.scope): "read:vat"
@@ -501,15 +501,19 @@ traits:
                   type: types.errorResponse
                   examples:
                     invalidVrn:
-                      description: Invalid VRN
+                      description: Invalid VRN.
                       value:
                         code: VRN_INVALID
+                    invalidChargeReference:
+                      description: The provided chargeReference is invalid.
+                      value:
+                        code: CHARGE_REFERENCE_INVALID
             404:
               body:
                 application/json:
                   type: types.errorResponse
                   examples:
                     notFound:
-                      description: The remote endpoint has indicated that no associated data is found
+                      description: The supplied income source could not be found.
                       value:
-                        code: NOT_FOUND
+                        code: MATCHING_RESOURCE_NOT_FOUND

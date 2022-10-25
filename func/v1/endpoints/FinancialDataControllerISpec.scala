@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.FinancialDataConstants
-import v1.models.errors.{FinancialInvalidCorrelationId, FinancialNotDataFound, MtdError, VrnFormatError}
+import v1.models.errors.{FinancialInvalidIdNumber, FinancialNotDataFound, MtdError, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class FinancialDataControllerISpec extends IntegrationBaseSpec {
@@ -80,7 +80,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
               """
                 |{
                 |"failures": [{
-                | "code":"INVALID_CORRELATIONID",
+                | "code":"INVALID_IDNUMBER",
                 | "reason":"Some Reason"
                 |}]
                 |}
@@ -93,7 +93,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
 
             val response: WSResponse = await(request.get())
             response.status shouldBe BAD_REQUEST
-            response.json shouldBe Json.toJson(FinancialInvalidCorrelationId)
+            response.json shouldBe Json.toJson(FinancialInvalidIdNumber)
             response.header("Content-Type") shouldBe Some("application/json")
           }
 
@@ -102,7 +102,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
               """
                 |{
                 |"failures": [{
-                | "code":"INVALID_DATE_FROM",
+                | "code":"INVALID_IDNUMBER",
                 | "reason":"Some Reason"
                 |},
                 |{
@@ -115,11 +115,11 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             val expectedJson: JsValue = Json.parse(
               """
                 |{
-                | "code":"INVALID_DATE_FROM",
-                | "message":"Invalid Date From",
+                | "code":"VRN_INVALID",
+                | "message":"The provided Vrn is invalid",
                 | "errors": [{
                 | "code":"INVALID_DATE_TO",
-                | "message": "Invalid Date to"
+                | "message": "Some Reason"
                 | }]
                 |
                 |}

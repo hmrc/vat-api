@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status
-import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR, NOT_FOUND, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY}
+import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 import v1.connectors.httpparsers.FinancialDataHttpParser.FinancialDataHttpReads
 import v1.constants.{FinancialDataConstants, PenaltiesConstants}
-import v1.models.errors.{FinancialDuplicateSubmission, FinancialInvalidCorrelationId, FinancialInvalidDateFrom, FinancialInvalidDateRange, FinancialInvalidDateTo, FinancialInvalidDocNumber, FinancialInvalidDocNumberUnprocessEntity, FinancialInvalidIdNumber, FinancialInvalidIdType, FinancialInvalidIdTypeUnprocessEntity, FinancialInvalidIdValueUnprocessEntity, FinancialInvalidIncludeAccruedInterest, FinancialInvalidIncludeCustomerPaymentInfo, FinancialInvalidIncludeLocks, FinancialInvalidIncludeStats, FinancialInvalidOnlyOpenItems, FinancialInvalidRegimeType, FinancialInvalidRegimeUnprocessEntity, FinancialInvalidRemovePaymentOnAccount, FinancialInvalidRequest, FinancialInvalidRequestUnprocessEntity, FinancialNotDataFound, FinancialServiceUnavailable, InvalidJson, MtdError}
+import v1.models.errors._
 
 class FinancialDataHttpParserSpec extends UnitSpec {
 
@@ -130,7 +130,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               )
             )
           )
-          result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("INVALID_IDTYPE", "Invalid Id type")))
+          result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.")))
         }
 
         "return Left(MultiErrors)" in {
@@ -158,9 +158,10 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               )
             )
           )
+
           result shouldBe Left(FinancialDataConstants.errorWrapperMulti(
-            Seq(MtdError("INVALID_IDTYPE", "Invalid Id type"),
-              MtdError("INVALID_IDNUMBER", "Invalid Id Number"))))
+            Seq(MtdError("INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType."),
+              FinancialInvalidIdNumber)))
         }
       }
 
@@ -259,10 +260,11 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return multi errors when passed multiple errors" in {
           val result = FinancialDataHttpReads.errorHelper(multiJsonString(), BAD_REQUEST)
-          result shouldBe (FinancialInvalidCorrelationId, Some(Seq(
-            FinancialInvalidIdType,
+          result shouldBe (MtdError("INVALID_CORRELATIONID", "Some reason"),
+            Some(Seq(
+              MtdError("INVALID_IDTYPE", "Some reason"),
             FinancialInvalidIdNumber,
-            FinancialInvalidDocNumber
+              MtdError("INVALID_DOC_NUMBER", "Some reason")
           )))
         }
 
@@ -273,37 +275,37 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return FinancialServiceUnavailable mtd error when passed a Service Unavailable and SERVICE_UNAVAILABLE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("SERVICE_UNAVAILABLE"), SERVICE_UNAVAILABLE)
-          result shouldBe (FinancialServiceUnavailable, None)
+          result shouldBe (MtdError("SERVICE_UNAVAILABLE", "Some reason"), None)
         }
 
         "return FinancialInvalidRequestUnprocessEntity mtd error when passed a Unprocessable entity and REQUEST_NOT_PROCESSED json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("REQUEST_NOT_PROCESSED"), UNPROCESSABLE_ENTITY)
-          result shouldBe (FinancialInvalidRequestUnprocessEntity, None)
+          result shouldBe (MtdError("REQUEST_NOT_PROCESSED", "Some reason"), None)
         }
 
         "return FinancialInvalidDocNumberUnprocessEntity mtd error when passed a Unprocessable entity and INVALID_DOC_NUMBER json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_DOC_NUMBER"), UNPROCESSABLE_ENTITY)
-          result shouldBe (FinancialInvalidDocNumberUnprocessEntity, None)
+          result shouldBe (MtdError("INVALID_DOC_NUMBER", "Some reason"), None)
         }
 
         "return FinancialInvalidRegimeUnprocessEntity mtd error when passed a Unprocessable entity and INVALID_REGIME_TYPE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_REGIME_TYPE"), UNPROCESSABLE_ENTITY)
-          result shouldBe (FinancialInvalidRegimeUnprocessEntity, None)
+          result shouldBe (MtdError("INVALID_REGIME_TYPE", "Some reason"), None)
         }
 
         "return FinancialInvalidIdValueUnprocessEntity mtd error when passed a Unprocessable entity and INVALID_ID json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_ID"), UNPROCESSABLE_ENTITY)
-          result shouldBe (FinancialInvalidIdValueUnprocessEntity, None)
+          result shouldBe (MtdError("INVALID_ID", "Some reason"), None)
         }
 
         "return FinancialInvalidIdTypeUnprocessEntity mtd error when passed a Unprocessable entity and INVALID_IDTYPE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_IDTYPE"), UNPROCESSABLE_ENTITY)
-          result shouldBe (FinancialInvalidIdTypeUnprocessEntity, None)
+          result shouldBe (MtdError("INVALID_IDTYPE", "Some reason"), None)
         }
 
         "return FinancialDuplicateSubmission mtd error when passed a Conflict and DUPLICATE_SUBMISSION json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("DUPLICATE_SUBMISSION"), CONFLICT)
-          result shouldBe (FinancialDuplicateSubmission, None)
+          result shouldBe (MtdError("DUPLICATE_SUBMISSION", "Some reason"), None)
         }
 
         "return FinancialNotDataFound mtd error when passed a Not Found and NO_DATA_FOUND json" in {
@@ -313,77 +315,77 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return FinancialInvalidCorrelationId mtd error when passed a Bad Request and INVALID_CORRELATIONID json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_CORRELATIONID"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidCorrelationId, None)
+          result shouldBe (MtdError("INVALID_CORRELATIONID", "Some reason"), None)
         }
 
         "return FinancialInvalidIdType mtd error when passed a Bad Request and INVALID_IDTYPE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_IDTYPE"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIdType, None)
-        }
-
-        "return FinancialInvalidIdNumber mtd error when passed a Bad Request and INVALID_IDNUMBER json" in {
-          val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_IDNUMBER"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIdNumber, None)
+          result shouldBe (MtdError("INVALID_IDTYPE", "Some reason"), None)
         }
 
         "return FinancialInvalidRegimeType mtd error when passed a Bad Request and INVALID_REGIME_TYPE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_REGIME_TYPE"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidRegimeType, None)
+          result shouldBe (MtdError("INVALID_REGIME_TYPE", "Some reason"), None)
         }
 
         "return FinancialInvalidDocNumber mtd error when passed a Bad Request and INVALID_DOC_NUMBER json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_DOC_NUMBER"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidDocNumber, None)
+          result shouldBe (MtdError("INVALID_DOC_NUMBER", "Some reason"), None)
         }
 
         "return FinancialInvalidOnlyOpenItems mtd error when passed a Bad Request and INVALID_ONLY_OPEN_ITEMS json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_ONLY_OPEN_ITEMS"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidOnlyOpenItems, None)
+          result shouldBe (MtdError("INVALID_ONLY_OPEN_ITEMS", "Some reason"), None)
         }
 
         "return FinancialInvalidIncludeLocks mtd error when passed a Bad Request and INVALID_INCLUDE_LOCKS json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_INCLUDE_LOCKS"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIncludeLocks, None)
+          result shouldBe (MtdError("INVALID_INCLUDE_LOCKS", "Some reason"), None)
         }
 
         "return FinancialInvalidIncludeAccruedInterest mtd error when passed a Bad Request and INVALID_CALCULATE_ACCRUED_INTEREST json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_CALCULATE_ACCRUED_INTEREST"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIncludeAccruedInterest, None)
+          result shouldBe (MtdError("INVALID_CALCULATE_ACCRUED_INTEREST", "Some reason"), None)
         }
 
         "return FinancialInvalidIncludeCustomerPaymentInfo mtd error when passed a Bad Request and INVALID_CUSTOMER_PAYMENT_INFORMATION json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_CUSTOMER_PAYMENT_INFORMATION"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIncludeCustomerPaymentInfo, None)
+          result shouldBe (MtdError("INVALID_CUSTOMER_PAYMENT_INFORMATION", "Some reason"), None)
         }
 
         "return FinancialInvalidDateFrom mtd error when passed a Bad Request and INVALID_DATE_FROM json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_DATE_FROM"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidDateFrom, None)
+          result shouldBe (MtdError("INVALID_DATE_FROM", "Some reason"), None)
         }
 
         "return FinancialInvalidDateTo mtd error when passed a Bad Request and INVALID_DATE_TO json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_DATE_TO"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidDateTo, None)
+          result shouldBe (MtdError("INVALID_DATE_TO", "Some reason"), None)
         }
 
         "return FinancialInvalidDateRange mtd error when passed a Bad Request and INVALID_DATE_RANGE json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_DATE_RANGE"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidDateRange, None)
+          result shouldBe (MtdError("INVALID_DATE_RANGE", "Some reason"), None)
         }
 
         "return FinancialInvalidRemovePaymentOnAccount mtd error when passed a Bad Request and INVALID_REMOVE_PAYMENT_ON_ACCOUNT json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_REMOVE_PAYMENT_ON_ACCOUNT"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidRemovePaymentOnAccount, None)
+          result shouldBe (MtdError("INVALID_REMOVE_PAYMENT_ON_ACCOUNT", "Some reason"), None)
         }
 
         "return FinancialInvalidIncludeStats mtd error when passed a Bad Request and INVALID_INCLUDE_STATISTICAL json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_INCLUDE_STATISTICAL"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidIncludeStats, None)
+          result shouldBe (MtdError("INVALID_INCLUDE_STATISTICAL", "Some reason"), None)
+        }
+
+        "return FinancialInvalidSearchItem mtd error when passed a Bad Request and INVALID_REQUEST json" in {
+          val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_SEARCH_ITEM"), BAD_REQUEST)
+          result shouldBe (FinancialInvalidSearchItem, None)
         }
 
         "return FinancialInvalidRequest mtd error when passed a Bad Request and INVALID_REQUEST json" in {
           val result = FinancialDataHttpReads.errorHelper(jsonString("INVALID_REQUEST"), BAD_REQUEST)
-          result shouldBe (FinancialInvalidRequest, None)
+          result shouldBe (MtdError("INVALID_REQUEST", "Some reason"), None)
         }
 
       }
