@@ -34,29 +34,9 @@ object FinancialDataHttpParser extends Logging {
       val financialDataErrors = jsonString.as[FinancialDataErrors]
       val mtdErrorsConvert = financialDataErrors.failures.map{ error =>
         (error.code, status) match {
-          case ("INVALID_CORRELATIONID", BAD_REQUEST)                 => FinancialInvalidCorrelationId
-          case ("INVALID_IDTYPE", BAD_REQUEST)                        => FinancialInvalidIdType
-          case ("INVALID_IDNUMBER", BAD_REQUEST)                      => FinancialInvalidIdNumber
-          case ("INVALID_REGIME_TYPE", BAD_REQUEST)                   => FinancialInvalidRegimeType
-          case ("INVALID_DOC_NUMBER", BAD_REQUEST)                    => FinancialInvalidDocNumber
-          case ("INVALID_ONLY_OPEN_ITEMS", BAD_REQUEST)               => FinancialInvalidOnlyOpenItems
-          case ("INVALID_INCLUDE_LOCKS", BAD_REQUEST)                 => FinancialInvalidIncludeLocks
-          case ("INVALID_CALCULATE_ACCRUED_INTEREST", BAD_REQUEST)    => FinancialInvalidIncludeAccruedInterest
-          case ("INVALID_CUSTOMER_PAYMENT_INFORMATION", BAD_REQUEST)  => FinancialInvalidIncludeCustomerPaymentInfo
-          case ("INVALID_DATE_FROM", BAD_REQUEST)                     => FinancialInvalidDateFrom
-          case ("INVALID_DATE_TO", BAD_REQUEST)                       => FinancialInvalidDateTo
-          case ("INVALID_DATE_RANGE", BAD_REQUEST)                    => FinancialInvalidDateRange
-          case ("INVALID_REMOVE_PAYMENT_ON_ACCOUNT", BAD_REQUEST)     => FinancialInvalidRemovePaymentOnAccount
-          case ("INVALID_INCLUDE_STATISTICAL", BAD_REQUEST)           => FinancialInvalidIncludeStats
-          case ("INVALID_REQUEST", BAD_REQUEST)                       => FinancialInvalidRequest
-          case ("NO_DATA_FOUND", NOT_FOUND) => FinancialNotDataFound
-          case ("DUPLICATE_SUBMISSION", CONFLICT) => FinancialDuplicateSubmission
-          case ("INVALID_IDTYPE", UNPROCESSABLE_ENTITY) => FinancialInvalidIdTypeUnprocessEntity
-          case ("INVALID_ID", UNPROCESSABLE_ENTITY) => FinancialInvalidIdValueUnprocessEntity
-          case ("INVALID_REGIME_TYPE", UNPROCESSABLE_ENTITY) => FinancialInvalidRegimeUnprocessEntity
-          case ("INVALID_DOC_NUMBER", UNPROCESSABLE_ENTITY) => FinancialInvalidDocNumberUnprocessEntity
-          case ("REQUEST_NOT_PROCESSED", UNPROCESSABLE_ENTITY) => FinancialInvalidRequestUnprocessEntity
-          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE) => FinancialServiceUnavailable
+          case ("INVALID_IDNUMBER", BAD_REQUEST)      => FinancialInvalidIdNumber
+          case ("INVALID_SEARCH_ITEM", BAD_REQUEST)   => FinancialInvalidSearchItem
+          case ("NO_DATA_FOUND", NOT_FOUND)           => FinancialNotDataFound
           case _ => MtdError(error.code, error.reason)
         }
       }
