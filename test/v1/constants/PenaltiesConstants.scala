@@ -121,10 +121,10 @@ object PenaltiesConstants {
       latePaymentPenalty1HigherRatePercentage = Some(123),
       latePaymentPenalty2Days = Some("123"),
       latePaymentPenalty2Percentage = Some(123),
-      penaltyChargeCreationDate = "2022-10-11",
+      penaltyChargeCreationDate = Some("2022-10-11"),
       communicationsDate = "2022-10-11",
       penaltyChargeReference = Some("123"),
-      penaltyChargeDueDate = "2022-10-11",
+      penaltyChargeDueDate = Some("2022-10-11"),
       appealInformation = Some(Seq(
         AppealInformation(
           appealStatus = AppealStatusUpstream.`under appeal`,

@@ -16,9 +16,8 @@
 
 package v1.models.response.penalties
 
-import play.api.libs.json._
-import v1.models.errors.MtdError
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 case class LatePaymentPenalty(
                              details: Option[Seq[LatePaymentPenaltyDetails]]
@@ -44,10 +43,10 @@ case class LatePaymentPenaltyDetails(
                                       latePaymentPenalty1HigherRatePercentage: Option[BigDecimal],
                                       latePaymentPenalty2Days: Option[String],
                                       latePaymentPenalty2Percentage: Option[BigDecimal],
-                                      penaltyChargeCreationDate: String,
+                                      penaltyChargeCreationDate: Option[String],
                                       communicationsDate: String,
                                       penaltyChargeReference: Option[String],
-                                      penaltyChargeDueDate: String,
+                                      penaltyChargeDueDate: Option[String],
                                       appealInformation: Option[Seq[AppealInformation]],
                                       principalChargeDocNumber: String,
                                       principalChargeMainTransaction: String,
@@ -75,10 +74,10 @@ object LatePaymentPenaltyDetails {
     lPP1HRPercentage                <- (JsPath \ "LPP1HRPercentage").readNullable[BigDecimal]
     lPP2Days                        <- (JsPath \ "LPP2Days").readNullable[String]
     lPP2Percentage                  <- (JsPath \ "LPP2Percentage").readNullable[BigDecimal]
-    penaltyChargeCreationDate       <- (JsPath \ "penaltyChargeCreationDate").read[String]
+    penaltyChargeCreationDate       <- (JsPath \ "penaltyChargeCreationDate").readNullable[String]
     communicationsDate              <- (JsPath \ "communicationsDate").read[String]
     penaltyChargeReference          <- (JsPath \ "penaltyChargeReference").readNullable[String]
-    penaltyChargeDueDate            <- (JsPath \ "penaltyChargeDueDate").read[String]
+    penaltyChargeDueDate            <- (JsPath \ "penaltyChargeDueDate").readNullable[String]
     appealInformation               <- (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]]
     principalChargeDocNumber        <- (JsPath \ "principalChargeDocNumber").read[String]
     principalChargeMainTransaction  <- (JsPath \ "principalChargeMainTransaction").read[String]
