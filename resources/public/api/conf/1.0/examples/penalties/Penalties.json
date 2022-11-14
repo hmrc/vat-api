@@ -41,7 +41,7 @@
             "appealLevel": "appeal-first-tier-tribunal"
           }
         ],
-        "chargeReference": "12345678901234",
+        "chargeReference": "XS198765432109",
         "chargeAmount": 424.34,
         "chargeDueDate": "2023-06-30"
       },
@@ -64,7 +64,7 @@
             "returnReceiptDate": "2023-05-04"
           }
         ],
-        "chargeReference": "12345678901234",
+        "chargeReference": "XS212345678901",
         "chargeAmount": 534.34,
         "chargeOutstandingAmount": 132.26,
         "chargeDueDate": "2023-06-30"
@@ -74,7 +74,7 @@
   "latePaymentPenalty": {
     "details": [
       {
-        "principalChargeReference": "12345678901234",
+        "principalChargeReference": "XV123451234512",
         "penaltyCategory": "LPP1",
         "penaltyStatus": "accruing",
         "penaltyAmountAccruing": 1435.21,
@@ -89,7 +89,7 @@
         "latePaymentPenalty2Percentage": 85.35,
         "penaltyChargeCreationDate": "2023-03-30",
         "communicationsDate": "2023-03-30",
-        "penaltyChargeReference": "12345678901234",
+        "penaltyChargeReference": "XP123456789012",
         "penaltyChargeDueDate": "2023-04-30",
         "appealInformation": [
           {
