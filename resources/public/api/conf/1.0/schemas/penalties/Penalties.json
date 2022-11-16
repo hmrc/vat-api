@@ -16,7 +16,7 @@
           "multipleOf": 0.01
         },
         "penalisedPrincipalTotal": {
-          "description": "Total value of Value Added Tax (VAT) owed before penalties and interest. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+          "description": "Total amount of late VAT (before penalties and interest). The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "4286.55",
           "minimum": -9999999999999.99,
@@ -24,7 +24,7 @@
           "multipleOf": 0.01
         },
         "latePaymentPenaltyPostedTotal": {
-          "description": "Total value of Late Payment Penalty (LPP) charged. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+          "description": "Total amount of late payment penalty charges. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "171.46",
           "minimum": -9999999999999.99,
@@ -32,7 +32,7 @@
           "multipleOf": 0.01
         },
         "latePaymentPenaltyEstimateTotal": {
-          "description": "Estimated total value of uncharged Late Payment Penalty (LPP) with amount accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+          "description": "Estimated total amount of uncharged late payment penalties, based upon the amount that is accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
           "example": "171.46",
           "minimum": -9999999999999.99,
@@ -65,19 +65,19 @@
               "multipleOf": 1
             },
             "periodOfComplianceAchievement": {
-              "description": "This is the date that penalty points expire if customer meets requirements.",
+              "description": "The date upon which the penalty points will expire, if the individual or organisation meets the requirements for compliance.",
               "type": "string",
               "example": "2023-04-01"
             },
             "regimeThreshold": {
-              "description": "Total number of penalty points required to generate a financial penalty.",
+              "description": "Total number of penalty points that are required before a financial penalty will be generated.",
               "type": "number",
               "example": "6",
               "minimum": 0,
               "multipleOf": 1
             },
             "penaltyChargeAmount": {
-              "description": "Total amount charged per penalty after reaching threshold. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+              "description": "Amount charged per penalty, after the threshold has been reached. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
               "type": "number",
               "example": "200.00",
               "minimum": -9999999999999.99,
@@ -101,17 +101,17 @@
             "type": "object",
             "properties": {
               "penaltyNumber": {
-                "description": "This is used to identify the penalty points received within a set period.",
+                "description": "The identification number of the penalty.",
                 "type": "string",
                 "example": "12345678901234"
               },
               "penaltyOrder": {
-                "description": "Used to sort penalty points in order of the date the customer received the penalty.",
+                "description": "Used to sort penalties in order of the date upon which the individual or organisation received them.",
                 "type": "string",
                 "example": "01"
               },
               "penaltyCategory": {
-                "description": "This shows the category of the penalty object.",
+                "description": "The category of the penalty.",
                 "type": "string",
                 "example": "point",
                 "oneOf": [
@@ -121,7 +121,7 @@
                 ]
               },
               "penaltyStatus": {
-                "description": "Shows if the penalty has been paid, or not been paid.",
+                "description": "The status of the penalty. Its meaning depends upon the penalty's category.",
                 "type": "string",
                 "example": "active",
                 "oneOf": [
@@ -130,18 +130,18 @@
                 ]
               },
               "frequencyAdjustmentPointIndicator": {
-                "description": "Indicates if there's been an adjustment to your penalty point because of a change to your submission frequency. For example, changing from quarterly submissions to monthly submissions.",
+                "description": "Indicates whether there has been an adjustment to the penalty point because of a change to your submission frequency (for example, changing from quarterly submissions to monthly submissions).",
                 "type": "string",
                 "example": "X",
                 "enum": ["X"]
               },
               "penaltyCreationDate": {
-                "description": "Date that the penalty point was created.",
+                "description": "The date that the penalty point was created.",
                 "type": "string",
                 "example": "2022-07-01"
               },
               "penaltyExpiryDate": {
-                "description": "This is the date a penalty point will expire. If penalty points fall into a threshold, it will expire once compliance is met.",
+                "description": "The date that the penalty point will expire. If the penalty falls within the points threshold, it will expire once compliance is met.",
                 "type": "string",
                 "example": "2024-07-01"
               },
@@ -161,7 +161,7 @@
                 ]
               },
               "communicationsDate": {
-                "description": "This is the date that letters about a penalty are sent to users.",
+                "description": "The date upon which a letter about the penalty was sent to the user.",
                 "type": "string",
                 "example": "2022-07-01"
               },
@@ -172,7 +172,7 @@
                   "type": "object",
                   "properties": {
                     "lateSubmissionID": {
-                      "description": "Late Submission Identification linked to the penalty.",
+                      "description": "The identification number of the late submission penalty..",
                       "type": "string",
                       "example": "001"
                     },
@@ -182,28 +182,32 @@
                       "example": "18AD"
                     },
                     "taxReturnStatus": {
-                      "description": "This shows the status of a tax return.",
+                      "description": "The status of the tax return.",
                       "type": "string",
                       "example": "open",
-                      "enum": ["open", "fulfilled", "reversed"]
+                      "oneOf": [
+                        { "enum": ["open"], "description": "The VAT return is yet to be submitted." },
+                        { "enum": ["fulfilled"], "description": "The obligation has been met (whether the submission was late or not)." },
+                        { "enum": ["reversed"], "description": "The obligation no longer exists. The individual or organisation is therefore not required to submit any information." }
+                      ]
                     },
                     "taxPeriodStartDate": {
-                      "description": "Start date of the obligation period for the penalty.",
+                      "description": "Start date of the VAT period to which the penalty relates.",
                       "type": "string",
                       "example": "2022-04-01"
                     },
                     "taxPeriodEndDate": {
-                      "description": "End date of the obligation period for the penalty.",
+                      "description": "End date of the VAT period to which the penalty relates.",
                       "type": "string",
                       "example": "2022-06-30"
                     },
                     "taxPeriodDueDate": {
-                      "description": "Tax period due date that a failed submission happened.",
+                      "description": "The due date for the VAT return, which was missed and gave rise to the late submission penalty.",
                       "type": "string",
                       "example": "2022-07-07"
                     },
                     "returnReceiptDate": {
-                      "description": "The date a VAT return submission was made.",
+                      "description": "The date upon which the VAT return was submitted.",
                       "type": "string",
                       "example": "2022-07-15"
                     }
@@ -242,7 +246,7 @@
                 "example": "XS198765432109"
               },
               "chargeAmount": {
-                "description": "Total amount of Late Submission Penalty (LSP) charge. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The late submission penalty charge amount. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "200.00",
                 "minimum": -9999999999999.99,
@@ -250,7 +254,7 @@
                 "multipleOf": 0.01
               },
               "chargeOutstandingAmount": {
-                "description": "Total amount remaining on the penalty that needs to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The penalty charge amount that remains to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "103.12",
                 "minimum": -9999999999999.99,
@@ -258,7 +262,7 @@
                 "multipleOf": 0.01
               },
               "chargeDueDate": {
-                "description": "Late Submission Penalty (LSP) charge due date (30 days max)",
+                "description": "The due date for the late submission penalty charge (this will be a maximum of 30 days after the submission was originally due).",
                 "type": "string",
                 "example": "2022-07-31"
               }
@@ -287,18 +291,21 @@
                 "example": "XV123451234512"
               },
               "penaltyCategory": {
-                "description": "This shows if the penalty is LPP (Type 1) or an additional penalty (Type 2).",
+                "description": "The category of the penalty. This specifies whether the penalty is a first late payment penalty (LPP1) or a second late payment penalty (LPP2).",
                 "type": "string",
                 "example": "LPP1"
               },
               "penaltyStatus": {
-                "description": "This is used to show the status of the penalty.",
+                "description": "The status of the penalty.",
                 "type": "string",
                 "example": "accruing",
-                "enum": ["accruing", "posted"]
+                "oneOf": [
+                  { "enum": ["accruing"], "description": "The penalty is accruing, and is yet to be posted to the account." },
+                  { "enum": ["posted"], "description": "The penalty has been posted to the account." }
+                ]
               },
               "penaltyAmountAccruing": {
-                "description": "Total amount to be paid on penalty. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The unposted penalty amount that is accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "400.00",
                 "minimum": -9999999999999.99,
@@ -306,7 +313,7 @@
                 "multipleOf": 0.01
               },
               "penaltyAmountPosted": {
-                "description": "Total amount to be paid on penalty. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The penalty amount that has been posted to the account. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "400.00",
                 "minimum": -9999999999999.99,
@@ -314,7 +321,7 @@
                 "multipleOf": 0.01
               },
               "penaltyAmountPaid": {
-                "description": "Amount of the penalty that has already been paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The penalty amount that has already been paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "100.00",
                 "minimum": -9999999999999.99,
@@ -322,7 +329,7 @@
                 "multipleOf": 0.01
               },
               "penaltyAmountOutstanding": {
-                "description": "Remaining amount on penalty to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The remaining penalty amount to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "300.00",
                 "minimum": -9999999999999.99,
@@ -330,7 +337,7 @@
                 "multipleOf": 0.01
               },
               "latePaymentPenalty1LowerRateCalculationAmount": {
-                "description": "Amount of unpaid tax on day 16, after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The amount of VAT that remained unpaid 16 days after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "3605.50",
                 "minimum": -9999999999999.99,
@@ -338,7 +345,7 @@
                 "multipleOf": 0.01
               },
               "latePaymentPenalty1LowerRatePercentage": {
-                "description": "The percentage used to calculate the lower rate part of the penalty.",
+                "description": "The percentage used to calculate the lower-rate part of the first late payment penalty.",
                 "type": "number",
                 "example": "2.00",
                 "minimum": -99.99,
@@ -346,7 +353,7 @@
                 "multipleOf": 0.01
               },
               "latePaymentPenalty1HigherRateCalculationAmount": {
-                "description": "Amount of unpaid tax on day 31, after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+                "description": "The amount of VAT that remained unpaid 31 days after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
                 "example": "10000.00",
                 "minimum": -9999999999999.99,
@@ -354,7 +361,7 @@
                 "multipleOf": 0.01
               },
               "latePaymentPenalty1HigherRatePercentage": {
-                "description": "The percentage used to calculate the higher rate part of the penalty.",
+                "description": "The percentage used to calculate the higher-rate part of the first late payment penalty.",
                 "type": "number",
                 "example": "2.00",
                 "minimum": -99.99,
@@ -362,12 +369,12 @@
                 "multipleOf": 0.01
               },
               "latePaymentPenalty2Days": {
-                "description": "The number of days since day 31 of the late penalty payment.",
+                "description": "The number of days over which the second late payment penalty has accrued. This is the number of days that have elapsed since day 31 after the VAT payment due date.",
                 "type": "string",
                 "example": "14"
               },
               "latePaymentPenalty2Percentage": {
-                "description": "The rate applied to unpaid tax to calculate the penalty payment.",
+                "description": "The percentage rate that has been applied to unpaid VAT in order to calculate the second late payment penalty.",
                 "type": "number",
                 "example": "2.00",
                 "minimum": -99.99,
@@ -375,12 +382,12 @@
                 "multipleOf": 0.01
               },
               "penaltyChargeCreationDate": {
-                "description": "This is the date when the penalty charge was created.",
+                "description": "The date when the penalty charge was created.",
                 "type": "string",
                 "example": "2022-07-08"
               },
               "communicationsDate": {
-                "description": "This is the date a letter was sent to the customer.",
+                "description": "The date when a letter about the penalty was sent to the customer.",
                 "type": "string",
                 "example": "2022-07-09"
               },
@@ -390,7 +397,7 @@
                 "example": "XP123456789012"
               },
               "penaltyChargeDueDate": {
-                "description": "This is the date the penalty must be paid by.",
+                "description": "The date that the penalty must be paid by.",
                 "type": "string",
                 "example": "2022-07-31"
               },
@@ -418,7 +425,7 @@
                 }
               },
               "principalChargeDocNumber": {
-                "description": "Document number relating to VAT charge",
+                "description": "Document number relating to the VAT charge",
                 "type": "string",
                 "example": "123456789012"
               },
@@ -433,22 +440,22 @@
                 "example": ""
               },
               "principalChargeBillingFrom": {
-                "description": "principal Charge Billing date from",
+                "description": "The start date of the obligation period.",
                 "type": "string",
                 "example": ""
               },
               "principalChargeBillingTo": {
-                "description": "principal Charge Billing date to",
+                "description": "The end date of the obligation period.",
                 "type": "string",
                 "example": ""
               },
               "principalChargeDueDate": {
-                "description": "Principal Charge Due Date",
+                "description": "The date that the principal charge should have been paid by.",
                 "type": "string",
                 "example": ""
               },
               "principalChargeLatestClearing": {
-                "description": "Principal Charge Latest Clearing",
+                "description": "The date that the principal charge was paid.",
                 "type": "string",
                 "example": ""
               },
