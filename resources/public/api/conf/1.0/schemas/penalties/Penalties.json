@@ -176,11 +176,6 @@
                       "type": "string",
                       "example": "001"
                     },
-                    "taxPeriod": {
-                      "description": "Tax period one failed to submit.",
-                      "type": "string",
-                      "example": "18AD"
-                    },
                     "taxReturnStatus": {
                       "description": "The status of the tax return.",
                       "type": "string",
