@@ -65,7 +65,7 @@
               "multipleOf": 1
             },
             "periodOfComplianceAchievement": {
-              "description": "The date upon which the penalty points will expire, if the individual or organisation meets the requirements for compliance.",
+              "description": "The date upon which all accrued penalty points will expire, if the individual or organisation meets the requirements for compliance.",
               "type": "string",
               "example": "2023-04-01"
             },
