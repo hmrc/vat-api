@@ -505,7 +505,7 @@ traits:
                       value:
                         code: VRN_INVALID
                     invalidChargeReference:
-                      description: The provided chargeReference is invalid.
+                      description: The specified penalty charge reference is invalid.
                       value:
                         code: CHARGE_REFERENCE_INVALID
             404:
@@ -514,6 +514,6 @@ traits:
                   type: types.errorResponse
                   examples:
                     notFound:
-                      description: The supplied income source could not be found.
+                      description: The remote endpoint has indicated that no associated data is found.
                       value:
                         code: MATCHING_RESOURCE_NOT_FOUND
