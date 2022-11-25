@@ -1,116 +1,156 @@
 {
-  "totalisations": {
-    "lateSubmissionPenaltyTotalValue": 200,
-    "penalisedPrincipalTotal": 2000,
-    "latePaymentPenaltyPostedTotal": 165.25,
-    "latePaymentPenaltyEstimateTotal": 15.26
-  },
-  "lateSubmissionPenalty": {
-    "summary": {
-      "activePenaltyPoints": 2,
-      "inactivePenaltyPoints": 10,
-      "periodOfComplianceAchievement": "2023-10-30",
-      "regimeThreshold": 10,
-      "penaltyChargeAmount": 684.25
+    "totalisations": {
+        "lateSubmissionPenaltyTotalValue": 400,
+        "penalisedPrincipalTotal": 10000,
+        "latePaymentPenaltyPostedTotal": 425.21,
+        "latePaymentPenaltyEstimateTotal": 30.68
     },
-    "details": [
-      {
-        "penaltyNumber": "12345678901234",
-        "penaltyOrder": "01",
-        "penaltyCategory": "point",
-        "penaltyStatus": "inactive",
-        "frequencyAdjustmentPointIndicator": "X",
-        "penaltyCreationDate": "2023-10-30",
-        "penaltyExpiryDate": "2024-04-31",
-        "expiryReason": "appeal",
-        "communicationsDate": "2023-10-30",
-        "lateSubmissions": [
-          {
-            "lateSubmissionID": "123",
-            "taxPeriod": "2023",
-            "taxReturnStatus": "reversed",
-            "taxPeriodStartDate": "2022-10-30",
-            "taxPeriodEndDate": "2022-12-30",
-            "taxPeriodDueDate": "2023-01-30",
-            "returnReceiptDate": "2023-02-04"
-          }
-        ],
-        "appealInformation": [
-          {
-            "appealStatus": "appeal-upheld",
-            "appealLevel": "appeal-first-tier-tribunal"
-          }
-        ],
-        "chargeReference": "XS198765432109",
-        "chargeAmount": 424.34,
-        "chargeDueDate": "2023-06-30"
-      },
-      {
-        "penaltyNumber": "43210987654321",
-        "penaltyOrder": "02",
-        "penaltyCategory": "point",
-        "penaltyStatus": "active",
-        "penaltyCreationDate": "2023-10-30",
-        "penaltyExpiryDate": "2025-10-30",
-        "communicationsDate": "2023-10-30" ,
-        "lateSubmissions": [
-          {
-            "lateSubmissionID": "321",
-            "taxPeriod": "2023",
-            "taxReturnStatus": "open",
-            "taxPeriodStartDate": "2023-01-30",
-            "taxPeriodEndDate": "2023-03-30",
-            "taxPeriodDueDate": "2023-04-30",
-            "returnReceiptDate": "2023-05-04"
-          }
-        ],
-        "chargeReference": "XS212345678901",
-        "chargeAmount": 534.34,
-        "chargeOutstandingAmount": 132.26,
-        "chargeDueDate": "2023-06-30"
-      }
-    ]
-  },
-  "latePaymentPenalty": {
-    "details": [
-      {
-        "principalChargeReference": "XV123451234512",
-        "penaltyCategory": "LPP1",
-        "penaltyStatus": "accruing",
-        "penaltyAmountAccruing": 1435.21,
-        "penaltyAmountPosted": 832.35,
-        "penaltyAmountPaid": 529.35,
-        "penaltyAmountOutstanding": 303,
-        "latePaymentPenalty1LowerRateCalculationAmount": 754.43,
-        "latePaymentPenalty1LowerRatePercentage": 2.00,
-        "latePaymentPenalty1HigherRateCalculationAmount": 724.24,
-        "latePaymentPenalty1HigherRatePercentage": 2.00,
-        "latePaymentPenalty2Days": "12",
-        "latePaymentPenalty2Percentage": 85.35,
-        "penaltyChargeCreationDate": "2023-03-30",
-        "communicationsDate": "2023-03-30",
-        "penaltyChargeReference": "XP123456789012",
-        "penaltyChargeDueDate": "2023-04-30",
-        "appealInformation": [
-          {
-            "appealStatus": "cannot-be-appealed",
-            "appealLevel": "statutory-review"
-          }
-        ],
-        "principalChargeDocNumber": "123456789012",
-        "principalChargeMainTransaction": "4700",
-        "principalChargeSubTransaction": "1174",
-        "principalChargeBillingFrom": "2023-01-01",
-        "principalChargeBillingTo": "2023-03-30",
-        "principalChargeDueDate": "2023-04-30",
-        "principalChargeLatestClearing": "2023-05-30",
-        "timeToPay": [
-          {
-            "timeToPayStartDate": "2023-05-01",
-            "timeToPayEndDate": "2023-05-30"
-          }
+    "lateSubmissionPenalty": {
+        "summary": {
+            "activePenaltyPoints": 4,
+            "inactivePenaltyPoints": 1,
+            "periodOfComplianceAchievement": "2025-05-01",
+            "regimeThreshold": 4,
+            "penaltyChargeAmount": 200
+        },
+        "details": [
+           {
+                "penaltyNumber": "00004",
+                "penaltyOrder": "4",
+                "penaltyCategory": "point",
+                "penaltyStatus": "inactive",
+                "frequencyAdjustmentPointIndicator": "X",
+                "penaltyCreationDate": "2023-11-08",
+                "penaltyExpiryDate": "2025-12-01",
+		"expiryReason": "appeal",
+                "communicationsDate": "2023-11-11",
+                "lateSubmissions": [
+                    {
+                        "lateSubmissionID": "1054600",
+                        "taxReturnStatus": "fulfilled",
+                        "taxPeriodStartDate": "2023-07-01",
+                        "taxPeriodEndDate": "2023-09-30",
+                        "taxPeriodDueDate": "2023-11-07",
+                        "returnReceiptDate": "2023-11-13"
+                    }
+                ],
+                "appealInformation": [
+                    {
+                        "appealStatus": "appeal-upheld",
+                        "appealLevel": "statutory-review"
+                    }
+                ]
+            },
+            {
+                "penaltyNumber": "00005",
+                "penaltyOrder": "5",
+                "penaltyCategory": "threshold",
+                "penaltyStatus": "active",
+                "penaltyCreationDate": "2024-02-08",
+                "penaltyExpiryDate": "2026-03-01",
+                "communicationsDate": "2024-02-11",
+                "lateSubmissions": [
+                    {
+                        "lateSubmissionID": "1054700",
+                        "taxReturnStatus": "fulfilled",
+                        "taxPeriodStartDate": "2023-10-01",
+                        "taxPeriodEndDate": "2023-12-31",
+                        "taxPeriodDueDate": "2024-02-07",
+                        "returnReceiptDate": "2024-02-15"
+
+                    }
+                ],
+                "chargeReference": "XS198765432109",
+                "chargeAmount": 200,
+                "chargeOutstandingAmount": 200,
+                "chargeDueDate": "2024-02-28"
+            },
+            {
+                "penaltyNumber": "00006",
+                "penaltyOrder": "6",
+                "penaltyCategory": "charge",
+                "penaltyStatus": "active",
+                "penaltyCreationDate": "2024-05-08",
+                "penaltyExpiryDate": "2026-06-01",
+                "communicationsDate": "2024-05-11",
+                "lateSubmissions": [
+                    {
+                        "lateSubmissionID": "1054800",
+                        "taxReturnStatus": "fulfilled",
+                        "taxPeriodStartDate": "2024-01-01",
+                        "taxPeriodEndDate": "2024-03-31",
+                        "taxPeriodDueDate": "2024-05-07",
+                        "returnReceiptDate": "2024-11-12"
+
+                    }
+                ],
+                "chargeReference": "XS212345678901",
+                "chargeAmount": 200,
+                "chargeOutstandingAmount": 200,
+                "chargeDueDate": "2024-02-28"
+            }
         ]
-      }
-    ]
-  }
+    },
+    "latePaymentPenalty": {
+        "details": [
+            {
+                "principalChargeReference": "XV123451234512",
+                "penaltyCategory": "LPP1",
+                "penaltyStatus": "posted",
+                "penaltyAmountAccruing": 0,
+                "penaltyAmountPosted": 400,
+                "penaltyAmountPaid": 0,
+                "penaltyAmountOutstanding": 400,
+                "latePaymentPenalty1LowerRateCalculationAmount": 10000,
+                "latePaymentPenalty1LowerRatePercentage": 2,
+                "latePaymentPenalty1HigherRateCalculationAmount": 10000,
+                "latePaymentPenalty1HigherRatePercentage": 4,
+                "penaltyChargeCreationDate": "2024-06-06",
+                "communicationsDate": "2024-06-09",
+                "penaltyChargeReference": "XP123456789012",
+                "penaltyChargeDueDate": "2024-07-06",
+                "principalChargeDocNumber": "10023852",
+                "principalChargeMainTransaction": "4700",
+                "principalChargeSubTransaction": "1174",
+                "principalChargeBillingFrom": "2024-01-01",
+                "principalChargeBillingTo": "2024-03-31",
+                "principalChargeDueDate": "2024-05-07",
+                "principalChargeLatestClearing": "2024-07-31",
+                "timeToPay": [
+                    {
+                        "timeToPayStartDate": "2024-07-06",
+                        "timeToPayEndDate": "2024-07-11"
+                    }
+                ],
+                "appealInformation": [
+                    {
+                        "appealStatus": "appeal-rejected",
+                        "appealLevel": "statutory-review"
+                    }
+                ]
+            },
+            {
+                "principalChargeReference": "XV123451234512",
+                "penaltyCategory": "LPP2",
+                "penaltyStatus": "accruing",
+                "penaltyAmountAccruing": 30.68,
+                "penaltyAmountPosted": 25.21,
+                "penaltyAmountPaid": 0,
+                "penaltyAmountOutstanding": 25.21,
+                "latePaymentPenalty2Days": "23",
+                "latePaymentPenalty2Percentage": 4,
+                "penaltyChargeCreationDate": "2024-07-01",
+                "communicationsDate": "2024-07-04",
+                "penaltyChargeReference": "XP298765432109",
+                "penaltyChargeDueDate": "2024-08-07",
+                "principalChargeDocNumber": "10023852",
+                "principalChargeMainTransaction": "4700",
+                "principalChargeSubTransaction": "1174",
+                "principalChargeBillingFrom": "2024-01-01",
+                "principalChargeBillingTo": "2024-03-31",
+                "principalChargeDueDate": "2024-05-07",
+                "principalChargeLatestClearing": "2024-07-31"
+            }
+        ]
+    }
 }

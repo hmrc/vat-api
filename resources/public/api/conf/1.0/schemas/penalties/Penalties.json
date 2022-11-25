@@ -10,7 +10,7 @@
         "lateSubmissionPenaltyTotalValue": {
           "description": "Total value of all unpaid late submission penalties. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
           "type": "number",
-          "example": "200.00",
+          "example": "200",
           "minimum": -9999999999999.99,
           "maximum": 9999999999999.99,
           "multipleOf": 0.01
@@ -79,7 +79,7 @@
             "penaltyChargeAmount": {
               "description": "Amount charged per penalty, after the threshold has been reached. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
               "type": "number",
-              "example": "200.00",
+              "example": "200",
               "minimum": -9999999999999.99,
               "maximum": 9999999999999.99,
               "multipleOf": 0.01
@@ -243,7 +243,7 @@
               "chargeAmount": {
                 "description": "The late submission penalty charge amount. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "200.00",
+                "example": "200",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -302,7 +302,7 @@
               "penaltyAmountAccruing": {
                 "description": "The unposted penalty amount that is accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "400.00",
+                "example": "400",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -310,7 +310,7 @@
               "penaltyAmountPosted": {
                 "description": "The penalty amount that has been posted to the account. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "400.00",
+                "example": "400",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -318,7 +318,7 @@
               "penaltyAmountPaid": {
                 "description": "The penalty amount that has already been paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "100.00",
+                "example": "100",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -326,7 +326,7 @@
               "penaltyAmountOutstanding": {
                 "description": "The remaining penalty amount to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "300.00",
+                "example": "300",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -342,7 +342,7 @@
               "latePaymentPenalty1LowerRatePercentage": {
                 "description": "The percentage used to calculate the lower-rate part of the first late payment penalty.",
                 "type": "number",
-                "example": "2.00",
+                "example": "2",
                 "minimum": -99.99,
                 "maximum": 99.99,
                 "multipleOf": 0.01
@@ -350,7 +350,7 @@
               "latePaymentPenalty1HigherRateCalculationAmount": {
                 "description": "The amount of VAT that remained unpaid 31 days after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
                 "type": "number",
-                "example": "10000.00",
+                "example": "10000",
                 "minimum": -9999999999999.99,
                 "maximum": 9999999999999.99,
                 "multipleOf": 0.01
@@ -358,7 +358,7 @@
               "latePaymentPenalty1HigherRatePercentage": {
                 "description": "The percentage used to calculate the higher-rate part of the first late payment penalty.",
                 "type": "number",
-                "example": "2.00",
+                "example": "2",
                 "minimum": -99.99,
                 "maximum": 99.99,
                 "multipleOf": 0.01
@@ -371,7 +371,7 @@
               "latePaymentPenalty2Percentage": {
                 "description": "The percentage rate that has been applied to unpaid VAT in order to calculate the second late payment penalty.",
                 "type": "number",
-                "example": "2.00",
+                "example": "2",
                 "minimum": -99.99,
                 "maximum": 99.99,
                 "multipleOf": 0.01
