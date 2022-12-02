@@ -179,11 +179,11 @@
                     "taxReturnStatus": {
                       "description": "The status of the tax return.",
                       "type": "string",
-                      "example": "open",
+                      "example": "Open",
                       "oneOf": [
-                        { "enum": ["open"], "description": "The VAT return is yet to be submitted." },
-                        { "enum": ["fulfilled"], "description": "The obligation has been met (whether the submission was late or not)." },
-                        { "enum": ["reversed"], "description": "The obligation no longer exists. The individual or organisation is therefore not required to submit any information." }
+                        { "enum": ["Open"], "description": "The VAT return is yet to be submitted." },
+                        { "enum": ["Fulfilled"], "description": "The obligation has been met (whether the submission was late or not)." },
+                        { "enum": ["Reversed"], "description": "The obligation no longer exists. The individual or organisation is therefore not required to submit any information." }
                       ]
                     },
                     "taxPeriodStartDate": {
