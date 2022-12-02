@@ -27,7 +27,7 @@
                 "lateSubmissions": [
                     {
                         "lateSubmissionID": "1054600",
-                        "taxReturnStatus": "fulfilled",
+                        "taxReturnStatus": "Fulfilled",
                         "taxPeriodStartDate": "2023-07-01",
                         "taxPeriodEndDate": "2023-09-30",
                         "taxPeriodDueDate": "2023-11-07",
@@ -52,7 +52,7 @@
                 "lateSubmissions": [
                     {
                         "lateSubmissionID": "1054700",
-                        "taxReturnStatus": "fulfilled",
+                        "taxReturnStatus": "Fulfilled",
                         "taxPeriodStartDate": "2023-10-01",
                         "taxPeriodEndDate": "2023-12-31",
                         "taxPeriodDueDate": "2024-02-07",
@@ -76,7 +76,7 @@
                 "lateSubmissions": [
                     {
                         "lateSubmissionID": "1054800",
-                        "taxReturnStatus": "fulfilled",
+                        "taxReturnStatus": "Fulfilled",
                         "taxPeriodStartDate": "2024-01-01",
                         "taxPeriodEndDate": "2024-03-31",
                         "taxPeriodDueDate": "2024-05-07",
