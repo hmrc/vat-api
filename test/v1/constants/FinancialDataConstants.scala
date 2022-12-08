@@ -43,7 +43,7 @@ object FinancialDataConstants {
 
   def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC?searchItem=${searchItem}"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC?searchType=CHGREF&searchItem=${searchItem}&includeClearedItems=true&includeStatistical=false&includePaymentOnAccount=true&addRegimeTotalisation=false&addLockInformation=false&addPenaltyDetails=false&addPostedInterestDetails=true&addAccruingInterestDetails=true"
 
 
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
