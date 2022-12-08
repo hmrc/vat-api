@@ -17,10 +17,10 @@
 package v1.controllers.requestParsers.validators.validations
 
 import support.UnitSpec
-import v1.models.errors.VrnFormatError
+import v1.models.errors.FinancialInvalidSearchItem
 import v1.models.utils.JsonErrorValidators
 
-class ChargeReferenceValidation extends UnitSpec with JsonErrorValidators {
+class ChargeReferenceValidationSpec extends UnitSpec with JsonErrorValidators {
 
   "validate" should {
     "return no errors" when {
@@ -35,19 +35,19 @@ class ChargeReferenceValidation extends UnitSpec with JsonErrorValidators {
         val validationResult = ChargeReferenceValidation.validate("BR123456789012")
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
-        validationResult.head shouldBe VrnFormatError
+        validationResult.head shouldBe FinancialInvalidSearchItem
       }
       "when a Charge Reference is supplied has too many Letters" in {
         val validationResult = ChargeReferenceValidation.validate("XRP23456789012")
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
-        validationResult.head shouldBe VrnFormatError
+        validationResult.head shouldBe FinancialInvalidSearchItem
       }
       "when an invalid Charge Reference is supplied" in {
         val validationResult = ChargeReferenceValidation.validate("thisIsNotAChargeReference")
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
-        validationResult.head shouldBe VrnFormatError
+        validationResult.head shouldBe FinancialInvalidSearchItem
       }
     }
   }

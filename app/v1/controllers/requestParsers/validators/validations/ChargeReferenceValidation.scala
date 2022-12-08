@@ -16,12 +16,12 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{MtdError, VrnFormatError}
+import v1.models.errors.{FinancialInvalidSearchItem, MtdError}
 
-object VrnValidation {
-  private val vrnRegex = """^\d{9}$"""
+object ChargeReferenceValidation {
+  private val vrnRegex = """^X[a-zA-Z]\d{12}+$"""
 
-  def validate(vrn: String): List[MtdError] = {
-    if (vrn.matches(vrnRegex)) NoValidationErrors else List(VrnFormatError)
+  def validate(chargeReference: String): List[MtdError] = {
+    if (chargeReference.matches(vrnRegex)) NoValidationErrors else List(FinancialInvalidSearchItem)
   }
 }

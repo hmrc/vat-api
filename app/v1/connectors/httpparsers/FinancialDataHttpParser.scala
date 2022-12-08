@@ -34,9 +34,32 @@ object FinancialDataHttpParser extends Logging {
       val financialDataErrors = jsonString.as[FinancialDataErrors]
       val mtdErrorsConvert = financialDataErrors.failures.map{ error =>
         (error.code, status) match {
-          case ("INVALID_IDNUMBER", BAD_REQUEST)      => FinancialInvalidIdNumber
-          case ("INVALID_SEARCH_ITEM", BAD_REQUEST)   => FinancialInvalidSearchItem
-          case ("NO_DATA_FOUND", NOT_FOUND)           => FinancialNotDataFound
+          case ("INVALID_IDNUMBER", BAD_REQUEST)                      => FinancialInvalidIdNumber
+          case ("INVALID_SEARCH_ITEM", BAD_REQUEST)                   => FinancialInvalidSearchItem
+          case ("NO_DATA_FOUND", NOT_FOUND)                           => FinancialNotDataFound
+          case ("INVALID_CORRELATIONID", BAD_REQUEST)                 => DownstreamError
+          case ("INVALID_IDTYPE", BAD_REQUEST)                        => DownstreamError
+          case ("INVALID_REGIME_TYPE", BAD_REQUEST)                   => DownstreamError
+          case ("INVALID_SEARCH_TYPE", BAD_REQUEST)                   => DownstreamError
+          case ("INVALID_DATE_FROM", BAD_REQUEST)                     => DownstreamError
+          case ("INVALID_DATE_TO", BAD_REQUEST)                       => DownstreamError
+          case ("INVALID_DATE_TYPE", BAD_REQUEST)                     => DownstreamError
+          case ("INVALID_INCLUDE_CLEARED_ITEMS", BAD_REQUEST)         => DownstreamError
+          case ("INVALID_INCLUDE_STATISTICAL_ITEMS", BAD_REQUEST)     => DownstreamError
+          case ("INVALID_INCLUDE_PAYMENT_ON_ACCOUNT", BAD_REQUEST)    => DownstreamError
+          case ("INVALID_ADD_REGIME_TOTALISATION", BAD_REQUEST)       => DownstreamError
+          case ("INVALID_INCLUDE_STATISTICAL", BAD_REQUEST)           => DownstreamError
+          case ("INVALID_ADD_LOCK_INFORMATION", BAD_REQUEST)          => DownstreamError
+          case ("INVALID_ADD_PENALTY_DETAILS", BAD_REQUEST)           => DownstreamError
+          case ("INVALID_ADD_POSTED_INTEREST_DETAILS", BAD_REQUEST)   => DownstreamError
+          case ("INVALID_ADD_ACCRUING_INTEREST_DETAILS", BAD_REQUEST) => DownstreamError
+          case ("DUPLICATE_SUBMISSION", CONFLICT)                     => DownstreamError
+          case ("INVALID_ID", UNPROCESSABLE_ENTITY)                   => DownstreamError
+          case ("INVALID_IDTYPE", UNPROCESSABLE_ENTITY)               => DownstreamError
+          case ("INVALID_REGIME_TYPE", UNPROCESSABLE_ENTITY)          => DownstreamError
+          case ("REQUEST_NOT_PROCESSED", UNPROCESSABLE_ENTITY)        => DownstreamError
+          case ("SERVER_ERROR", INTERNAL_SERVER_ERROR)                => DownstreamError
+          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE)           => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }

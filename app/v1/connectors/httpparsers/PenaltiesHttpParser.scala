@@ -36,6 +36,16 @@ object PenaltiesHttpParser extends Logging {
         (error.code, status) match {
           case ("INVALID_IDVALUE", BAD_REQUEST) => PenaltiesInvalidIdValue
           case ("NO_DATA_FOUND", NOT_FOUND) => PenaltiesNotDataFound
+          case ("INVALID_REGIME", BAD_REQUEST) => DownstreamError
+          case ("INVALID_IDTYPE", BAD_REQUEST) => DownstreamError
+          case ("INVALID_DATELIMIT", BAD_REQUEST) => DownstreamError
+          case ("INVALID_CORRELATIONID", BAD_REQUEST) => DownstreamError
+          case ("DUPLICATE_SUBMISSION", 409) => DownstreamError
+          case ("INVALID_IDTYPE", 422) => DownstreamError
+          case ("INVALID_ID", 422) => DownstreamError
+          case ("REQUEST_NOT_PROCESSED", 422) => DownstreamError
+          case ("SERVER_ERROR", INTERNAL_SERVER_ERROR) => DownstreamError
+          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE) => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
@@ -43,6 +53,8 @@ object PenaltiesHttpParser extends Logging {
       val head = mtdErrorsConvert.head
       val error = if(mtdErrorsConvert.tail.isEmpty) {
         head
+      } else if(mtdErrorsConvert.contains(DownstreamError)) {
+        DownstreamError
       } else {
         MtdError("INVALID_REQUEST", "Invalid request penalties", Some(Json.toJson(mtdErrorsConvert)))
       }
