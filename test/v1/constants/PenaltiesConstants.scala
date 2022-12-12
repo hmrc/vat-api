@@ -95,7 +95,7 @@ object PenaltiesConstants {
       ))),
       appealInformation = Some(List(
         AppealInformation(
-          appealStatus = AppealStatusUpstream.`under appeal`,
+          appealStatus = AppealStatusUpstream.`under-appeal`,
           appealLevel = AppealLevelUpstream.`statutory-review`
         )
       )),
@@ -127,7 +127,7 @@ object PenaltiesConstants {
       penaltyChargeDueDate = Some("2022-10-11"),
       appealInformation = Some(Seq(
         AppealInformation(
-          appealStatus = AppealStatusUpstream.`under appeal`,
+          appealStatus = AppealStatusUpstream.`under-appeal`,
           appealLevel = AppealLevelUpstream.`statutory-review`
         )
       )),
@@ -257,7 +257,7 @@ object PenaltiesConstants {
       |            ],
       |            "appealInformation":[
       |               {
-      |                  "appealStatus":"under appeal",
+      |                  "appealStatus":"under-appeal",
       |                  "appealLevel":"statutory-review"
       |               }
       |            ],
@@ -288,7 +288,7 @@ object PenaltiesConstants {
        |            ],
        |            "appealInformation":[
        |               {
-       |                  "appealStatus":"under appeal",
+       |                  "appealStatus":"under-appeal",
        |                  "appealLevel":"statutory-review"
        |               }
        |            ],
@@ -402,7 +402,7 @@ object PenaltiesConstants {
         |    "penaltyChargeReference": "123",
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
-        |        "appealStatus":  "under appeal",
+        |        "appealStatus":  "under-appeal",
         |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",
@@ -436,7 +436,7 @@ object PenaltiesConstants {
         |    "penaltyChargeReference": "123",
         |    "penaltyChargeDueDate": "2022-10-11",
         |    "appealInformation": [{
-        |        "appealStatus":  "under appeal",
+        |        "appealStatus":  "under-appeal",
         |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",

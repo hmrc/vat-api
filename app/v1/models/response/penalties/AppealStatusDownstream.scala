@@ -25,19 +25,19 @@ sealed trait AppealStatusDownstream {
 
 object AppealStatusDownstream {
   case object `A` extends AppealStatusDownstream {
-    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`under appeal`
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`under-appeal`
   }
 
   case object `B` extends AppealStatusDownstream {
-    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal upheld`
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-upheld`
   }
 
   case object `C` extends AppealStatusDownstream {
-    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal rejected`
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-rejected`
   }
 
   case object `99` extends AppealStatusDownstream {
-    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`cannot be appealed`
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`cannot-be-appealed`
   }
 
   implicit val format: json.Format[AppealStatusDownstream] = Enums.format[AppealStatusDownstream]
