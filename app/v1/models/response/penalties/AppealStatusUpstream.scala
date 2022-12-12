@@ -24,19 +24,19 @@ sealed trait AppealStatusUpstream {
 }
 
 object AppealStatusUpstream {
-  case object `under appeal` extends AppealStatusUpstream {
+  case object `under-appeal` extends AppealStatusUpstream {
     override def toDownstreamAppealStatus: AppealStatusDownstream = AppealStatusDownstream.`A`
   }
 
-  case object `appeal upheld` extends AppealStatusUpstream {
+  case object `appeal-upheld` extends AppealStatusUpstream {
     override def toDownstreamAppealStatus: AppealStatusDownstream = AppealStatusDownstream.`B`
   }
 
-  case object `appeal rejected` extends AppealStatusUpstream {
+  case object `appeal-rejected` extends AppealStatusUpstream {
     override def toDownstreamAppealStatus: AppealStatusDownstream = AppealStatusDownstream.`C`
   }
 
-  case object `cannot be appealed` extends AppealStatusUpstream {
+  case object `cannot-be-appealed` extends AppealStatusUpstream {
     override def toDownstreamAppealStatus: AppealStatusDownstream = AppealStatusDownstream.`99`
   }
 
