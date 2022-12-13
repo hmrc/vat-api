@@ -177,7 +177,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
       "errorHelper" must{
         "return 500 when multiple errors occur including a 500" in{
 
-          val status = Status.INTERNAL_SERVER_ERROR
+          val status = Status.BAD_REQUEST
 
           val error = Json.parse(
             """

@@ -34,18 +34,18 @@ object PenaltiesHttpParser extends Logging {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code, status) match {
-          case ("INVALID_IDVALUE", BAD_REQUEST) => PenaltiesInvalidIdValue
-          case ("NO_DATA_FOUND", NOT_FOUND) => PenaltiesNotDataFound
-          case ("INVALID_REGIME", BAD_REQUEST) => DownstreamError
-          case ("INVALID_IDTYPE", BAD_REQUEST) => DownstreamError
-          case ("INVALID_DATELIMIT", BAD_REQUEST) => DownstreamError
-          case ("INVALID_CORRELATIONID", BAD_REQUEST) => DownstreamError
-          case ("DUPLICATE_SUBMISSION", 409) => DownstreamError
-          case ("INVALID_IDTYPE", 422) => DownstreamError
-          case ("INVALID_ID", 422) => DownstreamError
-          case ("REQUEST_NOT_PROCESSED", 422) => DownstreamError
-          case ("SERVER_ERROR", INTERNAL_SERVER_ERROR) => DownstreamError
-          case ("SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE) => DownstreamError
+          case ("INVALID_IDVALUE", _) => PenaltiesInvalidIdValue
+          case ("NO_DATA_FOUND", _) => PenaltiesNotDataFound
+          case ("INVALID_REGIME", _) => DownstreamError
+          case ("INVALID_IDTYPE", _) => DownstreamError
+          case ("INVALID_DATELIMIT", _) => DownstreamError
+          case ("INVALID_CORRELATIONID", _) => DownstreamError
+          case ("DUPLICATE_SUBMISSION", _) => DownstreamError
+          case ("INVALID_IDTYPE", _) => DownstreamError
+          case ("INVALID_ID", _) => DownstreamError
+          case ("REQUEST_NOT_PROCESSED", _) => DownstreamError
+          case ("SERVER_ERROR", _) => DownstreamError
+          case ("SERVICE_UNAVAILABLE", _) => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
