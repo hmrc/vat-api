@@ -106,8 +106,12 @@ case class FinancialDataResponse(totalisation: Option[Totalisation],
                                  documentDetails: Option[Seq[DocumentDetail]])
 
 object FinancialDataResponse {
-  implicit val format: OFormat[FinancialDataResponse] = Json.format[FinancialDataResponse]
-}
+  implicit val reads: Reads[FinancialDataResponse] = (
+    (JsPath \ "getFinancialData" \ "financialDetails" \ "totalisation").readNullable[Totalisation] and
+      (JsPath \ "getFinancialData" \ "financialDetails" \ "documentDetails").readNullable[Seq[DocumentDetail]]
+    )(FinancialDataResponse.apply _)
+
+  implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]}
 
 case class FinancialDataErrors(
                             failures: List[FinancialDataError]
