@@ -49,6 +49,8 @@ object FinancialDataConstants {
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
     Json.parse(
       """{
+        |"getFinancialData": {
+        |"financialDetails": {
         |  "totalisation": {
         |    "regimeTotalisation": {
         |      "totalAccountOverdue": 1000.00,
@@ -68,7 +70,7 @@ object FinancialDataConstants {
         |     "totalAccountAccruingInterest": 100
         |    }
         |  }
-        |}
+        |}}}
         |""".stripMargin
     )
   }
@@ -76,6 +78,8 @@ object FinancialDataConstants {
   val testDownstreamFinancialDetails: JsValue = {
     Json.parse(
       """{
+        |"getFinancialData": {
+        |"financialDetails": {
         |  "totalisation": {
         |    "regimeTotalisation": {
         |      "totalAccountOverdue": 1000.00,
@@ -161,7 +165,7 @@ object FinancialDataConstants {
         |      ]
         |    }
         |  ]
-        |}
+        |}}}
         |""".stripMargin
     )
   }

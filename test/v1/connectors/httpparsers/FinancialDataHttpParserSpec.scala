@@ -86,10 +86,15 @@ class FinancialDataHttpParserSpec extends UnitSpec {
           "return Left(InvalidJson)" in {
 
             val jsonObject =
-              Json.parse("""
-                           | "totalisations" {
-                           |   "test": "test"
-                           | }
+              Json.parse("""{
+                           |  "getFinancialData": {
+                           |    "financialDetails": {
+                           |      "documentDetails": {
+                           |        "test": "test"
+                           |      }
+                           |    }
+                           |  }
+                           |}
                            |""".stripMargin)
 
             val result = FinancialDataHttpReads.read("", "",
