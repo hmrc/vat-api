@@ -84,7 +84,7 @@ object PenaltiesConstants {
       penaltyCreationDate = "123",
       penaltyExpiryDate = "123",
       expiryReason = Some(ExpiryReasonUpstream.`appeal`),
-      communicationsDate = "123",
+      communicationsDate = Some("123"),
       lateSubmissions = Some(List(LateSubmissions(
         lateSubmissionID = "123",
         taxReturnStatus = TaxReturnStatus.`Open`,
@@ -122,7 +122,7 @@ object PenaltiesConstants {
       latePaymentPenalty2Days = Some("123"),
       latePaymentPenalty2Percentage = Some(123),
       penaltyChargeCreationDate = Some("2022-10-11"),
-      communicationsDate = "2022-10-11",
+      communicationsDate = Some("2022-10-11"),
       penaltyChargeReference = Some("123"),
       penaltyChargeDueDate = Some("2022-10-11"),
       appealInformation = Some(Seq(

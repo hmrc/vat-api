@@ -44,7 +44,7 @@ case class LatePaymentPenaltyDetails(
                                       latePaymentPenalty2Days: Option[String],
                                       latePaymentPenalty2Percentage: Option[BigDecimal],
                                       penaltyChargeCreationDate: Option[String],
-                                      communicationsDate: String,
+                                      communicationsDate: Option[String],
                                       penaltyChargeReference: Option[String],
                                       penaltyChargeDueDate: Option[String],
                                       appealInformation: Option[Seq[AppealInformation]],
@@ -75,7 +75,7 @@ object LatePaymentPenaltyDetails {
     lPP2Days                        <- (JsPath \ "LPP2Days").readNullable[String]
     lPP2Percentage                  <- (JsPath \ "LPP2Percentage").readNullable[BigDecimal]
     penaltyChargeCreationDate       <- (JsPath \ "penaltyChargeCreationDate").readNullable[String]
-    communicationsDate              <- (JsPath \ "communicationsDate").read[String]
+    communicationsDate              <- (JsPath \ "communicationsDate").readNullable[String]
     penaltyChargeReference          <- (JsPath \ "penaltyChargeReference").readNullable[String]
     penaltyChargeDueDate            <- (JsPath \ "penaltyChargeDueDate").readNullable[String]
     appealInformation               <- (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]]
@@ -226,7 +226,7 @@ case class LateSubmissionPenaltyDetails(
                                          penaltyCreationDate: String,
                                          penaltyExpiryDate: String,
                                          expiryReason: Option[ExpiryReasonUpstream],
-                                         communicationsDate: String,
+                                         communicationsDate: Option[String],
                                          lateSubmissions: Option[Seq[LateSubmissions]],
                                          appealInformation: Option[Seq[AppealInformation]],
                                          chargeReference: Option[String],
@@ -245,7 +245,7 @@ object LateSubmissionPenaltyDetails {
     penaltyCreationDate     <- (JsPath \ "penaltyCreationDate").read[String]
     penaltyExpiryDate       <- (JsPath \ "penaltyExpiryDate").read[String]
     expiryReason            <- (JsPath \ "expiryReason").readNullable[ExpiryReasonDownstream]
-    communicationsDate      <- (JsPath \ "communicationsDate").read[String]
+    communicationsDate      <- (JsPath \ "communicationsDate").readNullable[String]
     lateSubmissions         <- (JsPath \ "lateSubmissions").readNullable[Seq[LateSubmissions]]
     appealInformation       <- (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]]
     chargeReference         <- (JsPath \ "chargeReference").readNullable[String]
