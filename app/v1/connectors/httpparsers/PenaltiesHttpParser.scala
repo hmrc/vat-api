@@ -30,22 +30,22 @@ object PenaltiesHttpParser extends Logging {
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
     //TODO change content after user research
-    def errorHelper(jsonString: JsValue, status: Int): MtdError = {
+    def errorHelper(jsonString: JsValue): MtdError = {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
-        (error.code, status) match {
-          case ("INVALID_IDVALUE", _)       => PenaltiesInvalidIdValue
-          case ("NO_DATA_FOUND", _)         => PenaltiesNotDataFound
-          case ("INVALID_REGIME", _)        => DownstreamError
-          case ("INVALID_IDTYPE", _)        => DownstreamError
-          case ("INVALID_DATELIMIT", _)     => DownstreamError
-          case ("INVALID_CORRELATIONID", _) => DownstreamError
-          case ("DUPLICATE_SUBMISSION", _)  => DownstreamError
-          case ("INVALID_IDTYPE", _)        => DownstreamError
-          case ("INVALID_ID", _)            => DownstreamError
-          case ("REQUEST_NOT_PROCESSED", _) => DownstreamError
-          case ("SERVER_ERROR", _)          => DownstreamError
-          case ("SERVICE_UNAVAILABLE", _)   => DownstreamError
+        (error.code) match {
+          case ("INVALID_IDVALUE")       => PenaltiesInvalidIdValue
+          case ("NO_DATA_FOUND")         => PenaltiesNotDataFound
+          case ("INVALID_REGIME")        => DownstreamError
+          case ("INVALID_IDTYPE")        => DownstreamError
+          case ("INVALID_DATELIMIT")     => DownstreamError
+          case ("INVALID_CORRELATIONID") => DownstreamError
+          case ("DUPLICATE_SUBMISSION")  => DownstreamError
+          case ("INVALID_IDTYPE")        => DownstreamError
+          case ("INVALID_ID")            => DownstreamError
+          case ("REQUEST_NOT_PROCESSED") => DownstreamError
+          case ("SERVER_ERROR")          => DownstreamError
+          case ("SERVICE_UNAVAILABLE")   => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
@@ -71,7 +71,7 @@ object PenaltiesHttpParser extends Logging {
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case status =>
-          val mtdErrors = errorHelper(response.json, status)
+          val mtdErrors = errorHelper(response.json)
           logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors}")
           Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
