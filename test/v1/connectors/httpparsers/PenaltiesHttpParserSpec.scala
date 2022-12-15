@@ -175,35 +175,35 @@ class PenaltiesHttpParserSpec extends UnitSpec {
         }
       }
       "errorHelper" must{
-//        "return 500 when multiple errors occur including a 500" in{
-//
-//          val status = Status.BAD_REQUEST
-//
-//          val error = Json.parse(
-//            """
-//              |{
-//              |"failures": [{
-//              |"code":"INVALID_REGIME",
-//              |"reason":"Something went wrong"
-//              |},
-//              |{
-//              |"code":"INVALID_IDVALUE",
-//              |"reason":"Submission has not passed validation. Invalid parameter idNumber."
-//              |}]
-//              |}
-//              |""".stripMargin)
-//
-//          val result = PenaltiesHttpReads.read("", "",
-//            HttpResponse(
-//              status = status,
-//              json = error,
-//              headers = Map(
-//                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-//              )
-//            )
-//          )
-//          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INTERNAL_SERVICE_ERROR", "Something went wrong")))
-//        }
+        "return 500 when multiple errors occur including a 500" in{
+
+          val status = Status.BAD_REQUEST
+
+          val error = Json.parse(
+            """
+              |{
+              |"failures": [{
+              |"code":"INVALID_REGIME",
+              |"reason":"Something went wrong"
+              |},
+              |{
+              |"code":"INVALID_IDVALUE",
+              |"reason":"Submission has not passed validation. Invalid parameter idNumber."
+              |}]
+              |}
+              |""".stripMargin)
+
+          val result = PenaltiesHttpReads.read("", "",
+            HttpResponse(
+              status = status,
+              json = error,
+              headers = Map(
+                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+              )
+            )
+          )
+          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INTERNAL_SERVICE_ERROR", "Something went wrong")))
+        }
       }
     }
   }
