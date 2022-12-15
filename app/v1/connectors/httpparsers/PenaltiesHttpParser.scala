@@ -34,18 +34,18 @@ object PenaltiesHttpParser extends Logging {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code, status) match {
-          case ("INVALID_IDVALUE", _) => PenaltiesInvalidIdValue
-          case ("NO_DATA_FOUND", _) => PenaltiesNotDataFound
-          case ("INVALID_REGIME", _) => DownstreamError
-          case ("INVALID_IDTYPE", _) => DownstreamError
-          case ("INVALID_DATELIMIT", _) => DownstreamError
+          case ("INVALID_IDVALUE", _)       => PenaltiesInvalidIdValue
+          case ("NO_DATA_FOUND", _)         => PenaltiesNotDataFound
+          case ("INVALID_REGIME", _)        => DownstreamError
+          case ("INVALID_IDTYPE", _)        => DownstreamError
+          case ("INVALID_DATELIMIT", _)     => DownstreamError
           case ("INVALID_CORRELATIONID", _) => DownstreamError
-          case ("DUPLICATE_SUBMISSION", _) => DownstreamError
-          case ("INVALID_IDTYPE", _) => DownstreamError
-          case ("INVALID_ID", _) => DownstreamError
+          case ("DUPLICATE_SUBMISSION", _)  => DownstreamError
+          case ("INVALID_IDTYPE", _)        => DownstreamError
+          case ("INVALID_ID", _)            => DownstreamError
           case ("REQUEST_NOT_PROCESSED", _) => DownstreamError
-          case ("SERVER_ERROR", _) => DownstreamError
-          case ("SERVICE_UNAVAILABLE", _) => DownstreamError
+          case ("SERVER_ERROR", _)          => DownstreamError
+          case ("SERVICE_UNAVAILABLE", _)   => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
