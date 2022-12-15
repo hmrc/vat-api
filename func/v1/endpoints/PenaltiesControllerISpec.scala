@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.PenaltiesConstants
-import v1.models.errors.{MtdError, PenaltiesNotDataFound, VrnFormatError}
+import v1.models.errors.{DownstreamError, MtdError, PenaltiesNotDataFound, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class PenaltiesControllerISpec extends IntegrationBaseSpec {
@@ -120,7 +120,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
 
             val response: WSResponse = await(request.get())
             response.status shouldBe INTERNAL_SERVER_ERROR
-            response.json shouldBe Json.toJson(MtdError("INVALID_CORRELATIONID","Some Reason"))
+            response.json shouldBe Json.toJson(DownstreamError)
             response.header("Content-Type") shouldBe Some("application/json")
           }
 
@@ -141,23 +141,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
                 |}
                 |""".stripMargin)
 
-            val expectedJson: JsValue = Json.parse(
-              """
-                |{
-                |"code":"INVALID_REQUEST",
-                |"message":"Invalid request penalties",
-                |"errors": [{
-                | "code":"INVALID_CORRELATIONID",
-                | "message":"Some Reason"
-                |},
-                |{
-                | "code":"INVALID_DATELIMIT",
-                | "message":"Some Reason"
-                |}
-                |]
-                |}
-                |""".stripMargin
-            )
+            val expectedJson: JsValue = Json.toJson(DownstreamError)
 
             override def setupStubs(): StubMapping = {
               AuditStub.audit()

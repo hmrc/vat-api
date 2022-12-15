@@ -101,29 +101,36 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             val errorBody: JsValue = Json.parse(
               """
                 |{
-                |"failures": [{
-                | "code":"INVALID_IDNUMBER",
-                | "reason":"Some Reason"
-                |},
-                |{
-                | "code":"INVALID_DATE_TO",
-                | "reason":"Some Reason"
-                |}]
+                |  "failures": [
+                |    {
+                |      "code":"INVALID_IDNUMBER",
+                |      "reason":"Some reason"
+                |    },
+                |    {
+                |      "code":"INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER",
+                |      "reason":"Some reason"
+                |    }
+                |  ]
                 |}
                 |""".stripMargin)
 
             val expectedJson: JsValue = Json.parse(
               """
                 |{
-                | "code":"VRN_INVALID",
-                | "message":"The provided Vrn is invalid",
-                | "errors": [{
-                | "code":"INVALID_DATE_TO",
-                | "message": "Some Reason"
-                | }]
-                |
+                | "code":"INVALID_REQUEST",
+                | "message":"???",
+                | "errors": [
+                |   {
+                |     "code":"VRN_INVALID",
+                |     "message": "The provided Vrn is invalid"
+                |   },
+                |   {
+                |     "code":"CHARGE_REFERENCE_INVALID",
+                |     "message": "The provided chargeReference is invalid"
+                |   }
+                | ]
                 |}
-                |""".stripMargin
+                |""".stripMargin // not sure what will come out in the message for INVALID_REQUEST
             )
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
