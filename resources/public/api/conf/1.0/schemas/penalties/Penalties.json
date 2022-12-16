@@ -77,9 +77,9 @@
               "multipleOf": 1
             },
             "penaltyChargeAmount": {
-              "description": "Amount charged per penalty, after the threshold has been reached. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
+              "description": "The total late submission penalty charge amount. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.",
               "type": "number",
-              "example": "200",
+              "example": "400",
               "minimum": -9999999999999.99,
               "maximum": 9999999999999.99,
               "multipleOf": 0.01
@@ -101,12 +101,12 @@
             "type": "object",
             "properties": {
               "penaltyNumber": {
-                "description": "The identification number of the penalty.",
+                "description": "The unique identification number for the penalty.",
                 "type": "string",
                 "example": "12345678901234"
               },
               "penaltyOrder": {
-                "description": "Used to sort penalties in order of the date upon which the individual or organisation received them.",
+                "description": "The position that the penalty currently occupies within the individual's or organisation's point balance.",
                 "type": "string",
                 "example": "01"
               },
@@ -172,7 +172,7 @@
                   "type": "object",
                   "properties": {
                     "lateSubmissionID": {
-                      "description": "The identification number of the late submission penalty..",
+                      "description": "The unique identification number for the late submission penalty.",
                       "type": "string",
                       "example": "001"
                     },
@@ -281,7 +281,7 @@
             "type": "object",
             "properties": {
               "principalChargeReference": {
-                "description": "The reference for the principal charge upon which the late payment penalty is based. This is the original charge that was not paid on time.",
+                "description": "The reference for the principal charge upon which the late payment penalty is based. This is the original charge that was not paid on time (typically the VAT return charge reference).",
                 "type": "string",
                 "example": "XV123451234512"
               },
@@ -420,7 +420,7 @@
                 }
               },
               "principalChargeDocNumber": {
-                "description": "Document number relating to the VAT charge",
+                "description": "Document number relating to the VAT charge.",
                 "type": "string",
                 "example": "123456789012"
               },
@@ -437,22 +437,22 @@
               "principalChargeBillingFrom": {
                 "description": "The start date of the obligation period.",
                 "type": "string",
-                "example": ""
+                "example": "2024-01-01"
               },
               "principalChargeBillingTo": {
                 "description": "The end date of the obligation period.",
                 "type": "string",
-                "example": ""
+                "example": "2024-03-31"
               },
               "principalChargeDueDate": {
                 "description": "The date that the principal charge should have been paid by.",
                 "type": "string",
-                "example": ""
+                "example": "2024-05-07"
               },
               "principalChargeLatestClearing": {
                 "description": "The date that the principal charge was paid.",
                 "type": "string",
-                "example": ""
+                "example": "2024-07-31"
               },
               "timeToPay": {
                 "description": "Details of the Time to Pay arrangement that has been made.",
@@ -463,12 +463,12 @@
                     "timeToPayStartDate": {
                       "description": "This is the start date of the agreed time to pay the charge.",
                       "type": "string",
-                      "example": ""
+                      "example": "2024-07-06"
                     },
                     "timeToPayEndDate": {
                       "description": "This is the last date of the agreed time to pay the charge.",
                       "type": "string",
-                      "example": ""
+                      "example": "2024-07-11"
                     }
                   }
                 }

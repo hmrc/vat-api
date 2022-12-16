@@ -11,7 +11,7 @@
             "inactivePenaltyPoints": 1,
             "periodOfComplianceAchievement": "2025-05-01",
             "regimeThreshold": 4,
-            "penaltyChargeAmount": 200
+            "penaltyChargeAmount": 400
         },
         "details": [
            {
