@@ -121,11 +121,6 @@
                   "type": "string",
                   "example": "2022-08-16"
                 },
-                "periodKey": {
-                  "description": "A four-digit reference containing characters and numbers that identify a specific period of the due date.",
-                  "type": "string",
-                  "example": "13RL"
-                },
                 "netDueDate": {
                   "description": "The due date for payment.",
                   "type": "string",
@@ -140,11 +135,6 @@
                   "description": "Details of the interest that relates to the line item.",
                   "type": "object",
                   "properties": {
-                    "interestKey": {
-                      "description": "A specific line item that has been locked, rather than the entirety of the document. A two-digit reference to identify the interest key.",
-                      "type": "string",
-                      "example": "01"
-                    },
                     "interestStartDate": {
                       "description": "The date that the interest charges started.",
                       "type": "string",
