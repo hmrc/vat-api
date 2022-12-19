@@ -161,7 +161,7 @@
                 ]
               },
               "communicationsDate": {
-                "description": "The date upon which a letter about the penalty was sent to the user.",
+                "description": "The date when a letter about the penalty was sent to the customer.",
                 "type": "string",
                 "example": "2022-07-01"
               },
@@ -262,7 +262,7 @@
                 "example": "2022-07-31"
               }
             },
-            "required": ["penaltyNumber", "penaltyOrder", "penaltyCategory", "penaltyStatus", "penaltyCreationDate", "penaltyExpiryDate", "communicationsDate"],
+            "required": ["penaltyNumber", "penaltyOrder", "penaltyCategory", "penaltyStatus", "penaltyCreationDate", "penaltyExpiryDate"],
             "additionalProperties": false
           }
         }
@@ -480,7 +480,6 @@
               "penaltyStatus",
               "penaltyAmountAccruing",
               "penaltyAmountPosted",
-              "communicationsDate",
               "principalChargeDocNumber",
               "principalChargeMainTransaction",
               "principalChargeSubTransaction",
