@@ -91,8 +91,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
-      case PenaltiesInvalidIdValue |
-           MtdError("INVALID_REQUEST", _, _) => BadRequest(Json.toJson(errorWrapper))
+      case PenaltiesInvalidIdValue => BadRequest(Json.toJson(errorWrapper))
       case PenaltiesNotDataFound => NotFound(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }

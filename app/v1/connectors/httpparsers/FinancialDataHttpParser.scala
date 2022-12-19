@@ -17,7 +17,7 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.Logging
 import v1.connectors.Outcome
@@ -30,20 +30,55 @@ object FinancialDataHttpParser extends Logging {
   implicit object FinancialDataHttpReads extends HttpReads[Outcome[FinancialDataResponse]] with HttpParser {
 
     //TODO change content after user research
-    def errorHelper(jsonString: JsValue, status: Int): (MtdError, Option[List[MtdError]]) = {
+    def errorHelper(jsonString: JsValue): MtdError = {
       val financialDataErrors = jsonString.as[FinancialDataErrors]
-      val mtdErrorsConvert = financialDataErrors.failures.map{ error =>
-        (error.code, status) match {
-          case ("INVALID_IDNUMBER", BAD_REQUEST)      => FinancialInvalidIdNumber
-          case ("INVALID_SEARCH_ITEM", BAD_REQUEST)   => FinancialInvalidSearchItem
-          case ("NO_DATA_FOUND", NOT_FOUND)           => FinancialNotDataFound
+      val mtdErrorsConvert = financialDataErrors.failures.map { error =>
+        (error.code) match {
+          case ("INVALID_IDNUMBER")                              => FinancialInvalidIdNumber
+          case ("INVALID_SEARCH_ITEM")                           => FinancialInvalidSearchItem
+          case ("NO_DATA_FOUND")                                 => FinancialNotDataFound
+          case ("INVALID_CORRELATIONID")                         => DownstreamError
+          case ("INVALID_IDTYPE")                                => DownstreamError
+          case ("INVALID_REGIME_TYPE")                           => DownstreamError
+          case ("INVALID_SEARCH_TYPE")                           => DownstreamError
+          case ("INVALID_SEARCH_ITEM")                           => DownstreamError
+          case ("INVALID_DATE_FROM")                             => DownstreamError
+          case ("INVALID_DATE_TO")                               => DownstreamError
+          case ("INVALID_DATE_TYPE")                             => DownstreamError
+          case ("INVALID_DATE_RANGE")                            => DownstreamError
+          case ("INVALID_INCLUDE_CLEARED_ITEMS")                 => DownstreamError
+          case ("INVALID_INCLUDE_STATISTICAL_ITEMS")             => DownstreamError
+          case ("INVALID_INCLUDE_PAYMENT_ON_ACCOUNT")            => DownstreamError
+          case ("INVALID_ADD_REGIME_TOTALISATION")               => DownstreamError
+          case ("INVALID_ADD_LOCK_INFORMATION")                  => DownstreamError
+          case ("INVALID_ADD_PENALTY_DETAILS")                   => DownstreamError
+          case ("INVALID_ADD_POSTED_INTEREST_DETAILS")           => DownstreamError
+          case ("INVALID_ADD_ACCRUING_INTEREST_DETAILS")         => DownstreamError
+          case ("INVALID_REQUEST")                               => DownstreamError
+          case ("INVALID_TARGETED_SEARCH")                       => DownstreamError
+          case ("INVALID_SELECTION_CRITERIA")                    => DownstreamError
+          case ("INVALID_DATA_ENRICHMENT")                       => DownstreamError
+          case ("DUPLICATE_SUBMISSION")                          => DownstreamError
+          case ("INVALID_ID")                                    => DownstreamError
+          case ("INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER") => FinancialInvalidSearchItem
+          case ("REQUEST_NOT_PROCESSED")                         => DownstreamError
+          case ("INVALID_DATA_TYPE")                             => DownstreamError
+          case ("INVALID_DATE_RANGE")                            => DownstreamError
+          case ("SERVER_ERROR")                                  => DownstreamError
+          case ("SERVICE_UNAVAILABLE")                           => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
 
       val head = mtdErrorsConvert.head
-      val tail = if(mtdErrorsConvert.tail.isEmpty) None else Some(mtdErrorsConvert.tail)
-      (head, tail)
+      val error = if (mtdErrorsConvert.tail.isEmpty) {
+        head
+      } else if (mtdErrorsConvert.contains(DownstreamError)) {
+        DownstreamError
+      } else {
+        MtdError("INVALID_REQUEST", "Invalid request financial details", Some(Json.toJson(mtdErrorsConvert)))
+      }
+      error
     }
 
     //TODO more error handling can be added once scenarios confirmed by Penalties team
@@ -57,9 +92,9 @@ object FinancialDataHttpParser extends Logging {
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case status =>
-          val mtdErrors = errorHelper(response.json, status)
-          logger.error(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors._1} ${mtdErrors._2}")
-          Left(ErrorWrapper(responseCorrelationId, mtdErrors._1, mtdErrors._2))
+          val mtdErrors = errorHelper(response.json)
+          logger.error(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")
+          Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
     }
   }

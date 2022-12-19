@@ -30,12 +30,22 @@ object PenaltiesHttpParser extends Logging {
   implicit object PenaltiesHttpReads extends HttpReads[Outcome[PenaltiesResponse]] with HttpParser {
 
     //TODO change content after user research
-    def errorHelper(jsonString: JsValue, status: Int): MtdError = {
+    def errorHelper(jsonString: JsValue): MtdError = {
       val penaltiesErrors = jsonString.as[PenaltiesErrors]
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
-        (error.code, status) match {
-          case ("INVALID_IDVALUE", BAD_REQUEST) => PenaltiesInvalidIdValue
-          case ("NO_DATA_FOUND", NOT_FOUND) => PenaltiesNotDataFound
+        (error.code) match {
+          case ("INVALID_IDVALUE")       => PenaltiesInvalidIdValue
+          case ("NO_DATA_FOUND")         => PenaltiesNotDataFound
+          case ("INVALID_REGIME")        => DownstreamError
+          case ("INVALID_IDTYPE")        => DownstreamError
+          case ("INVALID_DATELIMIT")     => DownstreamError
+          case ("INVALID_CORRELATIONID") => DownstreamError
+          case ("DUPLICATE_SUBMISSION")  => DownstreamError
+          case ("INVALID_IDTYPE")        => DownstreamError
+          case ("INVALID_ID")            => DownstreamError
+          case ("REQUEST_NOT_PROCESSED") => DownstreamError
+          case ("SERVER_ERROR")          => DownstreamError
+          case ("SERVICE_UNAVAILABLE")   => DownstreamError
           case _ => MtdError(error.code, error.reason)
         }
       }
@@ -43,6 +53,8 @@ object PenaltiesHttpParser extends Logging {
       val head = mtdErrorsConvert.head
       val error = if(mtdErrorsConvert.tail.isEmpty) {
         head
+      } else if(mtdErrorsConvert.contains(DownstreamError)) {
+        DownstreamError
       } else {
         MtdError("INVALID_REQUEST", "Invalid request penalties", Some(Json.toJson(mtdErrorsConvert)))
       }
@@ -59,7 +71,7 @@ object PenaltiesHttpParser extends Logging {
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case status =>
-          val mtdErrors = errorHelper(response.json, status)
+          val mtdErrors = errorHelper(response.json)
           logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors}")
           Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
