@@ -200,11 +200,9 @@ object FinancialDataConstants {
         |          "chargeDescription": "IN1",
         |          "periodFromDate": "2022-03-01",
         |          "periodToDate": "2022-03-01",
-        |          "periodKey": "13RL",
         |          "netDueDate": "2022-03-01",
         |          "amount": 123.45,
         |          "lineItemInterestDetails": {
-        |            "interestKey": "01",
         |            "interestStartDate": "2022-03-01",
         |            "currentInterestRate": 2,
         |            "interestPostedAmount": 123,
@@ -220,7 +218,6 @@ object FinancialDataConstants {
   }
 
   val testLineItemInterestDetails: LineItemInterestDetails = LineItemInterestDetails(
-    interestKey = Some("01"),
     currentInterestRate = Some(2),
     interestPostedAmount = Some(123),
     interestAccruingAmount = Some(123),
@@ -231,7 +228,6 @@ object FinancialDataConstants {
     chargeDescription = Some("IN1"),
     periodFromDate = Some("2022-03-01"),
     periodToDate = Some("2022-03-01"),
-    periodKey = Some("13RL"),
     netDueDate = Some("2022-03-01"),
     amount = Some(123.45),
     lineItemInterestDetails = Some(testLineItemInterestDetails)

@@ -20,8 +20,7 @@ import play.api.libs.json._
 import v1.models.errors.MtdError
 import play.api.libs.functional.syntax._
 
-case class LineItemInterestDetails(interestKey: Option[String],
-                                   currentInterestRate: Option[BigDecimal],
+case class LineItemInterestDetails(currentInterestRate: Option[BigDecimal],
                                    interestPostedAmount: Option[BigDecimal],
                                    interestAccruingAmount: Option[BigDecimal],
                                    interestStartDate: Option[String])
@@ -34,7 +33,6 @@ case class LineItemDetail(
                           chargeDescription: Option[String],
                           periodFromDate: Option[String],
                           periodToDate: Option[String],
-                          periodKey: Option[String],
                           netDueDate: Option[String],
                           amount: Option[BigDecimal],
                           lineItemInterestDetails: Option[LineItemInterestDetails])
