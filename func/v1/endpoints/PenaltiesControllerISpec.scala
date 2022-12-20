@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.PenaltiesConstants
-import v1.models.errors.{MtdError, PenaltiesNotDataFound, VrnFormatError}
+import v1.models.errors.{DownstreamError, MtdError, PenaltiesInvalidIdValue, PenaltiesNotDataFound, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class PenaltiesControllerISpec extends IntegrationBaseSpec {
@@ -99,65 +99,20 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
         }
 
         "VRN is invalid" must {
-
-          "return 400" in new Test {
-
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |"failures": [{
-                | "code":"INVALID_CORRELATIONID",
-                | "reason":"Some Reason"
-                |}]
-                |}
-                |""".stripMargin)
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe INTERNAL_SERVER_ERROR
-            response.json shouldBe Json.toJson(MtdError("INVALID_CORRELATIONID","Some Reason"))
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
-
-          "return multiple 400 errors" in new Test {
+          "return 400 error" in new Test {
 
             val errorBody: JsValue = Json.parse(
               """
                 |{
                 |"failures": [{
-                | "code":"INVALID_CORRELATIONID",
-                | "reason":"Some Reason"
-                |},
-                |{
-                | "code":"INVALID_DATELIMIT",
+                | "code":"INVALID_IDVALUE",
                 | "reason":"Some Reason"
                 |}
                 |]
                 |}
                 |""".stripMargin)
 
-            val expectedJson: JsValue = Json.parse(
-              """
-                |{
-                |"code":"INVALID_REQUEST",
-                |"message":"Invalid request penalties",
-                |"errors": [{
-                | "code":"INVALID_CORRELATIONID",
-                | "message":"Some Reason"
-                |},
-                |{
-                | "code":"INVALID_DATELIMIT",
-                | "message":"Some Reason"
-                |}
-                |]
-                |}
-                |""".stripMargin
-            )
+            val expectedJson: JsValue = Json.toJson(PenaltiesInvalidIdValue)
 
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
@@ -222,6 +177,39 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             val response: WSResponse = await(request.get())
             response.status shouldBe INTERNAL_SERVER_ERROR
             response.json shouldBe Json.toJson(MtdError("REASON", "Some Reason"))
+            response.header("Content-Type") shouldBe Some("application/json")
+          }
+
+          "multiple errors return 500" in new Test {
+
+            val errorBody: JsValue = Json.parse(
+              """
+                |{
+                |"failures": [{
+                | "code":"REASON",
+                | "reason":"Some Reason"
+                |},
+                |{
+                |"code":"INVALID_IDVALUE",
+                | "reason":"Some Reason"
+                |}
+                |]
+                |}
+                |""".stripMargin)
+
+            override def setupStubs(): StubMapping = {
+              AuditStub.audit()
+              AuthStub.authorised()
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+            }
+
+            val response: WSResponse = await(request.get())
+            response.status shouldBe INTERNAL_SERVER_ERROR
+            response.json shouldBe Json.toJson(MtdError("INVALID_REQUEST", "Invalid request penalties",
+              Some(Json.toJson(Seq(
+                MtdError("REASON", "Some Reason"),
+                MtdError("VRN_INVALID", "The provided VRN is invalid.")
+              )))))
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }

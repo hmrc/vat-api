@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators
 
-import v1.controllers.requestParsers.validators.validations.VrnValidation
+import v1.controllers.requestParsers.validators.validations.{ChargeReferenceValidation, VrnValidation}
 import v1.models.errors.MtdError
 import v1.models.request.penalties.{FinancialRawData, PenaltiesRawData}
 
@@ -29,7 +29,8 @@ class FinancialDataValidator extends Validator[FinancialRawData] {
   private def vrnFormatValidation: FinancialRawData => List[List[MtdError]] = {
     (data: FinancialRawData) => {
       List(
-        VrnValidation.validate(data.vrn)
+        VrnValidation.validate(data.vrn),
+        ChargeReferenceValidation.validate(data.searchItem)
       )
     }
   }

@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.FinancialDataConstants
-import v1.models.errors.{FinancialInvalidIdNumber, FinancialNotDataFound, MtdError, VrnFormatError}
+import v1.models.errors.{DownstreamError, FinancialInvalidIdNumber, FinancialInvalidSearchItem, FinancialNotDataFound, MtdError, VrnFormatError}
 import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
 
 class FinancialDataControllerISpec extends IntegrationBaseSpec {
@@ -101,30 +101,25 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             val errorBody: JsValue = Json.parse(
               """
                 |{
-                |"failures": [{
-                | "code":"INVALID_IDNUMBER",
-                | "reason":"Some Reason"
-                |},
-                |{
-                | "code":"INVALID_DATE_TO",
-                | "reason":"Some Reason"
-                |}]
+                |  "failures": [
+                |    {
+                |      "code":"INVALID_IDNUMBER",
+                |      "reason":"Some reason"
+                |    },
+                |    {
+                |      "code":"INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER",
+                |      "reason":"Some reason"
+                |    }
+                |  ]
                 |}
                 |""".stripMargin)
 
-            val expectedJson: JsValue = Json.parse(
-              """
-                |{
-                | "code":"VRN_INVALID",
-                | "message":"The provided Vrn is invalid",
-                | "errors": [{
-                | "code":"INVALID_DATE_TO",
-                | "message": "Some Reason"
-                | }]
-                |
-                |}
-                |""".stripMargin
-            )
+            val expectedJson: JsValue = Json.toJson(MtdError("INVALID_REQUEST", "Invalid request financial details",
+              Some(Json.toJson(Seq(
+                FinancialInvalidIdNumber,
+                FinancialInvalidSearchItem
+              )))))
+
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()

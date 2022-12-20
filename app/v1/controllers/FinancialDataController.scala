@@ -93,7 +93,8 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError |
            FinancialInvalidIdNumber |
-           FinancialInvalidSearchItem => BadRequest(Json.toJson(errorWrapper))
+           FinancialInvalidSearchItem |
+           MtdError("INVALID_REQUEST", _, _) => BadRequest(Json.toJson(errorWrapper))
       case FinancialNotDataFound => NotFound(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }
