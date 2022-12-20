@@ -149,7 +149,7 @@ object PenaltiesConstants {
 
   val testLateSubmissionPenalty: LateSubmissionPenalty = LateSubmissionPenalty(
     summary = LateSubmissionPenaltySummary(
-      activePoints = 2,
+      activePenaltyPoints = 2,
       inactivePenaltyPoints = 2,
       periodOfComplianceAchievement = "2022-10-11",
       regimeThreshold = 2,
@@ -471,7 +471,7 @@ object PenaltiesConstants {
   )
 
   val upstreamTestLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
-    "activePoints" -> 2,
+    "activePenaltyPoints" -> 2,
     "inactivePenaltyPoints" -> 2,
     "periodOfComplianceAchievement" -> "2022-10-11",
     "regimeThreshold" -> 2,
