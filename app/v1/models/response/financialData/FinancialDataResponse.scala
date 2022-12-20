@@ -81,33 +81,33 @@ object AdditionalReceivableTotalisations {
 
 }
 
-case class Totalisation(totalOverdue: Option[BigDecimal],
+case class Totalisations(totalOverdue: Option[BigDecimal],
                         totalNotYetDue: Option[BigDecimal],
                         totalBalance: Option[BigDecimal],
                         totalCredit: Option[BigDecimal],
                         totalCleared: Option[BigDecimal],
                         additionalReceivableTotalisations: Option[AdditionalReceivableTotalisations])
 
-object Totalisation {
-  implicit val reads: Reads[Totalisation] = (
+object Totalisations {
+  implicit val reads: Reads[Totalisations] = (
     (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalOverdue").readNullable[BigDecimal] and
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalNotYetDue").readNullable[BigDecimal] and
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalBalance").readNullable[BigDecimal] and
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalCredit").readNullable[BigDecimal] and
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalCleared").readNullable[BigDecimal] and
       (JsPath \ "additionalReceivableTotalisations").readNullable[AdditionalReceivableTotalisations]
-    )(Totalisation.apply _)
+    )(Totalisations.apply _)
 
-  implicit val writes: OWrites[Totalisation] = Json.writes[Totalisation]
+  implicit val writes: OWrites[Totalisations] = Json.writes[Totalisations]
 }
 
 
-case class FinancialDataResponse(totalisation: Option[Totalisation],
+case class FinancialDataResponse(totalisations: Option[Totalisations],
                                  documentDetails: Option[Seq[DocumentDetail]])
 
 object FinancialDataResponse {
   implicit val reads: Reads[FinancialDataResponse] = (
-    (JsPath \ "getFinancialData" \ "financialDetails" \ "totalisation").readNullable[Totalisation] and
+    (JsPath \ "getFinancialData" \ "financialDetails" \ "totalisation").readNullable[Totalisations] and
       (JsPath \ "getFinancialData" \ "financialDetails" \ "documentDetails").readNullable[Seq[DocumentDetail]]
     )(FinancialDataResponse.apply _)
 

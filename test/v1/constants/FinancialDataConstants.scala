@@ -173,7 +173,7 @@ object FinancialDataConstants {
   val testUpstreamFinancialDetails: JsValue = {
     Json.parse(
       """{
-        |  "totalisation": {
+        |  "totalisations": {
         |    "totalOverdue": 123.45,
         |    "totalNotYetDue": 12.34,
         |    "totalBalance": 12.45,
@@ -258,7 +258,7 @@ object FinancialDataConstants {
     totalAccountAccruingInterest = Some(100)
   )
 
-  val testTotalisation: Totalisation = Totalisation(
+  val testTotalisation: Totalisations = Totalisations(
     totalOverdue = Some(123.45),
     totalNotYetDue = Some(12.34),
     totalBalance = Some(12.45),
