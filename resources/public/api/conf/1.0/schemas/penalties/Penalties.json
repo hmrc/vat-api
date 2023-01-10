@@ -424,16 +424,6 @@
                 "type": "string",
                 "example": "123456789012"
               },
-              "principalChargeMainTransaction": {
-                "description": "Used to identify the type of charge.",
-                "type": "string",
-                "example": ""
-              },
-              "principalChargeSubTransaction": {
-                "description": "Used to identify the type of charge that the penalty was applied to.",
-                "type": "string",
-                "example": ""
-              },
               "principalChargeBillingFrom": {
                 "description": "The start date of the obligation period.",
                 "type": "string",
@@ -481,8 +471,6 @@
               "penaltyAmountAccruing",
               "penaltyAmountPosted",
               "principalChargeDocNumber",
-              "principalChargeMainTransaction",
-              "principalChargeSubTransaction",
               "principalChargeBillingFrom",
               "principalChargeBillingTo",
               "principalChargeDueDate"
