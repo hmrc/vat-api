@@ -8,6 +8,10 @@
     </thead>
     <tbody>
         <tr>
+            <td><p>Default (no header value)</p></td>
+            <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+        </tr>
+        <tr>
             <td><p>SINGLE_LIABILITY</p></td>
             <td><p>Returns a single valid liability when used with dates from 2017-01-02 and to 2017-02-02.</p></td>
         </tr>
