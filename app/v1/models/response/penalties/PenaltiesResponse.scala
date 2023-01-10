@@ -49,8 +49,6 @@ case class LatePaymentPenaltyDetails(
                                       penaltyChargeDueDate: Option[String],
                                       appealInformation: Option[Seq[AppealInformation]],
                                       principalChargeDocNumber: String,
-                                      principalChargeMainTransaction: String,
-                                      principalChargeSubTransaction: String,
                                       principalChargeBillingFrom: String,
                                       principalChargeBillingTo: String,
                                       principalChargeDueDate: String,
@@ -80,8 +78,6 @@ object LatePaymentPenaltyDetails {
     penaltyChargeDueDate            <- (JsPath \ "penaltyChargeDueDate").readNullable[String]
     appealInformation               <- (JsPath \ "appealInformation").readNullable[Seq[AppealInformation]]
     principalChargeDocNumber        <- (JsPath \ "principalChargeDocNumber").read[String]
-    principalChargeMainTransaction  <- (JsPath \ "principalChargeMainTransaction").read[String]
-    principalChargeSubTransaction   <- (JsPath \ "principalChargeSubTransaction").read[String]
     principalChargeBillingFrom      <- (JsPath \ "principalChargeBillingFrom").read[String]
     principalChargeBillingTo        <- (JsPath \ "principalChargeBillingTo").read[String]
     principalChargeDueDate          <- (JsPath \ "principalChargeDueDate").read[String]
@@ -108,8 +104,6 @@ object LatePaymentPenaltyDetails {
       penaltyChargeDueDate = penaltyChargeDueDate,
       appealInformation = appealInformation,
       principalChargeDocNumber = principalChargeDocNumber,
-      principalChargeMainTransaction = principalChargeMainTransaction,
-      principalChargeSubTransaction = principalChargeSubTransaction,
       principalChargeBillingFrom = principalChargeBillingFrom,
       principalChargeBillingTo = principalChargeBillingTo,
       principalChargeDueDate = principalChargeDueDate,
@@ -141,8 +135,6 @@ object LatePaymentPenaltyDetails {
           "penaltyChargeDueDate" -> Json.toJson(o.penaltyChargeDueDate),
           "appealInformation" -> Json.toJson(o.appealInformation),
           "principalChargeDocNumber" -> Json.toJson(o.principalChargeDocNumber),
-          "principalChargeMainTransaction" -> Json.toJson(o.principalChargeMainTransaction),
-          "principalChargeSubTransaction" -> Json.toJson(o.principalChargeSubTransaction),
           "principalChargeBillingFrom" -> Json.toJson(o.principalChargeBillingFrom),
           "principalChargeBillingTo" -> Json.toJson(o.principalChargeBillingTo),
           "principalChargeDueDate" -> Json.toJson(o.principalChargeDueDate),

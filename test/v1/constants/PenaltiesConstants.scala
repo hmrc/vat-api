@@ -132,8 +132,6 @@ object PenaltiesConstants {
         )
       )),
       principalChargeDocNumber = "123",
-      principalChargeMainTransaction = "123",
-      principalChargeSubTransaction = "123",
       principalChargeBillingFrom = "2022-10-11",
       principalChargeBillingTo = "2022-10-11",
       principalChargeDueDate = "2022-10-11",
@@ -406,8 +404,6 @@ object PenaltiesConstants {
         |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",
-        |    "principalChargeMainTransaction": "123",
-        |    "principalChargeSubTransaction": "123",
         |    "principalChargeBillingFrom": "2022-10-11",
         |    "principalChargeBillingTo": "2022-10-11",
         |    "principalChargeDueDate": "2022-10-11",
@@ -440,8 +436,6 @@ object PenaltiesConstants {
         |        "appealLevel": "statutory-review"
         |      }],
         |    "principalChargeDocNumber": "123",
-        |    "principalChargeMainTransaction": "123",
-        |    "principalChargeSubTransaction": "123",
         |    "principalChargeBillingFrom": "2022-10-11",
         |    "principalChargeBillingTo": "2022-10-11",
         |    "principalChargeDueDate": "2022-10-11",
