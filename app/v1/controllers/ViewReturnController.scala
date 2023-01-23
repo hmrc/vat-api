@@ -50,7 +50,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
     authorisedAction(vrn).async { implicit request =>
 
       implicit val correlationId: String = idGenerator.getUid
-      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+      infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieve VAT returns for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: ViewRawData =
@@ -64,7 +64,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
           serviceResponse <- EitherT(service.viewReturn(parsedRequest))
         } yield {
-          logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+          infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
             s"Successfully retrieved Vat Return from DES with correlationId : ${serviceResponse.correlationId}")
 
           auditService.auditEvent(AuditEvents.auditReturns(serviceResponse.correlationId,
@@ -77,7 +77,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val resCorrelationId: String = errorWrapper.correlationId
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-        logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
+        warnLog(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
         auditService.auditEvent(AuditEvents.auditReturns(resCorrelationId,
           request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))

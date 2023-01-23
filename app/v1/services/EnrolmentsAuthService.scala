@@ -18,6 +18,7 @@ package v1.services
 
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsResultException
+import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -39,14 +40,15 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
     override def authConnector: AuthConnector = connector
   }
 
-  def authorised(predicate: Predicate, nrsRequired: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
+  def authorised(predicate: Predicate, nrsRequired: Boolean = false)
+                (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[AuthOutcome] = {
     if(!nrsRequired){
       authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
         case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
         case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
         case Some(Agent) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Agent", enrolments)
         case affinityGroup =>
-          logger.warn(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group. $affinityGroup")
+          warnLog(s"[AuthorisationService] [authoriseAsClient] Authorisation failed due to unsupported affinity group. $affinityGroup")
           Future.successful(Left(LegacyUnauthorisedError))
       }recoverWith unauthorisedError
     } else {
@@ -78,7 +80,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
 
           createUserDetailsWithLogging(affinityGroup = affGroup.get.toString, enrolments, Some(identityData))
         case affinityGroup =>
-          logger.warn(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group. $affinityGroup")
+          warnLog(s"[EnrolmentsAuthService] [authorised with nrsRequired = true] Authorisation failed due to unsupported affinity group. $affinityGroup")
           Future.successful(Left(LegacyUnauthorisedError))
 
       }recoverWith unauthorisedError
@@ -118,18 +120,18 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
     .flatMap(_.getIdentifier("AgentReferenceNumber"))
     .map(_.value)
 
-  private def unauthorisedError: PartialFunction[Throwable, Future[AuthOutcome]] = {
+  private def unauthorisedError(implicit request: Request[_]): PartialFunction[Throwable, Future[AuthOutcome]] = {
     case _: InsufficientEnrolments =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
+      warnLog(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient enrolments.")
       Future.successful(Left(LegacyUnauthorisedError))
     case _: InsufficientConfidenceLevel =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
+      warnLog(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to unsupported insufficient confidenceLevels.")
       Future.successful(Left(LegacyUnauthorisedError))
     case _: JsResultException =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
+      warnLog(s"[AuthorisationService] [unauthorisedError] - Did not receive minimum data from Auth required for NRS Submission")
       Future.successful(Left(ForbiddenDownstreamError))
     case exception@_ =>
-      logger.warn(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
+      warnLog(s"[AuthorisationService] [unauthorisedError] Client authorisation failed due to internal server error. auth-client exception was ${exception.getClass.getSimpleName}")
       Future.successful(Left(DownstreamError))
   }
 }

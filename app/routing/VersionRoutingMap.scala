@@ -20,9 +20,10 @@ import com.google.inject.ImplementedBy
 import config.FeatureSwitch.PenaltiesEndpointsFeature
 import config.{AppConfig, FeatureToggleSupport}
 import definition.Versions.VERSION_1
-import javax.inject.Inject
-import play.api.Logging
 import play.api.routing.Router
+import utils.Logging
+
+import javax.inject.Inject
 
 // So that we can have API-independent implementations of
 // VersionRoutingRequestHandler and VersionRoutingRequestHandlerSpec

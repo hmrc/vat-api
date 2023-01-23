@@ -17,6 +17,8 @@
 package v1.services
 
 import play.api.libs.json.JsResultException
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
@@ -47,6 +49,8 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
       .withIdentifier("VRN", "123456789")
       .withDelegatedAuthRule("mtd-vat-auth")
   }
+
+  implicit val request: Request[_] = FakeRequest()
 
   "authorised" when {
 

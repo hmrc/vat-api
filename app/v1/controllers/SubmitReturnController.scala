@@ -58,7 +58,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
     authorisedAction(vrn, nrsRequired = true).async(parse.json) { implicit request =>
 
       implicit val correlationId: String = idGenerator.getUid
-      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+      infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Submitting Vat Return for VRN : $vrn with correlationId : $correlationId")
 
       val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(request.body))
@@ -80,7 +80,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         }
       } yield {
 
-        logger.info(message = s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        infoLog(s"${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s" - Successfully created with correlationId : ${serviceResponse.correlationId}")
 
         auditService.auditEvent(AuditEvents.auditSubmit(serviceResponse.correlationId,
@@ -96,7 +96,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       result.leftMap { errorWrapper =>
         val resCorrelationId: String = errorWrapper.correlationId
         val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-        logger.warn(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
+        warnLog(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
         auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
           request.userDetails, AuditResponse(leftResult.header.status, Left(retrieveAuditErrors(errorWrapper))), request.body.toString()))

@@ -18,6 +18,7 @@ package v1.mocks.nrs
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.nrs.models.request.NrsSubmission
 import v1.nrs.{NrsConnector, NrsOutcome}
@@ -32,8 +33,8 @@ trait MockNrsConnector extends MockFactory {
 
     def submitNrs(body: NrsSubmission): CallHandler[Future[NrsOutcome]] = {
       (mockNrsConnector
-        .submit(_: NrsSubmission)(_: HeaderCarrier, _: String))
-        .expects(body, *, *)
+        .submit(_: NrsSubmission)(_: HeaderCarrier, _: String, _: Request[_]))
+        .expects(body, *, *, *)
     }
   }
 

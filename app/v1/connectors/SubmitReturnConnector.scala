@@ -53,7 +53,7 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        logger.error(ConnectorError.log(
+        errorLog(ConnectorError.log(
           logContext = "[SubmitReturnConnector][submitReturn]",
           vrn = vrn,
           details = logDetails,
@@ -63,7 +63,7 @@ class SubmitReturnConnector @Inject()(val http: HttpClient,
           pagerDutyLoggingEndpointName = Endpoint.SubmitReturn.requestFailedMessage,
           status = Status.INTERNAL_SERVER_ERROR,
           body = logDetails,
-          f = logger.error(_),
+          f = errorLog(_),
           affinityGroup = userRequest.userDetails.userType
         )
         Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }

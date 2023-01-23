@@ -17,7 +17,7 @@
 package config
 
 import config.FeatureSwitch.FeatureSwitch
-import play.api.Logging
+import utils.Logging
 
 import scala.sys.SystemProperties
 

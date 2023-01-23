@@ -67,12 +67,12 @@ object PenaltiesHttpParser extends Logging {
         case OK => response.json.validate[PenaltiesResponse] match {
           case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
           case JsError(errors) =>
-            logger.error(s"[PenaltiesHttpParser][read] invalid JSON errors: $errors")
+            errorConnectorLog(s"[PenaltiesHttpParser][read] invalid JSON errors: $errors")(response)
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case status =>
           val mtdErrors = errorHelper(response.json)
-          logger.error(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors}")
+          errorConnectorLog(s"[PenaltiesHttpParser][read] status: ${status} with Error ${mtdErrors}")(response)
           Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
     }

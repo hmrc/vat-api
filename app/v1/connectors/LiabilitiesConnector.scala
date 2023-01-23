@@ -62,7 +62,7 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
 
         val logDetails = s"request failed. ${e.getMessage}"
 
-        logger.error(ConnectorError.log(
+        errorLog(ConnectorError.log(
           logContext = "[LiabilitiesConnector][retrieveLiabilities]",
           vrn = vrn,
           details = logDetails,
@@ -72,7 +72,7 @@ class LiabilitiesConnector @Inject()(val http: HttpClient,
           pagerDutyLoggingEndpointName = Endpoint.RetrieveLiabilities.requestFailedMessage,
           status = Status.INTERNAL_SERVER_ERROR,
           body = logDetails,
-          f = logger.error(_),
+          f = errorLog(_),
           affinityGroup = userRequest.userDetails.userType
         )
 

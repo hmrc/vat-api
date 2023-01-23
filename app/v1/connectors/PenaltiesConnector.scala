@@ -66,7 +66,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        logger.error(ConnectorError.log(
+        errorLog(ConnectorError.log(
           logContext = "[PenaltiesConnector][retrievePenaltiesData]",
           vrn = vrn,
           details = logDetails,
@@ -76,7 +76,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
           pagerDutyLoggingEndpointName = Endpoint.RetrievePenalties.requestFailedMessage,
           status = Status.INTERNAL_SERVER_ERROR,
           body = logDetails,
-          f = logger.error(_),
+          f = errorLog(_),
           affinityGroup = userRequest.userDetails.userType
         )
         Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
@@ -101,7 +101,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        logger.error(ConnectorError.log(
+        errorLog(ConnectorError.log(
           logContext = "[PenaltiesConnector][retrieveFinancialData]",
           vrn = vrn,
           details = logDetails,
@@ -111,7 +111,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
           pagerDutyLoggingEndpointName = Endpoint.RetrieveFinancialData.requestFailedMessage,
           status = Status.INTERNAL_SERVER_ERROR,
           body = logDetails,
-          f = logger.error(_),
+          f = errorLog(_),
           affinityGroup = userRequest.userDetails.userType
         )
 
