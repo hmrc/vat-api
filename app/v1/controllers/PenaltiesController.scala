@@ -54,7 +54,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
 
     implicit val correlationId: String = idGenerator.getUid
 
-    logger.info(s"${endpointLogContext.toString} correlationId: $correlationId: " +
+    infoLog(s"${endpointLogContext.toString} correlationId: $correlationId: " +
       s"attempting to retrieve penalties for VRN: $vrn")
 
 
@@ -64,7 +64,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
         serviceResponse <- EitherT(service.retrievePenalties(parsedRequest))
       } yield {
 
-        logger.info(s"${endpointLogContext.toString} " +
+        infoLog(s"${endpointLogContext.toString} " +
           s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
 
 
@@ -79,7 +79,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
     result.leftMap { errorWrapper: ErrorWrapper =>
       val resCorrelationId: String = errorWrapper.correlationId
       val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-      logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
+      warnLog(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
       auditService.auditEvent(AuditEvents.auditPenalties(resCorrelationId,
         request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))

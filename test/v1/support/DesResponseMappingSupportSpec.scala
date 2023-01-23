@@ -16,8 +16,10 @@
 
 package v1.support
 
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 import support.UnitSpec
-import utils.{ EndpointLogContext, Logging }
+import utils.{EndpointLogContext, Logging}
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.response.liabilities.LiabilitiesResponse
@@ -31,6 +33,8 @@ class DesResponseMappingSupportSpec extends UnitSpec {
   val testClass = new TestClass
 
   private val correlationId = "X-123"
+
+  implicit val request: Request[_] = FakeRequest()
 
   "validatePaymentsSuccessResponse" should {
     "return Left" when {

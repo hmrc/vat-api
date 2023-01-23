@@ -18,6 +18,7 @@ package v1.connectors.httpparsers
 
 import utils.Logging
 import play.api.libs.json._
+import play.api.mvc.Request
 import uk.gov.hmrc.http.HttpResponse
 import v1.models.errors._
 
@@ -27,20 +28,20 @@ trait HttpParser extends Logging {
 
   implicit class KnownJsonResponse(response: HttpResponse) {
 
-    def validateJson[T](implicit reads: Reads[T]): Option[T] = {
+    def validateJson[T](implicit reads: Reads[T], request: Request[_]): Option[T] = {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
         case _ =>
-          logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
+          warnLog("[KnownJsonResponse][validateJson] No JSON was returned")
           None
       }
     }
 
-    def parseResult[T](json: JsValue)(implicit reads: Reads[T]): Option[T] = json.validate[T] match {
+    def parseResult[T](json: JsValue)(implicit reads: Reads[T], request: Request[_]): Option[T] = json.validate[T] match {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
-        logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
+        warnLog(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
         None
     }
   }
@@ -53,11 +54,11 @@ trait HttpParser extends Logging {
     (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[DesErrorCode]]
   }
 
-  def parseErrors(response: HttpResponse): DesError = {
+  def parseErrors(response: HttpResponse)(implicit request: Request[_]): DesError = {
     val singleError         = response.validateJson[DesErrorCode].map(err => DesErrors(List(err)))
-    lazy val bvrErrors      = response.validateJson(bvrErrorReads).map(errs => OutboundError(BVRError, Some(errs.map(_.toMtd))))
+    lazy val bvrErrors      = response.validateJson(bvrErrorReads, request).map(errs => OutboundError(BVRError, Some(errs.map(_.toMtd))))
     lazy val unableToParseJsonError = {
-      logger.warn(s"unable to parse errors from response: ${response.body}")
+      warnLog(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)
     }
 

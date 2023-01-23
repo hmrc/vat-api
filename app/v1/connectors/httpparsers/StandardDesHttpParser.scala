@@ -55,7 +55,7 @@ object StandardDesHttpParser extends HttpParser {
     val responseCorrelationId = retrieveCorrelationId(response)
 
     if (response.status != successCode.status) {
-      logger.info(
+      infoLog(
         "[StandardDesHttpParser][read] - " +
           s"Error response received from DES with status: ${response.status} and body\n" +
           s"${response.body} and correlationId: $responseCorrelationId when calling $url - " +
@@ -63,7 +63,7 @@ object StandardDesHttpParser extends HttpParser {
     }
     response.status match {
       case successCode.status =>
-        logger.info(
+        infoLog(
           "[StandardDesHttpParser][read] - " +
             s"Success response received from DES with correlationId: $responseCorrelationId when calling $url")
         successOutcomeFactory(responseCorrelationId)
@@ -72,10 +72,10 @@ object StandardDesHttpParser extends HttpParser {
            FORBIDDEN |
            CONFLICT |
            UNPROCESSABLE_ENTITY =>
-        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, logger.info(_), userRequest.userDetails.userType)
+        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, infoLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
       case _ =>
-        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, logger.error(_), userRequest.userDetails.userType)
+        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, errorLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, OutboundError(DownstreamError)))
     }
   }

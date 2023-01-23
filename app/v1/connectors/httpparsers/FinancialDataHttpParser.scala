@@ -88,12 +88,12 @@ object FinancialDataHttpParser extends Logging {
         case OK => response.json.validate[FinancialDataResponse] match {
           case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
           case JsError(errors) =>
-            logger.error(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")
+            errorConnectorLog(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")(response)
             Left(ErrorWrapper(responseCorrelationId, InvalidJson))
         }
         case status =>
           val mtdErrors = errorHelper(response.json)
-          logger.error(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")
+          errorConnectorLog(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")(response)
           Left(ErrorWrapper(responseCorrelationId, mtdErrors))
       }
     }

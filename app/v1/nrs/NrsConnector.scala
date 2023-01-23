@@ -18,8 +18,10 @@ package v1.nrs
 
 import akka.actor.Scheduler
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status
+import play.api.mvc.Request
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.{Delayer, Logging, Retrying}
@@ -42,7 +44,7 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
   private lazy val apiKey: String = appConfig.nrsApiKey
 
   def submit(nrsSubmission: NrsSubmission)(
-    implicit hc: HeaderCarrier, correlationId: String): Future[NrsOutcome] = {
+    implicit hc: HeaderCarrier, correlationId: String, request: Request[_]): Future[NrsOutcome] = {
 
     val retryCondition: Try[NrsOutcome] => Boolean = {
       case Success(Left(failure)) => failure.retryable
@@ -50,7 +52,7 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
     }
 
     retry(appConfig.nrsRetries, retryCondition) { attemptNumber =>
-      logger.info(s"Attempt $attemptNumber NRS submission: sending POST request to $url. CorrelationId: $correlationId")
+      infoLog(s"Attempt $attemptNumber NRS submission: sending POST request to $url. CorrelationId: $correlationId")
 
       httpClient
         .POST[NrsSubmission, HttpResponse](url, nrsSubmission, Seq("X-API-Key" -> apiKey))
@@ -58,16 +60,16 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
           val status = response.status
 
           if (Status.isSuccessful(status)) {
-            logger.info(s"NRS submission successful. CorrelationId: $correlationId")
+            infoLog(s"NRS submission successful. CorrelationId: $correlationId")
             Right(response.json.as[NrsResponse])
           } else {
-            logger.warn(s".CorrelationId: $correlationId\tRequestId:${hc.requestId}\nNRS submission failed with error: ${response.body}")
+            warnLog(s".CorrelationId: $correlationId\tRequestId:${hc.requestId}\nNRS submission failed with error: ${response.body}")
             Left(NrsFailure.ErrorResponse(status))
           }
         }
         .recover {
           case NonFatal(e) =>
-            logger.error(s".CorrelationId: $correlationId\tRequestId:${hc.requestId}\nNRS submission failed with exception", e)
+            errorLog(s".CorrelationId: $correlationId\tRequestId:${hc.requestId}\nNRS submission failed with exception", e)
             Left(NrsFailure.ExceptionThrown)
         }
     }

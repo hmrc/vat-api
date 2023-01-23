@@ -17,6 +17,8 @@
 package utils
 
 import com.kenshoo.play.metrics.Metrics
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 import support.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,7 +28,9 @@ class TimerSpec extends UnitSpec with Timer with Logging {
 
   var timeMs: Long = _
 
-  override def stopAndLog[A](name: String, timer: com.codahale.metrics.Timer.Context): Unit =
+  implicit val request: Request[_] = FakeRequest()
+
+  override def stopAndLog[_](name: String, timer: com.codahale.metrics.Timer.Context)(implicit request: Request[_]): Unit =
     timeMs = timer.stop() / 1000000
 
   "Timer" should {

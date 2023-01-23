@@ -18,6 +18,7 @@ package utils
 
 import com.codahale.metrics._
 import com.kenshoo.play.metrics.Metrics
+import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,12 +31,13 @@ trait Timer {
   val metrics: Metrics
 
   def timeFuture[A](name: String, metric: Metric, timerGroup: String = defaultTimerGroup)(block: => Future[A])(
-    implicit ec: ExecutionContext): Future[A] = {
+    implicit ec: ExecutionContext, request: Request[_]): Future[A] = {
     val timer = startTimer(metric, timerGroup)
     block andThen { case _ => stopAndLog(name, timer) }
   }
 
-  def time[A](name: String, metric: Metric, timerGroup: String = defaultTimerGroup)(block: => A): A = {
+  def time[A](name: String, metric: Metric, timerGroup: String = defaultTimerGroup)(block: => A)
+             (implicit request: Request[_]): A = {
     val timer = startTimer(metric, timerGroup)
     try block
     finally stopAndLog(name, timer)
@@ -44,11 +46,11 @@ trait Timer {
   protected def startTimer(metric: Metric, timerGroup: String): Timer.Context =
     metrics.defaultRegistry.timer(s"$metric-$timerGroup").time()
 
-  protected def stopAndLog[A](name: String, timer: Timer.Context): Unit = {
+  protected def stopAndLog[A](name: String, timer: Timer.Context)(implicit request: Request[_]): Unit = {
     val timeMillis = timer.stop() / 1000000
 
     if (timeMillis > 1000) {
-      logger.info(getClass.getName + s" $name took $timeMillis ms")
+      infoLog(getClass.getName + s" $name took $timeMillis ms")
     } else {
       logger.debug(getClass.getName + s" $name took $timeMillis ms")
     }

@@ -63,13 +63,13 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
       queryParams = queryParams
     ).andThen {
       case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BPKEY) =>
-        logger.warn(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
+        warnLog(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
     }.recover {
       case e =>
 
         val logDetails = s"request failed. ${e.getMessage}"
 
-        logger.error(ConnectorError.log(
+        errorLog(ConnectorError.log(
           logContext = "[ObligationsConnector][retrieveObligations]",
           vrn = vrn,
           details = logDetails,
@@ -79,7 +79,7 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
           pagerDutyLoggingEndpointName = Endpoint.RetrieveObligations.requestFailedMessage,
           status = Status.INTERNAL_SERVER_ERROR,
           body = logDetails,
-          f = logger.error(_),
+          f = errorLog(_),
           affinityGroup = userRequest.userDetails.userType
         )
 

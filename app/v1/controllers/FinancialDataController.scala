@@ -54,7 +54,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
 
     implicit val correlationId: String = idGenerator.getUid
 
-    logger.info(s"${endpointLogContext.toString} correlationId: $correlationId: " +
+    infoLog(s"${endpointLogContext.toString} correlationId: $correlationId: " +
       s"attempting to retrieve financial data for VRN: $vrn")
 
 
@@ -64,7 +64,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
         serviceResponse <- EitherT(service.retrieveFinancialData(parsedRequest))
       } yield {
 
-        logger.info(s"${endpointLogContext.toString} " +
+        infoLog(s"${endpointLogContext.toString} " +
           s"Successfully retrieved Financial Data from DES with correlationId : ${serviceResponse.correlationId}")
 
 
@@ -79,7 +79,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
     result.leftMap { errorWrapper: ErrorWrapper =>
       val resCorrelationId: String = errorWrapper.correlationId
       val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-      logger.warn(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
+      warnLog(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
       auditService.auditEvent(AuditEvents.auditFinancialData(resCorrelationId,
         request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))

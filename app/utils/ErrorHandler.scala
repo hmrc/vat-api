@@ -16,7 +16,6 @@
 
 package utils
 
-import javax.inject._
 import play.api._
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -30,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import v1.models.errors._
 
+import javax.inject._
 import scala.concurrent._
 
 @Singleton
@@ -44,7 +44,7 @@ class ErrorHandler @Inject()(config: Configuration,
 
     implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    logger.warn(s"[LegacyErrorHandler][onClientError] error in version 1, for (${request.method}) [${request.uri}] with status:" +
+    logger.warn(s"[ErrorHandler][onClientError] error in version 1, for (${request.method}) [${request.uri}] with status:" +
       s" $statusCode and message: $message")
     statusCode match {
       case BAD_REQUEST =>

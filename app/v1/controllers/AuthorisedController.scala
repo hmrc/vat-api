@@ -53,7 +53,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
       val clientId = request.headers.get("X-Client-Id").getOrElse("N/A")
 
       if (VrnValidation.validate(vrn) == Nil) {
-        authService.authorised(predicate(vrn), nrsRequired).flatMap[Result] {
+        authService.authorised(predicate(vrn), nrsRequired)(headerCarrier,executionContext, request).flatMap[Result] {
           case Right(userDetails) => block(UserRequest(userDetails.copy(clientId = clientId), request))
           case Left(LegacyUnauthorisedError) => Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
           case Left(ForbiddenDownstreamError) => Future.successful(Forbidden(Json.toJson(DownstreamError)))
