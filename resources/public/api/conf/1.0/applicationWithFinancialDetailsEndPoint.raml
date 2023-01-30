@@ -446,7 +446,10 @@ traits:
                 type: !include schemas/penalties/Penalties.json
                 examples:
                   example-1:
-                    description: all fields example
+                    description: Example of an account with no penalties
+                    value: !include examples/penalties/PenaltiesNone.json
+                  example-2:
+                    description: All fields example
                     value: !include examples/penalties/Penalties.json
           400:
             body:
@@ -457,15 +460,6 @@ traits:
                     description: Invalid VRN.
                     value:
                       code: VRN_INVALID
-          404:
-            body:
-              application/json:
-                type: types.errorResponse
-                examples:
-                  notFound:
-                    description: The remote endpoint has indicated that no associated data is found.
-                    value:
-                      code: NOT_FOUND
     /financial-details:
       /{penaltyChargeReference}:
         uriParameters:
