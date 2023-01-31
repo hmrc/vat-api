@@ -127,33 +127,6 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
           }
         }
 
-        "VRN is not found" must {
-
-          "return 404" in new Test {
-
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |"failures": [{
-                | "code":"NO_DATA_FOUND",
-                | "reason":"Some Reason"
-                |}]
-                |}
-                |""".stripMargin)
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), NOT_FOUND, errorBody)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe NOT_FOUND
-            response.json shouldBe Json.toJson(PenaltiesNotDataFound)
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
-        }
-
         "unexpected error" must {
 
           "return 500" in new Test {

@@ -118,33 +118,6 @@ class PenaltiesHttpParserSpec extends UnitSpec {
         }
       }
 
-      "response is NOT_FOUND (404)" must {
-
-        "return Left(VrnNotFound)" in {
-
-          val error = Json.parse(
-            """
-              |{
-              |"failures": [{
-              |"code":"NO_DATA_FOUND",
-              |"reason":"Submission has not passed validation. Invalid parameter idType."
-              |}]
-              |}
-              |""".stripMargin)
-
-          val result = PenaltiesHttpReads.read("", "",
-            HttpResponse(
-              status = Status.NOT_FOUND,
-              json = error,
-              headers = Map(
-                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-              )
-            )
-          )
-          result shouldBe Left(PenaltiesConstants.errorWrapper(PenaltiesNotDataFound))
-        }
-      }
-
       "response is INTERNAL_SERVER_ERROR (500)" must {
 
         "return Left(UnexpectedFailure)" in {
@@ -203,45 +176,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
           )
           result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")))
         }
-
-        "return 400 when multiple errors occur including a 400 only" in {
-
-          val status = Status.BAD_REQUEST
-
-          val error = Json.parse(
-            """
-              |{
-              |"failures": [{
-              |"code":"INVALID_IDVALUE",
-              |"reason":"Something went wrong"
-              |},
-              |{
-              |"code":"NO_DATA_FOUND",
-              |"reason":"Submission has not passed validation. Invalid parameter idNumber."
-              |}]
-              |}
-              |""".stripMargin)
-
-          val result = PenaltiesHttpReads.read("", "",
-            HttpResponse(
-              status = status,
-              json = error,
-              headers = Map(
-                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-              )
-            )
-          )
-
-          result shouldBe Left(PenaltiesConstants.errorWrapper(
-            MtdError("INVALID_REQUEST", "Invalid request penalties",
-              Some(Json.toJson(Seq(
-                MtdError("VRN_INVALID", "The provided VRN is invalid."),
-                MtdError("MATCHING_RESOURCE_NOT_FOUND", "No penalties could be found in the last 24 months"))))
-            ))
-          )
-        }
       }
     }
   }
-
 }
