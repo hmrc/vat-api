@@ -35,7 +35,6 @@ object PenaltiesHttpParser extends Logging {
       val mtdErrorsConvert = penaltiesErrors.failures.map{ error =>
         (error.code) match {
           case ("INVALID_IDVALUE")       => PenaltiesInvalidIdValue
-          case ("NO_DATA_FOUND")         => PenaltiesNotDataFound
           case ("INVALID_REGIME")        => DownstreamError
           case ("INVALID_IDTYPE")        => DownstreamError
           case ("INVALID_DATELIMIT")     => DownstreamError
