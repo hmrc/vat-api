@@ -88,14 +88,16 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
 
         Created(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId,
-            "Receipt-ID" -> nrsId,
+            "Receipt-ID" -> correlationId,
             "Receipt-Timestamp" -> submissionTimestamp.format(DateUtils.isoInstantDatePattern),
             "Receipt-Signature" -> NrsResponse.deprecatedString)
       }
 
       result.leftMap { errorWrapper =>
         val resCorrelationId: String = errorWrapper.correlationId
-        val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        val leftResult = errorResult(errorWrapper).withApiHeaders(
+          resCorrelationId,
+          "Receipt-ID" -> correlationId)
         warnLog(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
         auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
