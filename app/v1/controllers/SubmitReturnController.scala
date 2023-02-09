@@ -97,7 +97,8 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
         val resCorrelationId: String = errorWrapper.correlationId
         val leftResult = errorResult(errorWrapper).withApiHeaders(
           resCorrelationId,
-          "Receipt-ID" -> correlationId)
+          "Receipt-ID" -> correlationId,
+          "Receipt-Timestamp" -> submissionTimestamp.format(DateUtils.isoInstantDatePattern))
         warnLog(ControllerError(endpointLogContext ,vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
         auditService.auditEvent(AuditEvents.auditSubmit(resCorrelationId,
