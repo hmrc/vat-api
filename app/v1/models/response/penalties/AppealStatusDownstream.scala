@@ -36,6 +36,26 @@ object AppealStatusDownstream {
     override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-rejected`
   }
 
+  case object `03` extends AppealStatusDownstream {
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-rejected`
+  }
+
+  case object `91` extends AppealStatusDownstream {
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-rejected`
+  }
+
+  case object `92` extends AppealStatusDownstream {
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-upheld`
+  }
+
+  case object `93` extends AppealStatusDownstream {
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-upheld`
+  }
+
+  case object `94` extends AppealStatusDownstream {
+    override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`appeal-rejected`
+  }
+
   case object `99` extends AppealStatusDownstream {
     override def toUpstreamAppealStatus: AppealStatusUpstream = AppealStatusUpstream.`cannot-be-appealed`
   }
