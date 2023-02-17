@@ -429,7 +429,7 @@ traits:
       displayName: Retrieve VAT penalties
       description: Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
       get:
-        displayName: Retrieve VAT penalties [test only]
+        displayName: Retrieve VAT penalties
         description: Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
         (annotations.sandboxData): !include scenarios/vat-penalties-scenarios.md
         is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
@@ -470,7 +470,7 @@ traits:
         displayName: Retrieve financial details
         description: Retrieves the financial details relating to a late submission or late payment penalty that has been applied to a VAT account.
         get:
-          displayName: Retrieve financial details [test only]
+          displayName: Retrieve financial details
           description: Retrieves the financial details relating to a late submission or late payment penalty that has been applied to a VAT account.
           (annotations.sandboxData): !include scenarios/vat-financial-details-scenarios.md
           is: [headers.acceptHeader, testScenarioHeader, clientOrAgentNotAuthorised]
