@@ -22,10 +22,10 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc"                  %% "bootstrap-backend-play-28" % "5.24.0",
-    "org.typelevel"                %% "cats-core"                 % "2.7.0",
+    "uk.gov.hmrc"                  %% "bootstrap-backend-play-28" % "7.13.0",
+    "org.typelevel"                %% "cats-core"                 % "2.9.0",
     "com.chuusai"                  %% "shapeless"                 % "2.4.0-M1",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.13.2"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.14.2"
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
@@ -33,9 +33,9 @@ object AppDependencies {
     "com.typesafe.play"      %% "play-test"                % PlayVersion.current  % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.62.2"             % scope,
     "org.scalamock"          %% "scalamock"                % "5.2.0"              % scope,
-    "org.scalacheck"         %% "scalacheck"               % "1.15.4"             % scope,
+    "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"              % scope,
-    "com.github.tomakehurst" %  "wiremock-jre8"            % "2.32.0"             % scope,
+    "com.github.tomakehurst" %  "wiremock-jre8"            % "2.35.0"             % scope,
     "com.miguno.akka"        %% "akka-mock-scheduler"      % "0.5.5"              % scope
   )
 }
