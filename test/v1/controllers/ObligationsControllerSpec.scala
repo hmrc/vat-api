@@ -232,6 +232,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
+          (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
           (InvalidDateFromErrorDes, BAD_REQUEST),
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidStatusErrorDes, BAD_REQUEST),

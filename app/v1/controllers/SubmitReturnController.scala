@@ -27,12 +27,12 @@ import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.errors.ControllerError._
 import v1.models.errors._
-import v1.models.request.submit.{SubmitRawData, SubmitRequest}
+import v1.models.request.submit.SubmitRawData
 import v1.nrs.NrsService
 import v1.nrs.models.response.NrsResponse
 import v1.services.{AuditService, EnrolmentsAuthService, SubmitReturnService}
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -113,7 +113,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
       case VrnFormatError | VrnFormatErrorDes | BadRequestError |
            PeriodKeyFormatError | PeriodKeyFormatErrorDes | BodyPeriodKeyFormatError |
            VATTotalValueRuleError | VATNetValueRuleError | NumericFormatRuleError |
-           MandatoryFieldRuleError | StringFormatRuleError | UnMappedPlayRuleError => BadRequest(Json.toJson(errorWrapper))
+           MandatoryFieldRuleError | StringFormatRuleError | UnMappedPlayRuleError | RuleIncorrectGovTestScenarioError => BadRequest(Json.toJson(errorWrapper))
       case TaxPeriodNotEnded | DuplicateVatSubmission | FinalisedValueRuleError | RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
       case _: MtdError => BadRequest(Json.toJson(errorWrapper))

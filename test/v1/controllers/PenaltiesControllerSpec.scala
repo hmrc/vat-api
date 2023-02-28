@@ -104,6 +104,7 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
 
           val errors: Seq[(MtdError, Int)] = Seq(
             (PenaltiesInvalidIdValue, BAD_REQUEST),
+            (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
             (PenaltiesNotDataFound, NOT_FOUND),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )

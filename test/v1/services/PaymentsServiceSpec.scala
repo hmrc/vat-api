@@ -27,16 +27,16 @@ import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRequest
 import v1.models.response.common.TaxPeriod
 import v1.models.response.payments.PaymentsResponse.Payment
-import v1.models.response.payments.{PaymentItem, PaymentsResponse}
+import v1.models.response.payments.{ PaymentItem, PaymentsResponse }
 
 import scala.concurrent.Future
 
 class PaymentsServiceSpec extends ServiceSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
-  private val vrn: String = "123456789"
-  private val from: String = "2017-1-1"
-  private val to: String = "2017-12-31"
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual", None, "id"), FakeRequest())
+  private val vrn: String                                       = "123456789"
+  private val from: String                                      = "2017-1-1"
+  private val to: String                                        = "2017-12-31"
 
   private val retrievePaymentsRequest: PaymentsRequest =
     PaymentsRequest(vrn = Vrn(vrn), from = from, to = to)
@@ -47,9 +47,10 @@ class PaymentsServiceSpec extends ServiceSpec {
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
-          paymentItems = Some(Seq(
-            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
-          ))
+          paymentItems = Some(
+            Seq(
+              PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
+            ))
         )
       )
     )
@@ -65,7 +66,8 @@ class PaymentsServiceSpec extends ServiceSpec {
     "service call successful" must {
       "return the mapped result" in new Test {
 
-        MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
+        MockRetrievePaymentsConnector
+          .retrievePayments(retrievePaymentsRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, retrievePaymentsResponse))))
 
         await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Right(ResponseWrapper(correlationId, retrievePaymentsResponse))
@@ -73,7 +75,8 @@ class PaymentsServiceSpec extends ServiceSpec {
 
       "return a 404 Not Found for an empty payments response" in new Test {
 
-        MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
+        MockRetrievePaymentsConnector
+          .retrievePayments(retrievePaymentsRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, PaymentsResponse(Seq.empty[Payment])))))
 
         await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(correlationId, LegacyNotFoundError))
@@ -86,27 +89,29 @@ class PaymentsServiceSpec extends ServiceSpec {
         def serviceError(desErrorCode: String, error: MtdError): Unit =
           s"a $desErrorCode error is returned from the service" in new Test {
 
-            MockRetrievePaymentsConnector.retrievePayments(retrievePaymentsRequest)
+            MockRetrievePaymentsConnector
+              .retrievePayments(retrievePaymentsRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
             await(service.retrievePayments(retrievePaymentsRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          "INVALID_IDTYPE" -> DownstreamError,
-          "INVALID_IDNUMBER" -> VrnFormatErrorDes,
-          "INVALID_REGIMETYPE" -> DownstreamError,
-          "INVALID_ONLYOPENITEMS" -> DownstreamError,
-          "INVALID_INCLUDELOCKS" -> DownstreamError,
-          "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
+          "INVALID_IDTYPE"                     -> DownstreamError,
+          "INVALID_IDNUMBER"                   -> VrnFormatErrorDes,
+          "INVALID_REGIMETYPE"                 -> DownstreamError,
+          "INVALID_ONLYOPENITEMS"              -> DownstreamError,
+          "INVALID_INCLUDELOCKS"               -> DownstreamError,
+          "INVALID_CALCULATEACCRUEDINTEREST"   -> DownstreamError,
           "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
-          "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
-          "INVALID_DATETO" -> InvalidDateToErrorDes,
-          "INSOLVENT_TRADER" -> RuleInsolventTraderError,
-          "NOT_FOUND" -> LegacyNotFoundError,
-          "INVALID_DATA" -> InvalidDataError,
-          "SERVER_ERROR" -> DownstreamError,
-          "SERVICE_UNAVAILABLE" -> DownstreamError
+          "INVALID_DATEFROM"                   -> InvalidDateFromErrorDes,
+          "INVALID_DATETO"                     -> InvalidDateToErrorDes,
+          "INSOLVENT_TRADER"                   -> RuleInsolventTraderError,
+          "NOT_FOUND"                          -> LegacyNotFoundError,
+          "INVALID_DATA"                       -> InvalidDataError,
+          "SERVER_ERROR"                       -> DownstreamError,
+          "SERVICE_UNAVAILABLE"                -> DownstreamError,
+          "TEST_ONLY_UNMATCHED_STUB_ERROR"     -> RuleIncorrectGovTestScenarioError
         )
 
         input.foreach(args => (serviceError _).tupled(args))

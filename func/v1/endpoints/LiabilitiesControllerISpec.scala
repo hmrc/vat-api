@@ -228,6 +228,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
 
       val input = Seq(
         (BAD_REQUEST, "INVALID_IDTYPE", INTERNAL_SERVER_ERROR, DownstreamError),
+        (BAD_REQUEST, "TEST_ONLY_UNMATCHED_STUB_ERROR", BAD_REQUEST, RuleIncorrectGovTestScenarioError),
         (BAD_REQUEST, "INVALID_IDNUMBER", BAD_REQUEST, VrnFormatErrorDes),
         (BAD_REQUEST, "INVALID_REGIMETYPE", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_ONLYOPENITEMS", INTERNAL_SERVER_ERROR, DownstreamError),

@@ -186,6 +186,7 @@ class ViewReturnControllerSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
+          (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
           (PeriodKeyFormatErrorDes, BAD_REQUEST),
           (PeriodKeyFormatErrorDesNotFound, NOT_FOUND),
           (RuleDateRangeTooLargeError, FORBIDDEN),

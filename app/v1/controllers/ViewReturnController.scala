@@ -91,7 +91,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
     (errorWrapper.error: @unchecked) match {
       case VrnFormatError | VrnFormatErrorDes |
            PeriodKeyFormatError | PeriodKeyFormatErrorDes |
-           BadRequestError => BadRequest(Json.toJson(errorWrapper))
+           BadRequestError | RuleIncorrectGovTestScenarioError => BadRequest(Json.toJson(errorWrapper))
       case RuleDateRangeTooLargeError | InvalidInputDataError | RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case PeriodKeyFormatErrorDesNotFound => NotFound(Json.toJson(errorWrapper))
       case EmptyNotFoundError => NotFound

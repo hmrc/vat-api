@@ -18,8 +18,6 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import utils.{EndpointLogContext, IdGenerator, Logging}
@@ -27,11 +25,10 @@ import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PaymentsRequestParser
 import v1.models.audit.AuditResponse
 import v1.models.errors._
-import v1.models.outcomes.ResponseWrapper
 import v1.models.request.payments.PaymentsRawData
-import v1.models.response.payments.PaymentsResponse
 import v1.services.{AuditService, EnrolmentsAuthService, PaymentsService}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -95,7 +92,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
       case VrnFormatError | VrnFormatErrorDes |
            FinancialDataInvalidDateFromError | InvalidDateFromErrorDes |
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |
-           FinancialDataInvalidDateRangeError | InvalidDataError
+           FinancialDataInvalidDateRangeError | InvalidDataError | RuleIncorrectGovTestScenarioError
       => BadRequest(Json.toJson(errorWrapper))
       case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))

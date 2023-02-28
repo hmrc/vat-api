@@ -88,7 +88,7 @@ class LiabilitiesController @Inject()(val authService: EnrolmentsAuthService,
       case VrnFormatError | VrnFormatErrorDes | BadRequestError |
            FinancialDataInvalidDateFromError | InvalidDateFromErrorDes |
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |
-           FinancialDataInvalidDateRangeError | InvalidDataError
+           FinancialDataInvalidDateRangeError | InvalidDataError | RuleIncorrectGovTestScenarioError
       => BadRequest(Json.toJson(errorWrapper))
       case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))

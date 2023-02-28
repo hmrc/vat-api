@@ -26,7 +26,7 @@ import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockFinancialDataRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
 import v1.models.audit.{AuditError, AuditResponse}
-import v1.models.errors.{FinancialNotDataFound, MtdError, UnexpectedFailure, VrnFormatError, VrnNotFound}
+import v1.models.errors.{FinancialNotDataFound, MtdError, RuleIncorrectGovTestScenarioError, UnexpectedFailure, VrnFormatError}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -104,6 +104,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
           val errors: Seq[(MtdError, Int)] = Seq(
             (VrnFormatError, BAD_REQUEST),
+            (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
             (FinancialNotDataFound, NOT_FOUND),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )

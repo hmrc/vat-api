@@ -91,7 +91,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
-      case VrnFormatError |
+      case VrnFormatError | RuleIncorrectGovTestScenarioError |
            FinancialInvalidIdNumber |
            FinancialInvalidSearchItem |
            MtdError("INVALID_REQUEST", _, _) => BadRequest(Json.toJson(errorWrapper))

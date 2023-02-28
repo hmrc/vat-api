@@ -18,7 +18,6 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{ EndpointLogContext, Logging }
 import v1.connectors.SubmitReturnConnector
@@ -28,6 +27,7 @@ import v1.models.request.submit.SubmitRequest
 import v1.models.response.submit.SubmitResponse
 import v1.support.DesResponseMappingSupport
 
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
@@ -48,17 +48,18 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
 
   private val desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN"           -> VrnFormatErrorDes,
-      "INVALID_PERIODKEY"     -> PeriodKeyFormatErrorDes,
-      "INVALID_PAYLOAD"       -> BadRequestError,
-      "TAX_PERIOD_NOT_ENDED"  -> TaxPeriodNotEnded,
-      "DUPLICATE_SUBMISSION"  -> DuplicateVatSubmission,
-      "NOT_FOUND_VRN"         -> DownstreamError,
-      "INVALID_SUBMISSION"    -> DownstreamError,
-      "INVALID_ORIGINATOR_ID" -> DownstreamError,
-      "INSOLVENT_TRADER"      -> RuleInsolventTraderError,
-      "SERVICE_ERROR"         -> DownstreamError,
-      "SERVICE_UNAVAILABLE"   -> DownstreamError,
-      "DOWNSTREAM_ERROR"      -> DownstreamError
+      "INVALID_VRN"                    -> VrnFormatErrorDes,
+      "INVALID_PERIODKEY"              -> PeriodKeyFormatErrorDes,
+      "INVALID_PAYLOAD"                -> BadRequestError,
+      "TAX_PERIOD_NOT_ENDED"           -> TaxPeriodNotEnded,
+      "DUPLICATE_SUBMISSION"           -> DuplicateVatSubmission,
+      "NOT_FOUND_VRN"                  -> DownstreamError,
+      "INVALID_SUBMISSION"             -> DownstreamError,
+      "INVALID_ORIGINATOR_ID"          -> DownstreamError,
+      "INSOLVENT_TRADER"               -> RuleInsolventTraderError,
+      "SERVICE_ERROR"                  -> DownstreamError,
+      "SERVICE_UNAVAILABLE"            -> DownstreamError,
+      "DOWNSTREAM_ERROR"               -> DownstreamError,
+      "TEST_ONLY_UNMATCHED_STUB_ERROR" -> RuleIncorrectGovTestScenarioError
     )
 }

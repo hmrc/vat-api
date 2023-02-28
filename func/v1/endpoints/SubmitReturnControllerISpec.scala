@@ -462,7 +462,8 @@ class SubmitReturnControllerISpec extends IntegrationBaseSpec {
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
         (BAD_REQUEST, "INVALID_ORIGINATOR_ID", INTERNAL_SERVER_ERROR, DownstreamError),
         (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError),
-        (BAD_REQUEST, "INVALID_SUBMISSION", INTERNAL_SERVER_ERROR, DownstreamError)
+        (BAD_REQUEST, "INVALID_SUBMISSION", INTERNAL_SERVER_ERROR, DownstreamError),
+        (BAD_REQUEST, "TEST_ONLY_UNMATCHED_STUB_ERROR", BAD_REQUEST, RuleIncorrectGovTestScenarioError)
       )
 
       input.foreach(args => (serviceErrorTest _).tupled(args))

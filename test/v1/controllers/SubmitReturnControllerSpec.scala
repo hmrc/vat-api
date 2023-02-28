@@ -374,6 +374,7 @@ class SubmitReturnControllerSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
+          (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
           (BadRequestError, BAD_REQUEST),
           (PeriodKeyFormatErrorDes, BAD_REQUEST),
           (TaxPeriodNotEnded, FORBIDDEN),
