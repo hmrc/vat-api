@@ -18,7 +18,6 @@ package v1.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
-import v1.models.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.audit.AuditEvents
 import v1.mocks.MockIdGenerator
@@ -26,6 +25,7 @@ import v1.mocks.requestParsers.MockLiabilitiesRequestParser
 import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockLiabilitiesService}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.auth.UserDetails
+import v1.models.domain.Vrn
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
@@ -186,6 +186,7 @@ class LiabilitiesControllerSpec
 
         val input = Seq(
           (InvalidDateFromErrorDes, BAD_REQUEST),
+          (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
           (InvalidDateToErrorDes, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
           (InvalidDataError, BAD_REQUEST),

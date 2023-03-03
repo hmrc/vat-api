@@ -94,7 +94,8 @@ class ViewReturnServiceSpec extends ServiceSpec {
           ("INSOLVENT_TRADER", RuleInsolventTraderError),
           ("NOT_FOUND", EmptyNotFoundError),
           ("SERVER_ERROR", DownstreamError),
-          ("SERVICE_UNAVAILABLE", DownstreamError)
+          ("SERVICE_UNAVAILABLE", DownstreamError),
+          ("TEST_ONLY_UNMATCHED_STUB_ERROR", RuleIncorrectGovTestScenarioError)
         )
 
         input.foreach(args => (serviceError _).tupled(args))

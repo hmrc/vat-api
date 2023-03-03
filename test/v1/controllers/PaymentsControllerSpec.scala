@@ -216,6 +216,7 @@ class PaymentsControllerSpec
 
         val input = Seq(
           (VrnFormatErrorDes, BAD_REQUEST),
+          (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
           (InvalidDateFromErrorDes, BAD_REQUEST),
           (InvalidDateToErrorDes, BAD_REQUEST),
           (InvalidDataError, BAD_REQUEST),

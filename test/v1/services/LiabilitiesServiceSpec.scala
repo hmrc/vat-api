@@ -25,16 +25,16 @@ import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.liabilities.LiabilitiesRequest
-import v1.models.response.liabilities.{LiabilitiesResponse, Liability}
+import v1.models.response.liabilities.{ LiabilitiesResponse, Liability }
 
 import scala.concurrent.Future
 
 class LiabilitiesServiceSpec extends ServiceSpec {
 
-  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual",None,"id"),FakeRequest())
-  private val vrn: String = "123456789"
-  private val from: String = "2017-1-1"
-  private val to: String = "2017-12-31"
+  implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(UserDetails("Individual", None, "id"), FakeRequest())
+  private val vrn: String                                       = "123456789"
+  private val from: String                                      = "2017-1-1"
+  private val to: String                                        = "2017-12-31"
 
   private val retrieveLiabilitiesRequest: LiabilitiesRequest =
     LiabilitiesRequest(
@@ -44,7 +44,7 @@ class LiabilitiesServiceSpec extends ServiceSpec {
     )
 
   private val retrieveLiabilitiesResponse: LiabilitiesResponse =
-    LiabilitiesResponse(Seq(Liability(None,"VAT",1.0,None,None)))
+    LiabilitiesResponse(Seq(Liability(None, "VAT", 1.0, None, None)))
 
   trait Test extends MockLiabilitiesConnector {
 
@@ -57,7 +57,8 @@ class LiabilitiesServiceSpec extends ServiceSpec {
     "service call successful" must {
       "return the mapped result" in new Test {
 
-        MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
+        MockRetrieveLiabilitiesConnector
+          .retrieveLiabilities(retrieveLiabilitiesRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))))
 
         await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Right(ResponseWrapper(correlationId, retrieveLiabilitiesResponse))
@@ -65,7 +66,8 @@ class LiabilitiesServiceSpec extends ServiceSpec {
 
       "return a 404 Not Found for an empty liabilities response" in new Test {
 
-        MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
+        MockRetrieveLiabilitiesConnector
+          .retrieveLiabilities(retrieveLiabilitiesRequest)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, LiabilitiesResponse(Seq.empty[Liability])))))
 
         await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(correlationId, LegacyNotFoundError))
@@ -78,27 +80,29 @@ class LiabilitiesServiceSpec extends ServiceSpec {
         def serviceError(desErrorCode: String, error: MtdError): Unit =
           s"a $desErrorCode error is returned from the service" in new Test {
 
-            MockRetrieveLiabilitiesConnector.retrieveLiabilities(retrieveLiabilitiesRequest)
+            MockRetrieveLiabilitiesConnector
+              .retrieveLiabilities(retrieveLiabilitiesRequest)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
 
             await(service.retrieveLiabilities(retrieveLiabilitiesRequest)) shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
         val input: Seq[(String, MtdError)] = Seq(
-          "INVALID_IDTYPE" -> DownstreamError,
-          "INVALID_IDNUMBER" -> VrnFormatErrorDes,
-          "INVALID_REGIMETYPE" -> DownstreamError,
-          "INVALID_ONLYOPENITEMS" -> DownstreamError,
-          "INVALID_INCLUDELOCKS" -> DownstreamError,
-          "INVALID_CALCULATEACCRUEDINTEREST" -> DownstreamError,
+          "INVALID_IDTYPE"                     -> DownstreamError,
+          "INVALID_IDNUMBER"                   -> VrnFormatErrorDes,
+          "INVALID_REGIMETYPE"                 -> DownstreamError,
+          "INVALID_ONLYOPENITEMS"              -> DownstreamError,
+          "INVALID_INCLUDELOCKS"               -> DownstreamError,
+          "INVALID_CALCULATEACCRUEDINTEREST"   -> DownstreamError,
           "INVALID_CUSTOMERPAYMENTINFORMATION" -> DownstreamError,
-          "INVALID_DATEFROM" -> InvalidDateFromErrorDes,
-          "INVALID_DATETO" -> InvalidDateToErrorDes,
-          "NOT_FOUND" -> LegacyNotFoundError,
-          "INVALID_DATA" -> InvalidDataError,
-          "INSOLVENT_TRADER" -> RuleInsolventTraderError,
-          "SERVER_ERROR" -> DownstreamError,
-          "SERVICE_UNAVAILABLE" -> DownstreamError
+          "INVALID_DATEFROM"                   -> InvalidDateFromErrorDes,
+          "INVALID_DATETO"                     -> InvalidDateToErrorDes,
+          "NOT_FOUND"                          -> LegacyNotFoundError,
+          "INVALID_DATA"                       -> InvalidDataError,
+          "INSOLVENT_TRADER"                   -> RuleInsolventTraderError,
+          "SERVER_ERROR"                       -> DownstreamError,
+          "SERVICE_UNAVAILABLE"                -> DownstreamError,
+          "TEST_ONLY_UNMATCHED_STUB_ERROR"     -> RuleIncorrectGovTestScenarioError
         )
 
         input.foreach(args => (serviceError _).tupled(args))

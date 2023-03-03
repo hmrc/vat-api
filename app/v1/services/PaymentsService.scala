@@ -63,6 +63,7 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
       "NOT_FOUND"                          -> LegacyNotFoundError,
       "SERVER_ERROR"                       -> DownstreamError,
       "SERVICE_UNAVAILABLE"                -> DownstreamError,
-      "DOWNSTREAM_ERROR"                   -> DownstreamError
+      "DOWNSTREAM_ERROR"                   -> DownstreamError,
+      "TEST_ONLY_UNMATCHED_STUB_ERROR"     -> RuleIncorrectGovTestScenarioError
     )
 }

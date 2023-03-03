@@ -48,16 +48,17 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
 
   private val desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_VRN"          -> VrnFormatErrorDes,
-      "INVALID_PERIODKEY"    -> PeriodKeyFormatErrorDes,
-      "INVALID_IDENTIFIER"   -> PeriodKeyFormatErrorDesNotFound,
-      "NOT_FOUND_VRN"        -> DownstreamError,
-      "DATE_RANGE_TOO_LARGE" -> RuleDateRangeTooLargeError,
-      "INVALID_INPUTDATA"    -> InvalidInputDataError,
-      "INSOLVENT_TRADER"     -> RuleInsolventTraderError,
-      "NOT_FOUND"            -> EmptyNotFoundError,
-      "SERVICE_ERROR"        -> DownstreamError,
-      "SERVICE_UNAVAILABLE"  -> DownstreamError,
-      "DOWNSTREAM_ERROR"     -> DownstreamError
+      "INVALID_VRN"                    -> VrnFormatErrorDes,
+      "INVALID_PERIODKEY"              -> PeriodKeyFormatErrorDes,
+      "INVALID_IDENTIFIER"             -> PeriodKeyFormatErrorDesNotFound,
+      "NOT_FOUND_VRN"                  -> DownstreamError,
+      "DATE_RANGE_TOO_LARGE"           -> RuleDateRangeTooLargeError,
+      "INVALID_INPUTDATA"              -> InvalidInputDataError,
+      "INSOLVENT_TRADER"               -> RuleInsolventTraderError,
+      "NOT_FOUND"                      -> EmptyNotFoundError,
+      "SERVICE_ERROR"                  -> DownstreamError,
+      "SERVICE_UNAVAILABLE"            -> DownstreamError,
+      "DOWNSTREAM_ERROR"               -> DownstreamError,
+      "TEST_ONLY_UNMATCHED_STUB_ERROR" -> RuleIncorrectGovTestScenarioError
     )
 }

@@ -19,9 +19,9 @@ package v1.services
 import cats.data.EitherT
 import cats.implicits._
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{EndpointLogContext, Logging}
+import utils.{ EndpointLogContext, Logging }
 import v1.connectors.ObligationsConnector
 import v1.controllers.UserRequest
 import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
@@ -30,7 +30,7 @@ import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
 import v1.support.DesResponseMappingSupport
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class ObligationsService @Inject()(connector: ObligationsConnector) extends DesResponseMappingSupport with Logging {
@@ -52,18 +52,19 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
 
   private val desErrorMap: Map[String, MtdError] =
     Map(
-      "INVALID_IDTYPE"      -> DownstreamError,
-      "INVALID_IDNUMBER"    -> VrnFormatErrorDes,
-      "INVALID_STATUS"      -> InvalidStatusErrorDes,
-      "INVALID_REGIME"      -> DownstreamError,
-      "INVALID_DATE_FROM"   -> InvalidDateFromErrorDes,
-      "INVALID_DATE_TO"     -> InvalidDateToErrorDes,
-      "INVALID_DATE_RANGE"  -> RuleOBLDateRangeTooLargeError,
-      "INSOLVENT_TRADER"    -> RuleInsolventTraderError,
-      NOT_FOUND_BPKEY      -> DownstreamError,
-      "NOT_FOUND"           -> LegacyNotFoundError,
-      "SERVICE_ERROR"       -> DownstreamError,
-      "SERVICE_UNAVAILABLE" -> DownstreamError,
-      "DOWNSTREAM_ERROR"    -> DownstreamError
+      "INVALID_IDTYPE"                 -> DownstreamError,
+      "INVALID_IDNUMBER"               -> VrnFormatErrorDes,
+      "INVALID_STATUS"                 -> InvalidStatusErrorDes,
+      "INVALID_REGIME"                 -> DownstreamError,
+      "INVALID_DATE_FROM"              -> InvalidDateFromErrorDes,
+      "INVALID_DATE_TO"                -> InvalidDateToErrorDes,
+      "INVALID_DATE_RANGE"             -> RuleOBLDateRangeTooLargeError,
+      "INSOLVENT_TRADER"               -> RuleInsolventTraderError,
+      NOT_FOUND_BPKEY                  -> DownstreamError,
+      "NOT_FOUND"                      -> LegacyNotFoundError,
+      "SERVICE_ERROR"                  -> DownstreamError,
+      "SERVICE_UNAVAILABLE"            -> DownstreamError,
+      "DOWNSTREAM_ERROR"               -> DownstreamError,
+      "TEST_ONLY_UNMATCHED_STUB_ERROR" -> RuleIncorrectGovTestScenarioError
     )
 }

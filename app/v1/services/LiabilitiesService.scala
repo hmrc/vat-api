@@ -18,9 +18,8 @@ package v1.services
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{ EndpointLogContext, Logging }
+import utils.{EndpointLogContext, Logging}
 import v1.connectors.LiabilitiesConnector
 import v1.controllers.UserRequest
 import v1.models.errors._
@@ -28,7 +27,8 @@ import v1.models.request.liabilities.LiabilitiesRequest
 import v1.models.response.liabilities.LiabilitiesResponse
 import v1.support.DesResponseMappingSupport
 
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LiabilitiesService @Inject()(connector: LiabilitiesConnector) extends DesResponseMappingSupport with Logging {
@@ -63,6 +63,7 @@ class LiabilitiesService @Inject()(connector: LiabilitiesConnector) extends DesR
       "INSOLVENT_TRADER"                   -> RuleInsolventTraderError,
       "SERVER_ERROR"                       -> DownstreamError,
       "SERVICE_UNAVAILABLE"                -> DownstreamError,
-      "DOWNSTREAM_ERROR"                   -> DownstreamError
+      "DOWNSTREAM_ERROR"                   -> DownstreamError,
+      "TEST_ONLY_UNMATCHED_STUB_ERROR"     -> RuleIncorrectGovTestScenarioError
     )
 }
