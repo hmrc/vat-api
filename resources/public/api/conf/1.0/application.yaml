@@ -1,0 +1,2216 @@
+openapi: 3.0.3
+info:
+  title: VAT (MTD)
+  description: ""
+  contact: {}
+  version: '1.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: Production
+paths:
+  /organisations/vat/{vrn}/obligations:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve VAT obligations
+      description: Retrieve VAT obligations. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Submit VAT return for period](#_submit-vat-return-for-period_post_accordion).
+      operationId: RetrieveVATobligations
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: from
+        in: query
+        description: Date from which to return obligations. Mandatory unless the status is O.
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2017-01-25
+      - name: to
+        in: query
+        description: Date to which to return obligations. Mandatory unless the status is O.
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2017-01-25
+      - name: status
+        in: query
+        description: 'Obligation status to return: O=Open, F= Fulfilled. Omit status to retrieve all obligations.'
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: F
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Obligations'
+                - example:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-03-31
+                      due: 2017-05-07
+                      status: F
+                      periodKey: 18A1
+                      received: 2017-05-06
+                    - start: 2017-04-01
+                      end: 2017-06-30
+                      due: 2017-08-07
+                      status: O
+                      periodKey: 18A2
+              examples:
+                example-1:
+                  description: Quarterly obligations; one fulfilled
+                  value:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-03-31
+                      due: 2017-05-07
+                      status: F
+                      periodKey: 18A1
+                      received: 2017-05-06
+                    - start: 2017-04-01
+                      end: 2017-06-30
+                      due: 2017-08-07
+                      status: O
+                      periodKey: 18A2
+                example-2:
+                  description: Monthly obligations; one fulfilled
+                  value:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-01-31
+                      due: 2017-03-07
+                      status: F
+                      periodKey: 18AD
+                      received: 2017-03-06
+                    - start: 2017-02-01
+                      end: 2017-02-28
+                      due: 2017-04-07
+                      status: O
+                      periodKey: 18AE
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidNino:
+                  description: Invalid VRN
+                  value:
+                    code: VRN_INVALID
+                invalidDateFrom:
+                  description: Invalid date from
+                  value:
+                    code: INVALID_DATE_FROM
+                invalidDateTo:
+                  description: Invalid date to
+                  value:
+                    code: INVALID_DATE_TO
+                invalidDateRange:
+                  description: Invalid date range, must be 366 days or less
+                  value:
+                    code: INVALID_DATE_RANGE
+                invalidStatus:
+                  description: Invalid status
+                  value:
+                    code: INVALID_STATUS
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                invalidNino:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/returns:
+    post:
+      tags:
+      - organisations
+      summary: Submit VAT return for period
+      description: Submit VAT return for period. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Retrieve VAT obligations](#_retrieve-vat-obligations_get_accordion).
+      operationId: SubmitVATreturnforperiod
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/VATReturnDeclaration'
+              - example:
+                  periodKey: A001
+                  vatDueSales: 105.5
+                  vatDueAcquisitions: -100.45
+                  totalVatDue: 5.05
+                  vatReclaimedCurrPeriod: 105.15
+                  netVatDue: 100.1
+                  totalValueSalesExVAT: 300
+                  totalValuePurchasesExVAT: 300
+                  totalValueGoodsSuppliedExVAT: 3000
+                  totalAcquisitionsExVAT: 3000
+                  finalised: true
+            examples:
+              example-1:
+                description: VAT Return with decimals
+                value:
+                  periodKey: A001
+                  vatDueSales: 105.5
+                  vatDueAcquisitions: -100.45
+                  totalVatDue: 5.05
+                  vatReclaimedCurrPeriod: 105.15
+                  netVatDue: 100.1
+                  totalValueSalesExVAT: 300
+                  totalValuePurchasesExVAT: 300
+                  totalValueGoodsSuppliedExVAT: 3000
+                  totalAcquisitionsExVAT: 3000
+                  finalised: true
+              example-2:
+                description: VAT Return with a hash in the periodKey
+                value:
+                  periodKey: '#001'
+                  vatDueSales: 100
+                  vatDueAcquisitions: 100
+                  totalVatDue: 200
+                  vatReclaimedCurrPeriod: 100
+                  netVatDue: 100
+                  totalValueSalesExVAT: 500
+                  totalValuePurchasesExVAT: 500
+                  totalValueGoodsSuppliedExVAT: 500
+                  totalAcquisitionsExVAT: 500
+                  finalised: true
+        required: true
+      responses:
+        '201':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+            Receipt-ID:
+              description: Unique reference number returned for a submission <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique reference number returned for a submission <br> String, 36 characters.
+                    example: 2dd537bc-4244-4ebf-bac9-96321be13cdc
+                  example: 2dd537bc-4244-4ebf-bac9-96321be13cdc
+            Receipt-Timestamp:
+              description: The timestamp from the signature, in ISO8601 format
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: The timestamp from the signature, in ISO8601 format
+                    example: 2018-02-14T09:32:15Z
+                  example: 2018-02-14T09:32:15Z
+            Receipt-Signature:
+              description: This header is not currently used
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: This header is not currently used
+                    example: DO NOT USE
+                  example: DO NOT USE
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/MTDFB-API56v1.0Submit9-BoxVatReturn-Successresponse'
+                - example:
+                    processingDate: 2018-01-16T08:20:27.895+0000
+                    paymentIndicator: BANK
+                    formBundleNumber: '256660290587'
+                    chargeRefNumber: aCxFaNx0FZsCvyWF
+              example:
+                processingDate: 2018-01-16T08:20:27.895+0000
+                paymentIndicator: BANK
+                formBundleNumber: '256660290587'
+                chargeRefNumber: aCxFaNx0FZsCvyWF
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidVrn:
+                  description: Invalid VRN
+                  value:
+                    code: VRN_INVALID
+                invalidPeriodKey:
+                  description: Invalid period key
+                  value:
+                    code: PERIOD_KEY_INVALID
+                invalidRequest:
+                  description: Invalid request
+                  value:
+                    code: INVALID_REQUEST
+                invalidTotalValue:
+                  description: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
+                  value:
+                    code: VAT_TOTAL_VALUE
+                invalidNetValue:
+                  description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                  value:
+                    code: VAT_NET_VALUE
+                invalidNumericValue:
+                  description: Please provide a numeric field
+                  value:
+                    code: INVALID_NUMERIC_VALUE
+                invalidMonetaryAmount:
+                  description: The monetary amount is invalid
+                  value:
+                    code: INVALID_MONETARY_AMOUNT
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FINALISED
+              examples:
+                notDeclared:
+                  description: User has not declared VAT return as final
+                  value:
+                    code: NOT_FINALISED
+                duplicateSubmission:
+                  description: User has already submitted a VAT return for the given period
+                  value:
+                    code: DUPLICATE_SUBMISSION
+                submittedToEarly:
+                  description: Return submitted too early
+                  value:
+                    code: TAX_PERIOD_NOT_ENDED
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+      security:
+        - userRestricted: [ write:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/returns/{periodKey}:
+    get:
+      tags:
+      - organisations
+      summary: View VAT Return
+      description: Retrieve a submitted VAT return
+      operationId: ViewVATReturn
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: periodKey
+        in: path
+        description: The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the "#" symbol, which must be URL-encoded.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '18AD, 18A1, #001'
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/SubmitVAT'
+                - example:
+                    periodKey: A001
+                    vatDueSales: 105.5
+                    vatDueAcquisitions: -100.45
+                    totalVatDue: 5.05
+                    vatReclaimedCurrPeriod: 105.15
+                    netVatDue: 100.1
+                    totalValueSalesExVAT: 300
+                    totalValuePurchasesExVAT: 300
+                    totalValueGoodsSuppliedExVAT: 3000
+                    totalAcquisitionsExVAT: 3000
+              examples:
+                example-1:
+                  description: VAT Return with decimals
+                  value:
+                    periodKey: A001
+                    vatDueSales: 105.5
+                    vatDueAcquisitions: -100.45
+                    totalVatDue: 5.05
+                    vatReclaimedCurrPeriod: 105.15
+                    netVatDue: 100.1
+                    totalValueSalesExVAT: 300
+                    totalValuePurchasesExVAT: 300
+                    totalValueGoodsSuppliedExVAT: 3000
+                    totalAcquisitionsExVAT: 3000
+                example-2:
+                  description: VAT Return with a hash in the periodKey
+                  value:
+                    periodKey: '#001'
+                    vatDueSales: 100
+                    vatDueAcquisitions: 100
+                    totalVatDue: 200
+                    vatReclaimedCurrPeriod: 100
+                    netVatDue: 100
+                    totalValueSalesExVAT: 500
+                    totalValuePurchasesExVAT: 500
+                    totalValueGoodsSuppliedExVAT: 500
+                    totalAcquisitionsExVAT: 500
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidNino:
+                  description: The provided VRN is invalid
+                  value:
+                    code: VRN_INVALID
+                periodKeyInvalid:
+                  description: Invalid period key
+                  value:
+                    code: PERIOD_KEY_INVALID
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: DATE_RANGE_TOO_LARGE
+              examples:
+                dateRangeTooLarge:
+                  description: The date of the requested return cannot be more than four years from the current date
+                  value:
+                    code: DATE_RANGE_TOO_LARGE
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                notFound:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/liabilities:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve VAT liabilities
+      description: Retrieve VAT liabilities
+      operationId: RetrieveVATliabilities
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: from
+        in: query
+        description: Liabilities to return from date, the minimum 'from' date is 2017-12-01
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2018-01-25
+      - name: to
+        in: query
+        description: Liabilities to return up to date, the maximum 'to' date is the current date
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2018-12-31
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Liabilities'
+                - example:
+                    liabilities:
+                    - taxPeriod:
+                        from: 2018-04-06
+                        to: 2018-07-06
+                      type: VAT ...
+                      originalAmount: 6000.3
+                      outstandingAmount: 100.51
+                      due: 2018-07-06
+              example:
+                liabilities:
+                - taxPeriod:
+                    from: 2018-04-06
+                    to: 2018-07-06
+                  type: VAT ...
+                  originalAmount: 6000.3
+                  outstandingAmount: 100.51
+                  due: 2018-07-06
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidNino:
+                  description: Invalid VRN
+                  value:
+                    code: VRN_INVALID
+                invalidDateFrom:
+                  description: Invalid date from
+                  value:
+                    code: DATE_FROM_INVALID
+                invalidDateTo:
+                  description: Invalid date to
+                  value:
+                    code: DATE_TO_INVALID
+                invalidDateRange:
+                  description: Invalid date range, must be 365 days or less
+                  value:
+                    code: DATE_RANGE_INVALID
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                invalidNino:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/payments:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve VAT payments
+      description: Retrieve VAT payments
+      operationId: RetrieveVATpayments
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: from
+        in: query
+        description: Payments to return from date, the minimum 'from' date is 2017-12-01
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2018-01-25
+      - name: to
+        in: query
+        description: Payments to return up to date, the maximum 'to' date is the current date
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2018-12-31
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Payments'
+                - example:
+                    payments:
+                    - amount: 100.05
+                      received: 2018-04-06
+              example:
+                payments:
+                - amount: 100.05
+                  received: 2018-04-06
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidNino:
+                  description: Invalid VRN
+                  value:
+                    code: VRN_INVALID
+                invalidDateFrom:
+                  description: Invalid date from
+                  value:
+                    code: DATE_FROM_INVALID
+                invalidDateTo:
+                  description: Invalid date to
+                  value:
+                    code: DATE_TO_INVALID
+                invalidDateRange:
+                  description: Invalid date range, must be 365 days or less
+                  value:
+                    code: DATE_RANGE_INVALID
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                invalidNino:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/penalties:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve VAT penalties
+      description: Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
+      operationId: RetrieveVATpenalties
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Penalties'
+                - example: {}
+              examples:
+                example-1:
+                  description: Example of an account with no penalties
+                  value: {}
+                example-2:
+                  description: All fields example
+                  value:
+                    totalisations:
+                      lateSubmissionPenaltyTotalValue: 400
+                      penalisedPrincipalTotal: 10000
+                      latePaymentPenaltyPostedTotal: 425.21
+                      latePaymentPenaltyEstimateTotal: 30.68
+                    lateSubmissionPenalty:
+                      summary:
+                        activePenaltyPoints: 4
+                        inactivePenaltyPoints: 1
+                        periodOfComplianceAchievement: 2025-05-01
+                        regimeThreshold: 4
+                        penaltyChargeAmount: 400
+                      details:
+                      - penaltyNumber: '00004'
+                        penaltyOrder: '4'
+                        penaltyCategory: point
+                        penaltyStatus: inactive
+                        frequencyAdjustmentPointIndicator: X
+                        penaltyCreationDate: 2023-11-08
+                        penaltyExpiryDate: 2025-12-01
+                        expiryReason: appeal
+                        communicationsDate: 2023-11-11
+                        lateSubmissions:
+                        - lateSubmissionID: '1054600'
+                          taxReturnStatus: Fulfilled
+                          taxPeriodStartDate: 2023-07-01
+                          taxPeriodEndDate: 2023-09-30
+                          taxPeriodDueDate: 2023-11-07
+                          returnReceiptDate: 2023-11-13
+                        appealInformation:
+                        - appealStatus: appeal-upheld
+                          appealLevel: statutory-review
+                      - penaltyNumber: '00005'
+                        penaltyOrder: '5'
+                        penaltyCategory: threshold
+                        penaltyStatus: active
+                        penaltyCreationDate: 2024-02-08
+                        penaltyExpiryDate: 2026-03-01
+                        communicationsDate: 2024-02-11
+                        lateSubmissions:
+                        - lateSubmissionID: '1054700'
+                          taxReturnStatus: Fulfilled
+                          taxPeriodStartDate: 2023-10-01
+                          taxPeriodEndDate: 2023-12-31
+                          taxPeriodDueDate: 2024-02-07
+                          returnReceiptDate: 2024-02-15
+                        chargeReference: XS198765432109
+                        chargeAmount: 200
+                        chargeOutstandingAmount: 200
+                        chargeDueDate: 2024-02-28
+                      - penaltyNumber: '00006'
+                        penaltyOrder: '6'
+                        penaltyCategory: charge
+                        penaltyStatus: active
+                        penaltyCreationDate: 2024-05-08
+                        penaltyExpiryDate: 2026-06-01
+                        communicationsDate: 2024-05-11
+                        lateSubmissions:
+                        - lateSubmissionID: '1054800'
+                          taxReturnStatus: Fulfilled
+                          taxPeriodStartDate: 2024-01-01
+                          taxPeriodEndDate: 2024-03-31
+                          taxPeriodDueDate: 2024-05-07
+                          returnReceiptDate: 2024-11-12
+                        chargeReference: XS212345678901
+                        chargeAmount: 200
+                        chargeOutstandingAmount: 200
+                        chargeDueDate: 2024-02-28
+                    latePaymentPenalty:
+                      details:
+                      - principalChargeReference: XV123451234512
+                        penaltyCategory: LPP1
+                        penaltyStatus: posted
+                        penaltyAmountAccruing: 0
+                        penaltyAmountPosted: 400
+                        penaltyAmountPaid: 0
+                        penaltyAmountOutstanding: 400
+                        latePaymentPenalty1LowerRateCalculationAmount: 10000
+                        latePaymentPenalty1LowerRatePercentage: 2
+                        latePaymentPenalty1HigherRateCalculationAmount: 10000
+                        latePaymentPenalty1HigherRatePercentage: 4
+                        penaltyChargeCreationDate: 2024-06-06
+                        communicationsDate: 2024-06-09
+                        penaltyChargeReference: XP123456789012
+                        penaltyChargeDueDate: 2024-07-06
+                        principalChargeDocNumber: '10023852'
+                        principalChargeBillingFrom: 2024-01-01
+                        principalChargeBillingTo: 2024-03-31
+                        principalChargeDueDate: 2024-05-07
+                        principalChargeLatestClearing: 2024-07-31
+                        timeToPay:
+                        - timeToPayStartDate: 2024-07-06
+                          timeToPayEndDate: 2024-07-11
+                        appealInformation:
+                        - appealStatus: appeal-rejected
+                          appealLevel: statutory-review
+                      - principalChargeReference: XV123451234512
+                        penaltyCategory: LPP2
+                        penaltyStatus: accruing
+                        penaltyAmountAccruing: 30.68
+                        penaltyAmountPosted: 25.21
+                        penaltyAmountPaid: 0
+                        penaltyAmountOutstanding: 25.21
+                        latePaymentPenalty2Days: '23'
+                        latePaymentPenalty2Percentage: 4
+                        penaltyChargeCreationDate: 2024-07-01
+                        communicationsDate: 2024-07-04
+                        penaltyChargeReference: XP298765432109
+                        penaltyChargeDueDate: 2024-08-07
+                        principalChargeDocNumber: '10023852'
+                        principalChargeBillingFrom: 2024-01-01
+                        principalChargeBillingTo: 2024-03-31
+                        principalChargeDueDate: 2024-05-07
+                        principalChargeLatestClearing: 2024-07-31
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidVrn:
+                  description: Invalid VRN.
+                  value:
+                    code: VRN_INVALID
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+  /organisations/vat/{vrn}/financial-details/{penaltyChargeReference}:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve financial details
+      description: Retrieves the financial details relating to a late submission or late payment penalty that has been applied to a VAT account.
+      operationId: Retrievefinancialdetails
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: penaltyChargeReference
+        in: path
+        description: The late submission or late payment penalty charge reference, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: XP123456789012
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FinancialDetails'
+                - example:
+                    totalisations:
+                      totalOverdue: 123.45
+                      totalNotYetDue: 12.34
+                      totalBalance: 12.45
+                      totalCredit: 13.46
+                      totalCleared: 12.35
+                      additionalReceivableTotalisations:
+                        totalAccountPostedInterest: 13.12
+                        totalAccountAccruingInterest: 12.1
+                    documentDetails:
+                    - postingDate: 2024-05-07
+                      issueDate: 2024-05-07
+                      documentTotalAmount: 123.45
+                      documentClearedAmount: 111.11
+                      documentOutstandingAmount: 12.34
+                      documentInterestTotals:
+                        interestPostedAmount: 13.12
+                        interestAccruingAmount: 12.1
+                      lineItemDetails:
+                      - chargeDescription: VAT Return
+                        periodFromDate: 2024-01-01
+                        periodToDate: 2024-03-31
+                        netDueDate: 2024-05-07
+                        amount: 123.45
+                        lineItemInterestDetails:
+                          interestStartDate: 2024-05-08
+                          currentInterestRate: 2
+                          interestPostedAmount: 13.12
+                          interestAccruingAmount: 12.1
+              examples:
+                example-1:
+                  description: all fields example
+                  value:
+                    totalisations:
+                      totalOverdue: 123.45
+                      totalNotYetDue: 12.34
+                      totalBalance: 12.45
+                      totalCredit: 13.46
+                      totalCleared: 12.35
+                      additionalReceivableTotalisations:
+                        totalAccountPostedInterest: 13.12
+                        totalAccountAccruingInterest: 12.1
+                    documentDetails:
+                    - postingDate: 2024-05-07
+                      issueDate: 2024-05-07
+                      documentTotalAmount: 123.45
+                      documentClearedAmount: 111.11
+                      documentOutstandingAmount: 12.34
+                      documentInterestTotals:
+                        interestPostedAmount: 13.12
+                        interestAccruingAmount: 12.1
+                      lineItemDetails:
+                      - chargeDescription: VAT Return
+                        periodFromDate: 2024-01-01
+                        periodToDate: 2024-03-31
+                        netDueDate: 2024-05-07
+                        amount: 123.45
+                        lineItemInterestDetails:
+                          interestStartDate: 2024-05-08
+                          currentInterestRate: 2
+                          interestPostedAmount: 13.12
+                          interestAccruingAmount: 12.1
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: VRN_INVALID
+              examples:
+                invalidVrn:
+                  description: Invalid VRN.
+                  value:
+                    code: VRN_INVALID
+                invalidChargeReference:
+                  description: The specified penalty charge reference is invalid.
+                  value:
+                    code: CHARGE_REFERENCE_INVALID
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: MATCHING_RESOURCE_NOT_FOUND
+              examples:
+                notFound:
+                  description: The remote endpoint has indicated that no associated data is found.
+                  value:
+                    code: MATCHING_RESOURCE_NOT_FOUND
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
+components:
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+    AdditionalReceivableTotalisations:
+      title: AdditionalReceivableTotalisations
+      type: object
+      properties:
+        totalAccountPostedInterest:
+          type: number
+          description: The total amount of interest that HMRC has actually posted to the account.
+          example: 200
+        totalAccountAccruingInterest:
+          type: number
+          description: The total amount of unposted interest that the account has currently accrued.
+          example: 45.35
+      description: Interest totals that relate to the VAT account.
+    AppealInformation:
+      title: AppealInformation
+      required:
+      - appealStatus
+      - appealLevel
+      type: object
+      properties:
+        appealStatus:
+          allOf:
+          - $ref: '#/components/schemas/AppealStatus'
+          - description: The appeal status of a penalty.
+            example: under-appeal
+        appealLevel:
+          allOf:
+          - $ref: '#/components/schemas/AppealLevel'
+          - description: The level of appeal.
+            example: statutory-review
+    AppealLevel:
+      title: AppealLevel
+      enum:
+      - statutory-review
+      - appeal-first-tier-tribunal
+      type: string
+      description: The level of appeal.
+      example: statutory-review
+    AppealStatus:
+      title: AppealStatus
+      enum:
+      - under-appeal
+      - appeal-upheld
+      - appeal-rejected
+      - cannot-be-appealed
+      type: string
+      description: The appeal status of a penalty.
+      example: under-appeal
+    Detail:
+      title: Detail
+      required:
+      - penaltyNumber
+      - penaltyOrder
+      - penaltyCategory
+      - penaltyStatus
+      - penaltyCreationDate
+      - penaltyExpiryDate
+      type: object
+      properties:
+        penaltyNumber:
+          type: string
+          description: The unique identification number for the penalty.
+          example: '12345678901234'
+        penaltyOrder:
+          type: string
+          description: The position that the penalty currently occupies within the individual's or organisation's point balance.
+          example: '01'
+        penaltyCategory:
+          oneOf:
+          - $ref: '#/components/schemas/PenaltyCategory'
+          - $ref: '#/components/schemas/PenaltyCategory1'
+          - $ref: '#/components/schemas/PenaltyCategory2'
+          description: The category of the penalty.
+          example: point
+        penaltyStatus:
+          oneOf:
+          - $ref: '#/components/schemas/PenaltyStatus'
+          - $ref: '#/components/schemas/PenaltyStatus1'
+          description: The status of the penalty. Its meaning depends upon the penalty's category.
+          example: active
+        frequencyAdjustmentPointIndicator:
+          allOf:
+          - $ref: '#/components/schemas/FrequencyAdjustmentPointIndicator'
+          - description: Indicates whether there has been an adjustment to the penalty point because of a change to your submission frequency (for example, changing from quarterly submissions to monthly submissions).
+            example: X
+        penaltyCreationDate:
+          type: string
+          description: The date that the penalty point was created.
+          example: 2022-07-01
+        penaltyExpiryDate:
+          type: string
+          description: The date that the penalty point will expire. If the penalty falls within the points threshold, it will expire once compliance is met.
+          example: 2024-07-01
+        expiryReason:
+          oneOf:
+          - $ref: '#/components/schemas/ExpiryReason'
+          - $ref: '#/components/schemas/ExpiryReason1'
+          - $ref: '#/components/schemas/ExpiryReason2'
+          - $ref: '#/components/schemas/ExpiryReason3'
+          - $ref: '#/components/schemas/ExpiryReason4'
+          - $ref: '#/components/schemas/ExpiryReason5'
+          - $ref: '#/components/schemas/ExpiryReason6'
+          - $ref: '#/components/schemas/ExpiryReason7'
+          description: The reason why a penalty point has expired.
+          example: appeal
+        communicationsDate:
+          type: string
+          description: The date when a letter about the penalty was sent to the customer.
+          example: 2022-07-01
+        lateSubmissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LateSubmission'
+          description: The late submissions that relate to the period for which the penalty was levied. Note that although only one penalty point will be levied for late submissions of a particular type of obligation during a calendar month, more than one late submission of that type could be made during the month. In that case, the lateSubmissions array will contain more than one object. All of these late submissions are incorporated within the single penalty point and affect the period of compliance and expiry date (which will be set by the date of the most recent failure).
+        appealInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppealInformation'
+          description: Details of any appeals that the individual or organisation has made against the penalty point.
+        chargeReference:
+          type: string
+          description: The late submission penalty charge reference.
+          example: XS198765432109
+        chargeAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The late submission penalty charge amount. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 200
+        chargeOutstandingAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The penalty charge amount that remains to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 103.12
+        chargeDueDate:
+          type: string
+          description: The due date for the late submission penalty charge (this will be a maximum of 30 days after the submission was originally due).
+          example: 2022-07-31
+    Detail1:
+      title: Detail1
+      required:
+      - principalChargeReference
+      - penaltyCategory
+      - penaltyStatus
+      - penaltyAmountAccruing
+      - penaltyAmountPosted
+      - principalChargeDocNumber
+      - principalChargeBillingFrom
+      - principalChargeBillingTo
+      - principalChargeDueDate
+      type: object
+      properties:
+        principalChargeReference:
+          type: string
+          description: The reference for the principal charge upon which the late payment penalty is based. This is the original charge that was not paid on time (typically the VAT return charge reference).
+          example: XV123451234512
+        penaltyCategory:
+          type: string
+          description: The category of the penalty. This specifies whether the penalty is a first late payment penalty (LPP1) or a second late payment penalty (LPP2).
+          example: LPP1
+        penaltyStatus:
+          oneOf:
+          - $ref: '#/components/schemas/PenaltyStatus2'
+          - $ref: '#/components/schemas/PenaltyStatus21'
+          description: The status of the penalty.
+          example: accruing
+        penaltyAmountAccruing:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The unposted penalty amount that is accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 400
+        penaltyAmountPosted:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The penalty amount that has been posted to the account. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 400
+        penaltyAmountPaid:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The penalty amount that has already been paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 100
+        penaltyAmountOutstanding:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The remaining penalty amount to be paid. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 300
+        latePaymentPenalty1LowerRateCalculationAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The amount of VAT that remained unpaid 16 days after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 3605.5
+        latePaymentPenalty1LowerRatePercentage:
+          multipleOf: 0.01
+          maximum: 99.99
+          minimum: -99.99
+          type: number
+          description: The percentage used to calculate the lower-rate part of the first late payment penalty.
+          example: 2
+        latePaymentPenalty1HigherRateCalculationAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The amount of VAT that remained unpaid 31 days after the due date. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 10000
+        latePaymentPenalty1HigherRatePercentage:
+          multipleOf: 0.01
+          maximum: 99.99
+          minimum: -99.99
+          type: number
+          description: The percentage used to calculate the higher-rate part of the first late payment penalty.
+          example: 2
+        latePaymentPenalty2Days:
+          type: string
+          description: The number of days over which the second late payment penalty has accrued. This is the number of days that have elapsed since day 31 after the VAT payment due date.
+          example: '14'
+        latePaymentPenalty2Percentage:
+          multipleOf: 0.01
+          maximum: 99.99
+          minimum: -99.99
+          type: number
+          description: The percentage rate that has been applied to unpaid VAT in order to calculate the second late payment penalty.
+          example: 2
+        penaltyChargeCreationDate:
+          type: string
+          description: The date when the penalty charge was created.
+          example: 2022-07-08
+        communicationsDate:
+          type: string
+          description: The date when a letter about the penalty was sent to the customer.
+          example: 2022-07-09
+        penaltyChargeReference:
+          type: string
+          description: The late payment penalty charge reference.
+          example: XP123456789012
+        penaltyChargeDueDate:
+          type: string
+          description: The date that the penalty must be paid by.
+          example: 2022-07-31
+        appealInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppealInformation'
+          description: ''
+        principalChargeDocNumber:
+          type: string
+          description: Document number relating to the VAT charge.
+          example: '123456789012'
+        principalChargeBillingFrom:
+          type: string
+          description: The start date of the obligation period.
+          example: 2024-01-01
+        principalChargeBillingTo:
+          type: string
+          description: The end date of the obligation period.
+          example: 2024-03-31
+        principalChargeDueDate:
+          type: string
+          description: The date that the principal charge should have been paid by.
+          example: 2024-05-07
+        principalChargeLatestClearing:
+          type: string
+          description: The date that the principal charge was paid.
+          example: 2024-07-31
+        timeToPay:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeToPay'
+          description: Details of the Time to Pay arrangement that has been made.
+    DocumentDetail:
+      title: DocumentDetail
+      type: object
+      properties:
+        postingDate:
+          type: string
+          description: The date that the charge was posted to the individual's or organisation's account.
+          example: 2022-08-16
+        issueDate:
+          type: string
+          description: The date that correspondence about the charge was sent to the individual or organisation.
+          example: 2022-08-16
+        documentInterestTotals:
+          allOf:
+          - $ref: '#/components/schemas/DocumentInterestTotals'
+          - description: Interest totals that relate to the charge.
+        documentTotalAmount:
+          type: number
+          description: The total sum of the line items within the document. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        documentClearedAmount:
+          type: number
+          description: The amount that has been paid, reversed, removed or cleared. For example, this could be the portion of a charge that has already been paid. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        documentOutstandingAmount:
+          type: number
+          description: The remaining balance. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        lineItemDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItemDetail'
+          description: The line items that make up the document. A document can contain more than one line item. For example, an individual or organisation might submit an amendment form that contains multiple corrections (perhaps the individual or organisation paid too much VAT for one tax period, but not enough for the next). Each correction will comprise an individual line item. HMRC will take all of the line items into account when it calculates the charge.
+    DocumentInterestTotals:
+      title: DocumentInterestTotals
+      type: object
+      properties:
+        interestPostedAmount:
+          type: number
+          description: The amount of interest, relating to the charge, that HMRC has actually posted to the account.
+          example: 13.12
+        interestAccruingAmount:
+          type: number
+          description: The amount of unposted interest that has currently accrued on the charge.
+          example: 12.1
+      description: Interest totals that relate to the charge.
+    ExpiryReason:
+      title: ExpiryReason
+      enum:
+      - appeal
+      type: string
+      description: The penalty point has expired due to a successful appeal.
+    ExpiryReason1:
+      title: ExpiryReason1
+      enum:
+      - submission-frequency-change
+      type: string
+      description: The penalty point has expired due to a change in the user's submission frequency.
+    ExpiryReason2:
+      title: ExpiryReason2
+      enum:
+      - obligations-reversed
+      type: string
+      description: A change has resulted in the user's obligations being reversed. For example, a user might have deregistered for VAT before a submission was due.
+    ExpiryReason3:
+      title: ExpiryReason3
+      enum:
+      - HMRC-removed
+      type: string
+      description: An HMRC officer has removed the penalty. This might happen, for example, following a decision made by a tribunal.
+    ExpiryReason4:
+      title: ExpiryReason4
+      enum:
+      - natural-expiry
+      type: string
+      description: The penalty point has expired naturally. For example, it has reached the end of its 24-month lifetime.
+    ExpiryReason5:
+      title: ExpiryReason5
+      enum:
+      - penalty-removed
+      type: string
+      description: The penalty has been removed because the submission was deemed to be on time.
+    ExpiryReason6:
+      title: ExpiryReason6
+      enum:
+      - expiry-conditions-met
+      type: string
+      description: The penalty point has expired because the user has met the conditions for the expiry of all active penalty points.
+    ExpiryReason7:
+      title: ExpiryReason7
+      enum:
+      - HMRC-reset
+      type: string
+      description: An HMRC officer has reset the user's penalty points to zero.
+    FinancialDetails:
+      title: FinancialDetails
+      type: object
+      properties:
+        totalisations:
+          allOf:
+          - $ref: '#/components/schemas/Totalisations1'
+          - description: Totals that relate to the charge.
+        documentDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentDetail'
+          description: All the documents that relate to the charge. An individual document will only relate to one charge reference, but there could be multiple documents relating to that charge reference. For example, this might be the case if a charge has been levied and subsequently reversed, or if multiple periodic interest charges share the same charge reference.
+    FrequencyAdjustmentPointIndicator:
+      title: FrequencyAdjustmentPointIndicator
+      enum:
+      - X
+      type: string
+      description: Indicates whether there has been an adjustment to the penalty point because of a change to your submission frequency (for example, changing from quarterly submissions to monthly submissions).
+      example: X
+    LatePaymentPenalty:
+      title: LatePaymentPenalty
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Detail1'
+          description: Details of all the late payment penalties that the individual or organisation has accrued.
+      description: Information about the late payment penalties that HMRC has levied.
+    LateSubmission:
+      title: LateSubmission
+      required:
+      - lateSubmissionID
+      - taxReturnStatus
+      type: object
+      properties:
+        lateSubmissionID:
+          type: string
+          description: The unique identification number for the late submission penalty.
+          example: '001'
+        taxReturnStatus:
+          oneOf:
+          - $ref: '#/components/schemas/TaxReturnStatus'
+          - $ref: '#/components/schemas/TaxReturnStatus1'
+          - $ref: '#/components/schemas/TaxReturnStatus2'
+          description: The status of the tax return.
+          example: Open
+        taxPeriodStartDate:
+          type: string
+          description: Start date of the VAT period to which the penalty relates.
+          example: 2022-04-01
+        taxPeriodEndDate:
+          type: string
+          description: End date of the VAT period to which the penalty relates.
+          example: 2022-06-30
+        taxPeriodDueDate:
+          type: string
+          description: The due date for the VAT return, which was missed and gave rise to the late submission penalty.
+          example: 2022-07-07
+        returnReceiptDate:
+          type: string
+          description: The date upon which the VAT return was submitted.
+          example: 2022-07-15
+    LateSubmissionPenalty:
+      title: LateSubmissionPenalty
+      required:
+      - summary
+      - details
+      type: object
+      properties:
+        summary:
+          allOf:
+          - $ref: '#/components/schemas/Summary'
+          - description: A summary of the individual's or organisation's late submission penalty status.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Detail'
+          description: Details of each late submission penalty that the individual or organisation has accrued.
+      description: Information about the late submission penalties that HMRC has levied.
+    Liabilities:
+      title: Liabilities
+      required:
+      - liabilities
+      type: object
+      properties:
+        liabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Liability'
+          description: A list of all liabilities
+    Liability:
+      title: Liability
+      required:
+      - type
+      - originalAmount
+      type: object
+      properties:
+        taxPeriod:
+          allOf:
+          - $ref: '#/components/schemas/TaxPeriod'
+          - description: Tax Period
+        type:
+          type: string
+          description: The charge type of this liability. Max length, 30 characters.
+          example: VAT ...
+        originalAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        outstandingAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        due:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+      description: Liability
+    LineItemDetail:
+      title: LineItemDetail
+      type: object
+      properties:
+        chargeDescription:
+          type: string
+          description: Describes what the charge relates to.
+          example: VAT Return
+        periodFromDate:
+          type: string
+          description: The start date of this period.
+          example: 2022-08-16
+        periodToDate:
+          type: string
+          description: The end date of this period.
+          example: 2022-08-16
+        netDueDate:
+          type: string
+          description: The due date for payment.
+          example: 2022-08-16
+        amount:
+          type: number
+          description: The amount. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        lineItemInterestDetails:
+          allOf:
+          - $ref: '#/components/schemas/LineItemInterestDetails'
+          - description: Details of the interest that relates to the line item.
+    LineItemInterestDetails:
+      title: LineItemInterestDetails
+      type: object
+      properties:
+        interestStartDate:
+          type: string
+          description: The date that the interest charges started.
+          example: 2022-08-16
+        currentInterestRate:
+          type: number
+          description: The rate of interest that currently applies to the line item.
+          example: 2
+        interestPostedAmount:
+          type: number
+          description: The amount of interest, relating to the line item, that HMRC has actually posted to the account. Interest will continue to be posted at the end of each month, until the customer pays the charge upon which the interest is based. At this point, a final interest charge will be calculated and posted.
+          example: 13.12
+        interestAccruingAmount:
+          type: number
+          description: The amount of unposted interest that has accrued on the line item to date, since the interest start date.
+          example: 12.1
+      description: Details of the interest that relates to the line item.
+    MTDFB-API56v1.0Submit9-BoxVatReturn-Successresponse:
+      title: MTDFB-API56v1.0Submit9-BoxVatReturn-Successresponse
+      required:
+      - processingDate
+      - formBundleNumber
+      type: object
+      properties:
+        processingDate:
+          type: string
+          description: The time that the message was processed in the system.
+          format: date-time
+        formBundleNumber:
+          pattern: ^[0-9]{12}$
+          type: string
+          description: Unique number that represents the form bundle. The system stores VAT Return data in forms, which are held in a unique form bundle.
+        paymentIndicator:
+          allOf:
+          - $ref: '#/components/schemas/PaymentIndicator'
+          - description: Is DD if the netVatDue value is a debit and HMRC holds a Direct Debit Instruction for the client. Is BANK if the netVatDue value is a credit and HMRC holds the client’s bank data. Otherwise not present.
+        chargeRefNumber:
+          maxLength: 16
+          minLength: 1
+          type: string
+          description: The charge reference number is returned, only if the netVatDue value is a debit. Between 1 and 16 characters.
+      description: Submit 9-Box Vat Return - Success response
+    Obligation:
+      title: Obligation
+      required:
+      - start
+      - end
+      - due
+      - status
+      - periodKey
+      type: object
+      properties:
+        start:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+        end:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+        due:
+          type: string
+          description: 'The due date for this obligation period, in the format YYYY-MM-DD. For example: 2017-01-25. The due date for monthly/quarterly obligations is one month and seven days from the end date. The due date for Payment On Account customers is the last working day of the month after the end date. For example if the end date is 2018-02-28, the due date is 2018-03-29 (because the 31 March is a Saturday and the 30 March is Good Friday).'
+        status:
+          type: string
+          description: Which obligation statuses to return (O = Open, F = Fulfilled)
+          example: F
+        received:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+        periodKey:
+          type: string
+          description: 'The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol.'
+          example: '18AD, 18A1, #001'
+      description: Obligation
+    Obligations:
+      title: Obligations
+      required:
+      - obligations
+      type: object
+      properties:
+        obligations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Obligation'
+          description: A list of all obligations, sorted by start date
+    Payment:
+      title: Payment
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        received:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+      description: Payment
+    PaymentIndicator:
+      title: PaymentIndicator
+      enum:
+      - DD
+      - BANK
+      type: string
+      description: Is DD if the netVatDue value is a debit and HMRC holds a Direct Debit Instruction for the client. Is BANK if the netVatDue value is a credit and HMRC holds the client’s bank data. Otherwise not present.
+    Payments:
+      title: Payments
+      required:
+      - payments
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+          description: A list of all payments
+    Penalties:
+      title: Penalties
+      type: object
+      properties:
+        totalisations:
+          allOf:
+          - $ref: '#/components/schemas/Totalisations'
+          - description: Totals that relate to the penalties that HMRC has levied.
+        lateSubmissionPenalty:
+          allOf:
+          - $ref: '#/components/schemas/LateSubmissionPenalty'
+          - description: Information about the late submission penalties that HMRC has levied.
+        latePaymentPenalty:
+          allOf:
+          - $ref: '#/components/schemas/LatePaymentPenalty'
+          - description: Information about the late payment penalties that HMRC has levied.
+    PenaltyCategory:
+      title: PenaltyCategory
+      enum:
+      - point
+      type: string
+      description: The penalty represents a point that has not met the threshold for a charge.
+    PenaltyCategory1:
+      title: PenaltyCategory1
+      enum:
+      - charge
+      type: string
+      description: The penalty represents a charge that has been levied because the point threshold has been exceeded. Although this penalty will not be added to the point total because the threshold has already been met, it will affect the period of compliance.
+    PenaltyCategory2:
+      title: PenaltyCategory2
+      enum:
+      - threshold
+      type: string
+      description: The penalty represents a point that has met the threshold for a charge. The penalty thus consists of a point and a charge.
+    PenaltyStatus:
+      title: PenaltyStatus
+      enum:
+      - active
+      type: string
+      description: If the penalty category is 'point', it counts towards the individual's or organisation's point balance. If the penalty category is 'threshold', it counts towards the individual's or organisation's point balance. It has also triggered a penalty charge. If the penalty category is 'charge', then it represents a charge that has been levied because the threshold has been exceeded.
+    PenaltyStatus1:
+      title: PenaltyStatus1
+      enum:
+      - inactive
+      type: string
+      description: If the penalty category is 'point', it no longer counts towards the individual's or organisation's point balance. This might be because the point has expired, been successfully appealed against, or been removed due to an adjustment. If the penalty category is 'threshold', then it no longer counts towards the individual's or organisation's point balance for the same reasons. Alternatively, a 'threshold' penalty could be inactive because the charge that is associated with it has been reversed. If the penalty category is 'charge', then the charge has been reversed.
+    PenaltyStatus2:
+      title: PenaltyStatus2
+      enum:
+      - accruing
+      type: string
+      description: The penalty is accruing, and is yet to be posted to the account.
+    PenaltyStatus21:
+      title: PenaltyStatus21
+      enum:
+      - posted
+      type: string
+      description: The penalty has been posted to the account.
+    SubmitVAT:
+      title: SubmitVAT
+      required:
+      - periodKey
+      - vatDueSales
+      - vatDueAcquisitions
+      - totalVatDue
+      - vatReclaimedCurrPeriod
+      - netVatDue
+      - totalValueSalesExVAT
+      - totalValuePurchasesExVAT
+      - totalValueGoodsSuppliedExVAT
+      - totalAcquisitionsExVAT
+      type: object
+      properties:
+        periodKey:
+          maxLength: 4
+          minLength: 4
+          type: string
+          description: 'The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol.'
+        vatDueSales:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        vatDueAcquisitions:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        totalVatDue:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        vatReclaimedCurrPeriod:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        netVatDue:
+          multipleOf: 0.01
+          maximum: 99999999999.99
+          minimum: 0
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
+        totalValueSalesExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalValuePurchasesExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalValueGoodsSuppliedExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalAcquisitionsExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+      description: Submit VAT
+    Summary:
+      title: Summary
+      required:
+      - activePenaltyPoints
+      - inactivePenaltyPoints
+      - periodOfComplianceAchievement
+      - regimeThreshold
+      - penaltyChargeAmount
+      type: object
+      properties:
+        activePenaltyPoints:
+          multipleOf: 1
+          minimum: 0
+          type: number
+          description: Number of active penalty points held for failure to submit on time.
+          example: 1
+        inactivePenaltyPoints:
+          multipleOf: 1
+          minimum: 0
+          type: number
+          description: Number of inactive penalty points.
+          example: 4
+        periodOfComplianceAchievement:
+          type: string
+          description: The date upon which all accrued penalty points will expire, if the individual or organisation meets the requirements for compliance.
+          example: 2023-04-01
+        regimeThreshold:
+          multipleOf: 1
+          minimum: 0
+          type: number
+          description: Total number of penalty points that are required before a financial penalty will be generated.
+          example: 6
+        penaltyChargeAmount:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: The total late submission penalty charge amount. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 400
+      description: A summary of the individual's or organisation's late submission penalty status.
+    TaxPeriod:
+      title: TaxPeriod
+      required:
+      - from
+      - to
+      type: object
+      properties:
+        from:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+        to:
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+          type: string
+          description: Date in the format YYYY-MM-DD
+          example: 2017-01-25
+      description: Tax Period
+    TaxReturnStatus:
+      title: TaxReturnStatus
+      enum:
+      - Open
+      type: string
+      description: The VAT return is yet to be submitted.
+    TaxReturnStatus1:
+      title: TaxReturnStatus1
+      enum:
+      - Fulfilled
+      type: string
+      description: The obligation has been met (whether the submission was late or not).
+    TaxReturnStatus2:
+      title: TaxReturnStatus2
+      enum:
+      - Reversed
+      type: string
+      description: The obligation no longer exists. The individual or organisation is therefore not required to submit any information.
+    TimeToPay:
+      title: TimeToPay
+      type: object
+      properties:
+        timeToPayStartDate:
+          type: string
+          description: This is the start date of the agreed time to pay the charge.
+          example: 2024-07-06
+        timeToPayEndDate:
+          type: string
+          description: This is the last date of the agreed time to pay the charge.
+          example: 2024-07-11
+    Totalisations:
+      title: Totalisations
+      type: object
+      properties:
+        lateSubmissionPenaltyTotalValue:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Total value of all unpaid late submission penalties. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 200
+        penalisedPrincipalTotal:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Total amount of late VAT (before penalties and interest). The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 4286.55
+        latePaymentPenaltyPostedTotal:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Total amount of late payment penalty charges. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 171.46
+        latePaymentPenaltyEstimateTotal:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Estimated total amount of uncharged late payment penalties, based upon the amount that is accruing. The value must be between -99999999999.99 and 99999999999.99 up to 2 decimal places.
+          example: 171.46
+      description: Totals that relate to the penalties that HMRC has levied.
+    Totalisations1:
+      title: Totalisations1
+      type: object
+      properties:
+        totalOverdue:
+          type: number
+          description: The charge amount that is overdue (collectable now). The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        totalNotYetDue:
+          type: number
+          description: The charge amount that has been posted to the account, but is not yet overdue. The due date is today or in the future. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        totalBalance:
+          type: number
+          description: The net charge amount (the amount that is overdue, minus any credit that is in the account). The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        totalCredit:
+          type: number
+          description: Credit that is in the individual's or organisation's account, which has not yet been allocated to any charges. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        totalCleared:
+          type: number
+          description: The amount that has been paid, reversed, removed or cleared. The value must be between -99999999999.99 and 99999999999.99 to 2 decimal places.
+          example: 5009.99
+        additionalReceivableTotalisations:
+          allOf:
+          - $ref: '#/components/schemas/AdditionalReceivableTotalisations'
+          - description: Interest totals that relate to the VAT account.
+      description: Totals that relate to the charge.
+    VATReturnDeclaration:
+      title: VATReturnDeclaration
+      required:
+      - periodKey
+      - vatDueSales
+      - vatDueAcquisitions
+      - totalVatDue
+      - vatReclaimedCurrPeriod
+      - netVatDue
+      - totalValueSalesExVAT
+      - totalValuePurchasesExVAT
+      - totalValueGoodsSuppliedExVAT
+      - totalAcquisitionsExVAT
+      - finalised
+      type: object
+      properties:
+        periodKey:
+          maxLength: 4
+          minLength: 4
+          type: string
+          description: 'The ID code for the period that this obligation belongs to. The format is a string of four alphanumeric characters. Occasionally the format includes the # symbol.'
+        vatDueSales:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        vatDueAcquisitions:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        totalVatDue:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        vatReclaimedCurrPeriod:
+          multipleOf: 0.01
+          maximum: 9999999999999.99
+          minimum: -9999999999999.99
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+        netVatDue:
+          multipleOf: 0.01
+          maximum: 99999999999.99
+          minimum: 0
+          type: number
+          description: Defines a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
+        totalValueSalesExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalValuePurchasesExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalValueGoodsSuppliedExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        totalAcquisitionsExVAT:
+          maximum: 9999999999999
+          minimum: -9999999999999
+          type: number
+          description: Defines a monetary value (to 2 zeroed decimal places), between -9,999,999,999,999.00 and 9,999,999,999,999.00
+        finalised:
+          type: boolean
+          description: Declaration that the user has finalised their VAT return.
+          example: true
+      description: VAT Return Declaration
+  securitySchemes:
+    userRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating user restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints for details.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes: { write:insolvent-vat, read:vat }
+    applicationRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating application restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/application-restricted-endpoints for details.
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          scopes: { "write:vat", "read:vat" }
+tags:
+- name: organisations
+  description: ''
