@@ -16,7 +16,6 @@
 
 package config
 
-import config.FeatureSwitch.FinancialDataRamlFeature
 import controllers.Assets
 import definition.ApiDefinitionFactory
 import javax.inject.{Inject, Singleton}
@@ -36,14 +35,6 @@ class DocumentationController @Inject()(vatApiDefinition: ApiDefinitionFactory,
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    if (isEnabled(FinancialDataRamlFeature)) {
-      if(file.equals("application.raml")) {
-        assets.at(s"/public/api/conf/$version", "applicationWithFinancialDetailsEndPoint.raml")
-      } else {
-        assets.at(s"/public/api/conf/$version", file)
-      }
-    } else {
       assets.at(s"/public/api/conf/$version", file)
-    }
   }
 }
