@@ -15,7 +15,100 @@ paths:
       tags:
       - organisations
       summary: Retrieve VAT obligations
-      description: Retrieve VAT obligations. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Submit VAT return for period](#_submit-vat-return-for-period_post_accordion).
+      description: |
+        Retrieve VAT obligations. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Submit VAT return for period](#_submit-vat-return-for-period_post_accordion).
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+          <table>
+            <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>Default (No header value)</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and one is fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_NONE_MET</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and none are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_ONE_MET</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and one is fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_TWO_MET</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and two are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_THREE_MET</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and three are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_FOUR_MET</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations and four are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_NONE_MET</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations and none are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_ONE_MET</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations and one month is fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_TWO_MET</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations and two months are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_THREE_MET</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations and three months are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_OBS_##_OPEN</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations for 2018 and the ## month is open. All previous obligations for same year will show as fulfilled. Accepts 01 to 12.</p>
+                <p>Example: MONTHLY_OBS_03_OPEN.</p></td>
+            </tr>
+            <tr>
+              <td><p>MONTHLY_OBS_12_FULFILLED</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations for 2018 and all obligations are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_OBS_##_OPEN</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and the ## quarter is open.  All previous obligations for same year will show as fulfilled. Accepts 01 to 04.</p>
+                <p>Example: QUARTERLY_OBS_02_OPEN.</p></td>
+            </tr>
+            <tr>
+              <td><p>QUARTERLY_OBS_04_FULFILLED</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and all obligations are fulfilled.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_OPEN_MONTHLY</p></td>
+              <td><p>Simulates the scenario where the client has monthly obligations for 2018 and two are open.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_OPEN_QUARTERLY</p></td>
+              <td><p>Simulates the scenario where the client has quarterly obligations for 2018 and two are open.</p></td>
+            </tr>
+            <tr>
+              <td><p>OBS_SPANS_MULTIPLE_YEARS</p></td>
+              <td><p>Simulates the scenario where the client has an obligation that spans both calendar years 2018 and 2019.</p></td>
+            </tr>
+            <tr>
+              <td><p>INSOLVENT_TRADER</p></td>
+              <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+            </tr>
+            <tr>
+              <td><p>NOT_FOUND</p></td>
+              <td><p>Simulates the scenario where no data is found.</p></td>
+            </tr>
+          </tbody>
+        </table>
+
       operationId: RetrieveVATobligations
       parameters:
       - name: vrn
@@ -192,7 +285,46 @@ paths:
       tags:
       - organisations
       summary: Submit VAT return for period
-      description: Submit VAT return for period. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Retrieve VAT obligations](#_retrieve-vat-obligations_get_accordion).
+      description: |
+        Submit VAT return for period. This endpoint is one of the mandatory endpoints to use to achieve the minimum level of compliance. The other endpoint required to achieve the minimum level of compliance is [Retrieve VAT obligations](#_retrieve-vat-obligations_get_accordion).
+      
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <p>Using this endpoint in the sandbox environment will store the data submitted. There is no requirement to use the periodKeys in the obligation response in the sandbox environment.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>INVALID_VRN</p></td>
+              <td><p>Submission has not passed validation. Invalid parameter VRN.</p></td>
+            </tr>
+            <tr>
+              <td><p>INVALID_PERIODKEY</p></td>
+              <td><p>Submission has not passed validation. Invalid parameter PERIODKEY.</p></td>
+            </tr>
+            <tr>
+              <td><p>INVALID_PAYLOAD</p></td>
+              <td><p>Submission has not passed validation. Invalid parameter Payload.</p></td>
+            </tr>
+            <tr>
+              <td><p>DUPLICATE_SUBMISSION</p></td>
+              <td><p>The remote endpoint has indicated that VAT has already been submitted for that period.</p></td>
+            </tr>
+            <tr>
+              <td><p>TAX_PERIOD_NOT_ENDED</p></td>
+              <td><p>The remote endpoint has indicated that the submission is for a tax period that has not ended.</p></td>
+            </tr>
+            <tr>
+              <td><p>INSOLVENT_TRADER</p></td>
+              <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+            </tr>
+          </tbody>
+        </table>
       operationId: SubmitVATreturnforperiod
       parameters:
       - name: vrn
@@ -392,7 +524,30 @@ paths:
       tags:
       - organisations
       summary: View VAT Return
-      description: Retrieve a submitted VAT return
+      description: |
+        Retrieve a submitted VAT return
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <p>Using this endpoint in the sandbox environment will return the previously submitted data. A 404 (Not Found) response will be returned for a periodKey that has not been submitted.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>DATE_RANGE_TOO_LARGE</p></td>
+              <td><p>The date of the requested return cannot be further than four years from the current date.</p></td>
+            </tr>
+            <tr>
+              <td><p>INSOLVENT_TRADER</p></td>
+              <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+            </tr>        
+          </tbody>
+        </table>
       operationId: ViewVATReturn
       parameters:
       - name: vrn
@@ -539,7 +694,47 @@ paths:
       tags:
       - organisations
       summary: Retrieve VAT liabilities
-      description: Retrieve VAT liabilities
+      description: | 
+        Retrieve VAT liabilities
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>Default (no header value)</p></td>
+              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+            </tr>
+            <tr>
+              <td><p>SINGLE_LIABILITY</p></td>
+              <td><p>Returns a single valid liability when used with dates from 2017-01-02 and to 2017-02-02.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_LIABILITIES</p></td>
+              <td><p>Returns multiple valid liabilities when used with dates from 2017-04-05 and to 2017-12-21.</p></td>
+            </tr>
+            <tr>
+              <td><p>SINGLE_LIABILITY_2018_19</p></td>
+              <td><p>Returns a single valid liability when used with dates from 2018-01-02 and to 2018-02-02.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_LIABILITIES_2018_19</p></td>
+              <td><p>Returns multiple valid liabilities when used with dates from 2018-04-05 and to 2018-12-21.</p></td>
+            </tr>
+            <tr>
+              <td><p>INSOLVENT_TRADER</p></td>
+              <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>The 'to' date of the liability must fall within the date range provided.</p>
+
       operationId: RetrieveVATliabilities
       parameters:
       - name: vrn
@@ -680,7 +875,47 @@ paths:
       tags:
       - organisations
       summary: Retrieve VAT payments
-      description: Retrieve VAT payments
+      description: |
+        Retrieve VAT payments
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>Default (no header value)</p></td>
+              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+            </tr>
+            <tr>
+              <td><p>SINGLE_PAYMENT</p></td>
+              <td><p>Returns a single valid payment when used with dates from 2017-01-02 and to 2017-02-02.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_PAYMENTS</p></td>
+              <td><p>Returns multiple valid payments when used with dates from 2017-02-27 and to 2017-12-21.</p></td>
+            </tr>
+            <tr>
+              <td><p>SINGLE_PAYMENT_2018_19</p></td>
+              <td><p>Returns a single valid payment when used with dates from 2018-01-02 and to 2018-02-02.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_PAYMENTS_2018_19</p></td>
+              <td><p>Returns multiple valid payments when used with dates from 2018-02-27 and to 2018-12-21.</p></td>
+            </tr>
+            <tr>
+              <td><p>INSOLVENT_TRADER</p></td>
+              <td><p>Simulates the scenario where the client is an insolvent trader.</p></td>
+            </tr>        
+          </tbody>
+        </table>
+        <p>The 'to' date of the payment must fall within the date range provided.</p>
+
       operationId: RetrieveVATpayments
       parameters:
       - name: vrn
@@ -811,7 +1046,57 @@ paths:
       tags:
       - organisations
       summary: Retrieve VAT penalties
-      description: Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
+      description: |
+        Retrieves details of all the penalties that have been applied to a VAT account. Twenty-four months' worth of penalty information will be returned.
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>DEFAULT</p></td>
+              <td><p>The default scenario which has multiple penalties in the last 2 years.</p></td>
+            </tr> 
+            <tr>
+              <td><p>NO_PENALTIES</p></td>
+              <td><p>The scenario where there are no penalties in the last 2 years.</p></td>
+            </tr> 
+            <tr>
+              <td><p>LATE_SUBMISSION</p></td>
+              <td><p>The scenario where there is a single late submission penalty in the last 2 years.</p></td>
+            </tr>
+            <tr>
+              <td><p>LATE_PAYMENT</p></td>
+              <td><p>The scenario where there is a single late payment penalty in the last 2 years.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_PENALTIES</p></td>
+              <td><p>The scenario where there is a single late submission penalty and a single late payment penalty in the last 2 years.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_LATE_PAYMENT_PENALTIES</p></td>
+              <td><p>The scenario where there are multiple late payment penalties in the last 2 years.</p></td>
+            </tr>
+            <tr>
+              <td><p>MULTIPLE_LATE_SUBMISSION_PENALTIES</p></td>
+              <td><p>The scenario where there are multiple late submission penalties in the last 2 years.</p></td>
+            </tr>
+            <tr>
+              <td><p>THRESHOLD_LATE_SUBMISSION_PENALTIES</p></td>
+              <td><p>The scenario where the number of penalties meets the penalty point threshold and the first charge has been generated.</p></td>
+            </tr>
+            <tr>
+              <td><p>CHARGE_LATE_SUBMISSION_PENALTIES</p></td>
+              <td><p>The scenario where the number of penalties exceeds the penalty point threshold and a second charge has been generated.</p></td>
+            </tr> 
+          </tbody>
+        </table>
       operationId: RetrieveVATpenalties
       parameters:
       - name: vrn
@@ -1007,7 +1292,26 @@ paths:
       tags:
       - organisations
       summary: Retrieve financial details
-      description: Retrieves the financial details relating to a late submission or late payment penalty that has been applied to a VAT account.
+      description: |
+        Retrieves the financial details relating to a late submission or late payment penalty that has been applied to a VAT account.
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>DEFAULT</p></td>
+              <td><p>The default scenario.</p></td>
+            </tr> 
+          </tbody>
+        </table>
+
       operationId: Retrievefinancialdetails
       parameters:
       - name: vrn
