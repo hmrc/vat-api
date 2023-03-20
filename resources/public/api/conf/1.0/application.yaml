@@ -2201,7 +2201,7 @@ components:
           authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
           tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
           refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
-          scopes: { write:insolvent-vat, read:vat }
+          scopes: { write:vat, read:vat }
     applicationRestricted:
       type: oauth2
       description: |
