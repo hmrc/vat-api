@@ -1,2 +1,0 @@
-* For non-technical, fraud prevention, and platform-related issues, you need to contact the [Software Development Support Team (SDST)](https://developer.service.hmrc.gov.uk/developer/support).
-* Raise technical issues on the [vat-api](https://github.com/hmrc/vat-api/issues) GitHub page.

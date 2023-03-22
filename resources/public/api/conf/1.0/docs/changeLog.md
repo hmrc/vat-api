@@ -1,1 +1,0 @@
-You can find the changelog in the [vat-api](https://github.com/hmrc/vat-api/wiki/Changelog) GitHub wiki.
