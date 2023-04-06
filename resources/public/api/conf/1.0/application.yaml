@@ -221,28 +221,36 @@ paths:
                 allOf:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
-                    code: VRN_INVALID
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                      message: The provided VRN is invalid
               examples:
                 invalidNino:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 invalidDateFrom:
                   description: Invalid date from
                   value:
                     code: INVALID_DATE_FROM
+                    message: The provided from date is invalid
                 invalidDateTo:
                   description: Invalid date to
                   value:
                     code: INVALID_DATE_TO
+                    message: The provided to date is invalid
                 invalidDateRange:
                   description: Invalid date range, must be 366 days or less
                   value:
                     code: INVALID_DATE_RANGE
+                    message: Invalid date range, must be 366 days or less
                 invalidStatus:
                   description: Invalid status
                   value:
                     code: INVALID_STATUS
+                    message: The provided data is failed validation, invalid status
         '404':
           description: ''
           headers: {}
@@ -253,11 +261,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
               examples:
                 invalidNino:
                   description: The remote endpoint has indicated that no associated data is found
                   value:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
         '403':
           description: ''
           headers: {}
@@ -268,15 +278,18 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
               examples:
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
                 ruleInsolventTrader:
                   description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
                   value:
                     code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -456,35 +469,43 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidVrn:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 invalidPeriodKey:
                   description: Invalid period key
                   value:
                     code: PERIOD_KEY_INVALID
+                    message: Invalid period key
                 invalidRequest:
                   description: Invalid request
                   value:
                     code: INVALID_REQUEST
+                    message: Invalid request
                 invalidTotalValue:
                   description: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
                   value:
                     code: VAT_TOTAL_VALUE
+                    message: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
                 invalidNetValue:
                   description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
                   value:
                     code: VAT_NET_VALUE
+                    message: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
                 invalidNumericValue:
                   description: Please provide a numeric field
                   value:
                     code: INVALID_NUMERIC_VALUE
+                    message: please provide a numeric field
                 invalidMonetaryAmount:
                   description: The monetary amount is invalid
                   value:
                     code: INVALID_MONETARY_AMOUNT
+                    message: amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
         '403':
           description: ''
           headers: {}
@@ -495,27 +516,33 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: NOT_FINALISED
+                    message: User has not declared VAT return as final
               examples:
                 notDeclared:
                   description: User has not declared VAT return as final
                   value:
                     code: NOT_FINALISED
+                    message: User has not declared VAT return as final
                 duplicateSubmission:
                   description: User has already submitted a VAT return for the given period
                   value:
                     code: DUPLICATE_SUBMISSION
+                    message: The VAT return was already submitted for the given period
                 submittedToEarly:
                   description: Return submitted too early
                   value:
                     code: TAX_PERIOD_NOT_ENDED
+                    message: The remote endpoint has indicated that the submission is for a tax period that has not ended
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
                 ruleInsolventTrader:
                   description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
                   value:
                     code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
       security:
         - userRestricted: [ write:vat ]
       deprecated: false
@@ -639,15 +666,18 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidNino:
                   description: The provided VRN is invalid
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 periodKeyInvalid:
                   description: Invalid period key
                   value:
                     code: PERIOD_KEY_INVALID
+                    message: Invalid period key
         '403':
           description: ''
           headers: {}
@@ -658,19 +688,23 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: DATE_RANGE_TOO_LARGE
+                    message: The date of the requested return cannot be further than four years from the current date
               examples:
                 dateRangeTooLarge:
                   description: The date of the requested return cannot be more than four years from the current date
                   value:
                     code: DATE_RANGE_TOO_LARGE
+                    message: The date of the requested return cannot be further than four years from the current date
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
                 ruleInsolventTrader:
                   description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
                   value:
                     code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
         '404':
           description: ''
           headers: {}
@@ -681,11 +715,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
               examples:
                 notFound:
                   description: The remote endpoint has indicated that no associated data is found
                   value:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -816,23 +852,28 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidNino:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 invalidDateFrom:
                   description: Invalid date from
                   value:
                     code: DATE_FROM_INVALID
+                    message: The provided from date is invalid
                 invalidDateTo:
                   description: Invalid date to
                   value:
                     code: DATE_TO_INVALID
+                    message: The provided to date is invalid
                 invalidDateRange:
                   description: Invalid date range, must be 365 days or less
                   value:
                     code: DATE_RANGE_INVALID
+                    message: Invalid date range, must be 365 days or less
         '404':
           description: ''
           headers: {}
@@ -843,11 +884,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
               examples:
                 invalidNino:
                   description: The remote endpoint has indicated that no associated data is found
                   value:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
         '403':
           description: ''
           headers: {}
@@ -858,15 +901,18 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
               examples:
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
                 ruleInsolventTrader:
                   description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
                   value:
                     code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -987,23 +1033,28 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidNino:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 invalidDateFrom:
                   description: Invalid date from
                   value:
                     code: DATE_FROM_INVALID
+                    message: The provided from date is invalid
                 invalidDateTo:
                   description: Invalid date to
                   value:
                     code: DATE_TO_INVALID
+                    message: The provided to date is invalid
                 invalidDateRange:
                   description: Invalid date range, must be 365 days or less
                   value:
                     code: DATE_RANGE_INVALID
+                    message: Invalid date range, must be 365 days or less
         '404':
           description: ''
           headers: {}
@@ -1014,11 +1065,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
               examples:
                 invalidNino:
                   description: The remote endpoint has indicated that no associated data is found
                   value:
                     code: NOT_FOUND
+                    message: The requested resource could not be found
         '403':
           description: ''
           headers: {}
@@ -1029,15 +1082,18 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
               examples:
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
                 ruleInsolventTrader:
                   description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
                   value:
                     code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -1264,11 +1320,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidVrn:
                   description: Invalid VRN.
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
         '403':
           description: ''
           headers: {}
@@ -1279,11 +1337,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
               examples:
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -1428,15 +1488,18 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
               examples:
                 invalidVrn:
                   description: Invalid VRN.
                   value:
                     code: VRN_INVALID
+                    message: The provided VRN is invalid
                 invalidChargeReference:
                   description: The specified penalty charge reference is invalid.
                   value:
                     code: CHARGE_REFERENCE_INVALID
+                    message: The provided chargeReference is invalid
         '404':
           description: ''
           headers: {}
@@ -1447,11 +1510,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: MATCHING_RESOURCE_NOT_FOUND
+                    message: Matching resource not found
               examples:
                 notFound:
                   description: The remote endpoint has indicated that no associated data is found.
                   value:
                     code: MATCHING_RESOURCE_NOT_FOUND
+                    message: Matching resource not found
         '403':
           description: ''
           headers: {}
@@ -1462,11 +1527,13 @@ paths:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
               examples:
                 clientNotSubscribedToMTD:
                   description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
