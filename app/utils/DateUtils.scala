@@ -29,6 +29,7 @@ object DateUtils {
   val isoInstantDateRegex = """(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}Z"""
   val dateTimePattern = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   val datePattern = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  
 
 
   implicit def dateTimeWrites: Writes[OffsetDateTime] = new Writes[OffsetDateTime] {
