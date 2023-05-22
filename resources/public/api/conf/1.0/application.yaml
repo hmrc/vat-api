@@ -2359,7 +2359,10 @@ components:
           example: 4
         periodOfComplianceAchievement:
           type: string
-          description: The date upon which all accrued penalty points will expire, if the individual or organisation meets the requirements for compliance.
+          description: |
+            The date upon which all accrued penalty points will expire, if the individual or organisation meets the requirements for compliance.
+
+            **Note:** The date 9999-12-31 signifies that the individual or organisation has no active penalty points. This could be because they have achieved the period of compliance.
           example: 2023-04-01
         regimeThreshold:
           multipleOf: 1
