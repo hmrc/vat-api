@@ -199,7 +199,7 @@ case class LateSubmissionPenaltySummary(
 
 object LateSubmissionPenaltySummary {
   implicit val reads: Reads[LateSubmissionPenaltySummary] = (
-    (JsPath \ "activePoints").read[BigDecimal] and
+    (JsPath \ "activePenaltyPoints").read[BigDecimal] and
       (JsPath \ "inactivePenaltyPoints").read[Int] and
       (JsPath \ "PoCAchievementDate").read[String] and
       (JsPath \ "regimeThreshold").read[Int] and

@@ -473,7 +473,7 @@ object PenaltiesConstants {
   )
 
   val downstreamTestLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
-    "activePoints" -> 2,
+    "activePenaltyPoints" -> 2,
     "inactivePenaltyPoints" -> 2,
     "PoCAchievementDate" -> "2022-10-11",
     "regimeThreshold" -> 2,
