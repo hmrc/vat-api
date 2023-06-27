@@ -29,7 +29,7 @@ import v1.models.auth.UserDetails
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 
 import java.time.LocalDate
-import scala.collection.Seq
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
 class EnrolmentsAuthServiceSpec extends ServiceSpec {

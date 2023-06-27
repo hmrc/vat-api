@@ -20,9 +20,8 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import v1.models.auth.UserDetails
 import v1.nrs.models.request.IdentityData
-
+import scala.collection.immutable.Seq
 import java.time.{Instant, LocalDate}
-import scala.collection.Seq
 
 object AuthFixture {
 

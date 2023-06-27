@@ -21,6 +21,7 @@ import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import scala.language.postfixOps
 
 trait UnitSpec extends AnyWordSpecLike
   with MockFactory

@@ -25,7 +25,7 @@ object NonDecimalMonetaryValueFormatValidation {
     lazy val error = InvalidMonetaryValueError.withFieldName(fieldName)
 
     field match {
-      case Some(amount) if amount.isWhole() => List()
+      case Some(amount) if amount.isWhole => List()
       case None => List()
       case _ =>   List(error)
     }
