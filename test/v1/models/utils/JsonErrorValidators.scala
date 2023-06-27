@@ -18,12 +18,13 @@ package v1.models.utils
 
 import play.api.libs.json._
 import support.UnitSpec
+import scala.collection.immutable.Seq
 
 trait JsonErrorValidators {
   _: UnitSpec =>
 
   type JsError = (JsPath, Seq[JsonValidationError])
-  type JsErrors = Seq[JsError]
+  type JsErrors = Seq[(JsPath, Seq[JsonValidationError])]
 
   object JsonError {
     val NUMBER_OR_STRING_FORMAT_EXCEPTION = "error.expected.jsnumberorjsstring"
@@ -44,10 +45,14 @@ trait JsonErrorValidators {
   }
 
   implicit class JsResultOps[T](res: JsResult[T]) {
-    def errors: JsErrors = res match {
-      case JsError(jsErrors) => jsErrors
-      case JsSuccess(_, _) => fail("A JSON error was expected")
+
+    def errors: JsErrors = {
+      res match {
+        case JsError(jsErrors) => jsErrors.map(item => (item._1, item._2.toList)).toList
+        case JsSuccess(_, _) => fail("A JSON error was expected")
+      }
     }
+
   }
 
   implicit class JsValueOps(json: JsValue){

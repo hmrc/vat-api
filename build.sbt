@@ -31,7 +31,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     retrieveManaged := true,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(warnScalaVersionEviction = false),
-    scalaVersion := "2.12.15"
+    scalaVersion := "2.13.8"
   )
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
@@ -64,3 +64,5 @@ dependencyUpdatesFilter -= moduleFilter(name = "scalatestplus-play")
 dependencyUpdatesFilter -= moduleFilter(name = "scalatestplus-scalacheck")
 dependencyUpdatesFilter -= moduleFilter(name = "bootstrap-backend-play-28")
 dependencyUpdatesFailBuild := true
+
+libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
