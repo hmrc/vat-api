@@ -1384,7 +1384,7 @@ paths:
           example: '123456789'
       - name: penaltyChargeReference
         in: path
-        description: The late submission or late payment penalty charge reference, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
+        description: The late submission *chargeReference* or late payment *penaltyChargeReference*, which has been obtained from the Retrieve VAT penalties endpoint. Only the financial details that relate to this charge will be returned.
         required: true
         style: simple
         schema:
