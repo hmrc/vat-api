@@ -1205,7 +1205,7 @@ paths:
                       summary:
                         activePenaltyPoints: 4
                         inactivePenaltyPoints: 1
-                        periodOfComplianceAchievement: 2025-05-01
+                        periodOfComplianceAchievement: 2025-05-31
                         regimeThreshold: 4
                         penaltyChargeAmount: 400
                       details:
@@ -1276,7 +1276,7 @@ paths:
                         latePaymentPenalty1LowerRateCalculationAmount: 10000
                         latePaymentPenalty1LowerRatePercentage: 2
                         latePaymentPenalty1HigherRateCalculationAmount: 10000
-                        latePaymentPenalty1HigherRatePercentage: 4
+                        latePaymentPenalty1HigherRatePercentage: 2
                         penaltyChargeCreationDate: 2024-06-06
                         communicationsDate: 2024-06-09
                         penaltyChargeReference: XP123456789012
@@ -1419,7 +1419,7 @@ paths:
                     totalisations:
                       totalOverdue: 123.45
                       totalNotYetDue: 12.34
-                      totalBalance: 12.45
+                      totalBalance: 109.99
                       totalCredit: 13.46
                       totalCleared: 12.35
                       additionalReceivableTotalisations:
@@ -1452,7 +1452,7 @@ paths:
                     totalisations:
                       totalOverdue: 123.45
                       totalNotYetDue: 12.34
-                      totalBalance: 12.45
+                      totalBalance: 109.99
                       totalCredit: 13.46
                       totalCleared: 12.35
                       additionalReceivableTotalisations:
