@@ -2538,7 +2538,10 @@ components:
           maximum: 99999999999.99
           minimum: 0
           type: number
-          description: Defines a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
+          description: |
+            The absolute difference between the *totalVatDue* and *vatReclaimedCurrPeriod* values. This should therefore be a positive number, calculated by subtracting the smallest value from the largest. HMRC will automatically determine whether the number represents net VAT that is due or net VAT that can be reclaimed.
+
+            Defines a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
         totalValueSalesExVAT:
           maximum: 9999999999999
           minimum: -9999999999999
