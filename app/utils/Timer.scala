@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package utils
 
 import com.codahale.metrics._
-import com.kenshoo.play.metrics.Metrics
 import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +27,7 @@ trait Timer {
   val defaultTimerGroup: String = "timer"
   type Metric = String
 
-  val metrics: Metrics
+  val metrics: MetricRegistry
 
   def timeFuture[A](name: String, metric: Metric, timerGroup: String = defaultTimerGroup)(block: => Future[A])(
     implicit ec: ExecutionContext, request: Request[_]): Future[A] = {
@@ -43,8 +42,9 @@ trait Timer {
     finally stopAndLog(name, timer)
   }
 
-  protected def startTimer(metric: Metric, timerGroup: String): Timer.Context =
-    metrics.defaultRegistry.timer(s"$metric-$timerGroup").time()
+  protected def startTimer(metric: Metric, timerGroup: String): Timer.Context = {
+    metrics.timer(s"$metric-$timerGroup").time()
+  }
 
   protected def stopAndLog[A](name: String, timer: Timer.Context)(implicit request: Request[_]): Unit = {
     val timeMillis = timer.stop() / 1000000

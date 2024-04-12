@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package v1.nrs
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -28,17 +28,16 @@ import v1.models.request.submit.SubmitRequest
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
 import v1.nrs.models.response.NrsResponse
 import v1.services.AuditService
-import java.time.{LocalDateTime, OffsetDateTime}
 
+import java.time.OffsetDateTime
 import javax.inject.{Inject, Singleton}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NrsService @Inject()(auditService: AuditService,
                            connector: NrsConnector,
                            hashUtil: HashUtil,
-                           override val metrics: Metrics) extends Timer with Logging {
+                           override val metrics: MetricRegistry) extends Timer with Logging {
 
   def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime)(
     implicit request: UserRequest[_],

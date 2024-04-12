@@ -16,7 +16,7 @@
 
 package routing
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import config.FeatureSwitch.Version1Feature
 import config.{AppConfig, FeatureToggleSupport}
