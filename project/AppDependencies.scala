@@ -23,23 +23,20 @@ object AppDependencies {
   val bootstrapVersion = "play-30"
 
   val compile: Seq[ModuleID] = Seq(
-    ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
-    "uk.gov.hmrc"                  %% s"bootstrap-backend-$bootstrapVersion" % "8.0.0",
+    "uk.gov.hmrc"                  %% s"bootstrap-backend-$bootstrapVersion" % "8.5.0",
     "org.typelevel"                %% "cats-core"                 % "2.10.0",
     "com.chuusai"                  %% "shapeless"                 % "2.4.0-M1",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.0",
-    "ch.qos.logback" % "logback-classic" % "1.5.2"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.0"
 
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
-    "org.scalatest"          %% "scalatest"                % "3.2.18"             % scope,
+    "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapVersion" % "8.5.0",
     "org.playframework"      %% "play-test"                % PlayVersion.current  % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % scope,
     "org.scalamock"          %% "scalamock"                % "6.0.0"              % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.1"              % scope,
-    "com.github.tomakehurst" %  "wiremock-jre8"            % "3.0.1"             % scope,
     "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"              % scope
   )
 }
