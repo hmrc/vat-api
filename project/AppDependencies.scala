@@ -27,7 +27,9 @@ object AppDependencies {
     "uk.gov.hmrc"                  %% s"bootstrap-backend-$bootstrapVersion" % "8.0.0",
     "org.typelevel"                %% "cats-core"                 % "2.10.0",
     "com.chuusai"                  %% "shapeless"                 % "2.4.0-M1",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.0"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.0",
+    "ch.qos.logback" % "logback-classic" % "1.5.2"
+
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
@@ -37,6 +39,7 @@ object AppDependencies {
     "org.scalamock"          %% "scalamock"                % "6.0.0"              % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.1"              % scope,
-    "com.github.tomakehurst" %  "wiremock-jre8"            % "2.35.0"             % scope,
+    "com.github.tomakehurst" %  "wiremock-jre8"            % "3.0.1"             % scope,
+    "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"              % scope
   )
 }

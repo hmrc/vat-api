@@ -19,11 +19,12 @@ package mocks
 import config.AppConfig
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import play.api.Configuration
 
 import scala.concurrent.duration.FiniteDuration
 
-trait MockAppConfig extends MockFactory {
+trait MockAppConfig extends TestSuite with MockFactory {
 
   val mockAppConfig: AppConfig = mock[AppConfig]
 
