@@ -18,11 +18,12 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import v1.controllers.requestParsers.validators.ObligationsValidator
 import v1.models.errors.MtdError
 import v1.models.request.obligations.ObligationsRawData
 
-class MockObligationsValidator extends MockFactory{
+class MockObligationsValidator extends TestSuite with MockFactory{
 
   val mockValidator: ObligationsValidator = mock[ObligationsValidator]
 

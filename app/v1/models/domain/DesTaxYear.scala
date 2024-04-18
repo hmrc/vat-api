@@ -34,5 +34,5 @@ object DesTaxYear {
     DesTaxYear(taxYear.take(2) + taxYear.drop(5))
 
   def fromDesIntToString(taxYear: Int): String =
-    (taxYear - 1) + "-" + taxYear.toString.drop(2)
+    s"${taxYear - 1}-${taxYear.toString.substring(2)}"
 }

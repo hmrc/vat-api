@@ -16,7 +16,7 @@
 
 package utils
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import support.UnitSpec
@@ -24,7 +24,7 @@ import support.UnitSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TimerSpec extends UnitSpec with Timer with Logging {
-  val metrics: Metrics = new MockMetrics
+  val metrics: MetricRegistry = new MockMetrics
 
   var timeMs: Long = _
 

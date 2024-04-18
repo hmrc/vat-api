@@ -18,6 +18,7 @@ package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{Outcome, PenaltiesConnector}
 import v1.controllers.UserRequest
@@ -27,7 +28,7 @@ import v1.models.response.penalties.PenaltiesResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockPenaltiesConnector extends MockFactory {
+trait MockPenaltiesConnector extends TestSuite with MockFactory {
 
   val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
 

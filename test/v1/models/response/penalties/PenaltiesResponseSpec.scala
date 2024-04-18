@@ -18,7 +18,6 @@ package v1.models.response.penalties
 
 import play.api.libs.json.Json
 import support.UnitSpec
-import v1.constants.PenaltiesConstants
 import v1.constants.PenaltiesConstants._
 
 class PenaltiesResponseSpec extends UnitSpec {

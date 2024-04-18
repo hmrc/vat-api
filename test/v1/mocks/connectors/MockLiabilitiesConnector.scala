@@ -18,6 +18,7 @@ package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, LiabilitiesConnector}
 import v1.controllers.UserRequest
@@ -26,7 +27,7 @@ import v1.models.response.liabilities.LiabilitiesResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockLiabilitiesConnector extends MockFactory {
+trait MockLiabilitiesConnector extends TestSuite with MockFactory {
 
   val mockRetrieveLiabilitiesConnector: LiabilitiesConnector = mock[LiabilitiesConnector]
 

@@ -18,16 +18,17 @@ package v1.mocks.nrs
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
 import v1.models.request.submit.SubmitRequest
 import v1.nrs.NrsService
 import v1.nrs.models.response.NrsResponse
-import java.time.{LocalDateTime, OffsetDateTime}
 
+import java.time.OffsetDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockNrsService extends MockFactory {
+trait MockNrsService extends TestSuite with MockFactory {
 
   val mockNrsService: NrsService = mock[NrsService]
 

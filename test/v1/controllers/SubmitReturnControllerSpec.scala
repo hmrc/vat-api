@@ -16,7 +16,7 @@
 
 package v1.controllers
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -62,7 +62,7 @@ class SubmitReturnControllerSpec
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
-    val mockedMetrics: Metrics = new MockMetrics
+    val mockedMetrics: MetricRegistry = new MockMetrics
 
     val controller: SubmitReturnController = new SubmitReturnController(
       mockEnrolmentsAuthService,

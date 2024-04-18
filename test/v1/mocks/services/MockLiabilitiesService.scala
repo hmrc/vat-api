@@ -18,6 +18,7 @@ package v1.mocks.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
 import v1.controllers.UserRequest
@@ -27,7 +28,7 @@ import v1.services.{LiabilitiesService, ServiceOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockLiabilitiesService extends MockFactory {
+trait MockLiabilitiesService extends TestSuite with MockFactory {
 
   val mockRetrieveLiabilitiesService: LiabilitiesService = mock[LiabilitiesService]
 

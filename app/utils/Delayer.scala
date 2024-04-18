@@ -28,7 +28,7 @@ trait Delayer {
   implicit val ec: ExecutionContext
 
   def delay(delay: FiniteDuration): Future[Unit] = {
-    val promise = Promise[Unit]
+    val promise = Promise[Unit]()
 
     scheduler.scheduleOnce(delay)(promise.success(()))
 

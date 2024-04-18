@@ -31,21 +31,21 @@ trait MockAppConfig extends TestSuite with MockFactory {
   object MockedAppConfig {
 
     //DES Config
-    def desBaseUrl: CallHandler[String] = (mockAppConfig.desBaseUrl _: () => String).expects()
-    def desToken: CallHandler[String] = (mockAppConfig.desToken _).expects()
-    def desEnvironment: CallHandler[String] = (mockAppConfig.desEnv _).expects()
-    def desEnvironmentHeaders: CallHandler[Option[Seq[String]]] = (mockAppConfig.desEnvironmentHeaders _).expects()
+    def desBaseUrl: CallHandler[String] = (() => mockAppConfig.desBaseUrl).expects()
+    def desToken: CallHandler[String] = (() => mockAppConfig.desToken).expects()
+    def desEnvironment: CallHandler[String] = (() => mockAppConfig.desEnv).expects()
+    def desEnvironmentHeaders: CallHandler[Option[Seq[String]]] = (() => mockAppConfig.desEnvironmentHeaders).expects()
 
     //API Config
-    def featureSwitch: CallHandler[Option[Configuration]] = (mockAppConfig.featureSwitch _: () => Option[Configuration]).expects()
-    def apiGatewayContext: CallHandler[String]            = (mockAppConfig.apiGatewayContext _: () => String).expects()
+    def featureSwitch: CallHandler[Option[Configuration]] = (() => mockAppConfig.featureSwitch).expects()
+    def apiGatewayContext: CallHandler[String] = (() => mockAppConfig.apiGatewayContext).expects()
     def apiStatus: CallHandler[String] = (mockAppConfig.apiStatus: String => String).expects("1.0")
     def endpointsEnabled: CallHandler[Boolean] = (mockAppConfig.endpointsEnabled: String => Boolean).expects("1.0")
 
     // NRS config items
-    def nrsApiKey: CallHandler[String] = (mockAppConfig.nrsApiKey _).expects()
-    def appName: CallHandler[String] = (mockAppConfig.appName _).expects()
-    def nrsBaseUrl: CallHandler[String] = (mockAppConfig.nrsBaseUrl _).expects()
+    def nrsApiKey: CallHandler[String] = (() => mockAppConfig.nrsApiKey).expects()
+    def appName: CallHandler[String] = (() => mockAppConfig.appName).expects()
+    def nrsBaseUrl: CallHandler[String] = (() => mockAppConfig.nrsBaseUrl).expects()
     def nrsRetries: CallHandler[List[FiniteDuration]] = (mockAppConfig.nrsRetries _).expects()
   }
 }

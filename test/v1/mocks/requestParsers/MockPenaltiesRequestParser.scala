@@ -18,11 +18,12 @@ package v1.mocks.requestParsers
 
 import org.scalamock.handlers.CallHandler2
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import v1.controllers.requestParsers.PenaltiesRequestParser
 import v1.models.errors.ErrorWrapper
 import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
 
-trait MockPenaltiesRequestParser extends MockFactory {
+trait MockPenaltiesRequestParser extends TestSuite with MockFactory {
 
   val mockPenaltiesRequestParser: PenaltiesRequestParser = mock[PenaltiesRequestParser]
 
