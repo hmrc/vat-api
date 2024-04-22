@@ -17,7 +17,6 @@
 package v1.mocks
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-
 import play.api.libs.ws.{BodyWritable, WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.Future

@@ -16,8 +16,8 @@
 
 package v1.nrs
 
-import org.apache.pekko.actor.Scheduler
 import config.AppConfig
+import org.apache.pekko.actor.Scheduler
 
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status

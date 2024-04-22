@@ -17,6 +17,7 @@
 package definition
 
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import utils.Logging
 

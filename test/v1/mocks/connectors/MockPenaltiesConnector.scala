@@ -18,7 +18,6 @@ package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
-
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{Outcome, PenaltiesConnector}
 import v1.controllers.UserRequest

@@ -16,8 +16,6 @@
 
 package v1.endpoints
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
@@ -28,6 +26,9 @@ import support.IntegrationBaseSpec
 import v1.fixtures.RetrieveLiabilitiesFixture
 import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub}
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabilitiesFixture {
 
@@ -86,7 +87,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams, OK, desJson)
+          DesStub.onSuccess(GET, desUrl, desQueryParams, OK, desJson)
         }
 
         private val response = await(request.get)
@@ -102,7 +103,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, "An internal server error occurred")
+          DesStub.onError(GET, desUrl, desQueryParams, BAD_REQUEST, "An internal server error occurred")
         }
 
         private val response = await(request.get)
@@ -134,7 +135,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
+          DesStub.onError(GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
         }
 
         private val response = await(request.get)
@@ -216,7 +217,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
             AuthStub.authorised()
-            DesStub.onError(DesStub.GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
+            DesStub.onError(GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
           }
 
           private val response = await(request.get)

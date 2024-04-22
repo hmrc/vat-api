@@ -18,7 +18,6 @@ package v1.mocks.nrs
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
 import v1.models.request.submit.SubmitRequest

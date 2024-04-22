@@ -15,42 +15,45 @@
  */
 
 import sbt._
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, targetJvm}
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings}
+import uk.gov.hmrc.{DefaultBuildSettings, SbtAutoBuildPlugin}
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
-import uk.gov.hmrc.SbtAutoBuildPlugin
 
 val appName = "vat-api"
 
-lazy val FuncTest = config("func") extend Test
+//lazy val FuncTest = config("func") extend Test
+
+ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / majorVersion := 1
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     retrieveManaged := true,
-    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(warnScalaVersionEviction = false),
-    scalaVersion := "2.13.13"
+    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(warnScalaVersionEviction = false)
   )
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
-  .settings(majorVersion := 1)
   .settings(CodeCoverageSettings.settings: _*)
-  .settings(defaultSettings(): _*)
-  .configs(FuncTest)
-  .settings(inConfig(FuncTest)(Defaults.testSettings): _*)
   .settings(
-    FuncTest / fork := true,
-    FuncTest / unmanagedSourceDirectories := Seq((FuncTest / baseDirectory).value / "func"),
-    FuncTest / unmanagedClasspath += baseDirectory.value / "resources",
-    Runtime / unmanagedClasspath += baseDirectory.value / "resources",
-    FuncTest / javaOptions += "-Dlogger.resource=logback-test.xml",
-    FuncTest / parallelExecution := false,
-    addTestReportOption(FuncTest, "int-test-reports")
+    Runtime / unmanagedClasspath += baseDirectory.value / "resources"
   )
   .settings(resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
+  .settings(resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)
   .settings(SilencerSettings())
+
+lazy val func = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= AppDependencies.test,
+    addTestReportOption(Test, "int-test-reports"))
+  .settings(headerSettings(Test): _*)
+  .settings(automateHeaderSettings(Test))
+  .settings(javaOptions += "-Dlogger.resource=logback-test.xml")
 
 

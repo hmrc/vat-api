@@ -15,7 +15,6 @@
  */
 
 import play.core.PlayVersion
-import play.sbt.PlayImport._
 import sbt._
 
 object AppDependencies {
@@ -30,13 +29,13 @@ object AppDependencies {
 
   )
 
-  def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
+  def test: Seq[sbt.ModuleID] = Seq(
     "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapPlayVersion" % "8.5.0",
-    "org.playframework"      %% "play-test"                % PlayVersion.current  % scope,
-    "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % scope,
-    "org.scalamock"          %% "scalamock"                % "5.2.0"              % scope,
-    "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.1"              % scope,
-    "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"              % scope
+    "org.playframework"      %% "play-test"                % PlayVersion.current  % Test,
+    "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % Test,
+    "org.scalamock"          %% "scalamock"                % "5.2.0"              % Test,
+    "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % Test,
+    "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.1"              % Test,
+    "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"              % Test
   )
 }

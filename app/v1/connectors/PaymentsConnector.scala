@@ -16,8 +16,9 @@
 
 package v1.connectors
 
-import java.time.LocalDate
 import config.AppConfig
+
+import java.time.LocalDate
 import play.api.http.Status
 
 import javax.inject.{Inject, Singleton}

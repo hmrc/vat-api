@@ -17,6 +17,7 @@
 package v1.connectors
 
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}

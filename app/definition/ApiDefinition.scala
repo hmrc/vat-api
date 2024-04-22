@@ -64,7 +64,7 @@ case class APIDefinition(name: String,
   require(uniqueVersions, "version numbers must be unique")
 
   private def uniqueVersions = {
-    !versions.map(_.version).groupBy(identity).view.mapValues(_.size).exists(_._2 > 1)
+    !versions.map(_.version).groupBy(identity).view.mapValues(_.size).toMap.exists(_._2 > 1)
   }
 }
 
