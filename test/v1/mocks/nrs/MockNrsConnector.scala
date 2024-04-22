@@ -18,7 +18,7 @@ package v1.mocks.nrs
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.nrs.models.request.NrsSubmission
@@ -26,7 +26,7 @@ import v1.nrs.{NrsConnector, NrsOutcome}
 
 import scala.concurrent.Future
 
-trait MockNrsConnector extends TestSuite with MockFactory {
+trait MockNrsConnector extends MockFactory {
 
   val mockNrsConnector: NrsConnector = mock[NrsConnector]
 

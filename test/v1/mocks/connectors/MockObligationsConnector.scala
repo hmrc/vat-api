@@ -18,7 +18,7 @@ package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, ObligationsConnector}
 import v1.controllers.UserRequest
@@ -27,7 +27,7 @@ import v1.models.response.obligations.ObligationsResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockObligationsConnector extends TestSuite with MockFactory {
+trait MockObligationsConnector extends MockFactory {
 
   val mockObligationsConnector: ObligationsConnector = mock[ObligationsConnector]
 

@@ -34,7 +34,7 @@ object AppDependencies {
     "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapVersion" % "8.5.0",
     "org.playframework"      %% "play-test"                % PlayVersion.current  % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % scope,
-    "org.scalamock"          %% "scalamock"                % "6.0.0"              % scope,
+    "org.scalamock"          %% "scalamock"                % "5.2.0"              % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.17.0"             % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.1"              % scope,
     "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"              % scope

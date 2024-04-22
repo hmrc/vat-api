@@ -18,12 +18,12 @@ package v1.mocks.requestParsers
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.PaymentsRequestParser
 import v1.models.errors.ErrorWrapper
 import v1.models.request.payments.{PaymentsRawData, PaymentsRequest}
 
-trait MockPaymentsRequestParser extends TestSuite with MockFactory {
+trait MockPaymentsRequestParser extends MockFactory {
 
   val mockPaymentsRequestParser: PaymentsRequestParser = mock[PaymentsRequestParser]
 

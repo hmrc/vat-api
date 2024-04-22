@@ -18,12 +18,12 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.validators.SubmitReturnValidator
 import v1.models.errors.MtdError
 import v1.models.request.submit.SubmitRawData
 
-class MockSubmitReturnValidator extends TestSuite with MockFactory {
+class MockSubmitReturnValidator extends MockFactory {
 
   val mockValidator: SubmitReturnValidator = mock[SubmitReturnValidator]
 

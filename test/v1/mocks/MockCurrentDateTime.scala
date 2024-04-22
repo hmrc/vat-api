@@ -18,13 +18,13 @@ package v1.mocks
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import utils.CurrentDateTime
 
 import java.time.OffsetDateTime
 
 
-trait MockCurrentDateTime extends TestSuite with MockFactory {
+trait MockCurrentDateTime extends MockFactory {
 
   val mockCurrentDateTime: CurrentDateTime = mock[CurrentDateTime]
 

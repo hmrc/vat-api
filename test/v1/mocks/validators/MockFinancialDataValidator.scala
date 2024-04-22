@@ -18,12 +18,12 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.validators.FinancialDataValidator
 import v1.models.errors.MtdError
 import v1.models.request.penalties.FinancialRawData
 
-class MockFinancialDataValidator extends TestSuite with MockFactory {
+class MockFinancialDataValidator extends MockFactory {
 
   val mockValidator: FinancialDataValidator = mock[FinancialDataValidator]
 

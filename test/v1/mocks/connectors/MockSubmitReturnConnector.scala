@@ -18,7 +18,7 @@ package v1.mocks.connectors
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.{DesOutcome, SubmitReturnConnector}
 import v1.controllers.UserRequest
@@ -27,7 +27,7 @@ import v1.models.response.submit.SubmitResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockSubmitReturnConnector extends TestSuite with MockFactory {
+trait MockSubmitReturnConnector extends MockFactory {
 
   val mockSubmitReturnConnector: SubmitReturnConnector = mock[SubmitReturnConnector]
 

@@ -18,12 +18,12 @@ package v1.mocks.requestParsers
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.SubmitReturnRequestParser
 import v1.models.errors.ErrorWrapper
 import v1.models.request.submit.{SubmitRawData, SubmitRequest}
 
-trait MockSubmitReturnRequestParser extends TestSuite with MockFactory {
+trait MockSubmitReturnRequestParser extends MockFactory {
 
   val mockSubmitReturnRequestParser: SubmitReturnRequestParser = mock[SubmitReturnRequestParser]
 

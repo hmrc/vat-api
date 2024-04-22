@@ -18,7 +18,7 @@ package v1.mocks.services
 
 import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.UserRequest
 import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
@@ -28,7 +28,7 @@ import v1.services.{PenaltiesService, ServiceOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockPenaltiesService extends TestSuite with MockFactory {
+trait MockPenaltiesService extends MockFactory {
 
   val mockPenaltiesService: PenaltiesService = mock[PenaltiesService]
 

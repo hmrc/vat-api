@@ -17,13 +17,13 @@
 package v1.mocks
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import play.api.libs.ws.{BodyWritable, WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
-trait MockWsClient extends TestSuite with MockFactory {
+trait MockWsClient extends MockFactory {
 
   val mockWsClient: WSClient = mock[WSClient]
   val mockWsRequest: WSRequest = mock[WSRequest]

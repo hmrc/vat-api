@@ -18,12 +18,12 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.validators.PaymentsValidator
 import v1.models.errors.MtdError
 import v1.models.request.payments.PaymentsRawData
 
-class MockPaymentsValidator extends TestSuite with MockFactory {
+class MockPaymentsValidator extends MockFactory {
     val mockValidator: PaymentsValidator = mock[PaymentsValidator]
 
     object MockVrnValidator {

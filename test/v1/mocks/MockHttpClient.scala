@@ -18,13 +18,13 @@ package v1.mocks
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockHttpClient extends TestSuite with MockFactory {
+trait MockHttpClient extends MockFactory {
 
   val mockHttpClient: HttpClient = mock[HttpClient]
 

@@ -18,12 +18,12 @@ package v1.mocks.requestParsers
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.TestSuite
+
 import v1.controllers.requestParsers.LiabilitiesRequestParser
 import v1.models.errors.ErrorWrapper
 import v1.models.request.liabilities.{LiabilitiesRawData, LiabilitiesRequest}
 
-trait MockLiabilitiesRequestParser extends TestSuite with MockFactory {
+trait MockLiabilitiesRequestParser extends MockFactory {
 
   val mockLiabilitiesRequestParser: LiabilitiesRequestParser = mock[LiabilitiesRequestParser]
 
