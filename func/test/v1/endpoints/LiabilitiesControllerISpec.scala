@@ -87,7 +87,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onSuccess(GET, desUrl, desQueryParams, OK, desJson)
+          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams, OK, desJson)
         }
 
         private val response = await(request.get)
@@ -103,7 +103,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(GET, desUrl, desQueryParams, BAD_REQUEST, "An internal server error occurred")
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, "An internal server error occurred")
         }
 
         private val response = await(request.get)
@@ -135,7 +135,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
         }
 
         private val response = await(request.get)
@@ -217,7 +217,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
             AuthStub.authorised()
-            DesStub.onError(GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
+            DesStub.onError(DesStub.GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
           }
 
           private val response = await(request.get)

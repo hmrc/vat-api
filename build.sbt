@@ -15,13 +15,11 @@
  */
 
 import sbt._
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings}
-import uk.gov.hmrc.{DefaultBuildSettings, SbtAutoBuildPlugin}
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
+import uk.gov.hmrc.{DefaultBuildSettings, SbtAutoBuildPlugin}
 
 val appName = "vat-api"
-
-//lazy val FuncTest = config("func") extend Test
 
 ThisBuild / scalaVersion := "2.13.12"
 ThisBuild / majorVersion := 1

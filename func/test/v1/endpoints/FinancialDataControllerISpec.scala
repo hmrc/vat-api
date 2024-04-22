@@ -79,7 +79,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onSuccess(GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testDownstreamFinancialDetails)
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testDownstreamFinancialDetails)
             }
 
             val response: WSResponse = await(request.get())
@@ -104,7 +104,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -139,7 +139,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -166,7 +166,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, FinancialDataConstants.financialDataUrl(), NOT_FOUND, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), NOT_FOUND, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -193,7 +193,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, FinancialDataConstants.financialDataUrl(), INTERNAL_SERVER_ERROR, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())

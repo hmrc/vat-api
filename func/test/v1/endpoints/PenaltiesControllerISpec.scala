@@ -79,7 +79,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onSuccess(GET, PenaltiesConstants.penaltiesURl(), OK, PenaltiesConstants.downstreamTestPenaltiesResponseJsonMax)
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), OK, PenaltiesConstants.downstreamTestPenaltiesResponseJsonMax)
             }
 
             val response: WSResponse = await(request.get())
@@ -104,7 +104,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -133,7 +133,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, PenaltiesConstants.penaltiesURl(), BAD_REQUEST, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), BAD_REQUEST, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -160,7 +160,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())
@@ -189,7 +189,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onError(GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
+              PenaltiesStub.onError(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), INTERNAL_SERVER_ERROR, errorBody)
             }
 
             val response: WSResponse = await(request.get())

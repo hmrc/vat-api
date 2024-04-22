@@ -71,7 +71,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onSuccess(GET, desUrl, queryParams,  OK, desJson)
+          DesStub.onSuccess(DesStub.GET, desUrl, queryParams,  OK, desJson)
         }
 
         private val response = await(request.get)
@@ -105,7 +105,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(GET, desUrl, queryParams, BAD_REQUEST, multipleErrors)
+          DesStub.onError(DesStub.GET, desUrl, queryParams, BAD_REQUEST, multipleErrors)
         }
 
         private val response = await(request.get)
@@ -133,7 +133,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
-          DesStub.onError(GET, desUrl, queryParams, BAD_REQUEST, multipleErrors)
+          DesStub.onError(DesStub.GET, desUrl, queryParams, BAD_REQUEST, multipleErrors)
         }
 
         private val response = await(request.get)
@@ -179,7 +179,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
             AuthStub.authorised()
-            DesStub.onError(GET, desUrl, queryParams, desStatus, errorBody(desCode))
+            DesStub.onError(DesStub.GET, desUrl, queryParams, desStatus, errorBody(desCode))
           }
 
           private val response = await(request.get)
@@ -211,7 +211,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
           override def setupStubs(): StubMapping = {
             AuditStub.audit()
             AuthStub.authorised()
-            DesStub.onError(GET, desUrl, queryParams, NOT_FOUND, errorBody("NOT_FOUND"))
+            DesStub.onError(DesStub.GET, desUrl, queryParams, NOT_FOUND, errorBody("NOT_FOUND"))
           }
 
           private val response = await(request.get)
