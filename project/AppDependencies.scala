@@ -20,10 +20,10 @@ import sbt._
 
 object AppDependencies {
 
-  val bootstrapVersion = "play-30"
+  val bootstrapPlayVersion = "play-30"
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"                  %% s"bootstrap-backend-$bootstrapVersion" % "8.5.0",
+    "uk.gov.hmrc"                  %% s"bootstrap-backend-$bootstrapPlayVersion" % "8.5.0",
     "org.typelevel"                %% "cats-core"                 % "2.10.0",
     "com.chuusai"                  %% "shapeless"                 % "2.4.0-M1",
     "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.0"
@@ -31,7 +31,7 @@ object AppDependencies {
   )
 
   def test(scope: String = "test, func"): Seq[sbt.ModuleID] = Seq(
-    "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapVersion" % "8.5.0",
+    "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapPlayVersion" % "8.5.0",
     "org.playframework"      %% "play-test"                % PlayVersion.current  % scope,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % scope,
     "org.scalamock"          %% "scalamock"                % "5.2.0"              % scope,
