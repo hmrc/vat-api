@@ -47,7 +47,7 @@ lazy val func = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
   .settings(DefaultBuildSettings.itSettings())
-  .settings(libraryDependencies ++= AppDependencies.test,
+  .settings(libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     addTestReportOption(Test, "int-test-reports"))
   .settings(javaOptions += "-Dlogger.resource=logback-test.xml")
 
