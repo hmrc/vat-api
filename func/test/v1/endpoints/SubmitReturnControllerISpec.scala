@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.v1.endpoints
+package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
