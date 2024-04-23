@@ -47,12 +47,14 @@ lazy val func = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
   .settings(DefaultBuildSettings.itSettings())
-  .settings(
-    Test / unmanagedClasspath += (ThisBuild / baseDirectory).value / "resources",
-    Test / unmanagedResourceDirectories += baseDirectory.value / "resources"
-  )
   .settings(libraryDependencies ++= AppDependencies.test,
     addTestReportOption(Test, "int-test-reports"))
+  .settings(
+    Test / unmanagedClasspath += (ThisBuild / baseDirectory).value / "resources",
+    Test / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    Test / unmanagedResourceDirectories += baseDirectory.value / "test",
+    Test / parallelExecution := false,
+  )
   .settings(javaOptions += "-Dlogger.resource=logback-test.xml")
 
 
