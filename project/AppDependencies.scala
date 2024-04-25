@@ -30,7 +30,7 @@ object AppDependencies {
   )
 
   def test: Seq[sbt.ModuleID] = Seq(
-    "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapPlayVersion" % "8.5.0",
+    "uk.gov.hmrc"           %% s"bootstrap-test-$bootstrapPlayVersion" % "8.5.0"  % Test,
     "org.playframework"      %% "play-test"                % PlayVersion.current  % Test,
     "com.vladsch.flexmark"   %  "flexmark-all"             % "0.64.8"             % Test,
     "org.scalamock"          %% "scalamock"                % "5.2.0"              % Test,
