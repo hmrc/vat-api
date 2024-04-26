@@ -4,8 +4,4 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="uk.gov.hmrc.play.logging.JsonEncoder"/>
     </appender>
-
-    <root level="${logger.root:-INFO}">
-        <appender-ref ref="STDOUT"/>
-    </root>
 </configuration>
