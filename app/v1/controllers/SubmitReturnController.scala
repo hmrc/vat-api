@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import utils._
@@ -44,7 +44,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        cc: ControllerComponents,
                                        dateTime: CurrentDateTime,
                                        idGenerator: IdGenerator,
-                                       override val metrics: Metrics)
+                                       override val metrics: MetricRegistry)
                                       (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Timer with Logging {
 

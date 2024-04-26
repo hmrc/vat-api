@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package v1.controllers.requestParsers
 
-import javax.inject.Inject
-import v1.controllers.requestParsers.validators.{FinancialDataValidator, PenaltiesValidator}
+import v1.controllers.requestParsers.validators.FinancialDataValidator
 import v1.models.domain.Vrn
-import v1.models.request.penalties.{FinancialRawData, FinancialRequest, PenaltiesRawData, PenaltiesRequest}
+import v1.models.request.penalties.{FinancialRawData, FinancialRequest}
+
+import javax.inject.Inject
 
 class FinancialDataRequestParser @Inject()(val validator: FinancialDataValidator) extends RequestParser[FinancialRawData, FinancialRequest] {
 

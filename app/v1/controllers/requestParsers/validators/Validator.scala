@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,14 @@ trait Validator[A <: RawData] {
   def validate(data: A): List[MtdError]
 
   def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
-
     validationSet match {
       case Nil => List()
       case thisLevel :: remainingLevels =>
-        thisLevel(data).flatten match {
-          case x if x.isEmpty  => run(remainingLevels, data)
-          case x if x.nonEmpty => x
+        val errors = thisLevel(data).flatten
+        if (errors.isEmpty) {
+          run(remainingLevels, data)
+        } else {
+          errors
         }
     }
   }

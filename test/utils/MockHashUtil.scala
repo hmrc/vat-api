@@ -19,6 +19,7 @@ package utils
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 
+
 trait MockHashUtil extends MockFactory {
 
   val mockHashUtil: HashUtil = mock[HashUtil]

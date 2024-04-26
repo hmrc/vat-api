@@ -16,7 +16,7 @@
 
 package v1.nrs
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import utils.{DateUtils, MockHashUtil, MockMetrics}
@@ -32,13 +32,13 @@ import v1.nrs.models.NrsTestData.IdentityDataTestData
 import v1.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
 import v1.nrs.models.response.{NrsFailure, NrsResponse}
 import v1.services.ServiceSpec
-import java.time.{LocalDateTime, OffsetDateTime}
 
+import java.time.OffsetDateTime
 import scala.concurrent.Future
 
 class NrsServiceSpec extends ServiceSpec {
 
-  val metrics: Metrics = new MockMetrics
+  val metrics: MetricRegistry = new MockMetrics
 
   private val vrn: Vrn = Vrn("123456789")
 

@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
 import v1.nrs.models.request._
 
-import java.time.{Instant, LocalDate, OffsetDateTime}
+import java.time.{Instant, LocalDate}
 
 object NrsTestData {
 

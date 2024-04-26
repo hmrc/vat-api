@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package v1.nrs.models.request
 
 import play.api.libs.json._
 import utils.DateUtils
-import java.time.{LocalDateTime, OffsetDateTime}
+
+import java.time.OffsetDateTime
 
 case class Metadata(
                      businessId: String,

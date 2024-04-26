@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package config
 
-import akka.actor.{ActorSystem, Scheduler}
+import org.apache.pekko.actor.{ActorSystem, Scheduler}
 import com.google.inject.{AbstractModule, Provides}
 
 class DIModule extends AbstractModule {
@@ -26,6 +26,6 @@ class DIModule extends AbstractModule {
   }
 
   @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
+  def pekkoScheduler(actorSystem: ActorSystem): Scheduler =
     actorSystem.scheduler
 }

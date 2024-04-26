@@ -16,8 +16,6 @@
 
 package v1.endpoints
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
@@ -28,6 +26,9 @@ import support.IntegrationBaseSpec
 import v1.fixtures.ObligationsFixture
 import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub}
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFixture {
@@ -199,7 +200,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
           DesStub.onError(DesStub.GET, desUrl, desQueryParams, BAD_REQUEST, multipleErrors)
         }
 
-        private val response = await(request.get)
+        private val response = await(request.get())
         response.status shouldBe INTERNAL_SERVER_ERROR
         response.json shouldBe Json.toJson(DownstreamError)
         response.header("Content-Type") shouldBe Some("application/json")
@@ -231,7 +232,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
             AuthStub.authorised()
           }
 
-          private val response = await(request.get)
+          private val response = await(request.get())
           response.status shouldBe expectedStatus
           response.json shouldBe Json.toJson(expectedBody)
           response.header("Content-Type") shouldBe Some("application/json")
@@ -281,7 +282,7 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
             DesStub.onError(DesStub.GET, desUrl, desQueryParams, desStatus, errorBody(desCode))
           }
 
-          private val response = await(request.get)
+          private val response = await(request.get())
           response.status shouldBe expectedStatus
           response.json shouldBe Json.toJson(expectedBody)
           response.header("Content-Type") shouldBe Some("application/json")

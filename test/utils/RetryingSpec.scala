@@ -18,7 +18,7 @@ package utils
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{ActorSystem, Scheduler}
+import org.apache.pekko.actor.{ActorSystem, Scheduler}
 import com.google.common.base.Stopwatch
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

@@ -16,8 +16,8 @@
 
 package utils
 
-import akka.actor.Scheduler
-import com.miguno.akka.testing.VirtualTime
+import org.apache.pekko.actor.Scheduler
+import com.github.pjfanning.pekko.scheduler.mock.VirtualTime
 import support.UnitSpec
 
 import scala.concurrent.ExecutionContext

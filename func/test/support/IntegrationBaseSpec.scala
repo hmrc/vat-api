@@ -52,7 +52,6 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
-    .disable[com.kenshoo.play.metrics.PlayModule]
     .configure(servicesConfig)
     .build()
 

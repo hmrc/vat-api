@@ -17,13 +17,13 @@
 package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.{Application, Environment, Mode}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSRequest
 import play.api.test.Helpers.AUTHORIZATION
+import play.api.{Application, Environment, Mode}
 import support.IntegrationBaseSpec
 import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DesStub, NrsStub}

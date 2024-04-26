@@ -16,10 +16,8 @@
 
 package config
 
-import com.typesafe.config.ConfigFactory
-import config.FeatureSwitch.{AuthFeature, Version1Feature, featureSwitches}
+import config.FeatureSwitch.{AuthFeature, Version1Feature}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import support.UnitSpec
 
 class FeatureSwitchSpec extends UnitSpec with FeatureToggleSupport with GuiceOneAppPerSuite {

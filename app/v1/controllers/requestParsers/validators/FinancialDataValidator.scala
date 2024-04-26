@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package v1.controllers.requestParsers.validators
 
 import v1.controllers.requestParsers.validators.validations.{ChargeReferenceValidation, VrnValidation}
 import v1.models.errors.MtdError
-import v1.models.request.penalties.{FinancialRawData, PenaltiesRawData}
+import v1.models.request.penalties.FinancialRawData
 
 class FinancialDataValidator extends Validator[FinancialRawData] {
 
