@@ -1793,7 +1793,10 @@ components:
           example: 2022-07-09
         penaltyChargeReference:
           type: string
-          description: The late payment penalty charge reference.
+          description: |
+            The late payment penalty charge reference.
+
+            **Note\:** If a late payment penalty charge has not been posted to the VAT account yet (the *penaltyStatus* is *"accruing"*, as opposed to *"posted"*), a *penaltyChargeReference* will not be returned. Financial details of the late payment penalty will not be available from the *financial-details* endpoint until a late payment penalty charge has been posted.
           example: XP123456789012
         penaltyChargeDueDate:
           type: string
