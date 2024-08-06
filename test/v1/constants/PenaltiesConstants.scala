@@ -106,6 +106,38 @@ object PenaltiesConstants {
     )
   }
 
+  def testlateSubmissionPenaltyDetailsMissingFields(testChargeRef: String): LateSubmissionPenaltyDetails = {
+    LateSubmissionPenaltyDetails(
+      penaltyNumber = "123",
+      penaltyOrder = "NA",
+      penaltyCategory = LateSubmissionPenaltyCategoryUpstream.`point`,
+      penaltyStatus = LateSubmissionPenaltyStatusUpstream.`active`,
+      frequencyAdjustmentPointIndicator = Some("123"),
+      penaltyCreationDate = "123",
+      penaltyExpiryDate = "123",
+      expiryReason = Some(ExpiryReasonUpstream.`appeal`),
+      communicationsDate = Some("123"),
+      lateSubmissions = Some(List(LateSubmissions(
+        lateSubmissionID = "123",
+        taxReturnStatus = TaxReturnStatus.`Reversed`,
+        taxPeriodStartDate = Some("123"),
+        taxPeriodEndDate = Some("2022-10-11"),
+        taxPeriodDueDate = Some("2022-10-11"),
+        returnReceiptDate = Some("2022-10-11")
+      ))),
+      appealInformation = Some(List(
+        AppealInformation(
+          appealStatus = AppealStatusUpstream.`under-appeal`,
+          appealLevel = AppealLevelUpstream.`statutory-review`
+        )
+      )),
+      chargeReference = Some(testChargeRef),
+      chargeAmount = Some(123),
+      chargeOutstandingAmount = Some(123),
+      chargeDueDate = Some("2022-10-11")
+    )
+  }
+
   def testLatePaymentPenaltyDetails(testPrincipalChargeReference: String): LatePaymentPenaltyDetails = {
     LatePaymentPenaltyDetails(
       principalChargeReference = testPrincipalChargeReference,
@@ -156,6 +188,20 @@ object PenaltiesConstants {
     details = List(
       testlateSubmissionPenaltyDetails("123"),
       testlateSubmissionPenaltyDetails("1234")
+    )
+  )
+
+  val testLateSubmissionPenaltyMissingFields: LateSubmissionPenalty = LateSubmissionPenalty(
+    summary = LateSubmissionPenaltySummary(
+      activePenaltyPoints = 2,
+      inactivePenaltyPoints = 2,
+      periodOfComplianceAchievement = "9999-12-31",
+      regimeThreshold = 2,
+      penaltyChargeAmount = 123
+    ),
+    details = List(
+      testlateSubmissionPenaltyDetailsMissingFields("123"),
+      testlateSubmissionPenaltyDetailsMissingFields("1234")
     )
   )
 
@@ -231,6 +277,70 @@ object PenaltiesConstants {
       |""".stripMargin)
   }
 
+  val downstreamTestLateSubmissionDetailsJsonMissingFields: JsValue = {
+    Json.parse(
+    """|[{
+      |            "penaltyNumber":"123",
+      |            "penaltyStatus":"ACTIVE",
+      |            "FAPIndicator":"123",
+      |            "penaltyCreationDate":"123",
+      |            "triggeringProcess":"123",
+      |            "penaltyExpiryDate":"123",
+      |            "expiryReason": "APP",
+      |            "communicationsDate":"123",
+      |            "lateSubmissions":[
+      |               {
+      |                  "lateSubmissionID":"123",
+      |                  "taxPeriod":"123",
+      |                  "taxPeriodStartDate":"123",
+      |                  "taxPeriodEndDate":"2022-10-11",
+      |                  "taxPeriodDueDate":"2022-10-11",
+      |                  "returnReceiptDate":"2022-10-11"
+      |               }
+      |            ],
+      |            "appealInformation":[
+      |               {
+      |                  "appealStatus":"A"
+      |               }
+      |            ],
+      |            "chargeReference":"123",
+      |            "chargeAmount":123,
+      |            "chargeOutstandingAmount":123,
+      |            "chargeDueDate":"2022-10-11"
+      |         },
+      |         {
+       |            "penaltyNumber":"123",
+       |            "penaltyStatus":"ACTIVE",
+       |            "FAPIndicator":"123",
+       |            "penaltyCreationDate":"123",
+       |            "triggeringProcess":"123",
+       |            "penaltyExpiryDate":"123",
+       |            "expiryReason":"APP",
+       |            "communicationsDate":"123",
+       |            "lateSubmissions":[
+       |               {
+       |                  "lateSubmissionID":"123",
+       |                  "taxPeriod":"123",
+       |                  "taxPeriodStartDate":"123",
+       |                  "taxPeriodEndDate":"2022-10-11",
+       |                  "taxPeriodDueDate":"2022-10-11",
+       |                  "returnReceiptDate":"2022-10-11"
+       |               }
+       |            ],
+       |            "appealInformation":[
+       |               {
+       |                  "appealStatus":"A"
+       |               }
+       |            ],
+       |            "chargeReference":"1234",
+       |            "chargeAmount":123,
+       |            "chargeOutstandingAmount":123,
+       |            "chargeDueDate":"2022-10-11"
+       |         }
+      |      ]
+      |""".stripMargin)
+  }
+
   val upstreamTestLateSubmissionDetailsJson: JsValue = {
     Json.parse(
     """|[{
@@ -278,6 +388,75 @@ object PenaltiesConstants {
        |               {
        |                  "lateSubmissionID":"123",
        |                  "taxReturnStatus":"Open",
+       |                  "taxPeriodStartDate":"123",
+       |                  "taxPeriodEndDate":"2022-10-11",
+       |                  "taxPeriodDueDate":"2022-10-11",
+       |                  "returnReceiptDate":"2022-10-11"
+       |               }
+       |            ],
+       |            "appealInformation":[
+       |               {
+       |                  "appealStatus":"under-appeal",
+       |                  "appealLevel":"statutory-review"
+       |               }
+       |            ],
+       |            "chargeReference":"1234",
+       |            "chargeAmount":123,
+       |            "chargeOutstandingAmount":123,
+       |            "chargeDueDate":"2022-10-11"
+       |         }
+      |      ]
+      |""".stripMargin)
+  }
+
+
+  val upstreamTestLateSubmissionDetailsJsonMissingFields: JsValue = {
+    Json.parse(
+    """|[{
+      |            "penaltyNumber":"123",
+      |            "penaltyOrder":"NA",
+      |            "penaltyCategory":"point",
+      |            "penaltyStatus":"active",
+      |            "frequencyAdjustmentPointIndicator":"123",
+      |            "penaltyCreationDate":"123",
+      |            "penaltyExpiryDate":"123",
+      |            "expiryReason": "appeal",
+      |            "communicationsDate":"123",
+      |            "lateSubmissions":[
+      |               {
+      |                  "lateSubmissionID":"123",
+      |                  "taxReturnStatus":"Reversed",
+      |                  "taxPeriodStartDate":"123",
+      |                  "taxPeriodEndDate":"2022-10-11",
+      |                  "taxPeriodDueDate":"2022-10-11",
+      |                  "returnReceiptDate":"2022-10-11"
+      |               }
+      |            ],
+      |            "appealInformation":[
+      |               {
+      |                  "appealStatus":"under-appeal",
+      |                  "appealLevel":"statutory-review"
+      |               }
+      |            ],
+      |            "chargeReference":"123",
+      |            "chargeAmount":123,
+      |            "chargeOutstandingAmount":123,
+      |            "chargeDueDate":"2022-10-11"
+      |         },
+      |         {
+       |            "penaltyNumber":"123",
+       |            "penaltyOrder":"NA",
+       |            "penaltyCategory":"point",
+       |            "penaltyStatus":"active",
+       |            "frequencyAdjustmentPointIndicator":"123",
+       |            "penaltyCreationDate":"123",
+       |            "penaltyExpiryDate":"123",
+       |            "expiryReason":"appeal",
+       |            "communicationsDate":"123",
+       |            "lateSubmissions":[
+       |               {
+       |                  "lateSubmissionID":"123",
+       |                  "taxReturnStatus":"Reversed",
        |                  "taxPeriodStartDate":"123",
        |                  "taxPeriodEndDate":"2022-10-11",
        |                  "taxPeriodDueDate":"2022-10-11",
@@ -472,10 +651,25 @@ object PenaltiesConstants {
     "penaltyChargeAmount" -> 123
   )
 
+  val upstreamTestLateSubmissionPenaltySummaryJsonMissingFields: JsObject = Json.obj(
+    "activePenaltyPoints" -> 2,
+    "inactivePenaltyPoints" -> 2,
+    "periodOfComplianceAchievement" -> "9999-12-31",
+    "regimeThreshold" -> 2,
+    "penaltyChargeAmount" -> 123
+  )
+
   val downstreamTestLateSubmissionPenaltySummaryJson: JsObject = Json.obj(
     "activePenaltyPoints" -> 2,
     "inactivePenaltyPoints" -> 2,
     "PoCAchievementDate" -> "2022-10-11",
+    "regimeThreshold" -> 2,
+    "penaltyChargeAmount" -> 123
+  )
+
+  val downstreamTestLateSubmissionPenaltySummaryJsonMissingFields: JsObject = Json.obj(
+    "activePenaltyPoints" -> 2,
+    "inactivePenaltyPoints" -> 2,
     "regimeThreshold" -> 2,
     "penaltyChargeAmount" -> 123
   )
@@ -493,15 +687,31 @@ object PenaltiesConstants {
     "details" -> downstreamTestLateSubmissionDetailsJson
   )
 
+  val downstreamTestLateSubmissionPenaltyJsonMissingFields: JsObject = Json.obj(
+    "summary" -> downstreamTestLateSubmissionPenaltySummaryJsonMissingFields,
+    "details" -> downstreamTestLateSubmissionDetailsJsonMissingFields
+  )
+
   val upstreamTestLateSubmissionPenaltyJson: JsObject = Json.obj(
     "summary" -> upstreamTestLateSubmissionPenaltySummaryJson,
     "details" -> upstreamTestLateSubmissionDetailsJson
+  )
+
+  val upstreamTestLateSubmissionPenaltyJsonMissingFeilds: JsObject = Json.obj(
+    "summary" -> upstreamTestLateSubmissionPenaltySummaryJsonMissingFields,
+    "details" -> upstreamTestLateSubmissionDetailsJsonMissingFields
   )
 
 
   val testPenaltiesResponseMax: PenaltiesResponse = PenaltiesResponse(
     totalisations = Some(testTotalisationMax),
     lateSubmissionPenalty = Some(testLateSubmissionPenalty),
+    latePaymentPenalty = Some(testLatePaymentPenalty)
+  )
+
+  val testPenaltiesResponseMissingFields: PenaltiesResponse = PenaltiesResponse(
+    totalisations = Some(testTotalisationMax),
+    lateSubmissionPenalty = Some(testLateSubmissionPenaltyMissingFields),
     latePaymentPenalty = Some(testLatePaymentPenalty)
   )
 
@@ -513,9 +723,21 @@ object PenaltiesConstants {
     "latePaymentPenalty" -> Some(upstreamTestLatePaymentPenaltyJson)
   )
 
+  val upstreamTestPenaltiesResponseJsonMissingField: JsObject = Json.obj(
+    "totalisations" -> Some(upstreamTestPenaltiesTotalisationDataJsonMax),
+    "lateSubmissionPenalty" -> Some(upstreamTestLateSubmissionPenaltyJsonMissingFeilds),
+    "latePaymentPenalty" -> Some(upstreamTestLatePaymentPenaltyJson)
+  )
+
   val downstreamTestPenaltiesResponseJsonMax: JsObject = Json.obj(
     "totalisations" -> Some(downstreamTestPenaltiesTotalisationDataJsonMax),
     "lateSubmissionPenalty" -> Some(downstreamTestLateSubmissionPenaltyJson),
+    "latePaymentPenalty" -> Some(downstreamTestLatePaymentPenaltyJson)
+  )
+
+  val downstreamTestPenaltiesResponseJsonMissingFields: JsObject = Json.obj(
+    "totalisations" -> Some(downstreamTestPenaltiesTotalisationDataJsonMax),
+    "lateSubmissionPenalty" -> Some(downstreamTestLateSubmissionPenaltyJsonMissingFields),
     "latePaymentPenalty" -> Some(downstreamTestLatePaymentPenaltyJson)
   )
 

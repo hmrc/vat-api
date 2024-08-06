@@ -74,7 +74,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
 
         "a valid request is made" must {
 
-          "return 200 and penalties data" in new Test {
+          "return 200 and penalties data (full)" in new Test {
 
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
@@ -85,6 +85,19 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
             val response: WSResponse = await(request.get())
             response.status shouldBe OK
             response.json shouldBe PenaltiesConstants.upstreamTestPenaltiesResponseJsonMax
+            response.header("Content-Type") shouldBe Some("application/json")
+          }
+          "return 200 and penalties data (min with new optional fields missing)" in new Test {
+
+            override def setupStubs(): StubMapping = {
+              AuditStub.audit()
+              AuthStub.authorised()
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, PenaltiesConstants.penaltiesURl(), OK, PenaltiesConstants.downstreamTestPenaltiesResponseJsonMissingFields)
+            }
+
+            val response: WSResponse = await(request.get())
+            response.status shouldBe OK
+            response.json shouldBe PenaltiesConstants.upstreamTestPenaltiesResponseJsonMissingField
             response.header("Content-Type") shouldBe Some("application/json")
           }
         }

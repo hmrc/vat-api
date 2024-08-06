@@ -24,22 +24,30 @@ class PenaltiesResponseSpec extends UnitSpec {
 
   "PenaltiesData" must {
 
-    "write data from json min" in {
+    "write data to json min" in {
 
       Json.toJson(testPenaltiesResponseMin) shouldBe testPenaltiesResponseJsonMin
     }
 
-    "read to json min" in {
+    "read from json min" in {
       testPenaltiesResponseJsonMin.as[PenaltiesResponse] shouldBe testPenaltiesResponseMin
     }
 
-    "write data from json max" in {
+    "write data to json max" in {
 
       Json.toJson(testPenaltiesResponseMax) shouldBe upstreamTestPenaltiesResponseJsonMax
     }
 
-    "read to json max" in {
+    "read from json max" in {
       downstreamTestPenaltiesResponseJsonMax.as[PenaltiesResponse] shouldBe testPenaltiesResponseMax
+    }
+
+    "write data to optional fields change json" in {
+      Json.toJson(testPenaltiesResponseMissingFields) shouldBe upstreamTestPenaltiesResponseJsonMissingField
+    }
+
+    "read from optional fields change json" in {
+      downstreamTestPenaltiesResponseJsonMissingFields.as[PenaltiesResponse] shouldBe testPenaltiesResponseMissingFields
     }
   }
 }
