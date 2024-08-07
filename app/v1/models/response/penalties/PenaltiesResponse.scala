@@ -201,7 +201,7 @@ object LateSubmissionPenaltySummary {
   implicit val reads: Reads[LateSubmissionPenaltySummary] = (
     (JsPath \ "activePenaltyPoints").read[BigDecimal] and
       (JsPath \ "inactivePenaltyPoints").read[Int] and
-      (JsPath \ "PoCAchievementDate").read[String] and
+      ((JsPath \ "PoCAchievementDate").read[String] orElse Reads.pure("9999-12-31")) and
       (JsPath \ "regimeThreshold").read[Int] and
       (JsPath \ "penaltyChargeAmount").read[BigDecimal]
     )(LateSubmissionPenaltySummary.apply _)
@@ -230,8 +230,10 @@ case class LateSubmissionPenaltyDetails(
 object LateSubmissionPenaltyDetails {
   implicit val reads: Reads[LateSubmissionPenaltyDetails] = for {
     penaltyNumber           <- (JsPath \ "penaltyNumber").read[String]
-    penaltyOrder            <- (JsPath \ "penaltyOrder").read[String]
-    penaltyCategory         <- (JsPath \ "penaltyCategory").read[LateSubmissionPenaltyCategoryDownstream].map(_.toUpstreamPenaltyCategory)
+    penaltyOrder            <- (JsPath \ "penaltyOrder").read[String] orElse Reads.pure("NA")
+    penaltyCategory         <- (JsPath \ "penaltyCategory").read[LateSubmissionPenaltyCategoryDownstream].map(_.toUpstreamPenaltyCategory) orElse
+                                            (Reads.pure(LateSubmissionPenaltyCategoryDownstream.`P`).map(_.toUpstreamPenaltyCategory))
+
     penaltyStatus           <- (JsPath \ "penaltyStatus").read[LateSubmissionPenaltyStatusDownstream].map(_.toUpstreamPenaltyStatus)
     fAPIndicator            <- (JsPath \ "FAPIndicator").readNullable[String]
     penaltyCreationDate     <- (JsPath \ "penaltyCreationDate").read[String]
@@ -277,7 +279,18 @@ case class LateSubmissions(
                           )
 
 object LateSubmissions {
-  implicit val format: OFormat[LateSubmissions] = Json.format[LateSubmissions]
+
+  implicit val reads: Reads[LateSubmissions] = (
+    (JsPath \ "lateSubmissionID").read[String] and
+      ((JsPath \ "taxReturnStatus").read[TaxReturnStatus] orElse Reads.pure(TaxReturnStatus.`Reversed`)) and
+      (JsPath \ "taxPeriodStartDate").readNullable[String] and
+      (JsPath \ "taxPeriodEndDate").readNullable[String] and
+      (JsPath \ "taxPeriodDueDate").readNullable[String] and
+      (JsPath \ "returnReceiptDate").readNullable[String]
+    )(LateSubmissions.apply _)
+
+  implicit val writes: OWrites[LateSubmissions] = Json.writes[LateSubmissions]
+
 }
 
 
@@ -289,7 +302,8 @@ case class AppealInformation (
 object AppealInformation {
   implicit val reads: Reads[AppealInformation] = (
     (JsPath \ "appealStatus").read[AppealStatusDownstream].map(_.toUpstreamAppealStatus) and
-      (JsPath \ "appealLevel").read[AppealLevelDownstream].map(_.toUpstreamAppealLevel)
+      ((JsPath \ "appealLevel").read[AppealLevelDownstream].map(_.toUpstreamAppealLevel) orElse
+                                     (Reads.pure(AppealLevelDownstream.`01`).map(_.toUpstreamAppealLevel)))
     )(AppealInformation.apply _)
 
   implicit val writes: OWrites[AppealInformation] = Json.writes[AppealInformation]
