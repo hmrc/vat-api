@@ -1144,6 +1144,10 @@ paths:
               <td><p>The scenario where there are multiple late submission penalties in the last 2 years.</p></td>
             </tr>
             <tr>
+              <td><p>MULTIPLE_INACTIVE_LATE_SUBMISSION_PENALTIES</p></td>
+              <td><p>The scenario where there are multiple inactive late submission penalties in the last 2 years.</p></td>
+            </tr>
+            <tr>
               <td><p>THRESHOLD_LATE_SUBMISSION_PENALTIES</p></td>
               <td><p>The scenario where the number of penalties meets the penalty point threshold and the first charge has been generated.</p></td>
             </tr>
@@ -1573,18 +1577,14 @@ components:
           - description: The appeal status of a penalty.
             example: under-appeal
         appealLevel:
-          allOf:
-          - $ref: '#/components/schemas/AppealLevel'
-          - description: The level of appeal.
-            example: statutory-review
-    AppealLevel:
-      title: AppealLevel
-      enum:
-      - statutory-review
-      - appeal-first-tier-tribunal
-      type: string
-      description: The level of appeal.
-      example: statutory-review
+          enum: [statutory-review, appeal-first-tier-tribunal]
+          default: statutory-review
+          type: string
+          example: statutory-review
+          description: |
+            The level of appeal.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
     AppealStatus:
       title: AppealStatus
       enum:
@@ -1612,15 +1612,24 @@ components:
           example: '12345678901234'
         penaltyOrder:
           type: string
-          description: The position that the penalty currently occupies within the individual's or organisation's point balance.
+          default: NA
+          description: |
+            The position that the penalty currently occupies within the individual's or organisation's point balance.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
           example: '01'
         penaltyCategory:
-          oneOf:
-          - $ref: '#/components/schemas/PenaltyCategory'
-          - $ref: '#/components/schemas/PenaltyCategory1'
-          - $ref: '#/components/schemas/PenaltyCategory2'
-          description: The category of the penalty.
+          enum: [point, charge, threshold]
+          default: point
+          type: string
           example: point
+          description: |
+            The category of the penalty.
+              * `point` - The penalty represents a point that has not met the threshold for a charge.
+              * `charge` - The penalty represents a charge that has been levied because the point threshold has been exceeded. Although this penalty will not be added to the point total because the threshold has already been met, it will affect the period of compliance.
+              * `threshold` - The penalty represents a point that has met the threshold for a charge. The penalty thus consists of a point and a charge.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
         penaltyStatus:
           oneOf:
           - $ref: '#/components/schemas/PenaltyStatus'
@@ -1968,12 +1977,17 @@ components:
           description: The unique identification number for the late submission penalty.
           example: '001'
         taxReturnStatus:
-          oneOf:
-          - $ref: '#/components/schemas/TaxReturnStatus'
-          - $ref: '#/components/schemas/TaxReturnStatus1'
-          - $ref: '#/components/schemas/TaxReturnStatus2'
-          description: The status of the tax return.
+          enum: [Open, Fulfilled, Reversed]
+          default: Reversed
+          type: string
           example: Open
+          description: |
+            The status of the tax return.
+              * `Open` - The VAT return is yet to be submitted.
+              * `Fulfilled` - The obligation has been met (whether the submission was late or not).
+              * `Reversed` - The obligation no longer exists. The individual or organisation is therefore not required to submit any information.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
         taxPeriodStartDate:
           type: string
           description: Start date of the VAT period to which the penalty relates.
@@ -2225,24 +2239,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/LatePaymentPenalty'
           - description: Information about the late payment penalties that HMRC has levied.
-    PenaltyCategory:
-      title: PenaltyCategory
-      enum:
-      - point
-      type: string
-      description: The penalty represents a point that has not met the threshold for a charge.
-    PenaltyCategory1:
-      title: PenaltyCategory1
-      enum:
-      - charge
-      type: string
-      description: The penalty represents a charge that has been levied because the point threshold has been exceeded. Although this penalty will not be added to the point total because the threshold has already been met, it will affect the period of compliance.
-    PenaltyCategory2:
-      title: PenaltyCategory2
-      enum:
-      - threshold
-      type: string
-      description: The penalty represents a point that has met the threshold for a charge. The penalty thus consists of a point and a charge.
     PenaltyStatus:
       title: PenaltyStatus
       enum:
@@ -2362,6 +2358,7 @@ components:
           example: 4
         periodOfComplianceAchievement:
           type: string
+          default: 9999-12-31
           description: |
             The date upon which all accrued penalty points will expire, if the individual or organisation meets the requirements for compliance.
 
@@ -2399,24 +2396,6 @@ components:
           description: Date in the format YYYY-MM-DD
           example: 2017-01-25
       description: Tax Period
-    TaxReturnStatus:
-      title: TaxReturnStatus
-      enum:
-      - Open
-      type: string
-      description: The VAT return is yet to be submitted.
-    TaxReturnStatus1:
-      title: TaxReturnStatus1
-      enum:
-      - Fulfilled
-      type: string
-      description: The obligation has been met (whether the submission was late or not).
-    TaxReturnStatus2:
-      title: TaxReturnStatus2
-      enum:
-      - Reversed
-      type: string
-      description: The obligation no longer exists. The individual or organisation is therefore not required to submit any information.
     TimeToPay:
       title: TimeToPay
       type: object
