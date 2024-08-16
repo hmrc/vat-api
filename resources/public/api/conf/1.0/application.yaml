@@ -1581,7 +1581,10 @@ components:
           default: statutory-review
           type: string
           example: statutory-review
-          description: The level of appeal.
+          description: |
+            The level of appeal.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
     AppealStatus:
       title: AppealStatus
       enum:
@@ -1610,7 +1613,10 @@ components:
         penaltyOrder:
           type: string
           default: NA
-          description: The position that the penalty currently occupies within the individual's or organisation's point balance.
+          description: |
+            The position that the penalty currently occupies within the individual's or organisation's point balance.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
           example: '01'
         penaltyCategory:
           enum: [point, charge, threshold]
@@ -1622,6 +1628,8 @@ components:
               * `point` - The penalty represents a point that has not met the threshold for a charge.
               * `charge` - The penalty represents a charge that has been levied because the point threshold has been exceeded. Although this penalty will not be added to the point total because the threshold has already been met, it will affect the period of compliance.
               * `threshold` - The penalty represents a point that has met the threshold for a charge. The penalty thus consists of a point and a charge.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
         penaltyStatus:
           oneOf:
           - $ref: '#/components/schemas/PenaltyStatus'
@@ -1978,6 +1986,8 @@ components:
               * `Open` - The VAT return is yet to be submitted.
               * `Fulfilled` - The obligation has been met (whether the submission was late or not).
               * `Reversed` - The obligation no longer exists. The individual or organisation is therefore not required to submit any information.
+
+            **Note:** If the late submission penalty is inactive, the default value will be returned.
         taxPeriodStartDate:
           type: string
           description: Start date of the VAT period to which the penalty relates.
