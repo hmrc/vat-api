@@ -1572,10 +1572,10 @@ components:
       type: object
       properties:
         appealStatus:
-          allOf:
-          - $ref: '#/components/schemas/AppealStatus'
-          - description: The appeal status of a penalty.
-            example: under-appeal
+          enum: [under-appeal, appeal-upheld, appeal-rejected, cannot-be-appealed]
+          type: string
+          example: under-appeal
+          description: The appeal status of a penalty.
         appealLevel:
           enum: [statutory-review, appeal-first-tier-tribunal]
           default: statutory-review
@@ -1585,16 +1585,6 @@ components:
             The level of appeal.
 
             **Note:** If the late submission penalty is inactive, the default value will be returned.
-    AppealStatus:
-      title: AppealStatus
-      enum:
-      - under-appeal
-      - appeal-upheld
-      - appeal-rejected
-      - cannot-be-appealed
-      type: string
-      description: The appeal status of a penalty.
-      example: under-appeal
     Detail:
       title: Detail
       required:
@@ -1631,11 +1621,13 @@ components:
 
             **Note:** If the late submission penalty is inactive, the default value will be returned.
         penaltyStatus:
-          oneOf:
-          - $ref: '#/components/schemas/PenaltyStatus'
-          - $ref: '#/components/schemas/PenaltyStatus1'
-          description: The status of the penalty. Its meaning depends upon the penalty's category.
+          enum: [active, inactive]
+          type: string
           example: active
+          description: |
+            The status of the penalty. Its meaning depends upon the penalty's category.
+              * `active` - If the penalty category is 'point', it counts towards the individual's or organisation's point balance. If the penalty category is 'threshold', it counts towards the individual's or organisation's point balance. It has also triggered a penalty charge. If the penalty category is 'charge', then it represents a charge that has been levied because the threshold has been exceeded.
+              * `inactive` - If the penalty category is 'point', it no longer counts towards the individual's or organisation's point balance. This might be because the point has expired, been successfully appealed against, or been removed due to an adjustment. If the penalty category is 'threshold', then it no longer counts towards the individual's or organisation's point balance for the same reasons. Alternatively, a 'threshold' penalty could be inactive because the charge that is associated with it has been reversed. If the penalty category is 'charge', then the charge has been reversed.
         frequencyAdjustmentPointIndicator:
           allOf:
           - $ref: '#/components/schemas/FrequencyAdjustmentPointIndicator'
@@ -1650,17 +1642,19 @@ components:
           description: The date that the penalty point will expire. If the penalty falls within the points threshold, it will expire once compliance is met.
           example: 2024-07-01
         expiryReason:
-          oneOf:
-          - $ref: '#/components/schemas/ExpiryReason'
-          - $ref: '#/components/schemas/ExpiryReason1'
-          - $ref: '#/components/schemas/ExpiryReason2'
-          - $ref: '#/components/schemas/ExpiryReason3'
-          - $ref: '#/components/schemas/ExpiryReason4'
-          - $ref: '#/components/schemas/ExpiryReason5'
-          - $ref: '#/components/schemas/ExpiryReason6'
-          - $ref: '#/components/schemas/ExpiryReason7'
-          description: The reason why a penalty point has expired.
+          enum: [appeal, submission-frequency-change, obligations-reversed, HMRC-removed, natural-expiry, penalty-removed, expiry-conditions-met, HMRC-reset]
+          type: string
           example: appeal
+          description: |
+            The reason why a penalty point has expired:
+              * `appeal` - The penalty point has expired due to a successful appeal.
+              * `submission-frequency-change` - The penalty point has expired due to a change in the user's submission frequency.
+              * `obligations-reversed` - A change has resulted in the user's obligations being reversed. For example, a user might have deregistered for VAT before a submission was due.
+              * `HMRC-removed` - An HMRC officer has removed the penalty. This might happen, for example, following a decision made by a tribunal.
+              * `natural-expiry` - The penalty point has expired naturally. For example, it has reached the end of its 24-month lifetime.
+              * `penalty-removed` - The penalty has been removed because the submission was deemed to be on time.
+              * `expiry-conditions-met` - The penalty point has expired because the user has met the conditions for the expiry of all active penalty points.
+              * `HMRC-reset` - An HMRC officer has reset the user's penalty points to zero.
         communicationsDate:
           type: string
           description: The date when a letter about the penalty was sent to the customer.
@@ -1720,11 +1714,13 @@ components:
           description: The category of the penalty. This specifies whether the penalty is a first late payment penalty (LPP1) or a second late payment penalty (LPP2).
           example: LPP1
         penaltyStatus:
-          oneOf:
-          - $ref: '#/components/schemas/PenaltyStatus2'
-          - $ref: '#/components/schemas/PenaltyStatus21'
-          description: The status of the penalty.
+          enum: [accruing, posted]
+          type: string
           example: accruing
+          description: |
+            The status of the penalty.
+              * `accruing` - The penalty is accruing, and is yet to be posted to the account.
+              * `posted` - The penalty has been posted to the account.
         penaltyAmountAccruing:
           multipleOf: 0.01
           maximum: 9999999999999.99
@@ -1887,54 +1883,6 @@ components:
           description: The amount of unposted interest that has currently accrued on the charge.
           example: 12.1
       description: Interest totals that relate to the charge.
-    ExpiryReason:
-      title: ExpiryReason
-      enum:
-      - appeal
-      type: string
-      description: The penalty point has expired due to a successful appeal.
-    ExpiryReason1:
-      title: ExpiryReason1
-      enum:
-      - submission-frequency-change
-      type: string
-      description: The penalty point has expired due to a change in the user's submission frequency.
-    ExpiryReason2:
-      title: ExpiryReason2
-      enum:
-      - obligations-reversed
-      type: string
-      description: A change has resulted in the user's obligations being reversed. For example, a user might have deregistered for VAT before a submission was due.
-    ExpiryReason3:
-      title: ExpiryReason3
-      enum:
-      - HMRC-removed
-      type: string
-      description: An HMRC officer has removed the penalty. This might happen, for example, following a decision made by a tribunal.
-    ExpiryReason4:
-      title: ExpiryReason4
-      enum:
-      - natural-expiry
-      type: string
-      description: The penalty point has expired naturally. For example, it has reached the end of its 24-month lifetime.
-    ExpiryReason5:
-      title: ExpiryReason5
-      enum:
-      - penalty-removed
-      type: string
-      description: The penalty has been removed because the submission was deemed to be on time.
-    ExpiryReason6:
-      title: ExpiryReason6
-      enum:
-      - expiry-conditions-met
-      type: string
-      description: The penalty point has expired because the user has met the conditions for the expiry of all active penalty points.
-    ExpiryReason7:
-      title: ExpiryReason7
-      enum:
-      - HMRC-reset
-      type: string
-      description: An HMRC officer has reset the user's penalty points to zero.
     FinancialDetails:
       title: FinancialDetails
       type: object
@@ -2130,9 +2078,11 @@ components:
           type: string
           description: Unique number that represents the form bundle. The system stores VAT Return data in forms, which are held in a unique form bundle.
         paymentIndicator:
-          allOf:
-          - $ref: '#/components/schemas/PaymentIndicator'
-          - description: Is DD if the netVatDue value is a debit and HMRC holds a Direct Debit Instruction for the client. Is BANK if the netVatDue value is a credit and HMRC holds the client’s bank data. Otherwise not present.
+          enum: [DD, BANK]
+          type: string
+          description: |
+            * `DD` - The netVatDue value is a debit, and HMRC holds a Direct Debit instruction for the client.
+            * `BANK` - The netVatDue value is a credit, and HMRC holds the client’s bank data.
         chargeRefNumber:
           maxLength: 16
           minLength: 1
@@ -2239,30 +2189,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/LatePaymentPenalty'
           - description: Information about the late payment penalties that HMRC has levied.
-    PenaltyStatus:
-      title: PenaltyStatus
-      enum:
-      - active
-      type: string
-      description: If the penalty category is 'point', it counts towards the individual's or organisation's point balance. If the penalty category is 'threshold', it counts towards the individual's or organisation's point balance. It has also triggered a penalty charge. If the penalty category is 'charge', then it represents a charge that has been levied because the threshold has been exceeded.
-    PenaltyStatus1:
-      title: PenaltyStatus1
-      enum:
-      - inactive
-      type: string
-      description: If the penalty category is 'point', it no longer counts towards the individual's or organisation's point balance. This might be because the point has expired, been successfully appealed against, or been removed due to an adjustment. If the penalty category is 'threshold', then it no longer counts towards the individual's or organisation's point balance for the same reasons. Alternatively, a 'threshold' penalty could be inactive because the charge that is associated with it has been reversed. If the penalty category is 'charge', then the charge has been reversed.
-    PenaltyStatus2:
-      title: PenaltyStatus2
-      enum:
-      - accruing
-      type: string
-      description: The penalty is accruing, and is yet to be posted to the account.
-    PenaltyStatus21:
-      title: PenaltyStatus21
-      enum:
-      - posted
-      type: string
-      description: The penalty has been posted to the account.
     SubmitVAT:
       title: SubmitVAT
       required:
