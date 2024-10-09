@@ -41,18 +41,6 @@ class ApiDefinitionFactorySpec extends UnitSpec {
 
         apiDefinitionFactory.definition shouldBe
           Definition(
-            scopes = Seq(
-              Scope(
-                key = readScope,
-                name = "View your VAT information",
-                description = "Allow read access to VAT data"
-              ),
-              Scope(
-                key = writeScope,
-                name = "Change your VAT information",
-                description = "Allow write access to VAT data"
-              )
-            ),
             api = APIDefinition(
               name = "VAT (MTD)",
               description =

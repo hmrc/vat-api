@@ -43,18 +43,6 @@ class DocumentationControllerISpec extends IntegrationBaseSpec with FeatureToggl
   val apiDefinitionJson: JsValue = Json.parse(
     """
       |{
-      |  "scopes":[
-      |    {
-      |      "key":"read:vat",
-      |      "name":"View your VAT information",
-      |      "description":"Allow read access to VAT data"
-      |    },
-      |    {
-      |      "key":"write:vat",
-      |      "name":"Change your VAT information",
-      |      "description":"Allow write access to VAT data"
-      |    }
-      |  ],
       |  "api":{
       |    "name":"VAT (MTD)",
       |    "description":"An API for providing VAT data",
