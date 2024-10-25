@@ -25,7 +25,9 @@ class PaymentItemSpec extends UnitSpec {
     """
       |{
       |  "paymentAmount" : 100.2,
-      |  "clearingDate" : "2017-01-01"
+      |  "clearingDate" : "2017-01-01",
+      |  "paymentLot":"01234",
+      |  "paymentLotItem":"0001"
       |}
     """.stripMargin
   )
@@ -34,7 +36,9 @@ class PaymentItemSpec extends UnitSpec {
     """
       |{
       |  "paymentAmount" : 100.2,
-      |  "clearingDate" : false
+      |  "clearingDate" : false,
+      |  "paymentLot":"01234",
+      |  "paymentLotItem":"0001"
       |}
     """.stripMargin
   )
@@ -44,12 +48,13 @@ class PaymentItemSpec extends UnitSpec {
       |{
       |  "amount" : 100.2,
       |  "received" : "2017-01-01"
+      |
       |}
     """.stripMargin
   )
 
   val paymentItemModel: PaymentItem =
-    PaymentItem(amount = Some(100.2), received = Some("2017-01-01"))
+    PaymentItem(amount = Some(100.2), received = Some("2017-01-01"), paymentLot = Some("01234"), paymentLotItem = Some("0001"))
 
   "PaymentItem" when {
     "read from valid JSON" should {
@@ -74,7 +79,8 @@ class PaymentItemSpec extends UnitSpec {
       "not write empty fields" in {
 
         val emptyPaymentItemModel: PaymentItem =
-          PaymentItem(amount = None, received = None)
+          PaymentItem(amount = None, received = None, paymentLot = None, paymentLotItem = None)
+
 
         Json.toJson(emptyPaymentItemModel) shouldBe JsObject.empty
       }

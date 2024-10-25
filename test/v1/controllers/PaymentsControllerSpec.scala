@@ -79,24 +79,24 @@ class PaymentsControllerSpec
           taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(15.0), received = Some("2017-02-11"))
+            PaymentItem(amount = Some(15.0), received = Some("2017-02-11"), paymentLot = Some("01234"), paymentLotItem = Some("0001"))
           ))
         ),
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-03-01", to = "2017-03-25")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(40.00), received = Some("2017-03-11")),
-            PaymentItem(amount = Some(1001.00), received = Some("2017-03-12"))
+            PaymentItem(amount = Some(40.00), received = Some("2017-03-11"), paymentLot = Some("01234"), paymentLotItem = Some("0001")),
+            PaymentItem(amount = Some(1001.00), received = Some("2017-03-12"), paymentLot = Some("56789"), paymentLotItem = Some("0002"))
           ))
         ),
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-08-01", to = "2017-12-20")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(Some(322.00), Some("2017-08-05")),
-            PaymentItem(Some(90.00), None),
-            PaymentItem(Some(6.00), Some("2017-09-12"))
+            PaymentItem(Some(322.00), Some("2017-08-05"), paymentLot = Some("01234"), paymentLotItem = Some("0001")),
+            PaymentItem(Some(90.00), None, paymentLot = Some("56789"), paymentLotItem = Some("0002")),
+            PaymentItem(Some(6.00), Some("2017-09-12"), paymentLot = Some("12345"), paymentLotItem = Some("0003"))
           ))
         )
       )
@@ -109,25 +109,31 @@ class PaymentsControllerSpec
       |      {
       |         "amount":15,
       |         "received":"2017-02-11"
+      |
       |      },
       |      {
       |         "amount":40,
       |         "received":"2017-03-11"
+      |
       |      },
       |      {
       |         "amount":1001,
       |         "received":"2017-03-12"
+      |
       |      },
       |      {
       |         "amount":322,
       |         "received":"2017-08-05"
+      |
       |      },
       |      {
-      |         "amount":90
+      |         "amount":90,
+      |         "received":null
       |      },
       |      {
       |         "amount":6,
       |         "received":"2017-09-12"
+      |
       |      }
       |   ]
       |}

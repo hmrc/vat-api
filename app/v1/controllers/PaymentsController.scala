@@ -89,6 +89,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
+      case RuleDuplicatePaymentError => Conflict(Json.toJson(errorWrapper)) // Error case to Handle duplicate payments
       case VrnFormatError | VrnFormatErrorDes |
            FinancialDataInvalidDateFromError | InvalidDateFromErrorDes |
            FinancialDataInvalidDateToError | InvalidDateToErrorDes |

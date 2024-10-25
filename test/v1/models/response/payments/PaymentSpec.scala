@@ -144,7 +144,7 @@ class PaymentSpec extends UnitSpec {
     taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
     `type` = "VAT Return Debit Charge",
     paymentItems = Some(Seq(
-      PaymentItem(amount = Some(5.00), received = Some("2017-02-11"))
+      PaymentItem(amount = Some(5.00), received = Some("2017-02-11"), paymentLot = Some("081203010024"), paymentLotItem = Some("000001")),
     ))
   )
 
@@ -153,8 +153,8 @@ class PaymentSpec extends UnitSpec {
       taxPeriod = Some(TaxPeriod("2017-03-01", "2017-03-25")),
       `type` = "VAT Return Debit Charge",
       paymentItems = Some(Seq(
-        PaymentItem(amount = Some(50.00), received = Some("2017-03-11")),
-        PaymentItem(amount = Some(1000.00), received = Some("2017-03-12"))
+        PaymentItem(amount = Some(50.00), received = Some("2017-03-11"), paymentLot = Some("081203010024"), paymentLotItem = Some("000001")),
+        PaymentItem(amount = Some(1000.00), received = Some("2017-03-12"), paymentLot = Some("081203010024"), paymentLotItem = Some("000001"))
       ))
     )
 
@@ -205,15 +205,21 @@ class PaymentSpec extends UnitSpec {
              |   "items": [
              |      {
              |         "clearingDate":"2017-02-11",
-             |         "paymentAmount":5.0
+             |         "paymentAmount":5.0,
+             |         "paymentLot":"081203010024",
+             |         "paymentLotItem":"000001"
              |      },
              |      {
-             |         "paymentAmount":-15.2
+             |         "paymentAmount":-15.2,
+             |         "paymentLot":"01234",
+             |         "paymentLotItem":"0001"
              |      },
              |      {
              |         "subItem":"001",
              |         "dueDate":"2017-03-02",
-             |         "amount":1001.00
+             |         "amount":1001.00,
+             |         "paymentLot":"6789",
+             |         "paymentLotItem":"0002"
              |      }
              |
              |   ]
@@ -226,8 +232,8 @@ class PaymentSpec extends UnitSpec {
             taxPeriod = Some(TaxPeriod("2017-02-01", "2017-02-28")),
             `type` = "VAT Return Debit Charge",
             paymentItems = Some(Seq(
-              PaymentItem(amount = Some(5.00), received = Some("2017-02-11")),
-              PaymentItem(amount = Some(-15.2), received = None)
+              PaymentItem(amount = Some(5.00), received = Some("2017-02-11"), paymentLot = Some("081203010024"), paymentLotItem = Some("000001")),
+              PaymentItem(amount = Some(-15.2), received = None,  paymentLot = Some("01234"), paymentLotItem = Some("0001"))
             ))
           )
 

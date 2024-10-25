@@ -42,7 +42,7 @@ class PaymentsConnectorSpec extends ConnectorSpec {
           taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
+            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"), paymentLot = Some("01234"), paymentLotItem = Some("0001"))
           ))
         )
       )
@@ -55,14 +55,14 @@ class PaymentsConnectorSpec extends ConnectorSpec {
           taxPeriod = Some(TaxPeriod(from = "2017-1-1", to = "2017-12-31")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
+            PaymentItem(amount = Some(200.00), received = Some("2017-03-12"), paymentLot = Some("01234"), paymentLotItem = Some("0001"))
           ))
         ),
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2018-1-1", to = "2018-12-31")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(2375.23), received = Some("2018-03-12"))
+            PaymentItem(amount = Some(2375.23), received = Some("2018-03-12"), paymentLot = Some("56789"), paymentLotItem = Some("0002"))
           ))
         )
       )
