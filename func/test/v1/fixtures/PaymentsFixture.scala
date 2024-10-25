@@ -266,24 +266,24 @@ trait PaymentsFixture {
           taxPeriod = Some(TaxPeriod(from = "2017-02-01", to = "2017-02-28")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(15.0), received = Some("2017-02-11"))
+            PaymentItem(amount = Some(15.0), received = Some("2017-02-11"), paymentLot = Some("081203010024"), paymentLotItem = Some ("000001"))
           ))
         ),
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-03-01", to = "2017-03-25")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(amount = Some(40.00), received = Some("2017-03-11")),
-            PaymentItem(amount = Some(1001.00), received = Some("2017-03-12"))
+            PaymentItem(amount = Some(40.00), received = Some("2017-03-11"), paymentLot = Some("081203010024"), paymentLotItem = Some ("000001")),
+            PaymentItem(amount = Some(1001.00), received = Some("2017-03-12"), paymentLot = Some("081203010024"), paymentLotItem = Some ("000001"))
           ))
         ),
         Payment(
           taxPeriod = Some(TaxPeriod(from = "2017-08-01", to = "2017-12-20")),
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(Seq(
-            PaymentItem(Some(322.00), Some("2017-08-05")),
-            PaymentItem(Some(90.00), None),
-            PaymentItem(Some(6.00), Some("2017-09-12"))
+            PaymentItem(Some(322.00), Some("2017-08-05"), paymentLot = Some("081203010024"), paymentLotItem = Some ("000001")),
+            PaymentItem(Some(90.00), None, paymentLot = Some("081203010024"), paymentLotItem = Some ("000002")),
+            PaymentItem(Some(6.00), Some("2017-09-12"), paymentLot = Some("081203010024"), paymentLotItem = Some ("000003"))
           ))
         )
       )
