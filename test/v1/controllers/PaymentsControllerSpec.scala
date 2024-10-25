@@ -127,8 +127,8 @@ class PaymentsControllerSpec
       |
       |      },
       |      {
-      |         "amount":90,
-      |         "received":null
+      |         "amount":90
+      |
       |      },
       |      {
       |         "amount":6,
