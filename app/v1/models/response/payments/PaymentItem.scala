@@ -21,20 +21,17 @@ import play.api.libs.json.{JsNull, JsPath, Json, OWrites, Reads, __}
 
 case class PaymentItem(amount: Option[BigDecimal],
                        received: Option[String],
-                       paymentLot: Option[String], //New Field
-                       paymentLotItem: Option[String]) //New Field
+                       paymentLot: Option[String],
+                       paymentLotItem: Option[String])
 
 object PaymentItem {
-
   val empty: PaymentItem = PaymentItem(None, None, None, None)
-  //Adjusted Serialization logic to exclude paymentLot and paymentLotItem
   implicit val writes: OWrites[PaymentItem] = OWrites[PaymentItem] { paymentItem =>
     Json.obj(
       "amount" -> paymentItem.amount,
       "received" -> paymentItem.received
-    ).fields.filterNot(_._2 == JsNull).foldLeft(Json.obj())(_ + _) //Filter out null Fields & rebuild the JsObject
+    ).fields.filterNot(_._2 == JsNull).foldLeft(Json.obj())(_ + _)
   }
-
   implicit val reads: Reads[PaymentItem] = (
     (JsPath \ "paymentAmount").readNullable[BigDecimal] and
       (JsPath \ "clearingDate").readNullable[String] and

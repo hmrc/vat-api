@@ -49,17 +49,17 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
     result.value
   }
   private def ensureUniquePayments(paymentsResponse: PaymentsResponse): PaymentsResponse = {
-    val seen = scala.collection.mutable.Set[(BigDecimal, String, String)]() // Global set to track seen keys
+    val seen = scala.collection.mutable.Set[(BigDecimal, String, String)]()
     val uniquePayments = paymentsResponse.payments.map { payment =>
       payment.paymentItems match {
         case Some(items) =>
           val uniqueItems = items.filter { item =>
             val key = (
-              item.amount.getOrElse(BigDecimal(0)),  // Use default value of 0 for amount if None
-              item.paymentLot.getOrElse("").trim,    // Use empty string and trim any extra spaces in paymentLot if None
-              item.paymentLotItem.getOrElse("").trim // Use empty string and trim any extra spaces in paymentLotItem if None
+              item.amount.getOrElse(BigDecimal(0)),
+              item.paymentLot.getOrElse("").trim,
+              item.paymentLotItem.getOrElse("").trim
             )
-            !seen.contains(key) && seen.add(key) //Filters out duplicates and adds new keys to the set
+            !seen.contains(key) && seen.add(key)
           }
           payment.copy(paymentItems = Some(uniqueItems))
         case None => payment

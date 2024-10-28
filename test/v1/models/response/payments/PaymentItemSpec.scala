@@ -48,7 +48,6 @@ class PaymentItemSpec extends UnitSpec {
       |{
       |  "amount" : 100.2,
       |  "received" : "2017-01-01"
-      |
       |}
     """.stripMargin
   )
@@ -80,8 +79,6 @@ class PaymentItemSpec extends UnitSpec {
 
         val emptyPaymentItemModel: PaymentItem =
           PaymentItem(amount = None, received = None, paymentLot = None, paymentLotItem = None)
-
-
         Json.toJson(emptyPaymentItemModel) shouldBe JsObject.empty
       }
     }

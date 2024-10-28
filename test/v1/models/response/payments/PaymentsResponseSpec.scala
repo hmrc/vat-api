@@ -65,7 +65,6 @@ class PaymentsResponseSpec extends UnitSpec {
       |               "paymentAmount":-25.0,
       |               "paymentLot":"01234",
       |               "paymentLotItem":"0001"
-      |
       |            }
       |         ]
       |      }
@@ -81,17 +80,14 @@ class PaymentsResponseSpec extends UnitSpec {
        |      {
        |         "amount":5,
        |         "received":"2017-02-11"
-       |
        |      },
        |      {
        |         "amount":10,
        |         "received":"2017-04-11"
-       |
        |      },
        |      {
        |         "amount": -25,
        |         "received": "2017-03-19"
-       |
        |      }
        |   ]
        |}
