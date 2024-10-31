@@ -49,7 +49,7 @@ class PaymentsServiceSpec extends ServiceSpec {
           `type` = "VAT Return Debit Charge",
           paymentItems = Some(
             Seq(
-              PaymentItem(amount = Some(200.00), received = Some("2017-03-12"))
+              PaymentItem(amount = Some(200.00), received = Some("2017-03-12"), paymentLot = Some("01234"), paymentLotItem = Some("0001"))
             ))
         )
       )

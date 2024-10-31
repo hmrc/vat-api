@@ -159,3 +159,6 @@ object DuplicateVatSubmission extends MtdError(
   ))
 
 object RuleIncorrectGovTestScenarioError extends MtdError(code = "RULE_INCORRECT_GOV_TEST_SCENARIO", message = "The Gov-Test-Scenario was not found")
+object RuleDuplicatePaymentError extends MtdError(
+  "RULE_DUPLICATE_PAYMENT",
+  "Duplicate payment found: paymentLot, and paymentLotItem must be unique")

@@ -42,11 +42,31 @@ class PaymentsService @Inject()(connector: PaymentsConnector) extends DesRespons
     val result = for {
       desResponseWrapper <- EitherT(connector.retrievePayments(request)).leftMap(mapDesErrors(desErrorMap))
       mtdResponseWrapper <- EitherT.fromEither[Future](validatePaymentsSuccessResponse(desResponseWrapper))
-    } yield mtdResponseWrapper
-
+    } yield {
+      val deduplicatedPayments = ensureUniquePayments(mtdResponseWrapper.responseData)
+      mtdResponseWrapper.copy(responseData = deduplicatedPayments)
+    }
     result.value
   }
-
+  private def ensureUniquePayments(paymentsResponse: PaymentsResponse): PaymentsResponse = {
+    val seen = scala.collection.mutable.Set[(BigDecimal, String, String)]()
+    val uniquePayments = paymentsResponse.payments.map { payment =>
+      payment.paymentItems match {
+        case Some(items) =>
+          val uniqueItems = items.filter { item =>
+            val key = (
+              item.amount.getOrElse(BigDecimal(0)),
+              item.paymentLot.getOrElse("").trim,
+              item.paymentLotItem.getOrElse("").trim
+            )
+            !seen.contains(key) && seen.add(key)
+          }
+          payment.copy(paymentItems = Some(uniqueItems))
+        case None => payment
+      }
+    }
+    paymentsResponse.copy(payments = uniquePayments)
+  }
   private val desErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_IDTYPE"                     -> DownstreamError,

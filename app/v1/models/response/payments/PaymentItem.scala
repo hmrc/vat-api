@@ -17,19 +17,25 @@
 package v1.models.response.payments
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{JsNull, JsPath, Json, OWrites, Reads, __}
 
 case class PaymentItem(amount: Option[BigDecimal],
-                       received: Option[String])
+                       received: Option[String],
+                       paymentLot: Option[String],
+                       paymentLotItem: Option[String])
 
 object PaymentItem {
-
-  val empty: PaymentItem = PaymentItem(None, None)
-
-  implicit val writes: OWrites[PaymentItem] = Json.writes[PaymentItem]
-
+  val empty: PaymentItem = PaymentItem(None, None, None, None)
+  implicit val writes: OWrites[PaymentItem] = OWrites[PaymentItem] { paymentItem =>
+    Json.obj(
+      "amount" -> paymentItem.amount,
+      "received" -> paymentItem.received
+    ).fields.filterNot(_._2 == JsNull).foldLeft(Json.obj())(_ + _)
+  }
   implicit val reads: Reads[PaymentItem] = (
     (JsPath \ "paymentAmount").readNullable[BigDecimal] and
-      (JsPath \ "clearingDate").readNullable[String]
+      (JsPath \ "clearingDate").readNullable[String] and
+      (JsPath \ "paymentLot").readNullable[String] and
+      (JsPath \ "paymentLotItem").readNullable[String]
     ) (PaymentItem.apply _)
 }
