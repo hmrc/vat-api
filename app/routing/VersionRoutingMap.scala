@@ -17,7 +17,6 @@
 package routing
 
 import com.google.inject.ImplementedBy
-import config.FeatureSwitch.PenaltiesEndpointsFeature
 import config.{AppConfig, FeatureToggleSupport}
 import definition.Versions.VERSION_1
 import play.api.routing.Router
@@ -40,7 +39,6 @@ trait VersionRoutingMap extends Logging {
 
 // Add routes corresponding to available versions...
 case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
-                                           v1Router: v1.Routes,
                                            v1RoutesWithPenalties: v1WithPenalties.Routes,
                                            implicit val appConfig: AppConfig
                                           ) extends VersionRoutingMap with FeatureToggleSupport {
@@ -48,13 +46,8 @@ case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
 
   val map: Map[String, Router] = Map(
     VERSION_1 -> {
-      if (isEnabled(PenaltiesEndpointsFeature)) {
         logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages including penalties")
         v1RoutesWithPenalties
-      } else {
-        logger.info("[VersionRoutingMap][map] using v1Router - pointing to new packages")
-        v1Router
-      }
     }
   )
 }

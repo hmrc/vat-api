@@ -23,7 +23,6 @@ object FeatureSwitch {
 
   val featureSwitches: Seq[FeatureSwitch] = Seq(
     AuthFeature,
-    PenaltiesEndpointsFeature,
     FinancialDataRamlFeature
   )
 
@@ -47,10 +46,6 @@ object FeatureSwitch {
 
   case object AuthFeature extends FeatureSwitch {
     override val name: String = s"$prefix.auth.enabled"
-  }
-
-  case object PenaltiesEndpointsFeature extends FeatureSwitch {
-    override val name: String = s"$prefix.penaltiesEndpoints.enabled"
   }
 
   case object FinancialDataRamlFeature extends FeatureSwitch {
