@@ -2434,7 +2434,10 @@ components:
           maximum: 9999999999999.99
           minimum: -9999999999999.99
           type: number
-          description: Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
+          description: |
+            The sum of the *vatDueSales* and *vatDueAcquisitions* values.
+
+            Defines a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99
         vatReclaimedCurrPeriod:
           multipleOf: 0.01
           maximum: 9999999999999.99
