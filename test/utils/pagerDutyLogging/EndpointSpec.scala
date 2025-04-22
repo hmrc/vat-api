@@ -35,7 +35,8 @@ class EndpointSpec extends UnitSpec {
     ExpectedEndpointMessages(RetrieveLiabilities, "RETRIEVE_LIABILITIES_500", "RETRIEVE_LIABILITIES_REQUEST_FAILED"),
     ExpectedEndpointMessages(RetrievePayments, "RETRIEVE_PAYMENTS_500", "RETRIEVE_PAYMENTS_REQUEST_FAILED"),
     ExpectedEndpointMessages(RetrievePenalties, "RETRIEVE_PENALTIES_500", "RETRIEVE_PENALTIES_REQUEST_FAILED"),
-    ExpectedEndpointMessages(RetrieveFinancialData, "RETRIEVE_FINANCIAL_DATA_500", "RETRIEVE_FINANCIAL_DATA_REQUEST_FAILED")
+    ExpectedEndpointMessages(RetrieveFinancialData, "RETRIEVE_FINANCIAL_DATA_500", "RETRIEVE_FINANCIAL_DATA_REQUEST_FAILED"),
+    ExpectedEndpointMessages(RetrieveCustomerInfo, "RETRIEVE_CUSTOMER_INFO_500", "RETRIEVE_CUSTOMER_INFO_REQUEST_FAILED")
   )
 
   endpointMessagesTests(expectedEndpointMessages)

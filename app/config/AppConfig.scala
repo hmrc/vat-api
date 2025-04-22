@@ -47,6 +47,7 @@ trait AppConfig {
 
   //Penalties config items
   def penaltiesBaseUrl: String
+  def vatSubscriptionUrl: String
 }
 
 @Singleton
@@ -76,6 +77,7 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
 
   //Penalties Config
   val penaltiesBaseUrl: String = config.baseUrl("penalties")
+  val vatSubscriptionUrl: String = config.baseUrl("vat-subscription")
 
   private final def getFiniteDuration(config: Configuration, path: String): FiniteDuration = {
     val string = config.get[String](path)

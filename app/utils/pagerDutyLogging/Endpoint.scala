@@ -57,4 +57,9 @@ object Endpoint {
     override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_FINANCIAL_DATA_500
     override def requestFailedMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_FINANCIAL_DATA_REQUEST_FAILED
   }
+
+  case object  RetrieveCustomerInfo extends Endpoint {
+    override def toLoggerMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_CUSTOMER_INFO_500
+    override def requestFailedMessage: PagerDutyLoggingEndpointName.Value = PagerDutyLoggingEndpointName.RETRIEVE_CUSTOMER_INFO_REQUEST_FAILED
+  }
 }

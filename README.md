@@ -34,3 +34,17 @@ You can create a GitHub issue [here](https://github.com/hmrc/vat-api/issues).
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
 
+### Postman setup
+
+To execute these apis in postman the following repo needs to be started.
+mtd-vat-api-acceptance-tests  
+sm2 --start MTDFB_VAT
+
+### Generate tax payer access tokens for each environment 
+
+checkout mtd-vat-api-acceptance-tests
+./generateTestUsers_local.sh
+./generateTestUsers_qa.sh
+./generateTestUsers_staging.sh
+./generateTestUsers_externaltest.sh
+

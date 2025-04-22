@@ -19,3 +19,5 @@ GET         /:vrn/penalties                             v1.controllers.Penalties
 # VAT Financial Details
 GET         /:vrn/financial-details/:chargeReference    v1.controllers.FinancialDataController.retrieveFinancialData(vrn, chargeReference)
 
+# Customer Information
+GET         /:vrn/information            v1.controllers.CustomerInfoController.retrieveCustomerInfo(vrn)

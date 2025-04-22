@@ -52,6 +52,10 @@ object AuditEvents {
       detail = AuditDetail(userDetails, correlationId, auditResponse)
     )
 
+  def auditCustomerInfo(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
+    AuditEvent("retrieveCustomerInfo", "retrieve-customer-info",
+      AuditDetail(userDetails, correlationId, auditResponse))
+
   def auditFinancialData(correlationId: String, userDetails: UserDetails, auditResponse: AuditResponse): AuditEvent[AuditDetail] =
     AuditEvent(
       auditType = "retrieveFinancialData",
