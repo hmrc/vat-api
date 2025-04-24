@@ -21,6 +21,7 @@ import config.{AppConfig, FeatureToggleSupport}
 import definition.Versions.VERSION_1
 import play.api.routing.Router
 import utils.Logging
+import config.FeatureSwitch.FrsFeatureSwitch
 
 import javax.inject.Inject
 
@@ -40,14 +41,20 @@ trait VersionRoutingMap extends Logging {
 // Add routes corresponding to available versions...
 case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
                                            v1RoutesWithPenalties: v1WithPenalties.Routes,
+                                           v1RoutesWithFrs: v1WithFrs.Routes,
                                            implicit val appConfig: AppConfig
                                           ) extends VersionRoutingMap with FeatureToggleSupport {
   
 
   val map: Map[String, Router] = Map(
     VERSION_1 -> {
-        logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages including penalties")
+      if (isEnabled(FrsFeatureSwitch)) {
+        logger.info("[VersionRoutingMap][map] using v1RoutesWithFRS - pointing to new packages including penalties")
+        v1RoutesWithFrs
+      }else{
+        logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages")
         v1RoutesWithPenalties
+      }
     }
   )
 }
