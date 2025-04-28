@@ -37,6 +37,8 @@ trait Logging extends LoggerLike {
 
   def infoLog(message: => String)(implicit mc: MarkerContext, request: Request[_]): Unit = this.info(s"$message (${identifiers(request)})")
 
+  def infoLogMessage(message: => String): Unit = this.info(s"$message")
+
   def infoConnectorLog(message: => String)(implicit mc: MarkerContext, httpResponse: HttpResponse): Unit = this.info(s"$message (${identifiersFromHttpResponse(httpResponse)})")
 
   def warnLog(message: => String)(implicit mc: MarkerContext, request: Request[_]): Unit = this.warn(s"$message (${identifiers(request)})")
