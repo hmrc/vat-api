@@ -1541,6 +1541,195 @@ paths:
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
+  /organisations/vat/{vrn}/information:
+    get:
+      tags:
+      - organisations
+      summary: Retrieve VAT customer information
+      description: |
+        Retrieve additional VAT information
+        
+        ### Test data
+        <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
+          <table>
+            <thead>
+            <tr>
+              <th>Header Value (Gov-Test-Scenario)</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p>Default (No header value)</p></td>
+              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+            </tr>
+            <tr>
+              <td><p>NOT_FOUND</p></td>
+              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+            </tr>
+          </tbody>
+        </table>
+
+      operationId: RetrieveVATCustomerInformation
+      parameters:
+      - name: vrn
+        in: path
+        description: VAT registration number. <br> A nine-digit number.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '123456789'
+      - name: Gov-Test-Scenario
+        in: header
+        description: Only in sandbox environment. See Test Data table for all header values.
+        style: simple
+        schema:
+          type: string
+          example: '-'
+      responses:
+        '200':
+          description: ''
+          headers:
+            X-CorrelationId:
+              description: Unique id for operation tracking <br> String, 36 characters.
+              content:
+                text/plain:
+                  schema:
+                    type: string
+                    description: Unique id for operation tracking <br> String, 36 characters.
+                    example: c75f40a6-a3df-4429-a697-471eeec46435
+                  example: c75f40a6-a3df-4429-a697-471eeec46435
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Information'
+                - example:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-03-31
+                      due: 2017-05-07
+                      status: F
+                      periodKey: 18A1
+                      received: 2017-05-06
+                    - start: 2017-04-01
+                      end: 2017-06-30
+                      due: 2017-08-07
+                      status: O
+                      periodKey: 18A2
+              examples:
+                example-1:
+                  description: Quarterly obligations; one fulfilled
+                  value:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-03-31
+                      due: 2017-05-07
+                      status: F
+                      periodKey: 18A1
+                      received: 2017-05-06
+                    - start: 2017-04-01
+                      end: 2017-06-30
+                      due: 2017-08-07
+                      status: O
+                      periodKey: 18A2
+                example-2:
+                  description: Monthly obligations; one fulfilled
+                  value:
+                    obligations:
+                    - start: 2017-01-01
+                      end: 2017-01-31
+                      due: 2017-03-07
+                      status: F
+                      periodKey: 18AD
+                      received: 2017-03-06
+                    - start: 2017-02-01
+                      end: 2017-02-28
+                      due: 2017-04-07
+                      status: O
+                      periodKey: 18AE
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    description: Invalid VRN
+                    value:
+                      code: VRN_INVALID
+                      message: The provided VRN is invalid
+              examples:
+                invalidNino:
+                  description: Invalid VRN
+                  value:
+                    code: VRN_INVALID
+                    message: The provided VRN is invalid
+                invalidDateFrom:
+                  description: Invalid date from
+                  value:
+                    code: INVALID_DATE_FROM
+                    message: The provided from date is invalid
+                invalidDateTo:
+                  description: Invalid date to
+                  value:
+                    code: INVALID_DATE_TO
+                    message: The provided to date is invalid
+                invalidDateRange:
+                  description: Invalid date range, must be 366 days or less
+                  value:
+                    code: INVALID_DATE_RANGE
+                    message: Invalid date range, must be 366 days or less
+                invalidStatus:
+                  description: Invalid status
+                  value:
+                    code: INVALID_STATUS
+                    message: The provided data is failed validation, invalid status
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+                    message: The requested resource could not be found
+              examples:
+                invalidNino:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+                    message: The requested resource could not be found
+        '403':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
+              examples:
+                clientNotSubscribedToMTD:
+                  description: 'The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.'
+                  value:
+                    code: CLIENT_OR_AGENT_NOT_AUTHORISED
+                    message: The client and/or agent is not authorised
+                ruleInsolventTrader:
+                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
+                  value:
+                    code: RULE_INSOLVENT_TRADER
+                    message: The remote endpoint has indicated that the Trader is insolvent
+      security:
+        - userRestricted: [ read:vat ]
+      deprecated: false
 components:
   schemas:
     errorResponse:
@@ -1585,6 +1774,19 @@ components:
             The level of appeal.
 
             **Note:** If the late submission penalty is inactive, the default value will be returned.
+    CustomerDetails:
+      title: CustomerDetails
+      type: object
+      properties:
+        effectiveRegistrationDate:
+          type: string
+          description: The date from when the business charges VAT.
+          example: 2025-12-31
+        flatRateScheme:
+          allOf:
+            - $ref: '#/components/schemas/FlatRateScheme'
+            - description: Information about the VAT Flat Rate Scheme.
+      description: Totals that relate to the charge.
     Detail:
       title: Detail
       required:
@@ -1896,6 +2098,76 @@ components:
           items:
             $ref: '#/components/schemas/DocumentDetail'
           description: All the documents that relate to the charge. An individual document will only relate to one charge reference, but there could be multiple documents relating to that charge reference. For example, this might be the case if a charge has been levied and subsequently reversed, or if multiple periodic interest charges share the same charge reference.
+    FlatRateScheme:
+      title: FlatRateScheme
+      type: object
+      properties:
+        frsCategory:
+          enum: ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024", "025", "026", "027", "028", "029", "030", "031", "032", "033", "034", "035", "036", "037", "038", "039", "040", "041", "042", "043", "044", "045", "046", "047", "048", "049", "050", "051", "052", "053", "054", "055", "999"]
+          type: string
+          description: |
+            The VAT flat rate category, based on the business type.
+              * `001` - Accountancy or book-keeping
+              * `002` - Advertising
+              * `003` - Agricultural services
+              * `004` - Any other activity not listed elsewhere
+              * `005` - Architect, civil and structural engineer or surveyor
+              * `006` - Boarding or care of animals
+              * `007` - Business services not listed elsewhere
+              * `008` - Catering services including restaurants and takeaways
+              * `009` - Computer and IT consultancy or data processing
+              * `010` - Computer repair services
+              * `011` - Entertainment or journalism
+              * `012` - Estate agency or property management services
+              * `013` - Farming or agriculture not listed elsewhere
+              * `014` - Film, radio, television or video production
+              * `015` - Financial services
+              * `016` - Forestry or fishing
+              * `017` - General building or construction services
+              * `018` - Hairdressing or other beauty treatment services
+              * `019` - Hiring or renting goods
+              * `020` - Hotel or accommodation
+              * `021` - Investigation or security
+              * `022` - Labour-only building or construction services
+              * `023` - Laundry or dry-cleaning services
+              * `024` - Lawyer or legal services
+              * `025` - Library, archive, museum or other cultural activity
+              * `026` - Management consultancy
+              * `027` - Manufacturing fabricated metal products
+              * `028` - Manufacturing food
+              * `029` - Manufacturing not listed elsewhere
+              * `030` - Manufacturing yarn, textiles or clothing
+              * `031` - Membership organisation
+              * `032` - Mining or quarrying
+              * `033` - Packaging
+              * `034` - Photography
+              * `035` - Post offices
+              * `036` - Printing
+              * `037` - Publishing
+              * `038` - Pubs
+              * `039` - Real estate activity not listed elsewhere
+              * `040` - Repairing personal or household goods
+              * `041` - Repairing vehicles
+              * `042` - Retailing food, confectionery, tobacco, newspapers or children’s clothing
+              * `043` - Retailing pharmaceuticals, medical goods, cosmetics or toiletries
+              * `044` - Retailing not listed elsewhere
+              * `045` - Retailing vehicles or fuel
+              * `046` - Secretarial services
+              * `047` - Social work
+              * `048` - Sport or recreation
+              * `049` - Transport or storage, including couriers, freight, removals and taxis
+              * `050` - Travel agency
+              * `051` - Veterinary medicine
+              * `052` - Wholesaling agricultural products
+              * `053` - Wholesaling food
+              * `054` - Wholesaling not listed elsewhere
+              * `055` - Dealing in waste or scrap
+              * `999` - Data Migrated from VMF
+          example: 001
+        startDate:
+          type: string
+          description: The date upon which the business entered the VAT Flat Rate Scheme.
+          example: 2025-12-31
     FrequencyAdjustmentPointIndicator:
       title: FrequencyAdjustmentPointIndicator
       enum:
@@ -1903,6 +2175,14 @@ components:
       type: string
       description: Indicates whether there has been an adjustment to the penalty point because of a change to your submission frequency (for example, changing from quarterly submissions to monthly submissions).
       example: X
+    Information:
+      title: Information
+      type: object
+      properties:
+        customerDetails:
+          allOf:
+            - $ref: '#/components/schemas/CustomerDetails'
+            - description: General VAT information for the business.
     LatePaymentPenalty:
       title: LatePaymentPenalty
       type: object
