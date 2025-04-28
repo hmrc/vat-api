@@ -49,10 +49,10 @@ case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
   val map: Map[String, Router] = Map(
     VERSION_1 -> {
       if (isEnabled(FrsFeatureSwitch)) {
-        logger.info("[VersionRoutingMap][map] using v1RoutesWithFRS - pointing to new packages including penalties")
+        infoLogMessage("[VersionRoutingMap][map] using v1RoutesWithFRS - pointing to new packages including penalties")
         v1RoutesWithFrs
       }else{
-        logger.info("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages")
+        infoLogMessage("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages")
         v1RoutesWithPenalties
       }
     }
