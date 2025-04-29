@@ -1547,7 +1547,7 @@ paths:
       - organisations
       summary: Retrieve VAT customer information
       description: |
-        Retrieve additional VAT information
+        Retrieves information about a VAT customer.
         
         ### Test data
         <p>Scenario simulations using Gov-Test-Scenario headers are only available in sandbox environment.</p>
@@ -1560,12 +1560,8 @@ paths:
           </thead>
           <tbody>
             <tr>
-              <td><p>Default (No header value)</p></td>
-              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
-            </tr>
-            <tr>
-              <td><p>NOT_FOUND</p></td>
-              <td><p>Simulates the scenario where the endpoint has indicated that no associated data could be found.</p></td>
+              <td><p>DEFAULT</p></td>
+              <td><p>The default scenario.</p></td>
             </tr>
           </tbody>
         </table>
@@ -1606,49 +1602,19 @@ paths:
                 allOf:
                 - $ref: '#/components/schemas/Information'
                 - example:
-                    obligations:
-                    - start: 2017-01-01
-                      end: 2017-03-31
-                      due: 2017-05-07
-                      status: F
-                      periodKey: 18A1
-                      received: 2017-05-06
-                    - start: 2017-04-01
-                      end: 2017-06-30
-                      due: 2017-08-07
-                      status: O
-                      periodKey: 18A2
+                    customerDetails:
+                      effectiveRegistrationDate: 2001-01-01
+                      flatRateScheme:
+                        frsCategory: '001'
+                        startDate: 2001-01-01
               examples:
                 example-1:
-                  description: Quarterly obligations; one fulfilled
                   value:
-                    obligations:
-                    - start: 2017-01-01
-                      end: 2017-03-31
-                      due: 2017-05-07
-                      status: F
-                      periodKey: 18A1
-                      received: 2017-05-06
-                    - start: 2017-04-01
-                      end: 2017-06-30
-                      due: 2017-08-07
-                      status: O
-                      periodKey: 18A2
-                example-2:
-                  description: Monthly obligations; one fulfilled
-                  value:
-                    obligations:
-                    - start: 2017-01-01
-                      end: 2017-01-31
-                      due: 2017-03-07
-                      status: F
-                      periodKey: 18AD
-                      received: 2017-03-06
-                    - start: 2017-02-01
-                      end: 2017-02-28
-                      due: 2017-04-07
-                      status: O
-                      periodKey: 18AE
+                    customerDetails:
+                      effectiveRegistrationDate: 2001-01-01
+                      flatRateScheme:
+                        frsCategory: '001'
+                        startDate: 2001-01-01
         '400':
           description: ''
           headers: {}
@@ -1663,31 +1629,11 @@ paths:
                       code: VRN_INVALID
                       message: The provided VRN is invalid
               examples:
-                invalidNino:
+                invalidVrn:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
-                invalidDateFrom:
-                  description: Invalid date from
-                  value:
-                    code: INVALID_DATE_FROM
-                    message: The provided from date is invalid
-                invalidDateTo:
-                  description: Invalid date to
-                  value:
-                    code: INVALID_DATE_TO
-                    message: The provided to date is invalid
-                invalidDateRange:
-                  description: Invalid date range, must be 366 days or less
-                  value:
-                    code: INVALID_DATE_RANGE
-                    message: Invalid date range, must be 366 days or less
-                invalidStatus:
-                  description: Invalid status
-                  value:
-                    code: INVALID_STATUS
-                    message: The provided data is failed validation, invalid status
         '404':
           description: ''
           headers: {}
@@ -1722,11 +1668,6 @@ paths:
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
                     message: The client and/or agent is not authorised
-                ruleInsolventTrader:
-                  description: The request could not be completed as it relates to an insolvent trader, which are not supported by this API.
-                  value:
-                    code: RULE_INSOLVENT_TRADER
-                    message: The remote endpoint has indicated that the Trader is insolvent
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
@@ -2163,7 +2104,7 @@ components:
               * `054` - Wholesaling not listed elsewhere
               * `055` - Dealing in waste or scrap
               * `999` - Data Migrated from VMF
-          example: 001
+          example: '001'
         startDate:
           type: string
           description: The date upon which the business entered the VAT Flat Rate Scheme.
