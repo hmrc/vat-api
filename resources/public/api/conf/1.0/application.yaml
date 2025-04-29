@@ -1604,17 +1604,17 @@ paths:
                 - example:
                     customerDetails:
                       effectiveRegistrationDate: 2001-01-01
-                      flatRateScheme:
-                        frsCategory: '001'
-                        startDate: 2001-01-01
+                    flatRateScheme:
+                      frsCategory: '001'
+                      startDate: 2001-01-01
               examples:
                 example-1:
                   value:
                     customerDetails:
                       effectiveRegistrationDate: 2001-01-01
-                      flatRateScheme:
-                        frsCategory: '001'
-                        startDate: 2001-01-01
+                    flatRateScheme:
+                      frsCategory: '001'
+                      startDate: 2001-01-01
         '400':
           description: ''
           headers: {}
@@ -1727,7 +1727,6 @@ components:
           allOf:
             - $ref: '#/components/schemas/FlatRateScheme'
             - description: Information about the VAT Flat Rate Scheme.
-      description: Totals that relate to the charge.
     Detail:
       title: Detail
       required:
