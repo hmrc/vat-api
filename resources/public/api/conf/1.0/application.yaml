@@ -1723,10 +1723,6 @@ components:
           type: string
           description: The date from when the business charges VAT.
           example: 2025-12-31
-        flatRateScheme:
-          allOf:
-            - $ref: '#/components/schemas/FlatRateScheme'
-            - description: Information about the VAT Flat Rate Scheme.
     Detail:
       title: Detail
       required:
@@ -2123,6 +2119,10 @@ components:
           allOf:
             - $ref: '#/components/schemas/CustomerDetails'
             - description: General VAT information for the business.
+        flatRateScheme:
+          allOf:
+            - $ref: '#/components/schemas/FlatRateScheme'
+            - description: Information about the VAT Flat Rate Scheme.
     LatePaymentPenalty:
       title: LatePaymentPenalty
       type: object
