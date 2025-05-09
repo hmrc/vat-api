@@ -43,8 +43,7 @@ class CustomerInfoConnector @Inject()(val http: HttpClient,
         // Contract headers
         Seq(
           "Authorization" -> s"Bearer ${appConfig.desToken}",
-          "Environment" -> appConfig.desEnv,
-          "CorrelationId" -> correlationId
+          "Environment" -> appConfig.desEnv
         ) ++
         // Other headers (i.e Gov-Test-Scenario, Content-Type)
         hc.headers(additionalHeaders ++ appConfig.desEnvironmentHeaders.getOrElse(Seq.empty))
