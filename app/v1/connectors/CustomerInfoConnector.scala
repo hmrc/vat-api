@@ -36,19 +36,32 @@ import scala.concurrent.{ExecutionContext, Future}
 class CustomerInfoConnector @Inject()(val http: HttpClient,
                                   val appConfig: AppConfig) extends BaseDownstreamConnector with Logging{
 
-  private def headerCarrier(additionalHeaders: Seq[String] = Seq.empty)(implicit hc: HeaderCarrier,
-                                                                        correlationId: String): HeaderCarrier =
-    HeaderCarrier(
-      extraHeaders = hc.extraHeaders ++
-        // Contract headers
-        Seq(
-          "Authorization" -> s"Bearer ${appConfig.desToken}",
-          "Environment" -> appConfig.desEnv,
-          "CorrelationId" -> correlationId
-        ) ++
-        // Other headers (i.e Gov-Test-Scenario, Content-Type)
-        hc.headers(additionalHeaders ++ appConfig.desEnvironmentHeaders.getOrElse(Seq.empty))
+  private def headerCarrier(
+                             additionalHeaders: Seq[String] = Seq.empty
+                           )(implicit
+                             hc: HeaderCarrier,
+                             userRequest: UserRequest[_],
+                             correlationId: String
+                           ): HeaderCarrier = {
+
+    val maybeAuthHeader: String = userRequest.request.headers
+      .get("Authorization")
+      .getOrElse("Bearer n") // fallback if not present
+
+    val contractHeaders: Seq[(String, String)] = Seq(
+      "Authorization" -> maybeAuthHeader,
+      "Environment"   -> appConfig.desEnv,
+      "CorrelationId" -> correlationId
     )
+
+    val otherHeaders: Seq[(String, String)] =
+      hc.headers(additionalHeaders ++ appConfig.desEnvironmentHeaders.getOrElse(Seq.empty))
+
+    HeaderCarrier(
+      extraHeaders = hc.extraHeaders ++ contractHeaders ++ otherHeaders
+    )
+  }
+
 
   def retrieveCustomerInfo(request: CustomerInfoRequest)(implicit hc: HeaderCarrier,
                                                        ec: ExecutionContext,
