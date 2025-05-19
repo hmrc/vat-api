@@ -5,6 +5,7 @@ This API allows developers to:
 * retrieve a VAT payment
 * retrieve VAT penalties
 * retrieve financial details relating to a penalty
+* retrieve information about a VAT customer
 
 For more background on the VAT API, see the [MTDfB VAT Guide for Vendors](https://usermanual.wiki/Document/mtdfbvatguideforvendors.996624737/view).
 
