@@ -59,10 +59,7 @@ object CustomerInfoConstants {
     flatRateScheme = Some(testFlatRateSchemeMax)
   )
 
-  val testCustomerInfoResponseMinJson:  JsObject = Json.obj(
-    "customerDetails" -> "{}",
-    "flatRateScheme" -> "{}"
-  )
+  val testCustomerInfoResponseMinJson:  JsObject = Json.obj()
 
   val upstreamTestCustomerInfoResponseJsonMax: JsObject = Json.obj(
     "customerDetails" -> Some(upstreamTestCustomerDetailsDataJsonMax),
