@@ -26,8 +26,8 @@ case class CustomerInfoResponse(
 
 object CustomerInfoResponse {
   implicit val reads: Reads[CustomerInfoResponse] = (
-    (__ \ "approvedInformation" \ "customerDetails").readNullable[CustomerDetails] and
-      (__ \ "approvedInformation" \ "flatRateScheme").readNullable[FlatRateScheme]
+    (__ \ "customerDetails").readNullable[CustomerDetails] and
+      (__ \ "flatRateScheme").readNullable[FlatRateScheme]
     )(CustomerInfoResponse.apply _)
 
   implicit val writes: Writes[CustomerInfoResponse] = new Writes[CustomerInfoResponse] {
