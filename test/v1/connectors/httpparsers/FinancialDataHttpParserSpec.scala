@@ -135,7 +135,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               )
             )
           )
-          result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("VRN_INVALID", "The provided Vrn is invalid")))
+          result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("VRN_INVALID", "The provided VRN is invalid")))
         }
       }
 

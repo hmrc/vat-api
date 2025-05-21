@@ -131,7 +131,7 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
               )
             )
           )
-          result shouldBe Left(CustomerInfoConstants.errorWrapper(MtdError("NOT_FOUND", "The backend indicated that no subscription found")))
+          result shouldBe Left(CustomerInfoConstants.errorWrapper(MtdError("NOT_FOUND", "The requested resource could not be found")))
         }
       }
     }
