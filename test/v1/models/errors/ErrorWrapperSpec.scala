@@ -30,7 +30,7 @@ class ErrorWrapperSpec extends UnitSpec {
       """
         |{
         |   "code": "VRN_INVALID",
-        |   "message": "The provided Vrn is invalid"
+        |   "message": "The provided VRN is invalid"
         |}
       """.stripMargin
     )
@@ -70,7 +70,7 @@ class ErrorWrapperSpec extends UnitSpec {
       """
         |{
         |   "code": "VRN_INVALID",
-        |   "message": "The provided Vrn is invalid"
+        |   "message": "The provided VRN is invalid"
         |}
       """.stripMargin
     )
@@ -98,7 +98,7 @@ class ErrorWrapperSpec extends UnitSpec {
         |   "errors": [
         |       {
         |         "code": "VRN_INVALID",
-        |         "message": "The provided Vrn is invalid"
+        |         "message": "The provided VRN is invalid"
         |       },
         |       {
         |         "code": "PERIOD_KEY_INVALID",

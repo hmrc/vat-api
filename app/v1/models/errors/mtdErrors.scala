@@ -54,7 +54,7 @@ object MtdErrorWrapper {
 object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
 
 // Format Errors
-object VrnFormatError extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+object VrnFormatError extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 object VrnNotFound extends MtdError("VRN_NOT_FOUND", "The provided VRN was not found")
 
@@ -64,10 +64,10 @@ object PenaltiesNotDataFound extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "No
 
 //API#1363 Get VAT Customer Information Errors
 object CustomerInfoInvalidIdValue extends MtdError("INVALID_VRN", "The provided VRN is invalid.")
-object CustomerInfoNotDataFound extends MtdError("NOT_FOUND", "The backend indicated that no subscription found")
+object CustomerInfoNotDataFound extends MtdError("NOT_FOUND", "The requested resource could not be found")
 
 //Financial Data Errors
-object FinancialInvalidIdNumber extends MtdError("VRN_INVALID", "The provided Vrn is invalid")
+object FinancialInvalidIdNumber extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 object FinancialInvalidSearchItem extends MtdError("CHARGE_REFERENCE_INVALID", "The provided chargeReference is invalid")
 object FinancialNotDataFound extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "The supplied income source could not be found")
 
