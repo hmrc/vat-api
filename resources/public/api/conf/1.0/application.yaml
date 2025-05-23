@@ -1634,7 +1634,7 @@ paths:
                   value:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
-        '404':
+        '401':
           description: ''
           headers: {}
           content:
@@ -1643,14 +1643,14 @@ paths:
                 allOf:
                 - $ref: '#/components/schemas/errorResponse'
                 - example:
-                    code: NOT_FOUND
-                    message: The requested resource could not be found
+                    code: INVALID_CREDENTIALS
+                    message: Invalid authentication information provided
               examples:
-                invalidNino:
-                  description: The remote endpoint has indicated that no associated data is found
+                invalidCredentials:
+                  description: 'Invalid authentication information provided.'
                   value:
-                    code: NOT_FOUND
-                    message: The requested resource could not be found
+                    code: INVALID_CREDENTIALS
+                    message: Invalid authentication information provided
         '403':
           description: ''
           headers: {}
@@ -1668,6 +1668,23 @@ paths:
                   value:
                     code: CLIENT_OR_AGENT_NOT_AUTHORISED
                     message: The client and/or agent is not authorised
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+                    message: The requested resource could not be found
+              examples:
+                invalidNino:
+                  description: The remote endpoint has indicated that no associated data is found
+                  value:
+                    code: NOT_FOUND
+                    message: The requested resource could not be found
       security:
         - userRestricted: [ read:vat ]
       deprecated: false
