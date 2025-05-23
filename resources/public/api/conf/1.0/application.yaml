@@ -1563,6 +1563,10 @@ paths:
               <td><p>DEFAULT</p></td>
               <td><p>The default scenario.</p></td>
             </tr>
+            <tr>
+              <td><p>CUSTOMER_INFO_NOT_FOUND</p></td>
+              <td><p>The scenario where no customer information could be found.</p></td>
+            </tr>
           </tbody>
         </table>
 
