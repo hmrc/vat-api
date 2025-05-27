@@ -1567,6 +1567,18 @@ paths:
               <td><p>CUSTOMER_INFO_NOT_FOUND</p></td>
               <td><p>The scenario where no customer information could be found.</p></td>
             </tr>
+            <tr>
+              <td><p>NO_EFFECTREGISTRATIONDATE</p></td>
+              <td><p>The scenario where the customer has no effective registration date.</p></td>
+            </tr>
+            <tr>
+              <td><p>NO_FLATRATESCHEME</p></td>
+              <td><p>The scenario where the customer has not entered the VAT Flat Rate Scheme.</p></td>
+            </tr>
+            <tr>
+              <td><p>NO_EFFECTREGISTRATIONDATE_NO_FRS</p></td>
+              <td><p>The scenario where the customer has no effective registration date and has not entered the VAT Flat Rate Scheme.</p></td>
+            </tr>
           </tbody>
         </table>
 
