@@ -45,7 +45,7 @@ class AuditService @Inject()(auditConnector: AuditConnector,
       detail = Json.toJson(event.detail),
       tags = eventTags
     )
-
+    logger.info(s"[Audit DEBUG] Sending event: type = ${event.auditType}, detail = ${Json.prettyPrint(Json.toJson(event.detail))}")
     auditConnector.sendExtendedEvent(dataEvent)
   }
 }
