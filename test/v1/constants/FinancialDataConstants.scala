@@ -41,7 +41,7 @@ object FinancialDataConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn, searchItem)
 
-  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/penalty/financial-data/VRN/$vrn/VATC"
+  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
 
   def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
 
