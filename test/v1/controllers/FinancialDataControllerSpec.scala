@@ -16,6 +16,7 @@
 
 package v1.controllers
 
+import config.FeatureSwitch.{CallAPI1811HIP, FeatureSwitch}
 import mocks.MockAppConfig
 import play.api.libs.json.Json
 import play.api.mvc.Result
@@ -24,7 +25,7 @@ import v1.audit.AuditEvents
 import v1.constants.FinancialDataConstants
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockFinancialDataRequestParser
-import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockFinancialDataHIPService, MockPenaltiesService}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.errors.{FinancialNotDataFound, MtdError, RuleIncorrectGovTestScenarioError, UnexpectedFailure, VrnFormatError}
 
@@ -32,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuthService
-  with MockPenaltiesService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
+  with MockPenaltiesService with MockFinancialDataHIPService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -41,6 +42,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
       authService = mockEnrolmentsAuthService,
       requestParser = mockFinancialDataRequestParser,
       service = mockPenaltiesService,
+      hipService = mockFinancialDataHIPService,
       auditService = stubAuditService,
       cc = cc,
       idGenerator = mockIdGenerator,
