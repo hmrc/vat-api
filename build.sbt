@@ -17,7 +17,7 @@
 import sbt._
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
-import uk.gov.hmrc.{DefaultBuildSettings}
+import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "vat-api"
 
@@ -39,7 +39,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     Runtime / unmanagedClasspath += baseDirectory.value / "resources"
   )
-  .settings(resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)
   .settings(SilencerSettings())
 

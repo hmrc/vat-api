@@ -24,7 +24,7 @@ import v1.audit.AuditEvents
 import v1.constants.FinancialDataConstants
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockFinancialDataRequestParser
-import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
+import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockFinancialDataHIPService, MockPenaltiesService}
 import v1.models.audit.{AuditError, AuditResponse}
 import v1.models.errors.{FinancialNotDataFound, MtdError, RuleIncorrectGovTestScenarioError, UnexpectedFailure, VrnFormatError}
 
@@ -32,21 +32,31 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuthService
-  with MockPenaltiesService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
+  with MockPenaltiesService with MockFinancialDataHIPService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
 
   trait Test {
+
+    (mockServicesConfig.getString _)
+      .expects("feature-switch.callAPI1811HIP.enabled")
+      .returning("false").anyNumberOfTimes()
+
+    (mockAppConfig.servicesConfig _)
+      .expects()
+      .returning(mockServicesConfig).anyNumberOfTimes()
+
     val hc: HeaderCarrier = HeaderCarrier()
 
     val controller = new FinancialDataController(
       authService = mockEnrolmentsAuthService,
       requestParser = mockFinancialDataRequestParser,
       service = mockPenaltiesService,
+      hipService = mockFinancialDataHIPService,
       auditService = stubAuditService,
       cc = cc,
       idGenerator = mockIdGenerator,
       appConfig = mockAppConfig
-    )
 
+    )
     MockIdGenerator.getUid.returns(FinancialDataConstants.correlationId)
     MockEnrolmentsAuthService.authoriseUser()
   }

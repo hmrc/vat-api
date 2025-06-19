@@ -21,17 +21,27 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.Retrying
 
+import java.util.Base64
 import scala.concurrent.duration._
 
 trait AppConfig {
 
-  val servicesConfig: ServicesConfig
+  def servicesConfig: ServicesConfig
 
   // DES Config
   def desBaseUrl: String
   def desEnv: String
   def desToken: String
   def desEnvironmentHeaders: Option[Seq[String]]
+
+  // HIP Config
+  def hipBaseUrl: String
+  def clientIdV1: String
+  def secretV1:String
+  def hipEnvironmentHeader: (String, String)
+  def hipAuthorisationToken: String
+  def hipServiceOriginatorIdKeyV1: String
+  def hipServiceOriginatorIdV1: String
 
   // API Config
   def apiGatewayContext: String
@@ -60,6 +70,18 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   val desEnv: String = config.getString("microservice.services.des.env")
   val desToken: String = config.getString("microservice.services.des.token")
   val desEnvironmentHeaders: Option[Seq[String]] = configuration.getOptional[Seq[String]]("microservice.services.des.environmentHeaders")
+
+  // HIP Config
+  val hipBaseUrl: String = config.baseUrl("hip")
+  val clientIdV1: String = config.getString("microservice.services.hip.client-id")
+  val secretV1:String = config.getString("microservice.services.hip.client-secret")
+  def hipAuthorisationToken: String = Base64.getEncoder.encodeToString(s"$clientIdV1:$secretV1".getBytes("UTF-8"))
+  val hipServiceOriginatorIdKeyV1: String = config.getString("microservice.services.hip.originator-id-key")
+  val hipServiceOriginatorIdV1: String =  config.getString("microservice.services.hip.originator-id-value")
+  lazy val hipEnvironmentHeader: (String, String) =
+    "Environment" -> servicesConfig.getString("microservice.services.hip.environment")
+
+
 
   // API Config
   val apiGatewayContext: String = config.getString("api.gateway.context")

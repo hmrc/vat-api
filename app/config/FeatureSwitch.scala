@@ -23,7 +23,8 @@ object FeatureSwitch {
 
   val featureSwitches: Seq[FeatureSwitch] = Seq(
     AuthFeature,
-    FinancialDataRamlFeature
+    FinancialDataRamlFeature,
+    CallAPI1811HIP
   )
 
   def apply(str: String): FeatureSwitch =
@@ -56,4 +57,7 @@ object FeatureSwitch {
     override val name: String = s"$prefix.financialDataRamlFeature.enabled"
   }
 
+  case object CallAPI1811HIP extends FeatureSwitch {
+    override val name: String = s"$prefix.callAPI1811HIP.enabled"
+  }
 }
