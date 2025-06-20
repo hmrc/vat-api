@@ -40,8 +40,8 @@ object PenaltiesConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: PenaltiesRawData = PenaltiesRawData(invalidVrn)
 
-  def penaltiesURl(vrn: String = vrn)(implicit appConfig: AppConfig) = s"/penalties/penalty-details/VAT/VRN/$vrn"
-  def penaltiesURlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig) = appConfig.penaltiesBaseUrl + s"/penalties/penalty-details/VAT/VRN/$vrn"
+  def penaltiesURl(vrn: String = vrn)(implicit appConfig: AppConfig) = s"/penalties/VATC/penalty-details/VRN/$vrn"
+  def penaltiesURlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig) = appConfig.penaltiesBaseUrl +  s"/penalties/VATC/penalty-details/VRN/$vrn"
 
 
   val testTotalisationMin: Totalisations = Totalisations(

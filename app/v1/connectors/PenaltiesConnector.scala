@@ -56,7 +56,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
                                                    userRequest: UserRequest[_],
                                                    correlationId: String): Future[Outcome[PenaltiesResponse]] = {
     val vrn = request.vrn.vrn
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty-details/VAT/VRN/$vrn"
+    val url = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty-details/VRN/$vrn"
     logger.debug(s"[PenaltiesConnector][retrievePenalties] url: $url")
 
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
@@ -91,8 +91,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
                                                        correlationId: String): Future[Outcome[FinancialDataResponse]] = {
     val vrn = request.vrn.vrn
     val searchItem = request.searchItem
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/penalty/financial-data/VRN/$vrn/VATC?searchType=CHGREF&searchItem=${searchItem}"
-
+    val url = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
 
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
       http.GET[Outcome[FinancialDataResponse]](url)
