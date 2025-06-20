@@ -16,7 +16,6 @@
 
 package v1.controllers
 
-import config.FeatureSwitch.{CallAPI1811HIP, FeatureSwitch}
 import mocks.MockAppConfig
 import play.api.libs.json.Json
 import play.api.mvc.Result
@@ -36,6 +35,15 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
   with MockPenaltiesService with MockFinancialDataHIPService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
 
   trait Test {
+
+    (mockServicesConfig.getString _)
+      .expects("feature-switch.callAPI1811HIP.enabled")
+      .returning("false").anyNumberOfTimes()
+
+    (mockAppConfig.servicesConfig _)
+      .expects()
+      .returning(mockServicesConfig).anyNumberOfTimes()
+
     val hc: HeaderCarrier = HeaderCarrier()
 
     val controller = new FinancialDataController(
@@ -47,8 +55,8 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
       cc = cc,
       idGenerator = mockIdGenerator,
       appConfig = mockAppConfig
-    )
 
+    )
     MockIdGenerator.getUid.returns(FinancialDataConstants.correlationId)
     MockEnrolmentsAuthService.authoriseUser()
   }

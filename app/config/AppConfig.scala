@@ -26,7 +26,7 @@ import scala.concurrent.duration._
 
 trait AppConfig {
 
-  val servicesConfig: ServicesConfig
+  def servicesConfig: ServicesConfig
 
   // DES Config
   def desBaseUrl: String
