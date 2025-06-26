@@ -56,15 +56,16 @@ object FinancialDataHIPHttpParser extends Logging {
                   val additionalErrors = if (mtdErrors.size > 1) Some(mtdErrors.tail) else None
                   logger.warn(s"[FinancialDataHIPReads][read] Business errors from HIP. Errors: $mtdErrors")
                   Left(ErrorWrapper(correlationId, mainError, additionalErrors))
+
+                case _ =>
+                  logger.warn("[FinancialDataHIPReads][read] Unexpected error model type")
+                  Left(ErrorWrapper(correlationId, DownstreamError))
               }
 
-            case JsError(e) =>
-              logger.error(s"[FinancialDataHIPReads][read] Failed to parse error JSON: $e")
-              Left(ErrorWrapper(correlationId, DownstreamError))
+                case JsError(e) =>
+                  logger.error(s"[FinancialDataHIPReads][read] Failed to parse error JSON: $e")
+                  Left(ErrorWrapper(correlationId, DownstreamError))
 
-            case _ =>
-              logger.warn("[FinancialDataHIPReads] Unexpected error model type")
-              Left(ErrorWrapper(correlationId, DownstreamError))
           }
 
         case SERVICE_UNAVAILABLE =>
