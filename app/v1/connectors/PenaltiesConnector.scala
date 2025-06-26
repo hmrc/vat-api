@@ -43,7 +43,6 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
       extraHeaders = hc.extraHeaders ++
         // Contract headers
         Seq(
-          "Authorization" -> s"Bearer ${appConfig.desToken}",
           "Environment" -> appConfig.desEnv,
           "CorrelationId" -> correlationId
         ) ++
