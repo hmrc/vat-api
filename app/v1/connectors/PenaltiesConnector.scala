@@ -47,7 +47,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
 
     val maybeAuthHeader: String = userRequest.request.headers
       .get("Authorization")
-      .getOrElse("Bearer n") // fallback if not present
+      .getOrElse(s"Bearer ${appConfig.desToken}") // fallback if not present
 
     val contractHeaders: Seq[(String, String)] = Seq(
       "Authorization" -> maybeAuthHeader,
