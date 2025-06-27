@@ -20,12 +20,13 @@ import config.AppConfig
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.duration.FiniteDuration
 
 trait MockAppConfig extends MockFactory {
-
   val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
 
   object MockedAppConfig {
 

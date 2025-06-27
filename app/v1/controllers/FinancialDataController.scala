@@ -19,6 +19,8 @@ package v1.controllers
 import cats.data.EitherT
 import cats.implicits._
 import config.AppConfig
+import config.FeatureSwitch.CallAPI1811HIP
+import config.FeatureToggleSupport.isEnabled
 
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
@@ -29,7 +31,8 @@ import v1.controllers.requestParsers.FinancialDataRequestParser
 import v1.models.audit.AuditResponse
 import v1.models.errors._
 import v1.models.request.penalties.FinancialRawData
-import v1.services.{AuditService, EnrolmentsAuthService, PenaltiesService}
+import v1.models.response.financialData.{FinancialDataHIPResponse, FinancialDataResponse}
+import v1.services.{AuditService, EnrolmentsAuthService, FinancialDataHIPService, PenaltiesService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,10 +40,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
                                         requestParser: FinancialDataRequestParser,
                                         service: PenaltiesService,
+                                        hipService: FinancialDataHIPService,
                                         auditService: AuditService,
                                         cc: ControllerComponents,
                                         val idGenerator: IdGenerator,
-                                        appConfig: AppConfig)
+                                        implicit val appConfig: AppConfig)
                                        (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
@@ -62,18 +66,30 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
     val result: EitherT[Future, ErrorWrapper, Result] = {
       for {
         parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(FinancialRawData(vrn, chargeReference)))
-        serviceResponse <- EitherT(service.retrieveFinancialData(parsedRequest))
+        serviceResponse <- {
+          if (isEnabled(CallAPI1811HIP)) {
+            EitherT(hipService.retrieveFinancialDataHIP(parsedRequest))
+          } else {
+            EitherT(service.retrieveFinancialData(parsedRequest))
+          }
+        }
       } yield {
-
         infoLog(s"${endpointLogContext.toString} " +
           s"Successfully retrieved Financial Data from DES with correlationId : ${serviceResponse.correlationId}")
 
+         val json = serviceResponse.responseData match {
+           case data: FinancialDataResponse => Json.toJson(data)(FinancialDataResponse.writes)
+           case data: FinancialDataHIPResponse => Json.toJson(data)(FinancialDataHIPResponse.writes)
+           case _ =>
+             logger.error("[FinancialDataController] Unexpected response type")
+             Json.obj("error" -> "Unexpected response type")
+         }
 
         auditService.auditEvent(AuditEvents.auditFinancialData(serviceResponse.correlationId,
-          request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))
+          request.userDetails, AuditResponse(OK, Right(Some(json)))
         ))
 
-        Ok(Json.toJson(serviceResponse.responseData))
+        Ok(json)
           .withApiHeaders(serviceResponse.correlationId)
       }
     }
