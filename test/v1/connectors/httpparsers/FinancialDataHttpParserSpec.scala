@@ -17,12 +17,12 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status
-import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.http.Status.{ CREATED, OK }
+import play.api.libs.json.{ JsValue, Json }
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 import v1.connectors.httpparsers.FinancialDataHttpParser.FinancialDataHttpReads
-import v1.constants.{FinancialDataConstants, PenaltiesConstants}
+import v1.constants.{ FinancialDataConstants, PenaltiesConstants }
 import v1.models.errors._
 
 class FinancialDataHttpParserSpec extends UnitSpec {
@@ -31,83 +31,92 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
     "FinancialDataHttpReads" when {
 
-      "response is OK (200)" when {
+      Seq(OK, CREATED).foreach { successResponse =>
+        s"response is a $successResponse" when {
 
-        "json is valid" must {
+          "json is valid" must {
 
-          "return Right(FinancialDataResponse) min" in {
+            "return Right(FinancialDataResponse) min" in {
 
-            val result = FinancialDataHttpReads.read("", "",
-              HttpResponse(
-                status = Status.OK,
-                json = FinancialDataConstants.testDownstreamFinancialDetails,
-                headers = Map(
-                  "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+              val result = FinancialDataHttpReads.read(
+                "",
+                "",
+                HttpResponse(
+                  status = successResponse,
+                  json = FinancialDataConstants.testDownstreamFinancialDetails,
+                  headers = Map(
+                    "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                  )
                 )
               )
-            )
 
-            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse())
+              result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse())
+            }
+
+            "return Right(FinancialDataResponse) max" in {
+
+              val result = FinancialDataHttpReads.read(
+                "",
+                "",
+                HttpResponse(
+                  status = successResponse,
+                  json = FinancialDataConstants.testDownstreamFinancialDetails,
+                  headers = Map(
+                    "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                  )
+                )
+              )
+
+              result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse))
+            }
+
+            "return Right(FinancialDataResponse) No Document Details" in {
+
+              val result = FinancialDataHttpReads.read(
+                "",
+                "",
+                HttpResponse(
+                  status = successResponse,
+                  json = FinancialDataConstants.testDownstreamFinancialDetailsNoDocumentDetails,
+                  headers = Map(
+                    "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                  )
+                )
+              )
+
+              result shouldBe Right(
+                FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialNoDocumentDetailsDataResponse))
+            }
           }
 
-          "return Right(FinancialDataResponse) max" in {
+          "json is invalid" must {
 
-            val result = FinancialDataHttpReads.read("", "",
-              HttpResponse(
-                status = Status.OK,
-                json = FinancialDataConstants.testDownstreamFinancialDetails,
-                headers = Map(
-                  "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
-                )
-              )
-            )
+            "return Left(InvalidJson)" in {
 
-            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse))
-          }
+              val jsonObject =
+                Json.parse("""{
+                    |  "getFinancialData": {
+                    |    "financialDetails": {
+                    |      "documentDetails": {
+                    |        "test": "test"
+                    |      }
+                    |    }
+                    |  }
+                    |}
+                    |""".stripMargin)
 
-          "return Right(FinancialDataResponse) No Document Details" in {
+              val result = FinancialDataHttpReads.read("",
+                                                       "",
+                                                       HttpResponse(
+                                                         status = successResponse,
+                                                         json = jsonObject,
+                                                         headers = Map(
+                                                           "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                                                         )
+                                                       ))
 
-            val result = FinancialDataHttpReads.read("", "",
-              HttpResponse(
-                status = Status.OK,
-                json = FinancialDataConstants.testDownstreamFinancialDetailsNoDocumentDetails,
-                headers = Map(
-                  "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
-                )
-              )
-            )
-
-            result shouldBe Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialNoDocumentDetailsDataResponse))
-          }
-        }
-
-        "json is invalid" must {
-
-          "return Left(InvalidJson)" in {
-
-            val jsonObject =
-              Json.parse("""{
-                           |  "getFinancialData": {
-                           |    "financialDetails": {
-                           |      "documentDetails": {
-                           |        "test": "test"
-                           |      }
-                           |    }
-                           |  }
-                           |}
-                           |""".stripMargin)
-
-            val result = FinancialDataHttpReads.read("", "",
-              HttpResponse(
-                status = Status.OK,
-                json = jsonObject,
-                headers = Map(
-                  "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
-                )
-              )
-            )
-
-            result shouldBe Left(FinancialDataConstants.errorWrapper(InvalidJson))
+              result shouldBe Left(FinancialDataConstants.errorWrapper(InvalidJson))
+            }
           }
         }
       }
@@ -116,8 +125,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return Left(InvalidVrn)" in {
 
-          val error = Json.parse(
-            """
+          val error = Json.parse("""
               |{
               |"failures": [{
               |"code":"INVALID_IDNUMBER",
@@ -126,15 +134,15 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               |}
               |""".stripMargin)
 
-          val result = FinancialDataHttpReads.read("", "",
-            HttpResponse(
-              status = Status.BAD_REQUEST,
-              json = error,
-              headers = Map(
-                "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
-              )
-            )
-          )
+          val result = FinancialDataHttpReads.read("",
+                                                   "",
+                                                   HttpResponse(
+                                                     status = Status.BAD_REQUEST,
+                                                     json = error,
+                                                     headers = Map(
+                                                       "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                                                     )
+                                                   ))
           result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("VRN_INVALID", "The provided VRN is invalid")))
         }
       }
@@ -143,8 +151,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return Left(VrnNotFound)" in {
 
-          val error = Json.parse(
-            """
+          val error = Json.parse("""
               |{
               |"failures": [{
               |"code":"NO_DATA_FOUND",
@@ -153,15 +160,15 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               |}
               |""".stripMargin)
 
-          val result = FinancialDataHttpReads.read("", "",
-            HttpResponse(
-              status = Status.NOT_FOUND,
-              json = error,
-              headers = Map(
-                "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
-              )
-            )
-          )
+          val result = FinancialDataHttpReads.read("",
+                                                   "",
+                                                   HttpResponse(
+                                                     status = Status.NOT_FOUND,
+                                                     json = error,
+                                                     headers = Map(
+                                                       "CorrelationId" -> Seq(FinancialDataConstants.correlationId)
+                                                     )
+                                                   ))
           result shouldBe Left(FinancialDataConstants.errorWrapper(FinancialNotDataFound))
         }
       }
@@ -172,8 +179,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
           val status = Status.INTERNAL_SERVER_ERROR
 
-          val error = Json.parse(
-            """
+          val error = Json.parse("""
               |{
               |"failures": [{
               |"code":"INTERNAL_SERVICE_ERROR",
@@ -182,15 +188,15 @@ class FinancialDataHttpParserSpec extends UnitSpec {
               |}
               |""".stripMargin)
 
-          val result = FinancialDataHttpReads.read("", "",
-            HttpResponse(
-              status = status,
-              json = error,
-              headers = Map(
-                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-              )
-            )
-          )
+          val result = FinancialDataHttpReads.read("",
+                                                   "",
+                                                   HttpResponse(
+                                                     status = status,
+                                                     json = error,
+                                                     headers = Map(
+                                                       "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
+                                                     )
+                                                   ))
           result shouldBe Left(FinancialDataConstants.errorWrapper(MtdError("INTERNAL_SERVICE_ERROR", "Something went wrong")))
         }
       }
@@ -201,7 +207,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
           Json.parse(s"""
             |{
             | "failures": [{
-            | "code":"${code}",
+            | "code":"$code",
             | "reason":"Some reason"
             | }]
             | }
@@ -244,11 +250,14 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
         "return multi errors when passed multiple errors bad " in {
           val result = FinancialDataHttpReads.errorHelper(multiJsonString())
-          result shouldBe MtdError("INVALID_REQUEST", "Invalid request financial details",
-            Some(Json.toJson(Seq(
-              FinancialInvalidIdNumber,
-              FinancialInvalidSearchItem
-          ))))
+          result shouldBe MtdError("INVALID_REQUEST",
+                                   "Invalid request financial details",
+                                   Some(
+                                     Json.toJson(
+                                       Seq(
+                                         FinancialInvalidIdNumber,
+                                         FinancialInvalidSearchItem
+                                       ))))
         }
 
         "return INTERNAL_SERVER_ERROR when passed multiple errors including one which maps to INTERNAL_SERVER_ERROR" in {
