@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
+import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.financialData.{FinancialDataErrors, FinancialDataResponse}
+import v1.models.response.financialData.{ FinancialDataErrors, FinancialDataResponse }
 
 object FinancialDataHttpParser extends Logging {
 
@@ -66,7 +66,7 @@ object FinancialDataHttpParser extends Logging {
           case ("INVALID_DATE_RANGE")                            => DownstreamError
           case ("SERVER_ERROR")                                  => DownstreamError
           case ("SERVICE_UNAVAILABLE")                           => DownstreamError
-          case _ => MtdError(error.code, error.reason)
+          case _                                                 => MtdError(error.code, error.reason)
         }
       }
 
@@ -85,12 +85,13 @@ object FinancialDataHttpParser extends Logging {
     def read(method: String, url: String, response: HttpResponse): Outcome[FinancialDataResponse] = {
       val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
-        case OK => response.json.validate[FinancialDataResponse] match {
-          case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
-          case JsError(errors) =>
-            errorConnectorLog(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")(response)
-            Left(ErrorWrapper(responseCorrelationId, InvalidJson))
-        }
+        case OK | CREATED =>
+          response.json.validate[FinancialDataResponse] match {
+            case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
+            case JsError(errors) =>
+              errorConnectorLog(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")(response)
+              Left(ErrorWrapper(responseCorrelationId, InvalidJson))
+          }
         case status =>
           val mtdErrors = errorHelper(response.json)
           errorConnectorLog(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")(response)

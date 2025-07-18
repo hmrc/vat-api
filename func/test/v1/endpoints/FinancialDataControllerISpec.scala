@@ -74,12 +74,12 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
 
         "a valid request is made" must {
 
-          "return 200 and penalties data" in new Test {
+          "return 201 and penalties data" in new Test {
 
             override def setupStubs(): StubMapping = {
               AuditStub.audit()
               AuthStub.authorised()
-              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, FinancialDataConstants.testDownstreamFinancialDetails)
+              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), CREATED, FinancialDataConstants.testDownstreamFinancialDetails)
             }
 
             val response: WSResponse = await(request.get())
