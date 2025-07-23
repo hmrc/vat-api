@@ -19,18 +19,21 @@ package v1.models.response.financialData
 import play.api.libs.json.Json
 import support.UnitSpec
 import v1.constants.FinancialDataConstants
+import v1.models.response.financialData.FinancialDataResponse.{readHipResponse, readIfResponse}
 
 class FinancialDataResponseSpec extends UnitSpec {
 
   "FinancialData" must {
-
     "write data from json" in {
-
       Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
     }
 
-    "read to json" in {
-      FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    "read to json IF response" in {
+      FinancialDataConstants.ifFinancialDetails.as[FinancialDataResponse](readIfResponse) shouldBe FinancialDataConstants.testFinancialDataResponse
+    }
+
+    "read to json HIP response" in {
+      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse](readHipResponse) shouldBe FinancialDataConstants.testFinancialDataResponse
     }
   }
 }

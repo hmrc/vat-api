@@ -41,16 +41,13 @@ object FinancialDataConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn, searchItem)
 
-  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
+  def financialDataUrl(vrn: String = vrn): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
-
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
   
-  val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
+  private val financialTotalisationDetails: JsValue = {
     Json.parse(
-      """{
-        |"getFinancialData": {
-        |"financialDetails": {
+      """
         |  "totalisation": {
         |    "regimeTotalisation": {
         |      "totalAccountOverdue": 1000.00,
@@ -70,36 +67,13 @@ object FinancialDataConstants {
         |     "totalAccountAccruingInterest": 100
         |    }
         |  }
-        |}}}
         |""".stripMargin
     )
   }
-
-  val testDownstreamFinancialDetails: JsValue = {
+  private val financialDocumentDetails: JsValue = {
     Json.parse(
-      """{
-        |"getFinancialData": {
-        |"financialDetails": {
-        |  "totalisation": {
-        |    "regimeTotalisation": {
-        |      "totalAccountOverdue": 1000.00,
-        |      "totalAccountNotYetDue": 250.00,
-        |      "totalAccountCredit": 40.00,
-        |      "totalAccountBalance": 1210.00
-        |    },
-        |    "targetedSearch_SelectionCriteriaTotalisation": {
-        |      "totalOverdue": 123.45,
-        |      "totalNotYetDue": 12.34,
-        |      "totalBalance": 12.45,
-        |      "totalCredit": 13.46,
-        |      "totalCleared": 12.35
-        |    },
-        |    "additionalReceivableTotalisations" :{
-        |     "totalAccountPostedInterest": 100,
-        |     "totalAccountAccruingInterest": 100
-        |    }
-        |  },
-        |  "documentDetails": [
+      """
+        |"documentDetails": [
         |    {
         |      "documentNumber": "187346702498",
         |      "documentType": "P1",
@@ -165,10 +139,24 @@ object FinancialDataConstants {
         |      ]
         |    }
         |  ]
-        |}}}
         |""".stripMargin
     )
   }
+
+  val ifFinancialDetailsNoDocumentDetails: JsValue =
+    Json.parse(s"""{"getFinancialData":{"financialDetails":{$financialTotalisationDetails}}}""")
+  val ifFinancialDetailsNoTotalisations: JsValue =
+    Json.parse(s"""{"getFinancialData":{"financialDetails":{$financialDocumentDetails}}}""")
+  val ifFinancialDetails: JsValue =
+    Json.parse(s"""{"getFinancialData":{"financialDetails":{$financialTotalisationDetails,$financialDocumentDetails}}}""")
+
+  val hipFinancialDetailsNoDocumentDetails: JsValue =
+    Json.parse(s"""{"success":{"financialData":{$financialTotalisationDetails}}}""")
+  val hipFinancialDetailsNoTotalisations: JsValue =
+    Json.parse(s"""{"success":{"financialData":{$financialDocumentDetails}}}""")
+  val hipFinancialDetails: JsValue =
+    Json.parse(s"""{"success":{"financialData":{$financialTotalisationDetails,$financialDocumentDetails}}}""")
+
 
   val testUpstreamFinancialDetails: JsValue = {
     Json.parse(
@@ -263,7 +251,8 @@ object FinancialDataConstants {
     additionalReceivableTotalisations = Some(testAdditionalReceivableTotalisations)
   )
 
-  val testFinancialNoDocumentDetailsDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
+  val testFinancialDataNoDocumentDetailsResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
+  val testFinancialDataNoTotalisationsResponse: FinancialDataResponse = FinancialDataResponse(None, Some(Seq(testDocumentDetail)))
   val testFinancialDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
 
   def wrappedFinancialDataResponse(financialResponse: FinancialDataResponse = testFinancialDataResponse): ResponseWrapper[FinancialDataResponse] = {

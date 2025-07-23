@@ -25,48 +25,48 @@ import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.response.financialData.{FinancialDataErrors, FinancialDataResponse}
 
+import scala.util.Try
+
 object FinancialDataHttpParser extends Logging {
 
   implicit object FinancialDataHttpReads extends HttpReads[Outcome[FinancialDataResponse]] with HttpParser {
 
-    //TODO change content after user research
     def errorHelper(jsonString: JsValue): MtdError = {
       val financialDataErrors = jsonString.as[FinancialDataErrors]
       val mtdErrorsConvert = financialDataErrors.failures.map { error =>
-        (error.code) match {
-          case ("INVALID_IDNUMBER")                              => FinancialInvalidIdNumber
-          case ("INVALID_SEARCH_ITEM")                           => FinancialInvalidSearchItem
-          case ("NO_DATA_FOUND")                                 => FinancialNotDataFound
-          case ("INVALID_CORRELATIONID")                         => DownstreamError
-          case ("INVALID_IDTYPE")                                => DownstreamError
-          case ("INVALID_REGIME_TYPE")                           => DownstreamError
-          case ("INVALID_SEARCH_TYPE")                           => DownstreamError
-          case ("INVALID_SEARCH_ITEM")                           => DownstreamError
-          case ("INVALID_DATE_FROM")                             => DownstreamError
-          case ("INVALID_DATE_TO")                               => DownstreamError
-          case ("INVALID_DATE_TYPE")                             => DownstreamError
-          case ("INVALID_DATE_RANGE")                            => DownstreamError
-          case ("INVALID_INCLUDE_CLEARED_ITEMS")                 => DownstreamError
-          case ("INVALID_INCLUDE_STATISTICAL_ITEMS")             => DownstreamError
-          case ("INVALID_INCLUDE_PAYMENT_ON_ACCOUNT")            => DownstreamError
-          case ("INVALID_ADD_REGIME_TOTALISATION")               => DownstreamError
-          case ("INVALID_ADD_LOCK_INFORMATION")                  => DownstreamError
-          case ("INVALID_ADD_PENALTY_DETAILS")                   => DownstreamError
-          case ("INVALID_ADD_POSTED_INTEREST_DETAILS")           => DownstreamError
-          case ("INVALID_ADD_ACCRUING_INTEREST_DETAILS")         => DownstreamError
-          case ("INVALID_REQUEST")                               => DownstreamError
-          case ("INVALID_TARGETED_SEARCH")                       => DownstreamError
-          case ("INVALID_SELECTION_CRITERIA")                    => DownstreamError
-          case ("INVALID_DATA_ENRICHMENT")                       => DownstreamError
-          case ("DUPLICATE_SUBMISSION")                          => DownstreamError
-          case ("INVALID_ID")                                    => DownstreamError
-          case ("INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER") => FinancialInvalidSearchItem
-          case ("REQUEST_NOT_PROCESSED")                         => DownstreamError
-          case ("INVALID_DATA_TYPE")                             => DownstreamError
-          case ("INVALID_DATE_RANGE")                            => DownstreamError
-          case ("SERVER_ERROR")                                  => DownstreamError
-          case ("SERVICE_UNAVAILABLE")                           => DownstreamError
-          case _ => MtdError(error.code, error.reason)
+        error.code match {
+          case "INVALID_IDNUMBER"                              => FinancialInvalidIdNumber
+          case "INVALID_SEARCH_ITEM"                           => FinancialInvalidSearchItem
+          case "NO_DATA_FOUND"                                 => FinancialNotDataFound
+          case "INVALID_CORRELATIONID"                         => DownstreamError
+          case "INVALID_IDTYPE"                                => DownstreamError
+          case "INVALID_REGIME_TYPE"                           => DownstreamError
+          case "INVALID_SEARCH_TYPE"                           => DownstreamError
+          case "INVALID_DATE_FROM"                             => DownstreamError
+          case "INVALID_DATE_TO"                               => DownstreamError
+          case "INVALID_DATE_TYPE"                             => DownstreamError
+          case "INVALID_DATE_RANGE"                            => DownstreamError
+          case "INVALID_INCLUDE_CLEARED_ITEMS"                 => DownstreamError
+          case "INVALID_INCLUDE_STATISTICAL_ITEMS"             => DownstreamError
+          case "INVALID_INCLUDE_PAYMENT_ON_ACCOUNT"            => DownstreamError
+          case "INVALID_ADD_REGIME_TOTALISATION"               => DownstreamError
+          case "INVALID_ADD_LOCK_INFORMATION"                  => DownstreamError
+          case "INVALID_ADD_PENALTY_DETAILS"                   => DownstreamError
+          case "INVALID_ADD_POSTED_INTEREST_DETAILS"           => DownstreamError
+          case "INVALID_ADD_ACCRUING_INTEREST_DETAILS"         => DownstreamError
+          case "INVALID_REQUEST"                               => DownstreamError
+          case "INVALID_TARGETED_SEARCH"                       => DownstreamError
+          case "INVALID_SELECTION_CRITERIA"                    => DownstreamError
+          case "INVALID_DATA_ENRICHMENT"                       => DownstreamError
+          case "DUPLICATE_SUBMISSION"                          => DownstreamError
+          case "INVALID_ID"                                    => DownstreamError
+          case "INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER" => FinancialInvalidSearchItem
+          case "REQUEST_NOT_PROCESSED"                         => DownstreamError
+          case "INVALID_DATA_TYPE"                             => DownstreamError
+          case "INVALID_DATE_RANGE"                            => DownstreamError
+          case "SERVER_ERROR"                                  => DownstreamError
+          case "SERVICE_UNAVAILABLE"                           => DownstreamError
+          case _                                               => MtdError(error.code, error.reason)
         }
       }
 
@@ -81,20 +81,28 @@ object FinancialDataHttpParser extends Logging {
       error
     }
 
-    //TODO more error handling can be added once scenarios confirmed by Penalties team
     def read(method: String, url: String, response: HttpResponse): Outcome[FinancialDataResponse] = {
-      val responseCorrelationId = retrieveCorrelationId(response)
+      val correlationId = retrieveCorrelationId(response)
       response.status match {
-        case OK => response.json.validate[FinancialDataResponse] match {
-          case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
-          case JsError(errors) =>
-            errorConnectorLog(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")(response)
-            Left(ErrorWrapper(responseCorrelationId, InvalidJson))
-        }
+        case OK      => validateJsonResponse(correlationId, response, hipOrIf = "IF")
+        case CREATED => validateJsonResponse(correlationId, response, hipOrIf = "HIP")
         case status =>
           val mtdErrors = errorHelper(response.json)
-          errorConnectorLog(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")(response)
-          Left(ErrorWrapper(responseCorrelationId, mtdErrors))
+          errorConnectorLog(s"[FinancialDataHttpParser][read] $status response with error $mtdErrors")(response)
+          Left(ErrorWrapper(correlationId, mtdErrors))
+      }
+    }
+
+    private def validateJsonResponse(correlationId: String, response: HttpResponse, hipOrIf: String): Outcome[FinancialDataResponse] = {
+      val reads             = if (hipOrIf == "HIP") FinancialDataResponse.readHipResponse else FinancialDataResponse.readIfResponse
+      val attemptValidation = Try(response.json.validate[FinancialDataResponse](reads)).toOption.getOrElse(JsError(""))
+      attemptValidation match {
+        case JsSuccess(model, _) => Right(ResponseWrapper(correlationId, model))
+        case JsError(errors) =>
+          errorConnectorLog(
+            s"[FinancialDataResponseReads][validateJsonResponse] Unable to validate json $hipOrIf response: $errors"
+          )(response)
+          Left(ErrorWrapper(correlationId, InvalidJson))
       }
     }
   }
