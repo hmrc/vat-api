@@ -63,7 +63,7 @@ object PenaltiesInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN
 object PenaltiesNotDataFound extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "No penalties could be found in the last 24 months")
 
 //API#1363 Get VAT Customer Information Errors
-object CustomerInfoInvalidIdValue extends MtdError("INVALID_VRN", "The provided VRN is invalid.")
+object CustomerInfoInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid.")
 object CustomerInfoNotDataFound extends MtdError("NOT_FOUND", "The requested resource could not be found")
 
 //Financial Data Errors
