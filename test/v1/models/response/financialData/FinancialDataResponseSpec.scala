@@ -29,11 +29,11 @@ class FinancialDataResponseSpec extends UnitSpec {
     }
 
     "read to json IF response" in {
-      FinancialDataConstants.ifFinancialDetails.as[FinancialDataResponse](readIfResponse) shouldBe FinancialDataConstants.testFinancialDataResponse
+      FinancialDataConstants.ifFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
     }
 
     "read to json HIP response" in {
-      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse](readHipResponse) shouldBe FinancialDataConstants.testFinancialDataResponse
+      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
     }
   }
 }

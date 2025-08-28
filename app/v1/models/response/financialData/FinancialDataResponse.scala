@@ -108,6 +108,8 @@ object FinancialDataResponse {
       (JsPath \ "success" \ "financialData" \ "documentDetails").readNullable[Seq[DocumentDetail]]
   )(FinancialDataResponse.apply _)
 
+  implicit val reads: Reads[FinancialDataResponse] = readIfResponse orElse readHipResponse
+
   implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]
 
   implicit val format: OFormat[FinancialDataErrors] = Json.format[FinancialDataErrors]

@@ -33,11 +33,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PenaltiesConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
+class PenaltiesConnector @Inject() (val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
 
-  private def buildHeaderCarrier(hc: HeaderCarrier,
-                              userRequest: UserRequest[_],
-                              correlationId: String): HeaderCarrier = {
+  private def buildHeaderCarrier(hc: HeaderCarrier, userRequest: UserRequest[_], correlationId: String): HeaderCarrier = {
 
     val maybeAuthHeader: String = userRequest.request.headers
       .get("Authorization")
@@ -45,7 +43,7 @@ class PenaltiesConnector @Inject()(val http: HttpClient, val appConfig: AppConfi
 
     val contractHeaders: Seq[(String, String)] = Seq(
       "Authorization" -> maybeAuthHeader,
-      "Environment" -> appConfig.desEnv,
+      "Environment"   -> appConfig.desEnv,
       "CorrelationId" -> correlationId
     )
 
@@ -54,68 +52,69 @@ class PenaltiesConnector @Inject()(val http: HttpClient, val appConfig: AppConfi
     HeaderCarrier(extraHeaders = hc.extraHeaders ++ contractHeaders ++ otherHeaders)
   }
 
-  def retrievePenalties(request: PenaltiesRequest)(implicit hc: HeaderCarrier,
-                                                   ec: ExecutionContext,
-                                                   userRequest: UserRequest[_],
-                                                   correlationId: String): Future[Outcome[PenaltiesResponse]] = {
+  def retrievePenalties(request: PenaltiesRequest)(implicit
+      hc: HeaderCarrier,
+      ec: ExecutionContext,
+      userRequest: UserRequest[_],
+      correlationId: String): Future[Outcome[PenaltiesResponse]] = {
     val vrn = request.vrn.vrn
     val url = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty-details/VRN/$vrn"
     logger.debug(s"[PenaltiesConnector][retrievePenalties] url: $url")
 
-    def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] = {
+    def doGet(implicit hc: HeaderCarrier): Future[Outcome[PenaltiesResponse]] =
       http.GET[Outcome[PenaltiesResponse]](url)
-    }
 
-    doGet(buildHeaderCarrier(hc, userRequest, correlationId)).recover {
-      case e =>
-        val logDetails = s"request failed. ${e.getMessage}"
+    doGet(buildHeaderCarrier(hc, userRequest, correlationId)).recover { case e =>
+      val logDetails = s"request failed. ${e.getMessage}"
 
-        errorLog(ConnectorError.log(
+      errorLog(
+        ConnectorError.log(
           logContext = "[PenaltiesConnector][retrievePenaltiesData]",
           vrn = vrn,
-          details = logDetails,
+          details = logDetails
         ))
 
-        PagerDutyLogging.log(
-          pagerDutyLoggingEndpointName = Endpoint.RetrievePenalties.requestFailedMessage,
-          status = Status.INTERNAL_SERVER_ERROR,
-          body = logDetails,
-          f = errorLog(_),
-          affinityGroup = userRequest.userDetails.userType
-        )
-        Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
+      PagerDutyLogging.log(
+        pagerDutyLoggingEndpointName = Endpoint.RetrievePenalties.requestFailedMessage,
+        status = Status.INTERNAL_SERVER_ERROR,
+        body = logDetails,
+        f = errorLog(_),
+        affinityGroup = userRequest.userDetails.userType
+      )
+      Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
     }
   }
 
-  def retrieveFinancialData(request: FinancialRequest)(implicit hc: HeaderCarrier,
-                                                       ec: ExecutionContext,
-                                                       userRequest: UserRequest[_],
-                                                       correlationId: String): Future[Outcome[FinancialDataResponse]] = {
+  def retrieveFinancialData(request: FinancialRequest)(implicit
+      hc: HeaderCarrier,
+      ec: ExecutionContext,
+      userRequest: UserRequest[_],
+      correlationId: String): Future[Outcome[FinancialDataResponse]] = {
 
-    val vrn = request.vrn.vrn
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
+    val vrn                                = request.vrn.vrn
+    val url                                = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
     val queryParams: Seq[(String, String)] = Seq("searchType" -> "CHGREF", "searchItem" -> request.searchItem)
-    val newHC: HeaderCarrier = buildHeaderCarrier(hc, userRequest, correlationId)
+    val newHC: HeaderCarrier               = buildHeaderCarrier(hc, userRequest, correlationId)
 
-    http.GET[Outcome[FinancialDataResponse]](url, queryParams)(implicitly, newHC, implicitly).recover {
-      case e =>
-        val logDetails = s"request failed: ${e.getMessage}"
+    http.GET[Outcome[FinancialDataResponse]](url, queryParams)(implicitly, newHC, implicitly).recover { case e =>
+      val logDetails = s"request failed: ${e.getMessage}"
 
-        errorLog(ConnectorError.log(
+      errorLog(
+        ConnectorError.log(
           logContext = "[PenaltiesConnector][retrieveFinancialData]",
           vrn = vrn,
-          details = logDetails,
+          details = logDetails
         ))
 
-        PagerDutyLogging.log(
-          pagerDutyLoggingEndpointName = Endpoint.RetrieveFinancialData.requestFailedMessage,
-          status = Status.INTERNAL_SERVER_ERROR,
-          body = logDetails,
-          f = errorLog(_),
-          affinityGroup = userRequest.userDetails.userType
-        )
+      PagerDutyLogging.log(
+        pagerDutyLoggingEndpointName = Endpoint.RetrieveFinancialData.requestFailedMessage,
+        status = Status.INTERNAL_SERVER_ERROR,
+        body = logDetails,
+        f = errorLog(_),
+        affinityGroup = userRequest.userDetails.userType
+      )
 
-        Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
+      Left(ErrorWrapper(correlationId, MtdError("DOWNSTREAM_ERROR", e.getMessage)))
     }
   }
 
