@@ -321,20 +321,27 @@ object PenaltiesResponse {
 }
 
 
-case class PenaltiesErrors(
-                         failures: Seq[PenaltyError]
-                         )
+case class PenaltiesErrorsIF(failures: Seq[PenaltyErrorIF])
 
-object PenaltiesErrors {
-  implicit val format: OFormat[PenaltiesErrors] = Json.format[PenaltiesErrors]
+object PenaltiesErrorsIF {
+  implicit val format: OFormat[PenaltiesErrorsIF] = Json.format[PenaltiesErrorsIF]
 }
 
-case class PenaltyError(
-                        code: String,
-                        reason: String
-                        )
+case class PenaltyErrorIF(code: String, reason: String)
 
-object PenaltyError {
-  implicit val format: OFormat[PenaltyError] = Json.format[PenaltyError]
+object PenaltyErrorIF {
+  implicit val format: OFormat[PenaltyErrorIF] = Json.format[PenaltyErrorIF]
 }
 
+// Despite the name HIP 'errors' are always singular even if request has multiple issues
+case class PenaltiesErrorsHIP(errors: PenaltyErrorHIP)
+
+object PenaltiesErrorsHIP {
+  implicit val format: OFormat[PenaltiesErrorsHIP] = Json.format[PenaltiesErrorsHIP]
+}
+
+case class PenaltyErrorHIP(processingDate: String, code: String, text: String)
+
+object PenaltyErrorHIP {
+  implicit val format: OFormat[PenaltyErrorHIP] = Json.format[PenaltyErrorHIP]
+}

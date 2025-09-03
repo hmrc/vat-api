@@ -22,15 +22,28 @@ import v1.constants.FinancialDataConstants
 
 class FinancialDataResponseSpec extends UnitSpec {
 
-  "FinancialData" must {
+  "FinancialDataResponse" must {
 
-    "write data from json" in {
-
+    "write FinancialDataResponse model to json" in {
       Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
     }
 
-    "read to json" in {
+    "read from IF json response" in {
       FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    }
+
+    "read from HIP json response" in {
+      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    }
+  }
+
+  "FinancialDataErrorsIF" must {
+    "write FinancialDataErrorsIF model to json" in {
+      Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
+    }
+
+    "read from json response" in {
+      FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataErrorsIF] shouldBe FinancialDataConstants.testFinancialDataResponse
     }
   }
 }
