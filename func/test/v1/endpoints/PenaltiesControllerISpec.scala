@@ -25,8 +25,13 @@ import play.api.libs.ws.{ WSRequest, WSResponse }
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.PenaltiesConstants
-import v1.constants.PenaltiesConstants.{ downstreamTestPenaltiesResponseJsonMax, invalidVrn, testPenaltiesResponseJsonMin }
-import v1.models.errors.{ DownstreamError, PenaltiesInvalidIdValue, VrnFormatError }
+import v1.constants.PenaltiesConstants.{
+  downstreamTestPenaltiesResponseJsonMax,
+  invalidVrn,
+  testPenaltiesResponseJsonMin,
+  upstreamTestLatePaymentPenaltyJson
+}
+import v1.models.errors.{ DownstreamError, InvalidJson, PenaltiesInvalidIdValue, VrnFormatError }
 import v1.stubs.{ AuditStub, AuthStub, PenaltiesStub }
 
 class PenaltiesControllerISpec extends IntegrationBaseSpec {
@@ -76,7 +81,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
       }
 
       "return a 400" when {
-        "raw vrn cannot be parsed" in new Test {
+        "VRN value cannot be parsed" in new Test {
           private val overrideUri  = Some(s"/$invalidVrn/penalties")
           val response: WSResponse = await(makeRequest(overrideUri).get())
 
@@ -105,6 +110,20 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
       }
 
       "return a 500" when {
+        "a 200 is returned but the response cannot be parsed" in new Test {
+          private val invalidSuccessResponse = Json.obj(
+            "totalisations"         -> Some(upstreamTestLatePaymentPenaltyJson),
+            "lateSubmissionPenalty" -> Some(upstreamTestLatePaymentPenaltyJson),
+            "latePaymentPenalty"    -> Some(upstreamTestLatePaymentPenaltyJson)
+          )
+          stubSuccess(invalidSuccessResponse)
+          val response: WSResponse = await(makeRequest().get())
+
+          response.status shouldBe INTERNAL_SERVER_ERROR
+          response.json shouldBe Json.toJson(InvalidJson)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+
         "there is an error from upstream" in new Test {
           private val errorBody = s"""
                                        |{
@@ -115,7 +134,7 @@ class PenaltiesControllerISpec extends IntegrationBaseSpec {
                                        |  }
                                        |}
                                        |""".stripMargin
-          stubError(BAD_REQUEST, errorBody)
+          stubError(UNPROCESSABLE_ENTITY, errorBody)
           val response: WSResponse = await(makeRequest().get())
 
           response.status shouldBe INTERNAL_SERVER_ERROR

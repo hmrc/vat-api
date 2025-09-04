@@ -68,7 +68,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
       }
 
       "return a 400" when {
-        "raw vrn cannot be parsed" in new Test {
+        "VRN value cannot be parsed" in new Test {
           private val overrideUri  = Some(s"/$invalidVrn/penalties")
           val response: WSResponse = await(makeRequest(overrideUri).get())
 
@@ -105,7 +105,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
                                      |  }
                                      |}
                                      |""".stripMargin
-          stubError(BAD_REQUEST, errorBody)
+          stubError(UNPROCESSABLE_ENTITY, errorBody)
           val response: WSResponse = await(makeRequest().get())
 
           response.status shouldBe BAD_REQUEST
@@ -135,6 +135,17 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
       }
 
       "return a 500" when {
+        "a 200 is returned but the response cannot be parsed" in new Test {
+          private val invalidSuccessResponse =
+            Json.parse(s"""{"invalidWrapper":{"financialData":"this is not a valid response"}}""")
+          stubSuccess(invalidSuccessResponse)
+          val response: WSResponse = await(makeRequest().get())
+
+          response.status shouldBe INTERNAL_SERVER_ERROR
+          response.json shouldBe Json.toJson(InvalidJson)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+
         "there is an error from upstream" in new Test {
           private val errorBody = s"""
                                      |{
@@ -145,7 +156,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
                                      |  }
                                      |}
                                      |""".stripMargin
-          stubError(BAD_REQUEST, errorBody)
+          stubError(UNPROCESSABLE_ENTITY, errorBody)
           val response: WSResponse = await(makeRequest().get())
 
           response.status shouldBe INTERNAL_SERVER_ERROR
