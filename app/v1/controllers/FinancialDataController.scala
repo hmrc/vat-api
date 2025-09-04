@@ -66,7 +66,7 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
       } yield {
 
         infoLog(s"${endpointLogContext.toString} " +
-          s"Successfully retrieved Financial Data from DES with correlationId : ${serviceResponse.correlationId}")
+          s"Successfully retrieved Financial Data with correlationId : ${serviceResponse.correlationId}")
 
 
         auditService.auditEvent(AuditEvents.auditFinancialData(serviceResponse.correlationId,

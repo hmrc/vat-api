@@ -22,7 +22,7 @@ import v1.constants.PenaltiesConstants._
 
 class PenaltiesResponseSpec extends UnitSpec {
 
-  "PenaltiesData" must {
+  "PenaltiesResponse" must {
 
     "write data to json min" in {
 
@@ -48,6 +48,76 @@ class PenaltiesResponseSpec extends UnitSpec {
 
     "read from optional fields change json" in {
       downstreamTestPenaltiesResponseJsonMissingFields.as[PenaltiesResponse] shouldBe testPenaltiesResponseMissingFields
+    }
+  }
+
+  private val errorIfJson   = Json.parse("""
+                                           |{
+                                           |  "code":"002",
+                                           |  "reason":"Invalid Tax Regime"
+                                           |}
+                                           |""".stripMargin)
+  private val errorsIfJson  = Json.parse(s"""
+                                            |{
+                                            |  "failures": [
+                                            |    $errorIfJson,
+                                            |    $errorIfJson
+                                            |  ]
+                                            |}
+                                            |""".stripMargin)
+  private val errorIfModel  = PenaltyErrorIF("002", "Invalid Tax Regime")
+  private val errorsIfModel = PenaltiesErrorsIF(List(errorIfModel, errorIfModel))
+
+  "PenaltyErrorIF" must {
+    "write PenaltyErrorIF model to json" in {
+      Json.toJson(errorIfModel) shouldBe errorIfJson
+    }
+
+    "read from json response" in {
+      errorIfJson.as[PenaltyErrorIF] shouldBe errorIfModel
+    }
+  }
+  "PenaltiesErrorsIF" must {
+    "write PenaltiesErrorsIF model to json" in {
+      Json.toJson(errorsIfModel) shouldBe errorsIfJson
+    }
+
+    "read from json response" in {
+      errorsIfJson.as[PenaltiesErrorsIF] shouldBe errorsIfModel
+    }
+  }
+
+  private val errorHipJson   = Json.parse("""
+                                            |{
+                                            |  "processingDate":"2017-01-01",
+                                            |  "code":"002",
+                                            |  "text":"Invalid Tax Regime"
+                                            |}
+                                            |""".stripMargin)
+  private val errorsHipJson  = Json.parse(s"""
+                                             |{
+                                             |  "errors": $errorHipJson
+                                             |}
+                                             |""".stripMargin)
+  private val errorHipModel  = PenaltiesErrorHIP("2017-01-01", "002", "Invalid Tax Regime")
+  private val errorsHipModel = PenaltiesErrorsHIP(errorHipModel)
+
+  "PenaltiesErrorHIP" must {
+    "write PenaltiesErrorHIP model to json" in {
+      Json.toJson(errorHipModel) shouldBe errorHipJson
+    }
+
+    "read from json response" in {
+      errorHipJson.as[PenaltiesErrorHIP] shouldBe errorHipModel
+    }
+  }
+  "PenaltiesErrorsHIP" must {
+    "write PenaltiesErrorsHIP model to json" in {
+      Json.toJson(errorsHipModel) shouldBe errorsHipJson
+    }
+
+    "read from json response" in {
+      errorsHipJson.as[PenaltiesErrorsHIP] shouldBe errorsHipModel
     }
   }
 }

@@ -20,17 +20,17 @@ import cats.data.EitherT
 import cats.implicits._
 import config.AppConfig
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import utils.{EndpointLogContext, IdGenerator, Logging}
+import play.api.mvc.{ Action, AnyContent, ControllerComponents, Result }
+import utils.{ EndpointLogContext, IdGenerator, Logging }
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.PenaltiesRequestParser
 import v1.models.audit.AuditResponse
 import v1.models.errors._
 import v1.models.request.penalties.PenaltiesRawData
-import v1.services.{AuditService, EnrolmentsAuthService, PenaltiesService}
+import v1.services.{ AuditService, EnrolmentsAuthService, PenaltiesService }
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
@@ -92,7 +92,6 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
       case PenaltiesInvalidIdValue | RuleIncorrectGovTestScenarioError => BadRequest(Json.toJson(errorWrapper))
-      case PenaltiesNotDataFound => NotFound(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }
   }

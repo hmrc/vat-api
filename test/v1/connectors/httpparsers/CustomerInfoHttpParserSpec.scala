@@ -21,7 +21,6 @@ import play.api.libs.json.Json
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 import v1.connectors.httpparsers.CustomerInfoHttpParser.CustomerInfoHttpReads
-import v1.constants
 import v1.constants.CustomerInfoConstants
 import v1.models.errors._
 

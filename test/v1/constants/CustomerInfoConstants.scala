@@ -17,16 +17,16 @@
 package v1.constants
 
 import config.AppConfig
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
-import v1.models.errors.{ErrorWrapper, MtdError}
+import v1.models.errors.{ ErrorWrapper, MtdError }
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.information.{CustomerInfoRequest, CustomerRawData}
-import v1.models.response.information.{CustomerDetails, CustomerInfoResponse, FlatRateScheme}
+import v1.models.request.information.{ CustomerInfoRequest, CustomerRawData }
+import v1.models.response.information.{ CustomerDetails, CustomerInfoResponse, FlatRateScheme }
 
 object CustomerInfoConstants {
 

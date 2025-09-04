@@ -334,14 +334,14 @@ object PenaltyErrorIF {
 }
 
 // Despite the name HIP 'errors' are always singular even if request has multiple issues
-case class PenaltiesErrorsHIP(errors: PenaltyErrorHIP)
+case class PenaltiesErrorsHIP(errors: PenaltiesErrorHIP)
 
 object PenaltiesErrorsHIP {
   implicit val format: OFormat[PenaltiesErrorsHIP] = Json.format[PenaltiesErrorsHIP]
 }
 
-case class PenaltyErrorHIP(processingDate: String, code: String, text: String)
+case class PenaltiesErrorHIP(processingDate: String, code: String, text: String)
 
-object PenaltyErrorHIP {
-  implicit val format: OFormat[PenaltyErrorHIP] = Json.format[PenaltyErrorHIP]
+object PenaltiesErrorHIP {
+  implicit val format: OFormat[PenaltiesErrorHIP] = Json.format[PenaltiesErrorHIP]
 }

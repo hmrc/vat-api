@@ -18,16 +18,9 @@ package support
 
 import config.AppConfig
 import org.scalatestplus.play.guice._
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.{FakeRequest, Injecting}
-import play.api.{Application, Mode}
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.ErrorHandler
-
-import scala.concurrent.ExecutionContext
+import play.api.inject.guice.{ GuiceApplicationBuilder, GuiceableModule }
+import play.api.test.Injecting
+import play.api.{ Application, Mode }
 
 trait GuiceBox extends UnitSpec with GuiceOneAppPerSuite with Injecting {
 

@@ -266,7 +266,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
       }
 
       "response is an error (any non 200/201 status)" must {
-        "return an error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
+        "return the error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
           val error = Json.parse("""
               |{
               |  "errors": {

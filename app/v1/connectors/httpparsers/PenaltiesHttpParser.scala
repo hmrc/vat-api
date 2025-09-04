@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
+import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.penalties.{PenaltiesErrorsHIP, PenaltiesErrorsIF, PenaltiesResponse}
+import v1.models.response.penalties.{ PenaltiesErrorsHIP, PenaltiesErrorsIF, PenaltiesResponse }
 
 object PenaltiesHttpParser extends Logging {
 
@@ -59,7 +59,6 @@ object PenaltiesHttpParser extends Logging {
     }
   }
 
-
   private def convertToMtdErrorsIF(errorsIF: PenaltiesErrorsIF): MtdError = {
     val convertedErrors = errorsIF.failures.map { error =>
       error.code match {
@@ -91,11 +90,11 @@ object PenaltiesHttpParser extends Logging {
   private def convertToMtdErrorsHIP(errorsHIP: PenaltiesErrorsHIP): MtdError = {
     val error = errorsHIP.errors
     error.code match {
-      case "002"                                        => DownstreamError // Invalid Tax Regime
-      case "003"                                        => DownstreamError // Request could not be processed (ETMP issue)
-      case "015"                                        => DownstreamError // Invalid ID Type
-      case "016"                                        => PenaltiesInvalidIdValue // Invalid ID Number
-      case _                                            => MtdError(error.code, error.text)
+      case "002" => DownstreamError // Invalid Tax Regime
+      case "003" => DownstreamError // Request could not be processed (ETMP issue)
+      case "015" => DownstreamError // Invalid ID Type
+      case "016" => PenaltiesInvalidIdValue // Invalid ID Number
+      case _     => MtdError(error.code, error.text)
     }
   }
 

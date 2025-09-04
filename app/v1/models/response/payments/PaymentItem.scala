@@ -17,7 +17,7 @@
 package v1.models.response.payments
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsNull, JsPath, Json, OWrites, Reads, __}
+import play.api.libs.json._
 
 case class PaymentItem(amount: Option[BigDecimal],
                        received: Option[String],

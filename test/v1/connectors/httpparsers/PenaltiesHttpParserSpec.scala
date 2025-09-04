@@ -16,116 +16,64 @@
 
 package v1.connectors.httpparsers
 
-import play.api.http.Status
+import play.api.http.Status._
 import play.api.libs.json.{ JsValue, Json }
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 import v1.connectors.httpparsers.PenaltiesHttpParser.PenaltiesHttpReads
-import v1.constants.PenaltiesConstants
+import v1.constants.PenaltiesConstants._
 import v1.models.errors._
 
 class PenaltiesHttpParserSpec extends UnitSpec {
 
+  private def buildHttpResponse(status: Int, jsonBody: JsValue) =
+    HttpResponse(
+      status = status,
+      json = jsonBody,
+      headers = Map("CorrelationId" -> Seq(correlationId))
+    )
+
   "PenaltiesHttpParser .read" when {
     "response is OK (200)" when {
       "json is valid" must {
-        "return Right(PenaltiesResponse) min" in {
-          val result = PenaltiesHttpReads.read(
-            "",
-            "",
-            HttpResponse(
-              status = Status.OK,
-              json = PenaltiesConstants.testPenaltiesResponseJsonMin,
-              headers = Map(
-                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-              )
-            )
-          )
+        "return a parsed PenaltiesResponse where the ID has no active penalties" in {
+          val response = buildHttpResponse(OK, testPenaltiesResponseJsonMin)
+          val result   = PenaltiesHttpReads.read("", "", response)
 
-          result shouldBe Right(PenaltiesConstants.wrappedPenaltiesResponse())
+          result shouldBe Right(wrappedPenaltiesResponse(testPenaltiesResponseMin))
         }
 
-        "return Right(PenaltiesResponse) max" in {
+        "return a parsed PenaltiesResponse where the ID has full penalties data" in {
+          val response = buildHttpResponse(OK, downstreamTestPenaltiesResponseJsonMax)
+          val result   = PenaltiesHttpReads.read("", "", response)
 
-          val result = PenaltiesHttpReads.read(
-            "",
-            "",
-            HttpResponse(
-              status = Status.OK,
-              json = PenaltiesConstants.downstreamTestPenaltiesResponseJsonMax,
-              headers = Map(
-                "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-              )
-            )
-          )
-
-          result shouldBe Right(PenaltiesConstants.wrappedPenaltiesResponse(PenaltiesConstants.testPenaltiesResponseMax))
+          result shouldBe Right(wrappedPenaltiesResponse(testPenaltiesResponseMax))
         }
       }
 
       "json is invalid" must {
+        "return as InvalidJson error" in {
+          val invalidJsonObject = Json.parse("""
+                                                | "totalisations" {
+                                                |   "test": "test"
+                                                | }
+                                                |""".stripMargin)
+          val invalidOkResponse = buildHttpResponse(OK, invalidJsonObject)
+          val result            = PenaltiesHttpReads.read("", "", invalidOkResponse)
 
-        "return Left(InvalidJson)" in {
-
-          val jsonObject =
-            Json.parse("""
-                | "totalisations" {
-                |   "test": "test"
-                | }
-                |""".stripMargin)
-
-          val result = PenaltiesHttpReads.read("",
-                                               "",
-                                               HttpResponse(
-                                                 status = Status.OK,
-                                                 json = jsonObject,
-                                                 headers = Map(
-                                                   "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-                                                 )
-                                               ))
-
-          result shouldBe Left(PenaltiesConstants.errorWrapper(InvalidJson))
+          result shouldBe Left(errorWrapper(InvalidJson))
         }
       }
     }
 
     "response is an error (any non 200 status)" when {
-      "API response is from IF" when {
-        "return an error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
-          val error = Json.parse("""
-                |{
-                |"failures": [{
-                |"code":"INVALID_IDVALUE",
-                |"reason":"Submission has not passed validation. Invalid parameter idNumber."
-                |}]
-                |}
-                |""".stripMargin)
+      "return an error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
+        val errorJson    = buildErrorHip("002", Some("Invalid Tax Regime"))
+        val httpResponse = buildHttpResponse(BAD_REQUEST, errorJson)
 
-          val result = PenaltiesHttpReads.read("",
-                                               "",
-                                               HttpResponse(
-                                                 status = Status.BAD_REQUEST,
-                                                 json = error,
-                                                 headers = Map(
-                                                   "CorrelationId" -> Seq(PenaltiesConstants.correlationId)
-                                                 )
-                                               ))
-          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("VRN_INVALID", "The provided VRN is invalid.")))
-        }
-      }
+        val result = PenaltiesHttpReads.read("", "", httpResponse)
 
-      "API response is from HIP" when {
-        "return an error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
-          val error = buildErrorHip("002", Some("Invalid Tax Regime"))
-          val httpResponse = HttpResponse(
-            status = Status.BAD_REQUEST,
-            json = error,
-            headers = Map("CorrelationId" -> Seq(PenaltiesConstants.correlationId))
-          )
-          val result = PenaltiesHttpReads.read("", "", httpResponse)
-
-          result shouldBe Left(PenaltiesConstants.errorWrapper(MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")))
-        }
+        result shouldBe Left(errorWrapper(MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")))
       }
     }
   }
