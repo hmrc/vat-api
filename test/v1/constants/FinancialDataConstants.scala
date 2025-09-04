@@ -17,15 +17,15 @@
 package v1.constants
 
 import config.AppConfig
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
-import v1.models.errors.{ErrorWrapper, MtdError}
+import v1.models.errors.{ ErrorWrapper, MtdError }
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.penalties.{FinancialRawData, FinancialRequest}
+import v1.models.request.penalties.{ FinancialRawData, FinancialRequest }
 import v1.models.response.financialData._
 
 object FinancialDataConstants {
@@ -43,7 +43,7 @@ object FinancialDataConstants {
 
   def financialDataUrl(vrn: String = vrn): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
 
   
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
@@ -436,8 +436,6 @@ object FinancialDataConstants {
     additionalReceivableTotalisations = Some(testAdditionalReceivableTotalisations)
   )
 
-//  val testFinancialDataNoDocumentDetailsResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
-//  val testFinancialDataNoTotalisationsResponse: FinancialDataResponse = FinancialDataResponse(None, Some(Seq(testDocumentDetail)))
   val testFinancialNoDocumentDetailsDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
   val testFinancialDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
 
