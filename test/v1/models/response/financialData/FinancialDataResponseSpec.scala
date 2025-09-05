@@ -22,15 +22,88 @@ import v1.constants.FinancialDataConstants
 
 class FinancialDataResponseSpec extends UnitSpec {
 
-  "FinancialData" must {
+  "FinancialDataResponse" must {
 
-    "write data from json" in {
-
+    "write FinancialDataResponse model to json" in {
       Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
     }
 
-    "read to json" in {
+    "read from IF json response" in {
       FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    }
+
+    "read from HIP json response" in {
+      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    }
+  }
+
+  private val errorIfJson   = Json.parse("""
+                               |{
+                               |  "code":"002",
+                               |  "reason":"Invalid Tax Regime"
+                               |}
+                               |""".stripMargin)
+  private val errorsIfJson  = Json.parse(s"""
+                                 |{
+                                 |  "failures": [
+                                 |    $errorIfJson,
+                                 |    $errorIfJson
+                                 |  ]
+                                 |}
+                                 |""".stripMargin)
+  private val errorIfModel  = FinancialDataErrorIF("002", "Invalid Tax Regime")
+  private val errorsIfModel = FinancialDataErrorsIF(List(errorIfModel, errorIfModel))
+
+  "FinancialDataErrorIF" must {
+    "write FinancialDataErrorIF model to json" in {
+      Json.toJson(errorIfModel) shouldBe errorIfJson
+    }
+
+    "read from json response" in {
+      errorIfJson.as[FinancialDataErrorIF] shouldBe errorIfModel
+    }
+  }
+  "FinancialDataErrorsIF" must {
+    "write FinancialDataErrorsIF model to json" in {
+      Json.toJson(errorsIfModel) shouldBe errorsIfJson
+    }
+
+    "read from json response" in {
+      errorsIfJson.as[FinancialDataErrorsIF] shouldBe errorsIfModel
+    }
+  }
+
+  private val errorHipJson   = Json.parse("""
+                                  |{
+                                  |  "processingDate":"2017-01-01",
+                                  |  "code":"002",
+                                  |  "text":"Invalid Tax Regime"
+                                  |}
+                                  |""".stripMargin)
+  private val errorsHipJson  = Json.parse(s"""
+                                    |{
+                                    |  "errors": $errorHipJson
+                                    |}
+                                    |""".stripMargin)
+  private val errorHipModel  = FinancialDataErrorHIP("2017-01-01", "002", "Invalid Tax Regime")
+  private val errorsHipModel = FinancialDataErrorsHIP(errorHipModel)
+
+  "FinancialDataErrorHIP" must {
+    "write FinancialDataErrorHIP model to json" in {
+      Json.toJson(errorHipModel) shouldBe errorHipJson
+    }
+
+    "read from json response" in {
+      errorHipJson.as[FinancialDataErrorHIP] shouldBe errorHipModel
+    }
+  }
+  "FinancialDataErrorsHIP" must {
+    "write FinancialDataErrorsHIP model to json" in {
+      Json.toJson(errorsHipModel) shouldBe errorsHipJson
+    }
+
+    "read from json response" in {
+      errorsHipJson.as[FinancialDataErrorsHIP] shouldBe errorsHipModel
     }
   }
 }

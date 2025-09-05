@@ -20,27 +20,33 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.AppConfig
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.{WSRequest, WSResponse}
-import play.api.test.Helpers.{AUTHORIZATION, GET}
+import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.ws.{ WSRequest, WSResponse }
+import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.constants.FinancialDataConstants
+import v1.constants.FinancialDataConstants._
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub, PenaltiesStub}
+import v1.stubs.{ AuditStub, AuthStub, PenaltiesStub }
 
 class FinancialDataControllerISpec extends IntegrationBaseSpec {
 
   implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
+  private val uri = s"/${FinancialDataConstants.vrn}/financial-details/${FinancialDataConstants.searchItem}"
+
   private trait Test {
+    AuditStub.audit()
+    AuthStub.authorised()
 
-    def uri: String = s"/${FinancialDataConstants.vrn}/financial-details/${FinancialDataConstants.searchItem}"
+    def stubSuccess(responseBody: JsValue): StubMapping =
+      PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), OK, responseBody)
 
-    def setupStubs(): StubMapping
+    def stubError(errorStatus: Int, errorBody: String): StubMapping =
+      PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), errorStatus, errorBody)
 
-    def request: WSRequest = {
-      setupStubs()
-      buildRequest(uri)
+    def makeRequest(overrideUri: Option[String] = None): WSRequest = {
+      buildRequest(overrideUri.getOrElse(uri))
         .withHttpHeaders(
           (ACCEPT, "application/vnd.hmrc.1.0+json"),
           (AUTHORIZATION, "Bearer 123")
@@ -49,158 +55,113 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
   }
 
   "FinancialDataController" when {
+    "GET /[VRN]/financial-details" should {
+      "return a 200 with financial data" when {
+        "valid request is made and VRN matches penalty financial data" in new Test {
+          stubSuccess(hipFinancialDetails)
+          val response: WSResponse = await(makeRequest().get())
 
-    "GET /[VRN]/financial-details" when {
-
-      "raw vrn cannot be parsed" must {
-
-        "return BadRequest" in new Test {
-
-          override def uri: String = s"/${FinancialDataConstants.invalidVrn}/penalties"
-
-          override def setupStubs(): StubMapping = {
-            AuditStub.audit()
-            AuthStub.authorised()
-          }
-
-          val response: WSResponse = await(request.get())
-          response.status shouldBe BAD_REQUEST
-          response.json shouldBe Json.toJson(VrnFormatError)
+          response.status shouldBe OK
+          response.json shouldBe testUpstreamFinancialDetails
           response.header("Content-Type") shouldBe Some("application/json")
         }
       }
 
-      "vrn can be parsed" when {
+      "return a 400" when {
+        "VRN value cannot be parsed" in new Test {
+          private val overrideUri  = Some(s"/$invalidVrn/penalties")
+          val response: WSResponse = await(makeRequest(overrideUri).get())
 
-        "a valid request is made" must {
-
-          "return 201 and penalties data" in new Test {
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onSuccess(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), CREATED, FinancialDataConstants.testDownstreamFinancialDetails)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe OK
-            response.json shouldBe FinancialDataConstants.testUpstreamFinancialDetails
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
+          response.status shouldBe BAD_REQUEST
+          response.json shouldBe Json.toJson(VrnFormatError)
+          response.header("Content-Type") shouldBe Some("application/json")
         }
 
-        "VRN is invalid" must {
+        "VRN is invalid and a 404 is returned from upstream" in new Test {
+          private val errorBody = s"""
+                                     |{
+                                     |  "errors": {
+                                     |    "processingDate":"2017-01-01",
+                                     |    "code":"016",
+                                     |    "text":"Invalid ID Number"
+                                     |  }
+                                     |}
+                                     |""".stripMargin
+          stubError(NOT_FOUND, errorBody)
+          val response: WSResponse = await(makeRequest().get())
 
-          "return 400" in new Test {
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |"failures": [{
-                | "code":"INVALID_IDNUMBER",
-                | "reason":"Some Reason"
-                |}]
-                |}
-                |""".stripMargin)
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe BAD_REQUEST
-            response.json shouldBe Json.toJson(FinancialInvalidIdNumber)
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
-
-          "return multi 400 errors" in new Test {
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |  "failures": [
-                |    {
-                |      "code":"INVALID_IDNUMBER",
-                |      "reason":"Some reason"
-                |    },
-                |    {
-                |      "code":"INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER",
-                |      "reason":"Some reason"
-                |    }
-                |  ]
-                |}
-                |""".stripMargin)
-
-            val expectedJson: JsValue = Json.toJson(MtdError("INVALID_REQUEST", "Invalid request financial details",
-              Some(Json.toJson(Seq(
-                FinancialInvalidIdNumber,
-                FinancialInvalidSearchItem
-              )))))
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), BAD_REQUEST, errorBody)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe BAD_REQUEST
-            response.json shouldBe expectedJson
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
+          response.status shouldBe BAD_REQUEST
+          response.json shouldBe Json.toJson(FinancialInvalidIdNumber)
+          response.header("Content-Type") shouldBe Some("application/json")
         }
 
-        "VRN is not found" must {
+        "Charge Reference query parameter is invalid" in new Test {
+          private val errorBody = s"""
+                                     |{
+                                     |  "errors": {
+                                     |    "processingDate":"2017-01-01",
+                                     |    "code":"017",
+                                     |    "text":"Invalid Charge Reference"
+                                     |  }
+                                     |}
+                                     |""".stripMargin
+          stubError(UNPROCESSABLE_ENTITY, errorBody)
+          val response: WSResponse = await(makeRequest().get())
 
-          "return 404" in new Test {
+          response.status shouldBe BAD_REQUEST
+          response.json shouldBe Json.toJson(FinancialInvalidSearchItem)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+      }
 
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |"failures": [{
-                | "code":"NO_DATA_FOUND",
-                | "reason":"Some Reason"
-                |}]
-                |}
-                |""".stripMargin)
+      "return a 404 with FinancialNotDataFound" when {
+        "VRN matches penalties that have no financial data and a 404 is returned from upstream" in new Test {
+          private val errorBody = s"""
+                                     |{
+                                     |  "errors": {
+                                     |    "processingDate":"2017-01-01",
+                                     |    "code":"018",
+                                     |    "text":"No Data Identified"
+                                     |  }
+                                     |}
+                                     |""".stripMargin
+          stubError(NOT_FOUND, errorBody)
+          val response: WSResponse = await(makeRequest().get())
 
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), NOT_FOUND, errorBody)
-            }
+          response.status shouldBe NOT_FOUND
+          response.json shouldBe Json.toJson(FinancialNotDataFound)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+      }
 
-            val response: WSResponse = await(request.get())
-            response.status shouldBe NOT_FOUND
-            response.json shouldBe Json.toJson(FinancialNotDataFound)
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
+      "return a 500" when {
+        "a 200 is returned but the response cannot be parsed" in new Test {
+          private val invalidSuccessResponse =
+            Json.parse(s"""{"invalidWrapper":{"financialData":"this is not a valid response"}}""")
+          stubSuccess(invalidSuccessResponse)
+          val response: WSResponse = await(makeRequest().get())
+
+          response.status shouldBe INTERNAL_SERVER_ERROR
+          response.json shouldBe Json.toJson(InvalidJson)
+          response.header("Content-Type") shouldBe Some("application/json")
         }
 
-        "unexpected error" must {
+        "there is an error from upstream" in new Test {
+          private val errorBody = s"""
+                                     |{
+                                     |  "errors": {
+                                     |    "processingDate":"2017-01-01",
+                                     |    "code":"002",
+                                     |    "text":"Invalid Tax Regime"
+                                     |  }
+                                     |}
+                                     |""".stripMargin
+          stubError(UNPROCESSABLE_ENTITY, errorBody)
+          val response: WSResponse = await(makeRequest().get())
 
-          "return 500" in new Test {
-
-            val errorBody: JsValue = Json.parse(
-              """
-                |{
-                |"failures": [{
-                | "code":"REASON",
-                | "reason":"error"
-                |}]
-                |}
-                |""".stripMargin)
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              PenaltiesStub.onError(PenaltiesStub.GET, FinancialDataConstants.financialDataUrl(), INTERNAL_SERVER_ERROR, errorBody)
-            }
-
-            val response: WSResponse = await(request.get())
-            response.status shouldBe INTERNAL_SERVER_ERROR
-            response.json shouldBe Json.toJson(MtdError("REASON", "error"))
-            response.header("Content-Type") shouldBe Some("application/json")
-          }
+          response.status shouldBe INTERNAL_SERVER_ERROR
+          response.json shouldBe Json.toJson(DownstreamError)
+          response.header("Content-Type") shouldBe Some("application/json")
         }
       }
     }

@@ -17,15 +17,15 @@
 package v1.constants
 
 import config.AppConfig
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
-import v1.models.errors.{ErrorWrapper, MtdError}
+import v1.models.errors.{ ErrorWrapper, MtdError }
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.penalties.{FinancialRawData, FinancialRequest}
+import v1.models.request.penalties.{ FinancialRawData, FinancialRequest }
 import v1.models.response.financialData._
 
 object FinancialDataConstants {
@@ -41,9 +41,9 @@ object FinancialDataConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn, searchItem)
 
-  def financialDataUrl(vrn: String = vrn)(implicit appConfig: AppConfig): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
+  def financialDataUrl(vrn: String = vrn): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
 
   
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
@@ -169,6 +169,179 @@ object FinancialDataConstants {
         |""".stripMargin
     )
   }
+
+  val totalisationJson: JsValue = Json.parse(
+    """{
+      |  "totalisation": {
+      |    "regimeTotalisation": {
+      |      "totalAccountOverdue": 1000.00,
+      |      "totalAccountNotYetDue": 250.00,
+      |      "totalAccountCredit": 40.00,
+      |      "totalAccountBalance": 1210.00
+      |    },
+      |    "targetedSearch_SelectionCriteriaTotalisation": {
+      |      "totalOverdue": 123.45,
+      |      "totalNotYetDue": 12.34,
+      |      "totalBalance": 12.45,
+      |      "totalCredit": 13.46,
+      |      "totalCleared": 12.35
+      |    },
+      |    "additionalReceivableTotalisations" : {
+      |      "totalAccountPostedInterest": 100,
+      |      "totalAccountAccruingInterest": 100
+      |    }
+      |  }
+      |}""".stripMargin
+  )
+  val documentDetailsJson: JsValue = Json.parse(
+    """{
+      |  "documentDetails": [
+      |    {
+      |      "documentNumber": "187346702498",
+      |      "documentType": "P1",
+      |      "chargeReferenceNumber": "XP001286394838",
+      |      "businessPartnerNumber": "100893731",
+      |      "contractAccountNumber": "900726630",
+      |      "contractAccountCategory": "32",
+      |      "contractObjectNumber": "104920928302302",
+      |      "contractObjectType": "ZVAT",
+      |      "postingDate": "2022-03-01",
+      |      "issueDate": "2022-03-01",
+      |      "documentTotalAmount": 123.45,
+      |      "documentClearedAmount": 111.11,
+      |      "documentOutstandingAmount": 12.34,
+      |      "documentInterestTotals": {
+      |        "interestPostedAmount": 13.12,
+      |        "interestPostedChargeRef": "XB001286323438",
+      |        "interestAccruingAmount": 12.10,
+      |        "interestTotalAmount": 1.23
+      |      },
+      |      "lineItemDetails": [
+      |        {
+      |          "chargeDescription": "IN1",
+      |          "itemNumber": "0001",
+      |          "subItemNumber": "003",
+      |          "mainTransaction": "4576",
+      |          "subTransaction": "1000",
+      |          "periodFromDate": "2022-03-01",
+      |          "periodToDate": "2022-03-01",
+      |          "periodKey": "13RL",
+      |          "netDueDate": "2022-03-01",
+      |          "formBundleNumber": "125435934761",
+      |          "statisticalKey": "1",
+      |          "amount": 123.45,
+      |          "clearingDate": "2022-03-01",
+      |          "clearingReason": "01",
+      |          "clearingDocument": "719283701921",
+      |          "outgoingPaymentMethod": "B",
+      |          "lineItemInterestDetails": {
+      |            "interestKey": "01",
+      |            "interestStartDate": "2022-03-01",
+      |            "currentInterestRate": 2,
+      |            "interestPostedAmount": 123,
+      |            "interestAccruingAmount": 123
+      |          }
+      |        }
+      |      ]
+      |    }
+      |  ]
+      |}""".stripMargin
+  )
+  val totalisationAndDocumentDetailsJson: JsValue = Json.parse(
+    """{
+      |  "totalisation": {
+      |    "regimeTotalisation": {
+      |      "totalAccountOverdue": 1000.00,
+      |      "totalAccountNotYetDue": 250.00,
+      |      "totalAccountCredit": 40.00,
+      |      "totalAccountBalance": 1210.00
+      |    },
+      |    "targetedSearch_SelectionCriteriaTotalisation": {
+      |      "totalOverdue": 123.45,
+      |      "totalNotYetDue": 12.34,
+      |      "totalBalance": 12.45,
+      |      "totalCredit": 13.46,
+      |      "totalCleared": 12.35
+      |    },
+      |    "additionalReceivableTotalisations" : {
+      |      "totalAccountPostedInterest": 100,
+      |      "totalAccountAccruingInterest": 100
+      |    }
+      |  },
+      |  "documentDetails": [
+      |    {
+      |      "documentNumber": "187346702498",
+      |      "documentType": "P1",
+      |      "chargeReferenceNumber": "XP001286394838",
+      |      "businessPartnerNumber": "100893731",
+      |      "contractAccountNumber": "900726630",
+      |      "contractAccountCategory": "32",
+      |      "contractObjectNumber": "104920928302302",
+      |      "contractObjectType": "ZVAT",
+      |      "postingDate": "2022-03-01",
+      |      "issueDate": "2022-03-01",
+      |      "documentTotalAmount": 123.45,
+      |      "documentClearedAmount": 111.11,
+      |      "documentOutstandingAmount": 12.34,
+      |      "documentLockDetails": {
+      |        "lockType": "",
+      |        "lockStartDate": "2022-03-01",
+      |        "lockEndDate": "2022-03-01"
+      |      },
+      |      "documentInterestTotals": {
+      |        "interestPostedAmount": 13.12,
+      |        "interestPostedChargeRef": "XB001286323438",
+      |        "interestAccruingAmount": 12.10,
+      |        "interestTotalAmount": 1.23
+      |      },
+      |      "documentPenaltyTotals": {
+      |        "Penalty Type": "LPP1",
+      |        "Posted Amount": 10.00,
+      |        "Posted Charge Reference": "XR00123933492",
+      |        "Accruing Amount": 0.00
+      |      },
+      |      "lineItemDetails": [
+      |        {
+      |          "chargeDescription": "IN1",
+      |          "itemNumber": "0001",
+      |          "subItemNumber": "003",
+      |          "mainTransaction": "4576",
+      |          "subTransaction": "1000",
+      |          "periodFromDate": "2022-03-01",
+      |          "periodToDate": "2022-03-01",
+      |          "periodKey": "13RL",
+      |          "netDueDate": "2022-03-01",
+      |          "formBundleNumber": "125435934761",
+      |          "statisticalKey": "1",
+      |          "amount": 123.45,
+      |          "clearingDate": "2022-03-01",
+      |          "clearingReason": "01",
+      |          "clearingDocument": "719283701921",
+      |          "outgoingPaymentMethod": "B",
+      |          "lineItemLockDetails": {
+      |            "lockType": "",
+      |            "lockStartDate": "",
+      |            "lockEndDate": ""
+      |          },
+      |          "lineItemInterestDetails": {
+      |            "interestKey": "01",
+      |            "interestStartDate": "2022-03-01",
+      |            "currentInterestRate": 2,
+      |            "interestPostedAmount": 123,
+      |            "interestAccruingAmount": 123
+      |          }
+      |        }
+      |      ]
+      |    }
+      |  ]
+      |}""".stripMargin
+  )
+  val hipFinancialDetailsNoDocumentDetails: JsValue =
+    Json.parse(s"""{"success":{"financialData":$totalisationJson}}""")
+  val hipFinancialDetailsNoTotalisations: JsValue =
+    Json.parse(s"""{"success":{"financialData":$documentDetailsJson}}""")
+  val hipFinancialDetails: JsValue =
+    Json.parse(s"""{"success":{"financialData":$totalisationAndDocumentDetailsJson}}""")
 
   val testUpstreamFinancialDetails: JsValue = {
     Json.parse(

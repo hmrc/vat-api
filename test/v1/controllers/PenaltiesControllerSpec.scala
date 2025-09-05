@@ -24,8 +24,8 @@ import v1.audit.AuditEvents
 import v1.constants.PenaltiesConstants
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockPenaltiesRequestParser
-import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
-import v1.models.audit.{AuditError, AuditResponse}
+import v1.mocks.services.{ MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService }
+import v1.models.audit.{ AuditError, AuditResponse }
 import v1.models.errors._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -105,7 +105,6 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
           val errors: Seq[(MtdError, Int)] = Seq(
             (PenaltiesInvalidIdValue, BAD_REQUEST),
             (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
-            (PenaltiesNotDataFound, NOT_FOUND),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 

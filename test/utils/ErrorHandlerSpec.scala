@@ -16,26 +16,26 @@
 
 package utils
 
-import java.time.Instant
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Configuration
 import play.api.http.Status
 import play.api.http.Status.UNSUPPORTED_MEDIA_TYPE
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsEmpty, RequestHeader}
+import play.api.mvc.{ AnyContentAsEmpty, RequestHeader }
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.InsufficientEnrolments
-import uk.gov.hmrc.http.{HeaderCarrier, JsValidationException, NotFoundException}
+import uk.gov.hmrc.http.{ HeaderCarrier, JsValidationException, NotFoundException }
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.{DataEvent, RedactionLog, TruncationLog}
+import uk.gov.hmrc.play.audit.model.{ DataEvent, TruncationLog }
 import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import v1.models.errors._
 
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NoStackTrace
 
 class ErrorHandlerSpec extends UnitSpec with GuiceOneAppPerSuite {

@@ -17,15 +17,15 @@
 package v1.constants
 
 import config.AppConfig
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import v1.controllers.UserRequest
 import v1.models.auth.UserDetails
 import v1.models.domain.Vrn
-import v1.models.errors.{ErrorWrapper, MtdError}
+import v1.models.errors.{ ErrorWrapper, MtdError }
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.penalties.{PenaltiesRawData, PenaltiesRequest}
+import v1.models.request.penalties.{ PenaltiesRawData, PenaltiesRequest }
 import v1.models.response.penalties._
 
 object PenaltiesConstants {
@@ -40,8 +40,8 @@ object PenaltiesConstants {
   val invalidVrn = "fakeVRN"
   val invalidRawData: PenaltiesRawData = PenaltiesRawData(invalidVrn)
 
-  def penaltiesURl(vrn: String = vrn)(implicit appConfig: AppConfig) = s"/penalties/VATC/penalty-details/VRN/$vrn"
-  def penaltiesURlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig) = appConfig.penaltiesBaseUrl +  s"/penalties/VATC/penalty-details/VRN/$vrn"
+  def penaltiesURl(vrn: String = vrn) = s"/penalties/VATC/penalty-details/VRN/$vrn"
+  def penaltiesURlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl +  s"/penalties/VATC/penalty-details/VRN/$vrn"
 
 
   val testTotalisationMin: Totalisations = Totalisations(

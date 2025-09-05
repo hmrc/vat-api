@@ -23,65 +23,12 @@ import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.financialData.{ FinancialDataErrors, FinancialDataResponse }
+import v1.models.response.financialData.{ FinancialDataErrorsHIP, FinancialDataErrorsIF, FinancialDataResponse }
 
 object FinancialDataHttpParser extends Logging {
 
   implicit object FinancialDataHttpReads extends HttpReads[Outcome[FinancialDataResponse]] with HttpParser {
 
-    //TODO change content after user research
-    def errorHelper(jsonString: JsValue): MtdError = {
-      val financialDataErrors = jsonString.as[FinancialDataErrors]
-      val mtdErrorsConvert = financialDataErrors.failures.map { error =>
-        (error.code) match {
-          case ("INVALID_IDNUMBER")                              => FinancialInvalidIdNumber
-          case ("INVALID_SEARCH_ITEM")                           => FinancialInvalidSearchItem
-          case ("NO_DATA_FOUND")                                 => FinancialNotDataFound
-          case ("INVALID_CORRELATIONID")                         => DownstreamError
-          case ("INVALID_IDTYPE")                                => DownstreamError
-          case ("INVALID_REGIME_TYPE")                           => DownstreamError
-          case ("INVALID_SEARCH_TYPE")                           => DownstreamError
-          case ("INVALID_SEARCH_ITEM")                           => DownstreamError
-          case ("INVALID_DATE_FROM")                             => DownstreamError
-          case ("INVALID_DATE_TO")                               => DownstreamError
-          case ("INVALID_DATE_TYPE")                             => DownstreamError
-          case ("INVALID_DATE_RANGE")                            => DownstreamError
-          case ("INVALID_INCLUDE_CLEARED_ITEMS")                 => DownstreamError
-          case ("INVALID_INCLUDE_STATISTICAL_ITEMS")             => DownstreamError
-          case ("INVALID_INCLUDE_PAYMENT_ON_ACCOUNT")            => DownstreamError
-          case ("INVALID_ADD_REGIME_TOTALISATION")               => DownstreamError
-          case ("INVALID_ADD_LOCK_INFORMATION")                  => DownstreamError
-          case ("INVALID_ADD_PENALTY_DETAILS")                   => DownstreamError
-          case ("INVALID_ADD_POSTED_INTEREST_DETAILS")           => DownstreamError
-          case ("INVALID_ADD_ACCRUING_INTEREST_DETAILS")         => DownstreamError
-          case ("INVALID_REQUEST")                               => DownstreamError
-          case ("INVALID_TARGETED_SEARCH")                       => DownstreamError
-          case ("INVALID_SELECTION_CRITERIA")                    => DownstreamError
-          case ("INVALID_DATA_ENRICHMENT")                       => DownstreamError
-          case ("DUPLICATE_SUBMISSION")                          => DownstreamError
-          case ("INVALID_ID")                                    => DownstreamError
-          case ("INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER") => FinancialInvalidSearchItem
-          case ("REQUEST_NOT_PROCESSED")                         => DownstreamError
-          case ("INVALID_DATA_TYPE")                             => DownstreamError
-          case ("INVALID_DATE_RANGE")                            => DownstreamError
-          case ("SERVER_ERROR")                                  => DownstreamError
-          case ("SERVICE_UNAVAILABLE")                           => DownstreamError
-          case _                                                 => MtdError(error.code, error.reason)
-        }
-      }
-
-      val head = mtdErrorsConvert.head
-      val error = if (mtdErrorsConvert.tail.isEmpty) {
-        head
-      } else if (mtdErrorsConvert.contains(DownstreamError)) {
-        DownstreamError
-      } else {
-        MtdError("INVALID_REQUEST", "Invalid request financial details", Some(Json.toJson(mtdErrorsConvert)))
-      }
-      error
-    }
-
-    //TODO more error handling can be added once scenarios confirmed by Penalties team
     def read(method: String, url: String, response: HttpResponse): Outcome[FinancialDataResponse] = {
       val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
@@ -89,13 +36,89 @@ object FinancialDataHttpParser extends Logging {
           response.json.validate[FinancialDataResponse] match {
             case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
             case JsError(errors) =>
-              errorConnectorLog(s"[FinancialDataResponseReads][read] invalid JSON errors: $errors")(response)
+              errorConnectorLog(s"[FinancialDataHttpParser][read] invalid JSON errors: $errors")(response)
               Left(ErrorWrapper(responseCorrelationId, InvalidJson))
           }
         case status =>
           val mtdErrors = errorHelper(response.json)
-          errorConnectorLog(s"[FinancialDataHttpParser][read] status: ${status} with Error ${mtdErrors}")(response)
+          errorConnectorLog(s"[FinancialDataHttpParser][read] status: $status with Error $mtdErrors")(response)
           Left(ErrorWrapper(responseCorrelationId, mtdErrors))
+      }
+    }
+
+    def errorHelper(jsonString: JsValue): MtdError = {
+      val financialDataErrorsIF  = jsonString.validate[FinancialDataErrorsIF]
+      val financialDataErrorsHIP = jsonString.validate[FinancialDataErrorsHIP]
+
+      (financialDataErrorsIF, financialDataErrorsHIP) match {
+        case (JsSuccess(errorsIF, _), _)  => convertToMtdErrorsIF(errorsIF)
+        case (_, JsSuccess(errorsHIP, _)) => convertToMtdErrorsHIP(errorsHIP)
+        case _ =>
+          MtdError("SERVER_ERROR", "Unable to validate json error response", Some(jsonString))
+      }
+    }
+
+    private def convertToMtdErrorsIF(errorsIF: FinancialDataErrorsIF): MtdError = {
+      val convertedErrors = errorsIF.failures.map { error =>
+        error.code match {
+          case "INVALID_IDNUMBER"                              => FinancialInvalidIdNumber
+          case "INVALID_SEARCH_ITEM"                           => FinancialInvalidSearchItem
+          case "NO_DATA_FOUND"                                 => FinancialNotDataFound
+          case "INVALID_CORRELATIONID"                         => DownstreamError
+          case "INVALID_IDTYPE"                                => DownstreamError
+          case "INVALID_REGIME_TYPE"                           => DownstreamError
+          case "INVALID_SEARCH_TYPE"                           => DownstreamError
+          case "INVALID_DATE_FROM"                             => DownstreamError
+          case "INVALID_DATE_TO"                               => DownstreamError
+          case "INVALID_DATE_TYPE"                             => DownstreamError
+          case "INVALID_INCLUDE_CLEARED_ITEMS"                 => DownstreamError
+          case "INVALID_INCLUDE_STATISTICAL_ITEMS"             => DownstreamError
+          case "INVALID_INCLUDE_PAYMENT_ON_ACCOUNT"            => DownstreamError
+          case "INVALID_ADD_REGIME_TOTALISATION"               => DownstreamError
+          case "INVALID_ADD_LOCK_INFORMATION"                  => DownstreamError
+          case "INVALID_ADD_PENALTY_DETAILS"                   => DownstreamError
+          case "INVALID_ADD_POSTED_INTEREST_DETAILS"           => DownstreamError
+          case "INVALID_ADD_ACCRUING_INTEREST_DETAILS"         => DownstreamError
+          case "INVALID_REQUEST"                               => DownstreamError
+          case "INVALID_TARGETED_SEARCH"                       => DownstreamError
+          case "INVALID_SELECTION_CRITERIA"                    => DownstreamError
+          case "INVALID_DATA_ENRICHMENT"                       => DownstreamError
+          case "DUPLICATE_SUBMISSION"                          => DownstreamError
+          case "INVALID_ID"                                    => DownstreamError
+          case "INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER" => FinancialInvalidSearchItem
+          case "REQUEST_NOT_PROCESSED"                         => DownstreamError
+          case "INVALID_DATA_TYPE"                             => DownstreamError
+          case "INVALID_DATE_RANGE"                            => DownstreamError
+          case "SERVER_ERROR"                                  => DownstreamError
+          case "SERVICE_UNAVAILABLE"                           => DownstreamError
+          case _                                               => MtdError(error.code, error.reason)
+        }
+      }
+
+      val head = convertedErrors.head
+      val error = if (convertedErrors.tail.isEmpty) {
+        head
+      } else if (convertedErrors.contains(DownstreamError)) {
+        DownstreamError
+      } else {
+        MtdError("INVALID_REQUEST", "Invalid request financial details", Some(Json.toJson(convertedErrors)))
+      }
+      error
+    }
+
+    private def convertToMtdErrorsHIP(errorsHIP: FinancialDataErrorsHIP): MtdError = {
+      val error = errorsHIP.errors
+      error.code match {
+        case "002"                                        => DownstreamError // Invalid Tax Regime
+        case "003"                                        => DownstreamError // Request could not be processed (ETMP issue)
+        case "015"                                        => DownstreamError // Invalid ID Type
+        case "016"                                        => FinancialInvalidIdNumber // Invalid ID Number
+        case "017" if error.text == "Invalid Search Type" => DownstreamError // Invalid Search Type
+        case "017"                                        => FinancialInvalidSearchItem // Invalid Document or Charge Ref
+        case "018"                                        => FinancialNotDataFound // No Data Identified
+        case "019"                                        => DownstreamError // Invalid Data Type
+        case "020"                                        => DownstreamError // Invalid Date Range
+        case _                                            => MtdError(error.code, error.text)
       }
     }
   }

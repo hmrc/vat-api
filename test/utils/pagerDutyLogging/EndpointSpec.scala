@@ -19,8 +19,6 @@ package utils.pagerDutyLogging
 import support.UnitSpec
 import utils.pagerDutyLogging.Endpoint._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class EndpointSpec extends UnitSpec {
 
   case class ExpectedEndpointMessages(endPoint: Endpoint,

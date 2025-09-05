@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import play.api.libs.json.{ JsError, JsSuccess, JsValue }
+import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.information.{CustomerInfoDataError, CustomerInfoResponse}
+import v1.models.response.information.{ CustomerInfoDataError, CustomerInfoResponse }
 
 object CustomerInfoHttpParser extends Logging {
 

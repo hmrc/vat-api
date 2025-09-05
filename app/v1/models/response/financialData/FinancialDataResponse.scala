@@ -28,8 +28,7 @@ object LineItemInterestDetails {
   implicit val format: OFormat[LineItemInterestDetails] = Json.format[LineItemInterestDetails]
 }
 
-case class LineItemDetail(
-                          chargeDescription: Option[String],
+case class LineItemDetail(chargeDescription: Option[String],
                           periodFromDate: Option[String],
                           periodToDate: Option[String],
                           netDueDate: Option[String],
@@ -40,8 +39,7 @@ object LineItemDetail {
   implicit val format: OFormat[LineItemDetail] = Json.format[LineItemDetail]
 }
 
-case class DocumentInterestTotals(interestPostedAmount: Option[BigDecimal],
-                                  interestAccruingAmount: Option[BigDecimal])
+case class DocumentInterestTotals(interestPostedAmount: Option[BigDecimal], interestAccruingAmount: Option[BigDecimal])
 
 object DocumentInterestTotals {
   implicit val format: OFormat[DocumentInterestTotals] = Json.format[DocumentInterestTotals]
@@ -64,14 +62,12 @@ object DocumentDetail {
       (JsPath \ "documentInterestTotals").readNullable[DocumentInterestTotals] and
       (JsPath \ "documentOutstandingAmount").readNullable[BigDecimal] and
       (JsPath \ "lineItemDetails").readNullable[Seq[LineItemDetail]]
-    )(DocumentDetail.apply _)
+  )(DocumentDetail.apply _)
 
   implicit val writes: OWrites[DocumentDetail] = Json.writes[DocumentDetail]
 }
 
-
-case class AdditionalReceivableTotalisations(totalAccountPostedInterest: Option[BigDecimal],
-                                             totalAccountAccruingInterest: Option[BigDecimal])
+case class AdditionalReceivableTotalisations(totalAccountPostedInterest: Option[BigDecimal], totalAccountAccruingInterest: Option[BigDecimal])
 
 object AdditionalReceivableTotalisations {
   implicit val format: OFormat[AdditionalReceivableTotalisations] = Json.format[AdditionalReceivableTotalisations]
@@ -79,11 +75,11 @@ object AdditionalReceivableTotalisations {
 }
 
 case class Totalisations(totalOverdue: Option[BigDecimal],
-                        totalNotYetDue: Option[BigDecimal],
-                        totalBalance: Option[BigDecimal],
-                        totalCredit: Option[BigDecimal],
-                        totalCleared: Option[BigDecimal],
-                        additionalReceivableTotalisations: Option[AdditionalReceivableTotalisations])
+                         totalNotYetDue: Option[BigDecimal],
+                         totalBalance: Option[BigDecimal],
+                         totalCredit: Option[BigDecimal],
+                         totalCleared: Option[BigDecimal],
+                         additionalReceivableTotalisations: Option[AdditionalReceivableTotalisations])
 
 object Totalisations {
   implicit val reads: Reads[Totalisations] = (
@@ -93,36 +89,57 @@ object Totalisations {
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalCredit").readNullable[BigDecimal] and
       (JsPath \ "targetedSearch_SelectionCriteriaTotalisation" \ "totalCleared").readNullable[BigDecimal] and
       (JsPath \ "additionalReceivableTotalisations").readNullable[AdditionalReceivableTotalisations]
-    )(Totalisations.apply _)
+  )(Totalisations.apply _)
 
   implicit val writes: OWrites[Totalisations] = Json.writes[Totalisations]
 }
 
-
-case class FinancialDataResponse(totalisations: Option[Totalisations],
-                                 documentDetails: Option[Seq[DocumentDetail]])
+case class FinancialDataResponse(totalisations: Option[Totalisations], documentDetails: Option[Seq[DocumentDetail]])
 
 object FinancialDataResponse {
-  implicit val reads: Reads[FinancialDataResponse] = (
+  private val readIfResponse: Reads[FinancialDataResponse] = (
     (JsPath \ "getFinancialData" \ "financialDetails" \ "totalisation").readNullable[Totalisations] and
       (JsPath \ "getFinancialData" \ "financialDetails" \ "documentDetails").readNullable[Seq[DocumentDetail]]
-    )(FinancialDataResponse.apply _)
+  )(FinancialDataResponse.apply _)
+  private val readHipResponse: Reads[FinancialDataResponse] = (
+    (JsPath \ "success" \ "financialData" \ "totalisation").readNullable[Totalisations] and
+      (JsPath \ "success" \ "financialData" \ "documentDetails").readNullable[Seq[DocumentDetail]]
+  )(FinancialDataResponse.apply _)
 
-  implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]}
+  implicit val reads: Reads[FinancialDataResponse] = { json =>
+    if ((json \ "getFinancialData").isDefined) {
+      readIfResponse.reads(json)
+    } else if ((json \ "success").isDefined) {
+      readHipResponse.reads(json)
+    } else {
+      JsError("Unrecognised FinancialDataResponse format")
+    }
+  }
 
-case class FinancialDataErrors(
-                            failures: List[FinancialDataError]
-                          )
-
-object FinancialDataErrors {
-  implicit val format: OFormat[FinancialDataErrors] = Json.format[FinancialDataErrors]
+  implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]
 }
 
-case class FinancialDataError(
-                         code: String,
-                         reason: String
-                       )
+case class FinancialDataErrorsIF(failures: List[FinancialDataErrorIF])
 
-object FinancialDataError {
-  implicit val format: OFormat[FinancialDataError] = Json.format[FinancialDataError]
+object FinancialDataErrorsIF {
+  implicit val format: OFormat[FinancialDataErrorsIF] = Json.format[FinancialDataErrorsIF]
+}
+
+case class FinancialDataErrorIF(code: String, reason: String)
+
+object FinancialDataErrorIF {
+  implicit val format: OFormat[FinancialDataErrorIF] = Json.format[FinancialDataErrorIF]
+}
+
+// Despite the name HIP 'errors' are always singular even if request has multiple issues
+case class FinancialDataErrorsHIP(errors: FinancialDataErrorHIP)
+
+object FinancialDataErrorsHIP {
+  implicit val format: OFormat[FinancialDataErrorsHIP] = Json.format[FinancialDataErrorsHIP]
+}
+
+case class FinancialDataErrorHIP(processingDate: String, code: String, text: String)
+
+object FinancialDataErrorHIP {
+  implicit val format: Format[FinancialDataErrorHIP] = Json.format[FinancialDataErrorHIP]
 }
