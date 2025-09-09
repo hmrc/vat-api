@@ -140,13 +140,13 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
 
       "valid request is not supplied" must {
 
-        "return Internal Server Error" in new Test {
+        "return a Bad Request" in new Test {
 
           MockPenaltiesRequestParser.parse(PenaltiesConstants.rawData)(Left(PenaltiesConstants.errorWrapper(VrnFormatError)))
 
           val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
 
-          status(result) shouldBe INTERNAL_SERVER_ERROR
+          status(result) shouldBe BAD_REQUEST
           contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
           contentType(result) shouldBe Some("application/json")
           header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
@@ -154,7 +154,7 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
           MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
             correlationId = PenaltiesConstants.correlationId,
             userDetails = PenaltiesConstants.userDetails,
-            auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(VrnFormatError.code))), None)
+            auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
           ))
         }
       }

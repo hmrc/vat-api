@@ -60,7 +60,7 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
               |{
               |"failures": {
               |"code":"VRN_INVALID",
-              |"reason":"The provided VRN is invalid."
+              |"reason":"The provided VRN is invalid"
               |}
               |}
               |""".stripMargin)
@@ -74,7 +74,7 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
               )
             )
           )
-          result shouldBe Left(CustomerInfoConstants.errorWrapper(MtdError("VRN_INVALID", "The provided VRN is invalid.")))
+          result shouldBe Left(CustomerInfoConstants.errorWrapper(MtdError("VRN_INVALID", "The provided VRN is invalid")))
         }
       }
 

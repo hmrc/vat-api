@@ -142,7 +142,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
 
             val expectedConvertedJson = Json.parse(s"""
                                                       |[
-                                                      |  {"code":"VRN_INVALID","message":"The provided VRN is invalid."},
+                                                      |  {"code":"VRN_INVALID","message":"The provided VRN is invalid"},
                                                       |  {"code":"UNKNOWN_CODE","message":"reason two"}
                                                       |]
                                                       |""".stripMargin)
