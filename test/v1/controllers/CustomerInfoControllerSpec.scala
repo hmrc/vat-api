@@ -120,13 +120,13 @@ class CustomerInfoControllerSpec extends ControllerBaseSpec with MockEnrolmentsA
 
       "valid request is not supplied" must {
 
-        "return Internal Server Error" in new Test {
+        "return a Bad Request" in new Test {
 
-          MockCustomerInfoRequestParser.parse(CustomerInfoConstants.rawData)(Left(CustomerInfoConstants.errorWrapper(VrnFormatError)))
+          MockCustomerInfoRequestParser.parse(CustomerInfoConstants.rawData)(Left(CustomerInfoConstants.errorWrapper(CustomerInfoInvalidIdValue)))
 
           val result: Future[Result] = controller.retrieveCustomerInfo(CustomerInfoConstants.vrn)(fakeGetRequest)
 
-          status(result) shouldBe INTERNAL_SERVER_ERROR
+          status(result) shouldBe BAD_REQUEST
           contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
           contentType(result) shouldBe Some("application/json")
           header("X-CorrelationId", result) shouldBe Some(CustomerInfoConstants.correlationId)
@@ -134,7 +134,7 @@ class CustomerInfoControllerSpec extends ControllerBaseSpec with MockEnrolmentsA
           MockedAuditService.verifyAuditEvent(AuditEvents.auditCustomerInfo(
             correlationId = CustomerInfoConstants.correlationId,
             userDetails = CustomerInfoConstants.userDetails,
-            auditResponse = AuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(VrnFormatError.code))), None)
+            auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
           ))
         }
       }
