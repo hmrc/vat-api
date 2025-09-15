@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
+import play.api.libs.json.{ JsError, JsSuccess, JsValue }
 import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.penalties.{ PenaltiesErrorsHIP, PenaltiesErrorsIF, PenaltiesResponse }
+import v1.models.response.penalties.{ PenaltiesErrorsHIP, PenaltiesResponse }
 
 object PenaltiesHttpParser extends Logging {
 
@@ -47,44 +47,12 @@ object PenaltiesHttpParser extends Logging {
     }
 
     def errorHelper(jsonString: JsValue): MtdError = {
-      val penaltiesErrorsIF  = jsonString.validate[PenaltiesErrorsIF]
-      val penaltiesErrorsHIP = jsonString.validate[PenaltiesErrorsHIP]
-
-      (penaltiesErrorsIF, penaltiesErrorsHIP) match {
-        case (JsSuccess(errorsIF, _), _)  => convertToMtdErrorsIF(errorsIF)
-        case (_, JsSuccess(errorsHIP, _)) => convertToMtdErrorsHIP(errorsHIP)
-        case _ =>
-          MtdError("SERVER_ERROR", "Unable to validate json error response", Some(jsonString))
+      jsonString.validate[PenaltiesErrorsHIP] match {
+        case JsSuccess(errorsHIP, _) => convertToMtdErrorsHIP(errorsHIP)
+        case JsError(errors) =>
+          MtdError("SERVER_ERROR", s"Unable to validate json error response with errors: $errors", Some(jsonString))
       }
     }
-  }
-
-  private def convertToMtdErrorsIF(errorsIF: PenaltiesErrorsIF): MtdError = {
-    val convertedErrors = errorsIF.failures.map { error =>
-      error.code match {
-        case "INVALID_IDVALUE"       => PenaltiesInvalidIdValue
-        case "INVALID_REGIME"        => DownstreamError
-        case "INVALID_IDTYPE"        => DownstreamError
-        case "INVALID_DATELIMIT"     => DownstreamError
-        case "INVALID_CORRELATIONID" => DownstreamError
-        case "DUPLICATE_SUBMISSION"  => DownstreamError
-        case "INVALID_ID"            => DownstreamError
-        case "REQUEST_NOT_PROCESSED" => DownstreamError
-        case "SERVER_ERROR"          => DownstreamError
-        case "SERVICE_UNAVAILABLE"   => DownstreamError
-        case _                       => MtdError(error.code, error.reason)
-      }
-    }
-
-    val head = convertedErrors.head
-    val error = if (convertedErrors.tail.isEmpty) {
-      head
-    } else if (convertedErrors.contains(DownstreamError)) {
-      DownstreamError
-    } else {
-      MtdError("INVALID_REQUEST", "Invalid request penalty details", Some(Json.toJson(convertedErrors)))
-    }
-    error
   }
 
   private def convertToMtdErrorsHIP(errorsHIP: PenaltiesErrorsHIP): MtdError = {

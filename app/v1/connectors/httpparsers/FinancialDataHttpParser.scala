@@ -17,13 +17,13 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
+import play.api.libs.json.{ JsError, JsSuccess, JsValue }
 import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.financialData.{ FinancialDataErrorsHIP, FinancialDataErrorsIF, FinancialDataResponse }
+import v1.models.response.financialData.{ FinancialDataErrorsHIP, FinancialDataResponse }
 
 object FinancialDataHttpParser extends Logging {
 
@@ -47,63 +47,11 @@ object FinancialDataHttpParser extends Logging {
     }
 
     def errorHelper(jsonString: JsValue): MtdError = {
-      val financialDataErrorsIF  = jsonString.validate[FinancialDataErrorsIF]
-      val financialDataErrorsHIP = jsonString.validate[FinancialDataErrorsHIP]
-
-      (financialDataErrorsIF, financialDataErrorsHIP) match {
-        case (JsSuccess(errorsIF, _), _)  => convertToMtdErrorsIF(errorsIF)
-        case (_, JsSuccess(errorsHIP, _)) => convertToMtdErrorsHIP(errorsHIP)
-        case _ =>
-          MtdError("SERVER_ERROR", "Unable to validate json error response", Some(jsonString))
+      jsonString.validate[FinancialDataErrorsHIP] match {
+        case JsSuccess(errorsHIP, _) => convertToMtdErrorsHIP(errorsHIP)
+        case JsError(errors) =>
+          MtdError("SERVER_ERROR", s"Unable to validate json error response with errors: $errors", Some(jsonString))
       }
-    }
-
-    private def convertToMtdErrorsIF(errorsIF: FinancialDataErrorsIF): MtdError = {
-      val convertedErrors = errorsIF.failures.map { error =>
-        error.code match {
-          case "INVALID_IDNUMBER"                              => FinancialInvalidIdNumber
-          case "INVALID_SEARCH_ITEM"                           => FinancialInvalidSearchItem
-          case "NO_DATA_FOUND"                                 => FinancialNotDataFound
-          case "INVALID_CORRELATIONID"                         => DownstreamError
-          case "INVALID_IDTYPE"                                => DownstreamError
-          case "INVALID_REGIME_TYPE"                           => DownstreamError
-          case "INVALID_SEARCH_TYPE"                           => DownstreamError
-          case "INVALID_DATE_FROM"                             => DownstreamError
-          case "INVALID_DATE_TO"                               => DownstreamError
-          case "INVALID_DATE_TYPE"                             => DownstreamError
-          case "INVALID_INCLUDE_CLEARED_ITEMS"                 => DownstreamError
-          case "INVALID_INCLUDE_STATISTICAL_ITEMS"             => DownstreamError
-          case "INVALID_INCLUDE_PAYMENT_ON_ACCOUNT"            => DownstreamError
-          case "INVALID_ADD_REGIME_TOTALISATION"               => DownstreamError
-          case "INVALID_ADD_LOCK_INFORMATION"                  => DownstreamError
-          case "INVALID_ADD_PENALTY_DETAILS"                   => DownstreamError
-          case "INVALID_ADD_POSTED_INTEREST_DETAILS"           => DownstreamError
-          case "INVALID_ADD_ACCRUING_INTEREST_DETAILS"         => DownstreamError
-          case "INVALID_REQUEST"                               => DownstreamError
-          case "INVALID_TARGETED_SEARCH"                       => DownstreamError
-          case "INVALID_SELECTION_CRITERIA"                    => DownstreamError
-          case "INVALID_DATA_ENRICHMENT"                       => DownstreamError
-          case "DUPLICATE_SUBMISSION"                          => DownstreamError
-          case "INVALID_ID"                                    => DownstreamError
-          case "INVALID_DOC_NUMBER_OR_CHARGE_REFERENCE_NUMBER" => FinancialInvalidSearchItem
-          case "REQUEST_NOT_PROCESSED"                         => DownstreamError
-          case "INVALID_DATA_TYPE"                             => DownstreamError
-          case "INVALID_DATE_RANGE"                            => DownstreamError
-          case "SERVER_ERROR"                                  => DownstreamError
-          case "SERVICE_UNAVAILABLE"                           => DownstreamError
-          case _                                               => MtdError(error.code, error.reason)
-        }
-      }
-
-      val head = convertedErrors.head
-      val error = if (convertedErrors.tail.isEmpty) {
-        head
-      } else if (convertedErrors.contains(DownstreamError)) {
-        DownstreamError
-      } else {
-        MtdError("INVALID_REQUEST", "Invalid request financial details", Some(Json.toJson(convertedErrors)))
-      }
-      error
     }
 
     private def convertToMtdErrorsHIP(errorsHIP: FinancialDataErrorsHIP): MtdError = {

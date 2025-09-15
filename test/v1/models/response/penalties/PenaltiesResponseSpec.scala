@@ -51,42 +51,6 @@ class PenaltiesResponseSpec extends UnitSpec {
     }
   }
 
-  private val errorIfJson   = Json.parse("""
-                                           |{
-                                           |  "code":"002",
-                                           |  "reason":"Invalid Tax Regime"
-                                           |}
-                                           |""".stripMargin)
-  private val errorsIfJson  = Json.parse(s"""
-                                            |{
-                                            |  "failures": [
-                                            |    $errorIfJson,
-                                            |    $errorIfJson
-                                            |  ]
-                                            |}
-                                            |""".stripMargin)
-  private val errorIfModel  = PenaltyErrorIF("002", "Invalid Tax Regime")
-  private val errorsIfModel = PenaltiesErrorsIF(List(errorIfModel, errorIfModel))
-
-  "PenaltyErrorIF" must {
-    "write PenaltyErrorIF model to json" in {
-      Json.toJson(errorIfModel) shouldBe errorIfJson
-    }
-
-    "read from json response" in {
-      errorIfJson.as[PenaltyErrorIF] shouldBe errorIfModel
-    }
-  }
-  "PenaltiesErrorsIF" must {
-    "write PenaltiesErrorsIF model to json" in {
-      Json.toJson(errorsIfModel) shouldBe errorsIfJson
-    }
-
-    "read from json response" in {
-      errorsIfJson.as[PenaltiesErrorsIF] shouldBe errorsIfModel
-    }
-  }
-
   private val errorHipJson   = Json.parse("""
                                             |{
                                             |  "processingDate":"2017-01-01",

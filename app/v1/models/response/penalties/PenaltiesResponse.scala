@@ -320,19 +320,6 @@ object PenaltiesResponse {
   implicit val format: OFormat[PenaltiesResponse] = Json.format[PenaltiesResponse]
 }
 
-
-case class PenaltiesErrorsIF(failures: Seq[PenaltyErrorIF])
-
-object PenaltiesErrorsIF {
-  implicit val format: OFormat[PenaltiesErrorsIF] = Json.format[PenaltiesErrorsIF]
-}
-
-case class PenaltyErrorIF(code: String, reason: String)
-
-object PenaltyErrorIF {
-  implicit val format: OFormat[PenaltyErrorIF] = Json.format[PenaltyErrorIF]
-}
-
 // Despite the name HIP 'errors' are always singular even if request has multiple issues
 case class PenaltiesErrorsHIP(errors: PenaltiesErrorHIP)
 

@@ -119,18 +119,6 @@ object FinancialDataResponse {
   implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]
 }
 
-case class FinancialDataErrorsIF(failures: List[FinancialDataErrorIF])
-
-object FinancialDataErrorsIF {
-  implicit val format: OFormat[FinancialDataErrorsIF] = Json.format[FinancialDataErrorsIF]
-}
-
-case class FinancialDataErrorIF(code: String, reason: String)
-
-object FinancialDataErrorIF {
-  implicit val format: OFormat[FinancialDataErrorIF] = Json.format[FinancialDataErrorIF]
-}
-
 // Despite the name HIP 'errors' are always singular even if request has multiple issues
 case class FinancialDataErrorsHIP(errors: FinancialDataErrorHIP)
 

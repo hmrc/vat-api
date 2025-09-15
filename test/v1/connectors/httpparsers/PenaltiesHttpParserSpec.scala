@@ -79,81 +79,6 @@ class PenaltiesHttpParserSpec extends UnitSpec {
   }
 
   "PenaltiesHttpParser .errorHelper" when {
-    "the error response matches the PenaltiesErrorsIF format" when {
-      "there is a single error" must {
-        val validDownstreamErrorCodes = Seq(
-          "INVALID_REGIME",
-          "INVALID_IDTYPE",
-          "INVALID_DATELIMIT",
-          "INVALID_CORRELATIONID",
-          "DUPLICATE_SUBMISSION",
-          "INVALID_ID",
-          "REQUEST_NOT_PROCESSED",
-          "SERVER_ERROR",
-          "SERVICE_UNAVAILABLE"
-        )
-
-        "return a DownstreamError" when {
-          validDownstreamErrorCodes.foreach { errorCode =>
-            s"error code is '$errorCode'" in {
-              val result = PenaltiesHttpReads.errorHelper(buildErrorIf(errorCode))
-
-              result shouldBe DownstreamError
-            }
-          }
-        }
-
-        "return a PenaltiesInvalidIdValue" when {
-          s"error code is 'INVALID_IDVALUE'" in {
-            val result = PenaltiesHttpReads.errorHelper(buildErrorIf("INVALID_IDVALUE"))
-
-            result shouldBe PenaltiesInvalidIdValue
-          }
-        }
-
-        "return a MtdError with error code and reason" when {
-          "error code is not recognised" in {
-            val result = PenaltiesHttpReads.errorHelper(buildErrorIf("111", Some("Unknown error message")))
-
-            result shouldBe MtdError("111", "Unknown error message")
-          }
-        }
-      }
-
-      "there are multiple errors" when {
-        "at least one of the errors is a DownstreamError" must {
-          "return a single DownstreamError" in {
-            val result = PenaltiesHttpReads.errorHelper(
-              buildMultipleErrorsIf(
-                codeOne = "INVALID_IDVALUE", // PenaltiesInvalidIdValue
-                codeTwo = "INVALID_REGIME" // DownstreamError
-              ))
-
-            result shouldBe DownstreamError
-          }
-        }
-        "none of the errors are a DownstreamError" must {
-          "return a single DownstreamError" in {
-            val multipleJsonErrors = buildMultipleErrorsIf(
-              codeOne = "INVALID_IDVALUE", // PenaltiesInvalidIdValue
-              codeTwo = "UNKNOWN_CODE" // MtdError
-            )
-            val result = PenaltiesHttpReads.errorHelper(multipleJsonErrors)
-
-            val expectedConvertedJson = Json.parse(s"""
-                                                      |[
-                                                      |  {"code":"VRN_INVALID","message":"The provided VRN is invalid."},
-                                                      |  {"code":"UNKNOWN_CODE","message":"reason two"}
-                                                      |]
-                                                      |""".stripMargin)
-            val expectedError         = MtdError("INVALID_REQUEST", "Invalid request penalty details", Some(Json.toJson(expectedConvertedJson)))
-
-            result shouldBe expectedError
-          }
-        }
-      }
-    }
-
     "the error response matches the PenaltiesErrorsHIP format" must {
 
       "return a DownstreamError" when {
@@ -183,7 +108,7 @@ class PenaltiesHttpParserSpec extends UnitSpec {
       }
     }
 
-    "the error response matches neither PenaltiesErrorsIF nor PenaltiesErrorsHIP formats" must {
+    "the error response does not match the PenaltiesErrorsHIP format" must {
       "return a MtdError explaining service was unable to validate json error response" in {
         val errorWithInvalidJsonFormat = Json.parse(s"""
                                                        |{
@@ -195,38 +120,14 @@ class PenaltiesHttpParserSpec extends UnitSpec {
 
         val result = PenaltiesHttpReads.errorHelper(errorWithInvalidJsonFormat)
 
-        result shouldBe MtdError("SERVER_ERROR", "Unable to validate json error response", Some(errorWithInvalidJsonFormat))
+        result shouldBe MtdError(
+          "SERVER_ERROR",
+          "Unable to validate json error response with errors: List((/errors,List(JsonValidationError(List(error.path.missing),List()))))",
+          Some(errorWithInvalidJsonFormat)
+        )
       }
     }
   }
-
-  def buildErrorIf(code: String, reason: Option[String] = None): JsValue = {
-    val errorReason = reason.getOrElse("This is the error message")
-    Json.parse(s"""
-                  |{
-                  |  "failures": [{
-                  |    "code":"$code",
-                  |    "reason":"$errorReason"
-                  |  }]
-                  |}
-                  |""".stripMargin)
-  }
-
-  def buildMultipleErrorsIf(codeOne: String, codeTwo: String): JsValue =
-    Json.parse(s"""
-                  |{
-                  |  "failures": [
-                  |     {
-                  |       "code":"$codeOne",
-                  |       "reason":"reason one"
-                  |     },
-                  |     {
-                  |       "code":"$codeTwo",
-                  |       "reason":"reason two"
-                  |     }
-                  |   ]
-                  |}
-                  |""".stripMargin)
 
   def buildErrorHip(code: String, text: Option[String] = None): JsValue = {
     val errorText = text.getOrElse("This is the error message")
