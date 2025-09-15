@@ -25,14 +25,13 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.bootstrap.config.AppName
 import v1.models.audit.AuditEvent
-import utils.{EndpointLogContext, Logging}
 
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditService @Inject()(auditConnector: AuditConnector,
-                             appNameConfiguration: Configuration) extends Logging{
+                             appNameConfiguration: Configuration) {
 
 
   def auditEvent[T](event: AuditEvent[T])(implicit hc: HeaderCarrier, ec: ExecutionContext, writer: Writes[T]): Future[AuditResult] = {
@@ -47,7 +46,6 @@ class AuditService @Inject()(auditConnector: AuditConnector,
       tags = eventTags
     )
 
-    infoLogMessage(s"Audit for testing agents: $dataEvent")
     auditConnector.sendExtendedEvent(dataEvent)
   }
 }
