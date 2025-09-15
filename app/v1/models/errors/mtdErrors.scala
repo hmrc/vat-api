@@ -59,10 +59,10 @@ object VrnFormatErrorDes extends MtdError("VRN_INVALID", "The provided VRN is in
 object VrnNotFound extends MtdError("VRN_NOT_FOUND", "The provided VRN was not found")
 
 //Penalties Errors
-object PenaltiesInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid.")
+object PenaltiesInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 
 //API#1363 Get VAT Customer Information Errors
-object CustomerInfoInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid.")
+object CustomerInfoInvalidIdValue extends MtdError("VRN_INVALID", "The provided VRN is invalid")
 object CustomerInfoNotDataFound extends MtdError("NOT_FOUND", "The requested resource could not be found")
 
 //Financial Data Errors
