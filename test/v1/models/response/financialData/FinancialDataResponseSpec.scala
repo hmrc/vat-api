@@ -37,42 +37,6 @@ class FinancialDataResponseSpec extends UnitSpec {
     }
   }
 
-  private val errorIfJson   = Json.parse("""
-                               |{
-                               |  "code":"002",
-                               |  "reason":"Invalid Tax Regime"
-                               |}
-                               |""".stripMargin)
-  private val errorsIfJson  = Json.parse(s"""
-                                 |{
-                                 |  "failures": [
-                                 |    $errorIfJson,
-                                 |    $errorIfJson
-                                 |  ]
-                                 |}
-                                 |""".stripMargin)
-  private val errorIfModel  = FinancialDataErrorIF("002", "Invalid Tax Regime")
-  private val errorsIfModel = FinancialDataErrorsIF(List(errorIfModel, errorIfModel))
-
-  "FinancialDataErrorIF" must {
-    "write FinancialDataErrorIF model to json" in {
-      Json.toJson(errorIfModel) shouldBe errorIfJson
-    }
-
-    "read from json response" in {
-      errorIfJson.as[FinancialDataErrorIF] shouldBe errorIfModel
-    }
-  }
-  "FinancialDataErrorsIF" must {
-    "write FinancialDataErrorsIF model to json" in {
-      Json.toJson(errorsIfModel) shouldBe errorsIfJson
-    }
-
-    "read from json response" in {
-      errorsIfJson.as[FinancialDataErrorsIF] shouldBe errorsIfModel
-    }
-  }
-
   private val errorHipJson   = Json.parse("""
                                   |{
                                   |  "processingDate":"2017-01-01",
@@ -106,4 +70,5 @@ class FinancialDataResponseSpec extends UnitSpec {
       errorsHipJson.as[FinancialDataErrorsHIP] shouldBe errorsHipModel
     }
   }
+
 }
