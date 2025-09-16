@@ -14,7 +14,7 @@ vat-api has these endpoints:
 - Scala 2.13.x
 - Java 21
 - sbt > 1.9.7
-- [Service Manager](https://github.com/hmrc/service-manager)
+- [Service Manager](https://github.com/hmrc/sm2)
 
 ## Development Setup
 
