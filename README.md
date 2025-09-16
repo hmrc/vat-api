@@ -29,6 +29,10 @@ dependencyCheck | Runs dependency-check against the current project. It aggregat
 dependencyUpdates |  Shows a list of project dependencies that can be updated | ```$ sbt dependencyUpdates```
 dependencyUpdatesReport | Writes a list of project dependencies to a file | ```$ sbt dependencyUpdatesReport```
 
+## Testing
+
+For information about testing the APIs, and generating tax payer access tokens for each environment, see [mtd-vat-api-acceptance-tests](https://github.com/hmrc/mtd-vat-api-acceptance-tests).
+
 ## Reporting Issues
 
 You can create a GitHub issue [here](https://github.com/hmrc/vat-api/issues).
@@ -36,7 +40,3 @@ You can create a GitHub issue [here](https://github.com/hmrc/vat-api/issues).
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).
-
-## Testing
-
-For information about testing the APIs, and generating tax payer access tokens for each environment, see [mtd-vat-api-acceptance-tests](https://github.com/hmrc/mtd-vat-api-acceptance-tests).
