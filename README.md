@@ -1,19 +1,22 @@
 # vat-api
 
-vat-api has five endpoints:
+vat-api has these endpoints:
   - GET obligations
   - POST returns
   - GET returns
   - GET payments
   - GET liabilities
+  - GET penalties
+  - GET financial-details (retrieves the financial details relating to a late submission or late payment penalty)
+  - GET information (retrieves information about a VAT customer)
 
-### Prerequisites 
+## Prerequisites 
 - Scala 2.13.x
 - Java 21
 - sbt > 1.9.7
 - [Service Manager](https://github.com/hmrc/service-manager)
 
-### Development Setup
+## Development Setup
 
 Run from the console using: `sbt "~run 9675"`
 
@@ -26,25 +29,14 @@ dependencyCheck | Runs dependency-check against the current project. It aggregat
 dependencyUpdates |  Shows a list of project dependencies that can be updated | ```$ sbt dependencyUpdates```
 dependencyUpdatesReport | Writes a list of project dependencies to a file | ```$ sbt dependencyUpdatesReport```
 
-### Reporting Issues
+## Reporting Issues
 
 You can create a GitHub issue [here](https://github.com/hmrc/vat-api/issues).
 
-### License
+## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
 
-### Postman setup
+## Testing
 
-To execute these apis in postman the following repo needs to be started.
-mtd-vat-api-acceptance-tests  
-sm2 --start MTDFB_VAT
-
-### Generate tax payer access tokens for each environment 
-
-checkout mtd-vat-api-acceptance-tests
-./generateTestUsers_local.sh
-./generateTestUsers_qa.sh
-./generateTestUsers_staging.sh
-./generateTestUsers_externaltest.sh
-
+For information about testing the APIs, and generating tax payer access tokens for each environment, see [mtd-vat-api-acceptance-tests]("https://github.com/hmrc/mtd-vat-api-acceptance-tests")
