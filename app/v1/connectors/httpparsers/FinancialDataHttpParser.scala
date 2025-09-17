@@ -39,6 +39,9 @@ object FinancialDataHttpParser extends Logging {
               errorConnectorLog(s"[FinancialDataHttpParser][read] invalid JSON errors: $errors")(response)
               Left(ErrorWrapper(responseCorrelationId, InvalidJson))
           }
+        case FORBIDDEN =>
+          errorConnectorLog(s"[FinancialDataHttpParser][read] 403 error: ${response.body}")(response)
+          Left(ErrorWrapper(responseCorrelationId, UnauthorisedError))
         case status =>
           val mtdErrors = errorHelper(response.json)
           errorConnectorLog(s"[FinancialDataHttpParser][read] status: $status with Error $mtdErrors")(response)

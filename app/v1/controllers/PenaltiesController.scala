@@ -39,9 +39,10 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
                                     auditService: AuditService,
                                     cc: ControllerComponents,
                                     val idGenerator: IdGenerator,
-                                    appConfig: AppConfig)
-                                   (implicit ec: ExecutionContext)
-  extends AuthorisedController(cc) with BaseController with Logging {
+                                    appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends AuthorisedController(cc)
+    with BaseController
+    with Logging {
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(
@@ -49,28 +50,27 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
       endpointName = "retrievePenalties"
     )
 
-
   def retrievePenalties(vrn: String): Action[AnyContent] = authorisedAction(vrn).async { implicit request =>
-
     implicit val correlationId: String = idGenerator.getUid
 
-    infoLog(s"${endpointLogContext.toString} correlationId: $correlationId: " +
-      s"attempting to retrieve penalties for VRN: $vrn")
-
+    infoLog(
+      s"${endpointLogContext.toString} correlationId: $correlationId: " +
+        s"attempting to retrieve penalties for VRN: $vrn")
 
     val result: EitherT[Future, ErrorWrapper, Result] = {
       for {
-        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(PenaltiesRawData(vrn)))
+        parsedRequest   <- EitherT.fromEither[Future](requestParser.parseRequest(PenaltiesRawData(vrn)))
         serviceResponse <- EitherT(service.retrievePenalties(parsedRequest))
       } yield {
 
-        infoLog(s"${endpointLogContext.toString} " +
-          s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
+        infoLog(
+          s"${endpointLogContext.toString} " +
+            s"Successfully retrieved Payments from DES with correlationId : ${serviceResponse.correlationId}")
 
-
-        auditService.auditEvent(AuditEvents.auditPenalties(serviceResponse.correlationId,
-          request.userDetails, AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))
-        ))
+        auditService.auditEvent(
+          AuditEvents.auditPenalties(serviceResponse.correlationId,
+                                     request.userDetails,
+                                     AuditResponse(OK, Right(Some(Json.toJson(serviceResponse.responseData))))))
 
         Ok(Json.toJson(serviceResponse.responseData))
           .withApiHeaders(serviceResponse.correlationId)
@@ -78,12 +78,13 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
     }
     result.leftMap { errorWrapper: ErrorWrapper =>
       val resCorrelationId: String = errorWrapper.correlationId
-      val leftResult = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+      val leftResult               = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
       warnLog(ControllerError(endpointLogContext, vrn, request, leftResult.header.status, errorWrapper.error.message, resCorrelationId))
 
-      auditService.auditEvent(AuditEvents.auditPenalties(resCorrelationId,
-        request.userDetails, AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))
-      ))
+      auditService.auditEvent(
+        AuditEvents.auditPenalties(resCorrelationId,
+                                   request.userDetails,
+                                   AuditResponse(httpStatus = leftResult.header.status, Left(errorWrapper.auditErrors))))
 
       leftResult
     }.merge
@@ -92,7 +93,8 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {
       case PenaltiesInvalidIdValue | RuleIncorrectGovTestScenarioError => BadRequest(Json.toJson(errorWrapper))
-      case _ => InternalServerError(Json.toJson(errorWrapper))
+      case UnauthorisedError                                           => Forbidden(Json.toJson(errorWrapper))
+      case _                                                           => InternalServerError(Json.toJson(errorWrapper))
     }
   }
 }

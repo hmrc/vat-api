@@ -66,7 +66,17 @@ class PenaltiesHttpParserSpec extends UnitSpec {
       }
     }
 
-    "response is an error (any non 200 status)" when {
+    "response is FORBIDDEN (403)" must {
+      "return an UnauthorisedError" in {
+        val response =
+          HttpResponse(status = FORBIDDEN, body = "403 - Forbidden", headers = Map("CorrelationId" -> Seq(correlationId)))
+        val result = PenaltiesHttpReads.read("", "", response)
+
+        result shouldBe Left(errorWrapper(MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")))
+      }
+    }
+
+    "response is an error (any non 200 or 403 status)" when {
       "return an error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
         val errorJson    = buildErrorHip("002", Some("Invalid Tax Regime"))
         val httpResponse = buildHttpResponse(BAD_REQUEST, errorJson)

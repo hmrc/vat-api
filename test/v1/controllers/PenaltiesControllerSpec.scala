@@ -31,8 +31,14 @@ import v1.models.errors._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuthService
-  with MockPenaltiesService with MockPenaltiesRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
+class PenaltiesControllerSpec
+    extends ControllerBaseSpec
+    with MockEnrolmentsAuthService
+    with MockPenaltiesService
+    with MockPenaltiesRequestParser
+    with MockAuditService
+    with MockIdGenerator
+    with MockAppConfig {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -56,7 +62,6 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
     "retrievePenalties" when {
 
       "valid request is supplied" when {
-
         "valid penalties data is returned" must {
 
           "return 200 and the penalties min data" in new Test {
@@ -83,7 +88,8 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
 
             MockPenaltiesRequestParser.parse(PenaltiesConstants.rawData)(Right(PenaltiesConstants.penaltiesRequest))
 
-            MockPenaltiesService.retrievePenalties(PenaltiesConstants.penaltiesRequest)(Right(PenaltiesConstants.wrappedPenaltiesResponse(PenaltiesConstants.testPenaltiesResponseMax)))
+            MockPenaltiesService.retrievePenalties(PenaltiesConstants.penaltiesRequest)(
+              Right(PenaltiesConstants.wrappedPenaltiesResponse(PenaltiesConstants.testPenaltiesResponseMax)))
 
             val result: Future[Result] = controller.retrievePenalties(PenaltiesConstants.vrn)(fakeGetRequest)
 
@@ -101,10 +107,10 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
         }
 
         "errors are returned from Penalties" when {
-
           val errors: Seq[(MtdError, Int)] = Seq(
             (PenaltiesInvalidIdValue, BAD_REQUEST),
             (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
+            (UnauthorisedError, FORBIDDEN),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 
@@ -151,11 +157,12 @@ class PenaltiesControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuth
           contentType(result) shouldBe Some("application/json")
           header("X-CorrelationId", result) shouldBe Some(PenaltiesConstants.correlationId)
 
-          MockedAuditService.verifyAuditEvent(AuditEvents.auditPenalties(
-            correlationId = PenaltiesConstants.correlationId,
-            userDetails = PenaltiesConstants.userDetails,
-            auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
-          ))
+          MockedAuditService.verifyAuditEvent(
+            AuditEvents.auditPenalties(
+              correlationId = PenaltiesConstants.correlationId,
+              userDetails = PenaltiesConstants.userDetails,
+              auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
+            ))
         }
       }
     }

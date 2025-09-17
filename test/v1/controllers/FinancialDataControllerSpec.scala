@@ -24,15 +24,21 @@ import v1.audit.AuditEvents
 import v1.constants.FinancialDataConstants
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockFinancialDataRequestParser
-import v1.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService}
-import v1.models.audit.{AuditError, AuditResponse}
-import v1.models.errors.{FinancialNotDataFound, MtdError, RuleIncorrectGovTestScenarioError, UnexpectedFailure, VrnFormatError}
+import v1.mocks.services.{ MockAuditService, MockEnrolmentsAuthService, MockPenaltiesService }
+import v1.models.audit.{ AuditError, AuditResponse }
+import v1.models.errors._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuthService
-  with MockPenaltiesService with MockFinancialDataRequestParser with MockAuditService with MockIdGenerator with MockAppConfig {
+class FinancialDataControllerSpec
+    extends ControllerBaseSpec
+    with MockEnrolmentsAuthService
+    with MockPenaltiesService
+    with MockFinancialDataRequestParser
+    with MockAuditService
+    with MockIdGenerator
+    with MockAppConfig {
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -63,9 +69,11 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
             MockPenaltiesRequestParser.parse(FinancialDataConstants.rawData)(Right(FinancialDataConstants.financialRequest))
 
-            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse()))
+            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(
+              Right(FinancialDataConstants.wrappedFinancialDataResponse()))
 
-            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
+            val result: Future[Result] =
+              controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
             contentAsJson(result) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
@@ -83,9 +91,11 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
             MockPenaltiesRequestParser.parse(FinancialDataConstants.rawData)(Right(FinancialDataConstants.financialRequest))
 
-            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse)))
+            MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(
+              Right(FinancialDataConstants.wrappedFinancialDataResponse(FinancialDataConstants.testFinancialDataResponse)))
 
-            val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
+            val result: Future[Result] =
+              controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
             status(result) shouldBe OK
             contentAsJson(result) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
@@ -106,6 +116,7 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
             (VrnFormatError, BAD_REQUEST),
             (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
             (FinancialNotDataFound, NOT_FOUND),
+            (UnauthorisedError, FORBIDDEN),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 
@@ -119,9 +130,11 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
 
                 MockPenaltiesRequestParser.parse(FinancialDataConstants.rawData)(Right(FinancialDataConstants.financialRequest))
 
-                MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(Left(FinancialDataConstants.errorWrapper(mtdError)))
+                MockPenaltiesService.retrieveFinancialData(FinancialDataConstants.financialRequest)(
+                  Left(FinancialDataConstants.errorWrapper(mtdError)))
 
-                val result: Future[Result] = controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
+                val result: Future[Result] =
+                  controller.retrieveFinancialData(FinancialDataConstants.vrn, FinancialDataConstants.searchItem)(fakeGetRequest)
 
                 status(result) shouldBe expectedStatus
                 contentAsJson(result) shouldBe Json.toJson(mtdError)
@@ -152,11 +165,12 @@ class FinancialDataControllerSpec extends ControllerBaseSpec with MockEnrolments
           contentType(result) shouldBe Some("application/json")
           header("X-CorrelationId", result) shouldBe Some(FinancialDataConstants.correlationId)
 
-          MockedAuditService.verifyAuditEvent(AuditEvents.auditFinancialData(
-            correlationId = FinancialDataConstants.correlationId,
-            userDetails = FinancialDataConstants.userDetails,
-            auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
-          ))
+          MockedAuditService.verifyAuditEvent(
+            AuditEvents.auditFinancialData(
+              correlationId = FinancialDataConstants.correlationId,
+              userDetails = FinancialDataConstants.userDetails,
+              auditResponse = AuditResponse(BAD_REQUEST, Some(Seq(AuditError(VrnFormatError.code))), None)
+            ))
         }
       }
     }
