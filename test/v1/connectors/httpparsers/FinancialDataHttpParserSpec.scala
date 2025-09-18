@@ -16,13 +16,14 @@
 
 package v1.connectors.httpparsers
 
-import play.api.http.Status.{ BAD_REQUEST, CREATED, OK }
+import play.api.http.Status.{ BAD_REQUEST, CREATED, FORBIDDEN, OK }
 import play.api.libs.json.{ JsValue, Json }
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 import v1.connectors.httpparsers.FinancialDataHttpParser.FinancialDataHttpReads
 import v1.constants.FinancialDataConstants
 import v1.constants.FinancialDataConstants._
+import v1.constants.PenaltiesConstants.errorWrapper
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.response.financialData.FinancialDataResponse
@@ -94,7 +95,17 @@ class FinancialDataHttpParserSpec extends UnitSpec {
       }
     }
 
-    "API response is an error (any non 200/201 status)" must {
+    "response is FORBIDDEN (403)" must {
+      "return an UnauthorisedError" in {
+        val response =
+          HttpResponse(status = FORBIDDEN, body = "403 - Forbidden", headers = Map("CorrelationId" -> Seq(correlationId)))
+        val result = FinancialDataHttpReads.read("", "", response)
+
+        result shouldBe Left(errorWrapper(MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")))
+      }
+    }
+
+    "API response is an error (any non 200/201/403 status)" must {
       "return the error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
         val error = Json.parse("""
             |{
