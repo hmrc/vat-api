@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
     "GET /[VRN]/financial-details" should {
       "return a 200 with financial data" when {
         "valid request is made and VRN matches penalty financial data" in new Test {
-          stubSuccess(hipFinancialDetails)
+          stubSuccess(financialDetails)
           val response: WSResponse = await(makeRequest().get())
 
           response.status shouldBe OK
@@ -140,6 +140,7 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             Json.parse(s"""{"invalidWrapper":{"financialData":"this is not a valid response"}}""")
           stubSuccess(invalidSuccessResponse)
           val response: WSResponse = await(makeRequest().get())
+          println("resp " + response.body)
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.json shouldBe Json.toJson(InvalidJson)

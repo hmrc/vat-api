@@ -17,33 +17,30 @@
 package v1.connectors
 
 import config.AppConfig
-
-import javax.inject.{Inject, Singleton}
 import play.api.http.Status
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
 import utils.Logging
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging}
+import utils.pagerDutyLogging.{ Endpoint, PagerDutyLogging }
 import v1.connectors.httpparsers.FinancialDataHttpParser._
 import v1.connectors.httpparsers.PenaltiesHttpParser._
 import v1.controllers.UserRequest
-import v1.models.errors.{ConnectorError, ErrorWrapper, MtdError}
-import v1.models.request.penalties.{FinancialRequest, PenaltiesRequest}
+import v1.models.errors.{ ConnectorError, ErrorWrapper, MtdError }
+import v1.models.request.penalties.{ FinancialRequest, PenaltiesRequest }
 import v1.models.response.financialData.FinancialDataResponse
 import v1.models.response.penalties.PenaltiesResponse
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class PenaltiesConnector @Inject()(val http: HttpClient,
-                                   val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
+class PenaltiesConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector with Logging {
 
   private def headerCarrier(
-                             additionalHeaders: Seq[String] = Seq.empty
-                           )(implicit
-                             hc: HeaderCarrier,
-                             userRequest: UserRequest[_],
-                             correlationId: String
-                           ): HeaderCarrier = {
+      additionalHeaders: Seq[String] = Seq.empty
+  )(implicit
+    hc: HeaderCarrier,
+    userRequest: UserRequest[_],
+    correlationId: String): HeaderCarrier = {
 
     val maybeAuthHeader: String = userRequest.request.headers
       .get("Authorization")
@@ -79,11 +76,12 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        errorLog(ConnectorError.log(
-          logContext = "[PenaltiesConnector][retrievePenaltiesData]",
-          vrn = vrn,
-          details = logDetails,
-        ))
+        errorLog(
+          ConnectorError.log(
+            logContext = "[PenaltiesConnector][retrievePenaltiesData]",
+            vrn = vrn,
+            details = logDetails,
+          ))
 
         PagerDutyLogging.log(
           pagerDutyLoggingEndpointName = Endpoint.RetrievePenalties.requestFailedMessage,
@@ -96,14 +94,13 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
     }
   }
 
-
   def retrieveFinancialData(request: FinancialRequest)(implicit hc: HeaderCarrier,
                                                        ec: ExecutionContext,
                                                        userRequest: UserRequest[_],
                                                        correlationId: String): Future[Outcome[FinancialDataResponse]] = {
-    val vrn = request.vrn.vrn
+    val vrn        = request.vrn.vrn
     val searchItem = request.searchItem
-    val url = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=${searchItem}"
+    val url        = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
 
     def doGet(implicit hc: HeaderCarrier): Future[Outcome[FinancialDataResponse]] = {
       http.GET[Outcome[FinancialDataResponse]](url)
@@ -113,11 +110,12 @@ class PenaltiesConnector @Inject()(val http: HttpClient,
       case e =>
         val logDetails = s"request failed. ${e.getMessage}"
 
-        errorLog(ConnectorError.log(
-          logContext = "[PenaltiesConnector][retrieveFinancialData]",
-          vrn = vrn,
-          details = logDetails,
-        ))
+        errorLog(
+          ConnectorError.log(
+            logContext = "[PenaltiesConnector][retrieveFinancialData]",
+            vrn = vrn,
+            details = logDetails,
+          ))
 
         PagerDutyLogging.log(
           pagerDutyLoggingEndpointName = Endpoint.RetrieveFinancialData.requestFailedMessage,
