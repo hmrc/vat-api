@@ -140,7 +140,6 @@ class FinancialDataControllerISpec extends IntegrationBaseSpec {
             Json.parse(s"""{"invalidWrapper":{"financialData":"this is not a valid response"}}""")
           stubSuccess(invalidSuccessResponse)
           val response: WSResponse = await(makeRequest().get())
-          println("resp " + response.body)
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.json shouldBe Json.toJson(InvalidJson)
