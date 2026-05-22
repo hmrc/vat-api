@@ -101,6 +101,7 @@ class ObligationsController @Inject()(val authService: EnrolmentsAuthService,
       case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+      case ServiceUnavailableError => ServiceUnavailable(Json.toJson(errorWrapper))
     }
   }
 }

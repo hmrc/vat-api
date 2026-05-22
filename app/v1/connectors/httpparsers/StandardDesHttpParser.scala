@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.pagerDutyLogging.{PagerDutyLoggingEndpointName, PagerDutyLogging}
 import v1.connectors.DesOutcome
 import v1.controllers.UserRequest
-import v1.models.errors.{ConnectorError, DownstreamError, OutboundError}
+import v1.models.errors.{ConnectorError, DownstreamError, OutboundError, ServiceUnavailableError}
 import v1.models.outcomes.ResponseWrapper
 
 object StandardDesHttpParser extends HttpParser {
@@ -74,6 +74,9 @@ object StandardDesHttpParser extends HttpParser {
            UNPROCESSABLE_ENTITY =>
         PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, infoLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
+      case SERVICE_UNAVAILABLE =>
+        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, errorLog(_), userRequest.userDetails.userType)
+        Left(ResponseWrapper(responseCorrelationId, OutboundError(ServiceUnavailableError)))
       case _ =>
         PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, errorLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, OutboundError(DownstreamError)))

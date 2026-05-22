@@ -240,7 +240,8 @@ class ObligationsControllerSpec extends ControllerBaseSpec
           (RuleMissingDateRangeError, BAD_REQUEST),
           (RuleInsolventTraderError, FORBIDDEN),
           (LegacyNotFoundError, NOT_FOUND),
-          (DownstreamError, INTERNAL_SERVER_ERROR)
+          (DownstreamError, INTERNAL_SERVER_ERROR),
+          (ServiceUnavailableError, SERVICE_UNAVAILABLE)
         )
 
         input.foreach(args => (serviceErrors _).tupled(args))

@@ -94,6 +94,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
     (errorWrapper.error: @unchecked) match {
       case PenaltiesInvalidIdValue | RuleIncorrectGovTestScenarioError => BadRequest(Json.toJson(errorWrapper))
       case UnauthorisedError                                           => Forbidden(Json.toJson(errorWrapper))
+      case ServiceUnavailableError                                     => ServiceUnavailable(Json.toJson(errorWrapper))
       case _                                                           => InternalServerError(Json.toJson(errorWrapper))
     }
   }
