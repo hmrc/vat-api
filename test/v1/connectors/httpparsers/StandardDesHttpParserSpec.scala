@@ -76,6 +76,7 @@ class StandardDesHttpParserSpec extends UnitSpec {
 
       handleErrorsCorrectly(httpReads)
       handleInternalErrorsCorrectly(httpReads)
+      handleServiceUnavailableCorrectly(httpReads)
       handleUnexpectedResponse(httpReads)
       handleBvrsCorrectly(httpReads)
     }
@@ -106,6 +107,7 @@ class StandardDesHttpParserSpec extends UnitSpec {
 
       handleErrorsCorrectly(httpReads)
       handleInternalErrorsCorrectly(httpReads)
+      handleServiceUnavailableCorrectly(httpReads)
       handleUnexpectedResponse(httpReads)
       handleBvrsCorrectly(httpReads)
     }
@@ -184,20 +186,34 @@ class StandardDesHttpParserSpec extends UnitSpec {
     )
 
   private def handleInternalErrorsCorrectly[A](httpReads: HttpReads[DesOutcome[A]]): Unit =
-    Seq(INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE).foreach(responseCode =>
-      s"receiving a $responseCode response" should {
-        "return an outbound error when the error returned matches the Error model" in {
-          val httpResponse = HttpResponse(responseCode, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
+    s"receiving a $INTERNAL_SERVER_ERROR response" should {
+      "return an outbound error when the error returned matches the Error model" in {
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
-        }
+        httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
+      }
 
-        "return an outbound error when the error returned doesn't match the Error model" in {
-          val httpResponse = HttpResponse(responseCode, malformedErrorJson, Map("CorrelationId" -> Seq(correlationId)))
+      "return an outbound error when the error returned doesn't match the Error model" in {
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, malformedErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
-        }
-      })
+        httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
+      }
+    }
+
+  private def handleServiceUnavailableCorrectly[A](httpReads: HttpReads[DesOutcome[A]]): Unit =
+    s"receiving a $SERVICE_UNAVAILABLE response" should {
+      "return an outbound ServiceUnavailableError" in {
+        val httpResponse = HttpResponse(SERVICE_UNAVAILABLE, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
+
+        httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(ServiceUnavailableError)))
+      }
+
+      "return an outbound ServiceUnavailableError when the body doesn't match the Error model" in {
+        val httpResponse = HttpResponse(SERVICE_UNAVAILABLE, malformedErrorJson, Map("CorrelationId" -> Seq(correlationId)))
+
+        httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(ServiceUnavailableError)))
+      }
+    }
 
   private def handleUnexpectedResponse[A](httpReads: HttpReads[DesOutcome[A]]): Unit =
     "receiving an unexpected response" should {

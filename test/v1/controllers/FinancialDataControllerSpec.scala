@@ -117,6 +117,7 @@ class FinancialDataControllerSpec
             (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
             (FinancialNotDataFound, NOT_FOUND),
             (UnauthorisedError, FORBIDDEN),
+            (ServiceUnavailableError, SERVICE_UNAVAILABLE),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 

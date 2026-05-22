@@ -95,9 +95,10 @@ class FinancialDataController @Inject()(val authService: EnrolmentsAuthService,
       case VrnFormatError | RuleIncorrectGovTestScenarioError | FinancialInvalidIdNumber | FinancialInvalidSearchItem |
           MtdError("INVALID_REQUEST", _, _) =>
         BadRequest(Json.toJson(errorWrapper))
-      case FinancialNotDataFound => NotFound(Json.toJson(errorWrapper))
-      case UnauthorisedError     => Forbidden(Json.toJson(errorWrapper))
-      case _                     => InternalServerError(Json.toJson(errorWrapper))
+      case FinancialNotDataFound   => NotFound(Json.toJson(errorWrapper))
+      case UnauthorisedError       => Forbidden(Json.toJson(errorWrapper))
+      case ServiceUnavailableError => ServiceUnavailable(Json.toJson(errorWrapper))
+      case _                       => InternalServerError(Json.toJson(errorWrapper))
     }
   }
 }
