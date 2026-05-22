@@ -198,7 +198,7 @@ class ViewReturnControllerISpec extends IntegrationBaseSpec with ViewReturnFixtu
         (FORBIDDEN, "DATE_RANGE_TOO_LARGE", FORBIDDEN, RuleDateRangeTooLargeError),
         (FORBIDDEN, "INSOLVENT_TRADER", FORBIDDEN, RuleInsolventTraderError),
         (BAD_REQUEST, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
-        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError),
+        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE, ServiceUnavailableError),
         (BAD_REQUEST, "TEST_ONLY_UNMATCHED_STUB_ERROR", BAD_REQUEST, RuleIncorrectGovTestScenarioError)
       )
 

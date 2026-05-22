@@ -242,7 +242,7 @@ class LiabilitiesControllerISpec extends IntegrationBaseSpec with RetrieveLiabil
         (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (UNPROCESSABLE_ENTITY, "INVALID_DATA", BAD_REQUEST, InvalidDataError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
-        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError)
+        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE, ServiceUnavailableError)
       )
 
       input.foreach(args => (serviceErrorTest _).tupled(args))
