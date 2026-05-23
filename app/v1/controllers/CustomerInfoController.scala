@@ -19,11 +19,14 @@ package v1.controllers
 import cats.data.EitherT
 import cats.implicits._
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, RequestHeader, Result}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.{EndpointLogContext, IdGenerator, Logging}
 import v1.audit.AuditEvents
 import v1.controllers.requestParsers.CustomerInfoRequestParser
-import v1.models.audit.AuditResponse
+import v1.models.audit.{AuditError, AuditResponse}
+import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.request.information.CustomerRawData
 import v1.models.response.information.{CustomerDetails, CustomerInfoResponse, FlatRateScheme}
@@ -48,9 +51,22 @@ extends AuthorisedController(cc) with BaseController with Logging {
       endpointName = "retrieveCustomerInfo"
     )
 
-  def retrieveCustomerInfo(vrn: String): Action[AnyContent] =
-    authorisedAction(vrn).async { implicit request =>
+  def retrieveCustomerInfo(vrn: String): Action[AnyContent] = {
+    val handler: (String, RequestHeader, Result) => Unit = {(correlationId, request, result) =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      println(s"[Audit DEBUG] inside custom audit = $correlationId, status=$result.header.status}")
+      auditService.auditEvent(AuditEvents.auditCustomerInfo(
+        correlationId,
+        UserDetails("unknown", None, "unknown", None), // or better if accessible
+        AuditResponse(result.header.status, Left(Seq(AuditError("UNAUTHORISED_OR_INVALID"))))
+      ))
+    }
 
+    authorisedAction(vrn,
+      auditOnFailure = true
+    ).async { implicit request =>
+      val updatedRequest = request.addAttr(AuditFailureHandler.AttrKey, handler)
+      implicit val reqWithAttr: Request[AnyContent] = updatedRequest
       implicit val correlationId: String = idGenerator.getUid
       infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
         s"Retrieve Customer Info for VRN : $vrn with correlationId : $correlationId")
@@ -91,6 +107,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
         leftResult
       }.merge
     }
+  }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error: @unchecked) match {

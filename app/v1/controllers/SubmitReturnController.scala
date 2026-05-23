@@ -43,7 +43,7 @@ class SubmitReturnController @Inject()(val authService: EnrolmentsAuthService,
                                        auditService: AuditService,
                                        cc: ControllerComponents,
                                        dateTime: CurrentDateTime,
-                                       idGenerator: IdGenerator,
+                                       val idGenerator: IdGenerator,
                                        override val metrics: MetricRegistry)
                                       (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Timer with Logging {
