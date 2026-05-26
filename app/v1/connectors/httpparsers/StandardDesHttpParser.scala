@@ -75,7 +75,6 @@ object StandardDesHttpParser extends HttpParser {
         PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, infoLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, parseErrors(response)))
       case SERVICE_UNAVAILABLE =>
-        PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, errorLog(_), userRequest.userDetails.userType)
         Left(ResponseWrapper(responseCorrelationId, OutboundError(ServiceUnavailableError)))
       case _ =>
         PagerDutyLogging.log(pagerDutyLoggingEndpointName, response.status, response.body, errorLog(_), userRequest.userDetails.userType)

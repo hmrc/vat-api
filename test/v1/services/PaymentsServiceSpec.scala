@@ -110,7 +110,7 @@ class PaymentsServiceSpec extends ServiceSpec {
           "NOT_FOUND"                          -> LegacyNotFoundError,
           "INVALID_DATA"                       -> InvalidDataError,
           "SERVER_ERROR"                       -> DownstreamError,
-          "SERVICE_UNAVAILABLE"                -> DownstreamError,
+          "SERVICE_UNAVAILABLE"                -> ServiceUnavailableError,
           "TEST_ONLY_UNMATCHED_STUB_ERROR"     -> RuleIncorrectGovTestScenarioError
         )
 

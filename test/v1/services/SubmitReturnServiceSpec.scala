@@ -105,7 +105,7 @@ class SubmitReturnServiceSpec extends ServiceSpec {
           ("INVALID_ORIGINATOR_ID", DownstreamError),
           ("INSOLVENT_TRADER", RuleInsolventTraderError),
           ("SERVER_ERROR", DownstreamError),
-          ("SERVICE_UNAVAILABLE", DownstreamError),
+          ("SERVICE_UNAVAILABLE", ServiceUnavailableError),
           ("TEST_ONLY_UNMATCHED_STUB_ERROR", RuleIncorrectGovTestScenarioError)
         )
 
