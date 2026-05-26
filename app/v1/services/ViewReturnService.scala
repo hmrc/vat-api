@@ -57,7 +57,7 @@ class ViewReturnService @Inject()(connector: ViewReturnConnector) extends DesRes
       "INSOLVENT_TRADER"               -> RuleInsolventTraderError,
       "NOT_FOUND"                      -> EmptyNotFoundError,
       "SERVICE_ERROR"                  -> DownstreamError,
-      "SERVICE_UNAVAILABLE"            -> DownstreamError,
+      "SERVICE_UNAVAILABLE"            -> ServiceUnavailableError,
       "DOWNSTREAM_ERROR"               -> DownstreamError,
       "TEST_ONLY_UNMATCHED_STUB_ERROR" -> RuleIncorrectGovTestScenarioError
     )
