@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,27 +30,27 @@ import v1.models.response.financialData._
 
 object FinancialDataConstants {
 
-  implicit val correlationId: String = "abc123-789xyz"
-  val userDetails: UserDetails = UserDetails("Individual", None, "client-Id")
+  implicit val correlationId: String                            = "abc123-789xyz"
+  val userDetails: UserDetails                                  = UserDetails("Individual", None, "client-Id")
   implicit val userRequest: UserRequest[AnyContentAsEmpty.type] = UserRequest(userDetails, FakeRequest())
 
-  val vrn: String = "123456789"
-  val searchItem = "XA002616060079"
-  val rawData: FinancialRawData = FinancialRawData(vrn, searchItem)
+  val vrn: String                        = "123456789"
+  val searchItem                         = "XA002616060079"
+  val rawData: FinancialRawData          = FinancialRawData(vrn, searchItem)
   val financialRequest: FinancialRequest = FinancialRequest(Vrn(vrn), searchItem)
-  val invalidVrn = "fakeVRN"
-  val invalidRawData: FinancialRawData = FinancialRawData(invalidVrn, searchItem)
+  val invalidVrn                         = "fakeVRN"
+  val invalidRawData: FinancialRawData   = FinancialRawData(invalidVrn, searchItem)
 
   def financialDataUrl(vrn: String = vrn): String = s"/penalties/VATC/penalty/financial-data/VRN/$vrn"
 
-  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String = appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
+  def financialDataUrlWithConfig(vrn: String = vrn)(implicit appConfig: AppConfig): String =
+    appConfig.penaltiesBaseUrl + s"/penalties/VATC/penalty/financial-data/VRN/$vrn?searchType=CHGREF&searchItem=$searchItem"
 
-  
   val testDownstreamFinancialDetailsNoDocumentDetails: JsValue = {
     Json.parse(
       """{
-        |"getFinancialData": {
-        |"financialDetails": {
+        |"success": {
+        |"financialData": {
         |  "totalisation": {
         |    "regimeTotalisation": {
         |      "totalAccountOverdue": 1000.00,
@@ -78,8 +78,8 @@ object FinancialDataConstants {
   val testDownstreamFinancialDetails: JsValue = {
     Json.parse(
       """{
-        |"getFinancialData": {
-        |"financialDetails": {
+        |"success": {
+        |"financialData": {
         |  "totalisation": {
         |    "regimeTotalisation": {
         |      "totalAccountOverdue": 1000.00,
@@ -193,6 +193,7 @@ object FinancialDataConstants {
       |  }
       |}""".stripMargin
   )
+
   val documentDetailsJson: JsValue = Json.parse(
     """{
       |  "documentDetails": [
@@ -247,6 +248,7 @@ object FinancialDataConstants {
       |  ]
       |}""".stripMargin
   )
+
   val totalisationAndDocumentDetailsJson: JsValue = Json.parse(
     """{
       |  "totalisation": {
@@ -336,11 +338,14 @@ object FinancialDataConstants {
       |  ]
       |}""".stripMargin
   )
-  val hipFinancialDetailsNoDocumentDetails: JsValue =
+
+  val financialDetailsNoDocumentDetails: JsValue =
     Json.parse(s"""{"success":{"financialData":$totalisationJson}}""")
-  val hipFinancialDetailsNoTotalisations: JsValue =
+
+  val financialDetailsNoTotalisations: JsValue =
     Json.parse(s"""{"success":{"financialData":$documentDetailsJson}}""")
-  val hipFinancialDetails: JsValue =
+
+  val financialDetails: JsValue =
     Json.parse(s"""{"success":{"financialData":$totalisationAndDocumentDetailsJson}}""")
 
   val testUpstreamFinancialDetails: JsValue = {
@@ -411,7 +416,6 @@ object FinancialDataConstants {
     interestAccruingAmount = Some(12.10)
   )
 
-
   val testDocumentDetail: DocumentDetail = DocumentDetail(
     postingDate = Some("2022-03-01"),
     issueDate = Some("2022-03-01"),
@@ -437,12 +441,12 @@ object FinancialDataConstants {
   )
 
   val testFinancialNoDocumentDetailsDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), None)
-  val testFinancialDataResponse: FinancialDataResponse = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
+  val testFinancialDataResponse: FinancialDataResponse                  = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
 
   def wrappedFinancialDataResponse(financialResponse: FinancialDataResponse = testFinancialDataResponse): ResponseWrapper[FinancialDataResponse] = {
     ResponseWrapper(correlationId, financialResponse)
   }
 
-  def errorWrapper(error: MtdError): ErrorWrapper = ErrorWrapper(correlationId, error)
+  def errorWrapper(error: MtdError): ErrorWrapper           = ErrorWrapper(correlationId, error)
   def errorWrapperMulti(error: Seq[MtdError]): ErrorWrapper = ErrorWrapper(correlationId, error.head, Some(error.tail))
 }

@@ -155,7 +155,7 @@ class PaymentsControllerSpec
 
         val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
-          UserDetails("Individual", None, "client-Id"), auditResponse)).once
+          UserDetails("Individual", None, "client-Id"), auditResponse)).once()
       }
     }
 
@@ -176,7 +176,7 @@ class PaymentsControllerSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(error.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
-              UserDetails("Individual", None, "client-Id"), auditResponse)).once
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once()
           }
         }
 
@@ -210,7 +210,7 @@ class PaymentsControllerSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditPayments(correlationId,
-              UserDetails("Individual", None, "client-Id"), auditResponse)).once
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once()
           }
         }
 

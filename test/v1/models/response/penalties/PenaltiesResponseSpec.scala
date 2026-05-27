@@ -51,37 +51,37 @@ class PenaltiesResponseSpec extends UnitSpec {
     }
   }
 
-  private val errorHipJson   = Json.parse("""
+  private val errorJson   = Json.parse("""
                                             |{
                                             |  "processingDate":"2017-01-01",
                                             |  "code":"002",
                                             |  "text":"Invalid Tax Regime"
                                             |}
                                             |""".stripMargin)
-  private val errorsHipJson  = Json.parse(s"""
+  private val errorsJson  = Json.parse(s"""
                                              |{
-                                             |  "errors": $errorHipJson
+                                             |  "errors": $errorJson
                                              |}
                                              |""".stripMargin)
-  private val errorHipModel  = PenaltiesErrorHIP("2017-01-01", "002", "Invalid Tax Regime")
-  private val errorsHipModel = PenaltiesErrorsHIP(errorHipModel)
+  private val errorModel  = PenaltiesError("2017-01-01", "002", "Invalid Tax Regime")
+  private val errorsModel = PenaltiesErrors(errorModel)
 
-  "PenaltiesErrorHIP" must {
-    "write PenaltiesErrorHIP model to json" in {
-      Json.toJson(errorHipModel) shouldBe errorHipJson
+  "PenaltiesError" must {
+    "write PenaltiesError model to json" in {
+      Json.toJson(errorModel) shouldBe errorJson
     }
 
     "read from json response" in {
-      errorHipJson.as[PenaltiesErrorHIP] shouldBe errorHipModel
+      errorJson.as[PenaltiesError] shouldBe errorModel
     }
   }
-  "PenaltiesErrorsHIP" must {
-    "write PenaltiesErrorsHIP model to json" in {
-      Json.toJson(errorsHipModel) shouldBe errorsHipJson
+  "PenaltiesErrors" must {
+    "write PenaltiesErrors model to json" in {
+      Json.toJson(errorsModel) shouldBe errorsJson
     }
 
     "read from json response" in {
-      errorsHipJson.as[PenaltiesErrorsHIP] shouldBe errorsHipModel
+      errorsJson.as[PenaltiesErrors] shouldBe errorsModel
     }
   }
 }
