@@ -1,4 +1,3 @@
 # Internal routes
 
-POST		/validate/:vrn            	v1.controllers.AssistReturnController.validateReturn(vrn)
-
+POST		/validate/:vrn            	v1.controllers.internal.AssistReturnController.validateReturn(vrn)

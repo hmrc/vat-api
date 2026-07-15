@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.controllers.internal
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.MockIdGenerator
+import v1.controllers.ControllerBaseSpec
 import v1.mocks.requestParsers.MockAssistReturnRequestParser
 import v1.mocks.services.MockEnrolmentsAuthService
 import v1.models.domain.Vrn

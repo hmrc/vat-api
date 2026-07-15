@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.controllers.internal
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import utils._
+import v1.controllers.{AuthorisedController, BaseController}
 import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.models.errors._
 import v1.models.request.submit.SubmitRawData
