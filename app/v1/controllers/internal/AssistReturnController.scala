@@ -19,9 +19,8 @@ package v1.controllers.internal
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import utils._
-import v1.controllers.{AuthorisedController, BaseController}
 import v1.controllers.requestParsers.AssistReturnRequestParser
-import v1.models.errors._
+import v1.controllers.{AuthorisedController, BaseController}
 import v1.models.request.submit.SubmitRawData
 import v1.services.EnrolmentsAuthService
 
@@ -36,40 +35,28 @@ class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
                                       (implicit ec: ExecutionContext)
   extends AuthorisedController(cc) with BaseController with Logging {
 
-  implicit val endpointLogContext: EndpointLogContext =
+  private val endpointLogContext: EndpointLogContext =
     EndpointLogContext(controllerName = "AssistReturnController", endpointName = "validateVatReturn")
 
   def validateReturn(vrn: String): Action[JsValue] =
     authorisedAction(vrn).async(parse.json) { implicit request =>
 
-      implicit val correlationId: String = idGenerator.getUid
-      infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"Validating Assist VAT Return for VRN : $vrn with correlationId : $correlationId")
+      implicit val correlationId: String = request.headers.get("X-Correlation-Id").getOrElse(idGenerator.getUid)
 
       val rawRequest = SubmitRawData(vrn, AnyContent(request.body))
 
       val result = requestParser.parseRequest(rawRequest) match {
         case Right(_) =>
           infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-            s"validation passed for VRN : $vrn, correlationId : $correlationId")
+            s"VAT return validation PASSED for VRN : $vrn")
           NoContent.withApiHeaders(correlationId)
 
         case Left(errorWrapper) =>
-          val res = errorResult(errorWrapper).withApiHeaders(errorWrapper.correlationId)
-          warnLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-            s"validation failed for VRN : $vrn, correlationId : ${errorWrapper.correlationId}, error : ${errorWrapper.error.message}")
-          res
+          infoLog(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+            s"VAT return validation FAILED for VRN : $vrn, with error : ${errorWrapper.error.message}")
+          BadRequest(Json.toJson(errorWrapper)).withApiHeaders(errorWrapper.correlationId)
       }
 
       Future.successful(result)
-    }
-
-  private def errorResult(errorWrapper: ErrorWrapper) =
-    (errorWrapper.error: @unchecked) match {
-      case VrnFormatError | BadRequestError |
-           PeriodKeyFormatError | BodyPeriodKeyFormatError |
-           VATTotalValueRuleError | VATNetValueRuleError | NumericFormatRuleError |
-           MandatoryFieldRuleError | StringFormatRuleError | UnMappedPlayRuleError => BadRequest(Json.toJson(errorWrapper))
-      case _: MtdError => BadRequest(Json.toJson(errorWrapper))
     }
 }

@@ -27,6 +27,9 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
 
   private val validationSet = List(vrnFormatValidation, jsonValidation, responseFieldValidation, tierFourValidation)
 
+  private def vrnFormatValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) =>
+    List(VrnValidation.validate(data.vrn))
+
   private def jsonValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) =>
     List(JsonValidation.validate(data.body))
 
@@ -36,8 +39,8 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
     val maxNetVatDue          = BigDecimal(99999999999.99)
     val minRegularValue       = BigDecimal(-9999999999999.99)
     val maxRegularValue       = BigDecimal(9999999999999.99)
-    val minNonDecRegularValue = BigDecimal(-9999999999999.0)
-    val maxNonDecRegularValue = BigDecimal(9999999999999.0)
+    val minWholeRegularValue = BigDecimal(-9999999999999.0)
+    val maxWholeRegularValue = BigDecimal(9999999999999.0)
 
     List(
       MandatoryFieldValidation.validate(body \ "periodKey", "periodKey"),
@@ -56,10 +59,10 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
       DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalVatDue"), "totalVatDue", minRegularValue, maxRegularValue),
       DecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "vatReclaimedCurrPeriod"), "vatReclaimedCurrPeriod", minRegularValue, maxRegularValue),
       NonNegativeDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "netVatDue"), "netVatDue", minNetVatDue, maxNetVatDue),
-      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueSalesExVAT"), "totalValueSalesExVAT", minNonDecRegularValue, maxNonDecRegularValue),
-      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValuePurchasesExVAT"), "totalValuePurchasesExVAT", minNonDecRegularValue, maxNonDecRegularValue),
-      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueGoodsSuppliedExVAT"), "totalValueGoodsSuppliedExVAT", minNonDecRegularValue, maxNonDecRegularValue),
-      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalAcquisitionsExVAT"), "totalAcquisitionsExVAT", minNonDecRegularValue, maxNonDecRegularValue),
+      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueSalesExVAT"), "totalValueSalesExVAT", minWholeRegularValue, maxWholeRegularValue),
+      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValuePurchasesExVAT"), "totalValuePurchasesExVAT", minWholeRegularValue, maxWholeRegularValue),
+      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalValueGoodsSuppliedExVAT"), "totalValueGoodsSuppliedExVAT", minWholeRegularValue, maxWholeRegularValue),
+      NonDecimalMonetaryValueFormatValidation.validate(getFieldFromBody[BigDecimal](body \ "totalAcquisitionsExVAT"), "totalAcquisitionsExVAT", minWholeRegularValue, maxWholeRegularValue),
 
       JsonFormatValidation.validate[String](body \ "periodKey", StringFormatRuleError),
       JsonFormatValidation.validate[BigDecimal](body \ "vatDueSales", NumericFormatRuleError.withFieldName("vatDueSales")),
@@ -93,9 +96,6 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
       VATTotalValueValidation.validate(body.vatDueSales, body.vatDueAcquisitions, body.totalVatDue)
     )
   }
-
-  private def vrnFormatValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) =>
-    List(VrnValidation.validate(data.vrn))
 
   private def getFieldFromBody[A](field: JsLookupResult)(implicit reads: Reads[A]): Option[A] =
     if (field.isDefined) field.validate[A] match {

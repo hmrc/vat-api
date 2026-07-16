@@ -1,3 +1,4 @@
-# Internal routes
+# Internal routes - these endpoints are not exposed publicly through the API platform
 
+# TxR (VAT Assist) to validate a VAT return
 POST		/validate/:vrn            	v1.controllers.internal.AssistReturnController.validateReturn(vrn)
