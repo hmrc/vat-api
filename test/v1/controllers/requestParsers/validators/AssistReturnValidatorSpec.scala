@@ -16,8 +16,8 @@
 
 package v1.controllers.requestParsers.validators
 
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContent, AnyContentAsJson}
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ AnyContent, AnyContentAsJson }
 import support.UnitSpec
 import v1.models.errors._
 import v1.models.request.submit.SubmitRawData
@@ -25,12 +25,13 @@ import v1.models.request.submit.SubmitRawData
 class AssistReturnValidatorSpec extends UnitSpec {
 
   val validator: AssistReturnValidator = new AssistReturnValidator()
-  private val validVrn   = "123456789"
-  private val invalidVrn = "thisIsNotAVrn"
+  private val validVrn                 = "123456789"
+  private val invalidVrn               = "thisIsNotAVrn"
 
   // No "finalised" field
-  val validBody: AnyContentAsJson = AnyContentAsJson(Json.parse(
-    """
+  val validBody: AnyContentAsJson = AnyContentAsJson(
+    Json.parse(
+      """
       |{
       |   "periodKey": "AB12",
       |   "vatDueSales": 0.00,
@@ -44,10 +45,11 @@ class AssistReturnValidatorSpec extends UnitSpec {
       |   "totalAcquisitionsExVAT": 9999999999999
       |}
       |""".stripMargin
-  ))
+    ))
 
-  val inValidFieldRangeBody: AnyContentAsJson = AnyContentAsJson(Json.parse(
-    """
+  val inValidFieldRangeBody: AnyContentAsJson = AnyContentAsJson(
+    Json.parse(
+      """
       |{
       |   "periodKey": "AB12",
       |   "vatDueSales": 9999999999999.99,
@@ -61,10 +63,11 @@ class AssistReturnValidatorSpec extends UnitSpec {
       |   "totalAcquisitionsExVAT": 9999999999999
       |}
       |""".stripMargin
-  ))
+    ))
 
-  val inValidMultipleFieldRangeBody: AnyContentAsJson = AnyContentAsJson(Json.parse(
-    """
+  val inValidMultipleFieldRangeBody: AnyContentAsJson = AnyContentAsJson(
+    Json.parse(
+      """
       |{
       |   "periodKey": "AB12",
       |   "vatDueSales": 9999999999999.99,
@@ -78,10 +81,11 @@ class AssistReturnValidatorSpec extends UnitSpec {
       |   "totalAcquisitionsExVAT": 9999999999999
       |}
       |""".stripMargin
-  ))
+    ))
 
-  val inValidPeriodKeyBody: AnyContentAsJson = AnyContentAsJson(Json.parse(
-    """
+  val inValidPeriodKeyBody: AnyContentAsJson = AnyContentAsJson(
+    Json.parse(
+      """
       |{
       |   "periodKey": "ABABABABABABABA",
       |   "vatDueSales": 9999999999999.99,
@@ -95,7 +99,7 @@ class AssistReturnValidatorSpec extends UnitSpec {
       |   "totalAcquisitionsExVAT": 9999999999999
       |}
       |""".stripMargin
-  ))
+    ))
 
   val invalidJsonBody: AnyContent = AnyContent(
     """
@@ -114,8 +118,7 @@ class AssistReturnValidatorSpec extends UnitSpec {
       |""".stripMargin
   )
 
-  val periodKeyCustomJson: Option[JsValue] = Some(Json.parse(
-    """
+  val periodKeyCustomJson: Option[JsValue] = Some(Json.parse("""
       |{
       |  "code": "INVALID_REQUEST",
       |  "message": "Invalid request",
@@ -173,8 +176,7 @@ class AssistReturnValidatorSpec extends UnitSpec {
 
     "return NumericFormatRuleError" when {
       "an invalid numerical value is supplied" in {
-        val jsonBody: JsValue = Json.parse(
-          """
+        val jsonBody: JsValue = Json.parse("""
             |{
             |   "periodKey": "AB12",
             |   "vatDueSales": "five",
@@ -196,8 +198,7 @@ class AssistReturnValidatorSpec extends UnitSpec {
 
     "return StringFormatRuleError" when {
       "the period key is not a string" in {
-        val jsonBody: JsValue = Json.parse(
-          """
+        val jsonBody: JsValue = Json.parse("""
             |{
             |   "periodKey": 12,
             |   "vatDueSales": 9999999999999.99,

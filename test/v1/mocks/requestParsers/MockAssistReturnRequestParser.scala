@@ -20,17 +20,16 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.models.errors.ErrorWrapper
-import v1.models.request.submit.{SubmitRawData, SubmitRequest}
+import v1.models.request.submit.{ SubmitRawData, SubmitRequest }
 
 trait MockAssistReturnRequestParser extends MockFactory {
 
   val mockAssistReturnRequestParser: AssistReturnRequestParser = mock[AssistReturnRequestParser]
 
-  object MockAssistReturnRequestParser{
+  object MockAssistReturnRequestParser {
 
     def parse(rawData: SubmitRawData): CallHandler[Either[ErrorWrapper, SubmitRequest]] = {
       (mockAssistReturnRequestParser.parseRequest(_: SubmitRawData)(_: String)).expects(rawData, *)
     }
   }
-
 }

@@ -16,10 +16,10 @@
 
 package v1.controllers.requestParsers.validators
 
-import play.api.libs.json.{JsLookupResult, JsSuccess, Reads}
+import play.api.libs.json.{ JsLookupResult, JsSuccess, Reads }
 import v1.controllers.requestParsers.validators.validations._
-import v1.models.errors.{MtdError, NumericFormatRuleError, StringFormatRuleError}
-import v1.models.request.submit.{SubmitRawData, SubmitRequestBody}
+import v1.models.errors.{ MtdError, NumericFormatRuleError, StringFormatRuleError }
+import v1.models.request.submit.{ SubmitRawData, SubmitRequestBody }
 
 class AssistReturnValidator extends Validator[SubmitRawData] {
 
@@ -27,18 +27,16 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
 
   private val validationSet = List(vrnFormatValidation, jsonValidation, responseFieldValidation, tierFourValidation)
 
-  private def vrnFormatValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) =>
-    List(VrnValidation.validate(data.vrn))
+  private def vrnFormatValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) => List(VrnValidation.validate(data.vrn))
 
-  private def jsonValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) =>
-    List(JsonValidation.validate(data.body))
+  private def jsonValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) => List(JsonValidation.validate(data.body))
 
   private def responseFieldValidation: SubmitRawData => List[List[MtdError]] = (data: SubmitRawData) => {
-    val body = data.body.asJson.get
-    val minNetVatDue          = BigDecimal(0.00)
-    val maxNetVatDue          = BigDecimal(99999999999.99)
-    val minRegularValue       = BigDecimal(-9999999999999.99)
-    val maxRegularValue       = BigDecimal(9999999999999.99)
+    val body                 = data.body.asJson.get
+    val minNetVatDue         = BigDecimal(0.00)
+    val maxNetVatDue         = BigDecimal(99999999999.99)
+    val minRegularValue      = BigDecimal(-9999999999999.99)
+    val maxRegularValue      = BigDecimal(9999999999999.99)
     val minWholeRegularValue = BigDecimal(-9999999999999.0)
     val maxWholeRegularValue = BigDecimal(9999999999999.0)
 
@@ -74,7 +72,6 @@ class AssistReturnValidator extends Validator[SubmitRawData] {
       JsonFormatValidation.validate[BigDecimal](body \ "totalValuePurchasesExVAT", NumericFormatRuleError.withFieldName("totalValuePurchasesExVAT")),
       JsonFormatValidation.validate[BigDecimal](body \ "totalValueGoodsSuppliedExVAT", NumericFormatRuleError.withFieldName("totalValueGoodsSuppliedExVAT")),
       JsonFormatValidation.validate[BigDecimal](body \ "totalAcquisitionsExVAT", NumericFormatRuleError.withFieldName("totalAcquisitionsExVAT")),
-
       BodyPeriodKeyValidation.validate(getFieldFromBody[String](body \ "periodKey")),
 
       DecimalMonetaryValueRangeValidation.validate(getFieldFromBody[BigDecimal](body \ "vatDueSales"), "vatDueSales", minRegularValue, maxRegularValue),

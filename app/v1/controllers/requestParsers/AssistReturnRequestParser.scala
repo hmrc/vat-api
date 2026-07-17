@@ -16,13 +16,13 @@
 
 package v1.controllers.requestParsers
 
-import javax.inject.Inject
-import v1.models.domain.Vrn
 import v1.controllers.requestParsers.validators.AssistReturnValidator
-import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
+import v1.models.domain.Vrn
+import v1.models.request.submit.{ SubmitRawData, SubmitRequest, SubmitRequestBody }
 
-class AssistReturnRequestParser @Inject()(val validator: AssistReturnValidator)
-  extends RequestParser[SubmitRawData, SubmitRequest] {
+import javax.inject.Inject
+
+class AssistReturnRequestParser @Inject()(val validator: AssistReturnValidator) extends RequestParser[SubmitRawData, SubmitRequest] {
 
   override protected def requestFor(data: SubmitRawData): SubmitRequest =
     SubmitRequest(Vrn(data.vrn), data.body.asJson.get.as[SubmitRequestBody])

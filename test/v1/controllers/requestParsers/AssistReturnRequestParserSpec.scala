@@ -16,18 +16,18 @@
 
 package v1.controllers.requestParsers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
 import v1.mocks.validators.MockAssistReturnValidator
 import v1.models.domain.Vrn
-import v1.models.errors.{BadRequestError, ErrorWrapper, PeriodKeyFormatError, VATNetValueRuleError, VATTotalValueRuleError, VrnFormatError}
-import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
+import v1.models.errors._
+import v1.models.request.submit.{ SubmitRawData, SubmitRequest, SubmitRequestBody }
 
 class AssistReturnRequestParserSpec extends UnitSpec {
 
-  private val validVrn   = "AA111111A"
-  private val invalidVrn = "invalidVRN"
+  private val validVrn               = "AA111111A"
+  private val invalidVrn             = "invalidVRN"
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   // Validation-only endpoint — no "finalised" field in the body
@@ -66,19 +66,19 @@ class AssistReturnRequestParserSpec extends UnitSpec {
   )
 
   val validBodyModel: SubmitRequestBody = SubmitRequestBody(
-    periodKey                    = Some("AB12"),
-    vatDueSales                  = Some(9999999999999.99),
-    vatDueAcquisitions           = Some(9999999999999.99),
-    totalVatDue                  = Some(9999999999999.99),
-    vatReclaimedCurrPeriod       = Some(9999999999999.99),
-    netVatDue                    = Some(999999999999.99),
-    totalValueSalesExVAT         = Some(9999999999999.99),
-    totalValuePurchasesExVAT     = Some(9999999999999.99),
+    periodKey = Some("AB12"),
+    vatDueSales = Some(9999999999999.99),
+    vatDueAcquisitions = Some(9999999999999.99),
+    totalVatDue = Some(9999999999999.99),
+    vatReclaimedCurrPeriod = Some(9999999999999.99),
+    netVatDue = Some(999999999999.99),
+    totalValueSalesExVAT = Some(9999999999999.99),
+    totalValuePurchasesExVAT = Some(9999999999999.99),
     totalValueGoodsSuppliedExVAT = Some(9999999999999.99),
-    totalAcquisitionsExVAT       = Some(9999999999999.99),
-    finalised                    = None,
-    receivedAt                   = None,
-    agentReference               = None
+    totalAcquisitionsExVAT = Some(9999999999999.99),
+    finalised = None,
+    receivedAt = None,
+    agentReference = None
   )
 
   trait Test extends MockAssistReturnValidator {
@@ -89,7 +89,8 @@ class AssistReturnRequestParserSpec extends UnitSpec {
 
     "produce a valid request" when {
       "the data supplied by the vendor is valid" in new Test {
-        MockAssistReturnValidator.validate(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson)))
+        MockAssistReturnValidator
+          .validate(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson)))
           .returns(Nil)
 
         parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson))) shouldBe
@@ -100,7 +101,8 @@ class AssistReturnRequestParserSpec extends UnitSpec {
     "return a single BadRequest-wrapped error" when {
 
       "an invalid vrn is provided" in new Test {
-        MockAssistReturnValidator.validate(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson)))
+        MockAssistReturnValidator
+          .validate(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson)))
           .returns(List(VrnFormatError))
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson))) shouldBe
@@ -108,7 +110,8 @@ class AssistReturnRequestParserSpec extends UnitSpec {
       }
 
       "an invalid period key is provided" in new Test {
-        MockAssistReturnValidator.validate(SubmitRawData(validVrn, AnyContentAsJson(invalidPeriodKeyJson)))
+        MockAssistReturnValidator
+          .validate(SubmitRawData(validVrn, AnyContentAsJson(invalidPeriodKeyJson)))
           .returns(List(PeriodKeyFormatError))
 
         parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(invalidPeriodKeyJson))) shouldBe
@@ -118,7 +121,8 @@ class AssistReturnRequestParserSpec extends UnitSpec {
 
     "return multiple wrapped errors" when {
       "the body fails more than one rule" in new Test {
-        MockAssistReturnValidator.validate(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson)))
+        MockAssistReturnValidator
+          .validate(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson)))
           .returns(List(VATTotalValueRuleError, VATNetValueRuleError))
 
         parser.parseRequest(SubmitRawData(validVrn, AnyContentAsJson(validBodyJson))) shouldBe
@@ -128,7 +132,8 @@ class AssistReturnRequestParserSpec extends UnitSpec {
 
     "return only a single error" when {
       "both an invalid vrn and body errors are present (vrn takes precedence)" in new Test {
-        MockAssistReturnValidator.validate(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson)))
+        MockAssistReturnValidator
+          .validate(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson)))
           .returns(List(VrnFormatError))
 
         parser.parseRequest(SubmitRawData(invalidVrn, AnyContentAsJson(validBodyJson))) shouldBe

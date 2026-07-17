@@ -19,22 +19,21 @@ package v1.endpoints
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.WSRequest
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub}
+import v1.stubs.{ AuditStub, AuthStub }
 
 class AssistReturnControllerISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    val vrn: String = "123456789"
+    val vrn: String       = "123456789"
     val periodKey: String = "AB12"
 
-    val validRequestJson: JsValue = Json.parse(
-      s"""
+    val validRequestJson: JsValue = Json.parse(s"""
          |{
          |  "periodKey": "$periodKey",
          |  "vatDueSales": 100.00,
@@ -83,8 +82,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
 
       "a request is made with an invalid monetary value" in new Test {
 
-        val invalidMonetaryJson: JsValue = Json.parse(
-          s"""
+        val invalidMonetaryJson: JsValue = Json.parse(s"""
              |{
              |  "periodKey": "$periodKey",
              |  "vatDueSales": 100.00,
@@ -99,8 +97,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
              |}
     """.stripMargin)
 
-        val expectedError: JsValue = Json.parse(
-          """
+        val expectedError: JsValue = Json.parse("""
             |{
             |  "code": "INVALID_REQUEST",
             |  "message": "Invalid request",
@@ -127,8 +124,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
 
       "a request is made with multiple field validation failures" in new Test {
 
-        val invalidRequestJson: JsValue = Json.parse(
-          s"""
+        val invalidRequestJson: JsValue = Json.parse(s"""
              |{
              |  "periodKey": "$periodKey",
              |  "vatDueSales": 100.00,
@@ -192,11 +188,10 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
 
     "return the error according to spec" when {
 
-      def validationErrorTest(requestVrn: String, requestPeriodKey: String,
-                              expectedStatus: Int, expectedBody: MtdError): Unit =
+      def validationErrorTest(requestVrn: String, requestPeriodKey: String, expectedStatus: Int, expectedBody: MtdError): Unit =
         s"validation fails with ${expectedBody.code} error" in new Test {
 
-          override val vrn: String = requestVrn
+          override val vrn: String       = requestVrn
           override val periodKey: String = requestPeriodKey
 
           override def setupStubs(): StubMapping = {
