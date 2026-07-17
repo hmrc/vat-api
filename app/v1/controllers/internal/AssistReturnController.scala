@@ -49,13 +49,13 @@ class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
         case Right(_) =>
           infoLog(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-              s"VAT return validation PASSED for VRN : $vrn")
+              s"VAT return validation PASSED for VRN : $vrn with correlationId : $correlationId")
           NoContent.withApiHeaders(correlationId)
 
         case Left(errorWrapper) =>
           infoLog(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-              s"VAT return validation FAILED for VRN : $vrn, with error : ${errorWrapper.error.message}")
+              s"VAT return validation FAILED for VRN : $vrn with correlationId : ${errorWrapper.correlationId}, error : ${errorWrapper.error.message}")
           BadRequest(Json.toJson(errorWrapper)).withApiHeaders(errorWrapper.correlationId)
       }
 
