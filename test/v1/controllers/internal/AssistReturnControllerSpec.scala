@@ -100,7 +100,9 @@ class AssistReturnControllerSpec
           .returns(Right(parsedRequest))
 
         private val result: Future[Result] =
-          controller.validateReturn(vrn)(fakePostRequest(requestBodyJson))
+          controller.validateReturn(vrn)(
+            fakePostRequest(requestBodyJson).withHeaders("X-CorrelationId" -> correlationId)
+          )
 
         status(result) shouldBe NO_CONTENT
         header("X-CorrelationId", result) shouldBe Some(correlationId)

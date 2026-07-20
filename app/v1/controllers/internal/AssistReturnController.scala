@@ -41,7 +41,7 @@ class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
 
   def validateReturn(vrn: String): Action[JsValue] =
     authorisedAction(vrn).async(parse.json) { implicit request =>
-      implicit val correlationId: String = request.headers.get("X-Correlation-Id").getOrElse("no-correlation-id-found")
+      implicit val correlationId: String = request.headers.get("X-CorrelationId").getOrElse("no-correlation-id-found")
 
       val rawRequest = SubmitRawData(vrn, AnyContent(request.body))
 
