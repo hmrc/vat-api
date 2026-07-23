@@ -96,6 +96,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
     (errorWrapper.error: @unchecked) match {
       case CustomerInfoInvalidIdValue => BadRequest(Json.toJson(errorWrapper))
       case CustomerInfoNotDataFound => NotFound(Json.toJson(errorWrapper))
+      case ServiceUnavailableError => ServiceUnavailable(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
     }
   }

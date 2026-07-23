@@ -98,6 +98,7 @@ extends AuthorisedController(cc) with BaseController with Logging {
       case RuleInsolventTraderError => Forbidden(Json.toJson(errorWrapper))
       case LegacyNotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+      case ServiceUnavailableError => ServiceUnavailable(Json.toJson(errorWrapper))
     }
   }
 }

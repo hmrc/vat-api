@@ -222,7 +222,8 @@ class PaymentsControllerSpec
           (InvalidDataError, BAD_REQUEST),
           (LegacyNotFoundError, NOT_FOUND),
           (RuleInsolventTraderError, FORBIDDEN),
-          (DownstreamError, INTERNAL_SERVER_ERROR)
+          (DownstreamError, INTERNAL_SERVER_ERROR),
+          (ServiceUnavailableError, SERVICE_UNAVAILABLE)
         )
 
         input.foreach(args => (serviceErrors _).tupled(args))

@@ -1,2 +1,3 @@
 ->         /                        definition.Routes
 ->         /                        health.Routes
+->		   /internal				internal.Routes

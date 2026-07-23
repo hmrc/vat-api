@@ -110,6 +110,7 @@ class PenaltiesControllerSpec
             (PenaltiesInvalidIdValue, BAD_REQUEST),
             (RuleIncorrectGovTestScenarioError, BAD_REQUEST),
             (UnauthorisedError, FORBIDDEN),
+            (ServiceUnavailableError, SERVICE_UNAVAILABLE),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 

@@ -85,6 +85,7 @@ class CustomerInfoControllerSpec extends ControllerBaseSpec with MockEnrolmentsA
           val errors: Seq[(MtdError, Int)] = Seq(
             (CustomerInfoInvalidIdValue, BAD_REQUEST),
             (CustomerInfoNotDataFound, NOT_FOUND),
+            (ServiceUnavailableError, SERVICE_UNAVAILABLE),
             (UnexpectedFailure.mtdError(INTERNAL_SERVER_ERROR, "error"), INTERNAL_SERVER_ERROR)
           )
 

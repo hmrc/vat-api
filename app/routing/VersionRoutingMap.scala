@@ -21,7 +21,6 @@ import config.{AppConfig, FeatureToggleSupport}
 import definition.Versions.VERSION_1
 import play.api.routing.Router
 import utils.Logging
-import config.FeatureSwitch.FrsFeatureSwitch
 
 import javax.inject.Inject
 
@@ -38,23 +37,18 @@ trait VersionRoutingMap extends Logging {
   final def versionRouter(version: String): Option[Router] = map.get(version)
 }
 
-// Add routes corresponding to available versions...
+// Add switches and multiple routes files to the map in order to coordinate the go-live of new 3rd party endpoints, or control multiple versions of exposed endpoints.
+// After a new endpoint goes live, remove the switch and old route file to leave only long term version(s).
+// Currently no switches are in use and only one route file exists.
 case class VersionRoutingMapImpl @Inject()(defaultRouter: Router,
-                                           v1RoutesWithPenalties: v1WithPenalties.Routes,
-                                           v1RoutesWithFrs: v1WithFrs.Routes,
+                                           v1Routes: v1.Routes,
                                            implicit val appConfig: AppConfig
                                           ) extends VersionRoutingMap with FeatureToggleSupport {
   
 
   val map: Map[String, Router] = Map(
     VERSION_1 -> {
-      if (isEnabled(FrsFeatureSwitch)) {
-        infoLogMessage("[VersionRoutingMap][map] using v1RoutesWithFRS - pointing to new packages including penalties")
-        v1RoutesWithFrs
-      }else{
-        infoLogMessage("[VersionRoutingMap][map] using v1RoutesWithPenalties - pointing to new packages")
-        v1RoutesWithPenalties
-      }
+        v1Routes
     }
   )
 }

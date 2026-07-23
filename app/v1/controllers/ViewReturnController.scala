@@ -96,6 +96,7 @@ class ViewReturnController @Inject()(val authService: EnrolmentsAuthService,
       case PeriodKeyFormatErrorDesNotFound => NotFound(Json.toJson(errorWrapper))
       case EmptyNotFoundError => NotFound
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+      case ServiceUnavailableError => ServiceUnavailable(Json.toJson(errorWrapper))
     }
   }
 }

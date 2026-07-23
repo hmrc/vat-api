@@ -395,7 +395,7 @@ class PaymentsControllerISpec extends IntegrationBaseSpec with PaymentsFixture {
         (NOT_FOUND, "NOT_FOUND", NOT_FOUND, LegacyNotFoundError),
         (UNPROCESSABLE_ENTITY, "INVALID_DATA", BAD_REQUEST, InvalidDataError),
         (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, DownstreamError),
-        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, DownstreamError),
+        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", SERVICE_UNAVAILABLE, ServiceUnavailableError),
         (BAD_REQUEST, "TEST_ONLY_UNMATCHED_STUB_ERROR", BAD_REQUEST, RuleIncorrectGovTestScenarioError)
       )
 

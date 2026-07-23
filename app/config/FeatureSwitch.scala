@@ -48,10 +48,6 @@ object FeatureSwitch {
     override val name: String = s"$prefix.auth.enabled"
   }
 
-  case object FrsFeatureSwitch extends FeatureSwitch {
-    override val name: String = s"$prefix.frs.enabled"
-  }
-
   case object FinancialDataRamlFeature extends FeatureSwitch {
     override val name: String = s"$prefix.financialDataRamlFeature.enabled"
   }

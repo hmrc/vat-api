@@ -58,7 +58,7 @@ class SubmitReturnService @Inject()(connector: SubmitReturnConnector) extends De
       "INVALID_ORIGINATOR_ID"          -> DownstreamError,
       "INSOLVENT_TRADER"               -> RuleInsolventTraderError,
       "SERVICE_ERROR"                  -> DownstreamError,
-      "SERVICE_UNAVAILABLE"            -> DownstreamError,
+      "SERVICE_UNAVAILABLE"            -> ServiceUnavailableError,
       "DOWNSTREAM_ERROR"               -> DownstreamError,
       "TEST_ONLY_UNMATCHED_STUB_ERROR" -> RuleIncorrectGovTestScenarioError
     )
