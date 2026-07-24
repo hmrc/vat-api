@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package v1.models.response.financialData
 
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsResultException, JsValue, Json }
 import support.UnitSpec
 import v1.constants.FinancialDataConstants
+import v1.constants.FinancialDataConstants.totalisationAndDocumentDetailsJson
 
 class FinancialDataResponseSpec extends UnitSpec {
 
@@ -28,46 +29,53 @@ class FinancialDataResponseSpec extends UnitSpec {
       Json.toJson(FinancialDataConstants.testFinancialDataResponse) shouldBe FinancialDataConstants.testUpstreamFinancialDetails
     }
 
-    "read from IF json response" in {
-      FinancialDataConstants.testDownstreamFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    "read from json response" in {
+      FinancialDataConstants.financialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
     }
 
-    "read from HIP json response" in {
-      FinancialDataConstants.hipFinancialDetails.as[FinancialDataResponse] shouldBe FinancialDataConstants.testFinancialDataResponse
+    "return an exception" when {
+      "read from json response that does not have wrapper 'success.financialData'" in {
+        val invalidResponse: JsValue = Json.parse(s"""{"succes":{"financialata":$totalisationAndDocumentDetailsJson}}""")
+
+        intercept[JsResultException] {
+          invalidResponse.as[FinancialDataResponse]
+        }
+      }
     }
   }
 
-  private val errorHipJson   = Json.parse("""
+  private val errorJson   = Json.parse("""
                                   |{
                                   |  "processingDate":"2017-01-01",
                                   |  "code":"002",
                                   |  "text":"Invalid Tax Regime"
                                   |}
                                   |""".stripMargin)
-  private val errorsHipJson  = Json.parse(s"""
+  private val errorsJson  = Json.parse(s"""
                                     |{
-                                    |  "errors": $errorHipJson
+                                    |  "errors": $errorJson
                                     |}
                                     |""".stripMargin)
-  private val errorHipModel  = FinancialDataErrorHIP("2017-01-01", "002", "Invalid Tax Regime")
-  private val errorsHipModel = FinancialDataErrorsHIP(errorHipModel)
+  private val errorModel  = FinancialDataError("2017-01-01", "002", "Invalid Tax Regime")
+  private val errorsModel = FinancialDataErrors(errorModel)
 
-  "FinancialDataErrorHIP" must {
-    "write FinancialDataErrorHIP model to json" in {
-      Json.toJson(errorHipModel) shouldBe errorHipJson
+  "FinancialDataError" must {
+    "write FinancialDataError model to json" in {
+      Json.toJson(errorModel) shouldBe errorJson
     }
 
     "read from json response" in {
-      errorHipJson.as[FinancialDataErrorHIP] shouldBe errorHipModel
+      errorJson.as[FinancialDataError] shouldBe errorModel
     }
   }
-  "FinancialDataErrorsHIP" must {
-    "write FinancialDataErrorsHIP model to json" in {
-      Json.toJson(errorsHipModel) shouldBe errorsHipJson
+
+  "FinancialDataErrors" must {
+    "write FinancialDataErrors model to json" in {
+      Json.toJson(errorsModel) shouldBe errorsJson
     }
 
     "read from json response" in {
-      errorsHipJson.as[FinancialDataErrorsHIP] shouldBe errorsHipModel
+      errorsJson.as[FinancialDataErrors] shouldBe errorsModel
     }
   }
 

@@ -49,8 +49,7 @@ class PenaltiesControllerSpec
       service = mockPenaltiesService,
       auditService = stubAuditService,
       cc = cc,
-      idGenerator = mockIdGenerator,
-      appConfig = mockAppConfig
+      idGenerator = mockIdGenerator
     )
 
     MockIdGenerator.getUid.returns(PenaltiesConstants.correlationId)

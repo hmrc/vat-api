@@ -23,7 +23,7 @@ import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.penalties.{ PenaltiesErrorsHIP, PenaltiesResponse }
+import v1.models.response.penalties.{ PenaltiesErrors, PenaltiesResponse }
 
 object PenaltiesHttpParser extends Logging {
 
@@ -50,16 +50,16 @@ object PenaltiesHttpParser extends Logging {
     }
 
     def errorHelper(jsonString: JsValue): MtdError = {
-      jsonString.validate[PenaltiesErrorsHIP] match {
-        case JsSuccess(errorsHIP, _) => convertToMtdErrorsHIP(errorsHIP)
+      jsonString.validate[PenaltiesErrors] match {
+        case JsSuccess(errors, _) => convertToMtdErrors(errors)
         case JsError(errors) =>
           MtdError("SERVER_ERROR", s"Unable to validate json error response with errors: $errors", Some(jsonString))
       }
     }
   }
 
-  private def convertToMtdErrorsHIP(errorsHIP: PenaltiesErrorsHIP): MtdError = {
-    val error = errorsHIP.errors
+  private def convertToMtdErrors(errors: PenaltiesErrors): MtdError = {
+    val error = errors.errors
     error.code match {
       case "002" => DownstreamError // Invalid Tax Regime
       case "003" => DownstreamError // Request could not be processed (ETMP issue)

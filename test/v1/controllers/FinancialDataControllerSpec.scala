@@ -49,8 +49,7 @@ class FinancialDataControllerSpec
       service = mockPenaltiesService,
       auditService = stubAuditService,
       cc = cc,
-      idGenerator = mockIdGenerator,
-      appConfig = mockAppConfig
+      idGenerator = mockIdGenerator
     )
 
     MockIdGenerator.getUid.returns(FinancialDataConstants.correlationId)

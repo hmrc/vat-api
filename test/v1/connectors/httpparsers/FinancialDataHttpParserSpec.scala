@@ -38,59 +38,57 @@ class FinancialDataHttpParserSpec extends UnitSpec {
     )
 
   "FinancialDataHttpParser .read" when {
-    Seq(OK, CREATED).foreach { successResponse =>
-      s"API response is a $successResponse" when {
-        "json is valid" must {
-          "return a partial FinancialDataResponse model when json has no Totalisations" in {
-            val response = buildHttpResponse(successResponse, hipFinancialDetailsNoTotalisations)
-            val result   = FinancialDataHttpReads.read("", "", response)
+    "API response is an OK (200)" when {
+      "json is valid" must {
+        "return a partial FinancialDataResponse model when json has no Totalisations" in {
+          val response = buildHttpResponse(OK, financialDetailsNoTotalisations)
+          val result   = FinancialDataHttpReads.read("", "", response)
 
-            val expectedModel  = FinancialDataResponse(totalisations = None, Some(Seq(testDocumentDetail)))
-            val expectedResult = ResponseWrapper(correlationId, expectedModel)
+          val expectedModel  = FinancialDataResponse(totalisations = None, Some(Seq(testDocumentDetail)))
+          val expectedResult = ResponseWrapper(correlationId, expectedModel)
 
-            result shouldBe Right(expectedResult)
-          }
-
-          "return a partial FinancialDataResponse model when json has no DocumentDetails" in {
-            val response = buildHttpResponse(successResponse, hipFinancialDetailsNoDocumentDetails)
-            val result   = FinancialDataHttpReads.read("", "", response)
-
-            val expectedModel  = FinancialDataResponse(Some(testTotalisation), documentDetails = None)
-            val expectedResult = ResponseWrapper(correlationId, expectedModel)
-
-            result shouldBe Right(expectedResult)
-          }
-
-          "return a full FinancialDataResponse model" in {
-            val response = buildHttpResponse(successResponse, testDownstreamFinancialDetails)
-            val result   = FinancialDataHttpReads.read("", "", response)
-
-            val expectedModel  = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
-            val expectedResult = ResponseWrapper(correlationId, expectedModel)
-
-            result shouldBe Right(expectedResult)
-          }
+          result shouldBe Right(expectedResult)
         }
 
-        "json is invalid" must {
-          "return Left(InvalidJson)" in {
-            val invalidJsonObject =
-              Json.parse("""{
-                  |  "success": {
-                  |    "financialData": {
-                  |      "documentDetails": {
-                  |        "test": "test"
-                  |      }
-                  |    }
-                  |  }
-                  |}
-                  |""".stripMargin)
-            val response = buildHttpResponse(successResponse, invalidJsonObject)
+        "return a partial FinancialDataResponse model when json has no DocumentDetails" in {
+          val response = buildHttpResponse(OK, financialDetailsNoDocumentDetails)
+          val result   = FinancialDataHttpReads.read("", "", response)
 
-            val result = FinancialDataHttpReads.read("", "", response)
+          val expectedModel  = FinancialDataResponse(Some(testTotalisation), documentDetails = None)
+          val expectedResult = ResponseWrapper(correlationId, expectedModel)
 
-            result shouldBe Left(errorWrapper(InvalidJson))
-          }
+          result shouldBe Right(expectedResult)
+        }
+
+        "return a full FinancialDataResponse model" in {
+          val response = buildHttpResponse(OK, testDownstreamFinancialDetails)
+          val result   = FinancialDataHttpReads.read("", "", response)
+
+          val expectedModel  = FinancialDataResponse(Some(testTotalisation), Some(Seq(testDocumentDetail)))
+          val expectedResult = ResponseWrapper(correlationId, expectedModel)
+
+          result shouldBe Right(expectedResult)
+        }
+      }
+
+      "json is invalid" must {
+        "return Left(InvalidJson)" in {
+          val invalidJsonObject =
+            Json.parse("""{
+                |  "success": {
+                |    "financialData": {
+                |      "documentDetails": {
+                |        "test": "test"
+                |      }
+                |    }
+                |  }
+                |}
+                |""".stripMargin)
+          val response = buildHttpResponse(OK, invalidJsonObject)
+
+          val result = FinancialDataHttpReads.read("", "", response)
+
+          result shouldBe Left(errorWrapper(InvalidJson))
         }
       }
     }
@@ -105,7 +103,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
       }
     }
 
-    "API response is an error (any non 200/201/403 status)" must {
+    "API response is an error (any non 200/403 status)" must {
       "return the error in an ErrorWrapper (appropriate error handled by .errorHelper)" in {
         val error = Json.parse("""
             |{
@@ -126,8 +124,8 @@ class FinancialDataHttpParserSpec extends UnitSpec {
   }
 
   "FinancialDataHttpParser .errorHelper" when {
-    "the error response matches the FinancialDataErrorsHIP format" must {
-      def buildErrorHip(code: String, text: Option[String] = None): JsValue = {
+    "the error response matches the FinancialDataErrors format" must {
+      def buildError(code: String, text: Option[String] = None): JsValue = {
         val errorText = text.getOrElse("This is the error message")
         Json.parse(s"""
              |{
@@ -143,13 +141,13 @@ class FinancialDataHttpParserSpec extends UnitSpec {
       "return a DownstreamError" when {
         Seq("002", "003", "015", "019", "020").foreach { errorCode =>
           s"error code is $errorCode" in {
-            val result = FinancialDataHttpReads.errorHelper(buildErrorHip(errorCode))
+            val result = FinancialDataHttpReads.errorHelper(buildError(errorCode))
 
             result shouldBe DownstreamError
           }
         }
         "error code is '017' and error text is 'Invalid Search Type'" in {
-          val result = FinancialDataHttpReads.errorHelper(buildErrorHip("017", Some("Invalid Search Type")))
+          val result = FinancialDataHttpReads.errorHelper(buildError("017", Some("Invalid Search Type")))
 
           result shouldBe DownstreamError
         }
@@ -157,7 +155,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
       "return a FinancialInvalidIdNumber" when {
         "error code is '016'" in {
-          val result = FinancialDataHttpReads.errorHelper(buildErrorHip("016"))
+          val result = FinancialDataHttpReads.errorHelper(buildError("016"))
 
           result shouldBe FinancialInvalidIdNumber
         }
@@ -165,7 +163,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
       "return a FinancialInvalidSearchItem" when {
         "error code is '017' and error text is NOT 'Invalid Search Type'" in {
-          val result = FinancialDataHttpReads.errorHelper(buildErrorHip("017", Some("Invalid Charge Reference")))
+          val result = FinancialDataHttpReads.errorHelper(buildError("017", Some("Invalid Charge Reference")))
 
           result shouldBe FinancialInvalidSearchItem
         }
@@ -173,7 +171,7 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
       "return a FinancialNotDataFound" when {
         "error code is '018'" in {
-          val result = FinancialDataHttpReads.errorHelper(buildErrorHip("018"))
+          val result = FinancialDataHttpReads.errorHelper(buildError("018"))
 
           result shouldBe FinancialNotDataFound
         }
@@ -181,14 +179,14 @@ class FinancialDataHttpParserSpec extends UnitSpec {
 
       "return a MtdError with error code and text" when {
         "error code is not recognised" in {
-          val result = FinancialDataHttpReads.errorHelper(buildErrorHip("111", Some("Unknown error message")))
+          val result = FinancialDataHttpReads.errorHelper(buildError("111", Some("Unknown error message")))
 
           result shouldBe MtdError("111", "Unknown error message")
         }
       }
     }
 
-    "the error response does not match the FinancialDataErrorsHIP format" must {
+    "the error response does not match the FinancialDataErrors format" must {
       "return a MtdError explaining service was unable to validate json error response" in {
         val errorWithInvalidJsonFormat = Json.parse(s"""
              |{

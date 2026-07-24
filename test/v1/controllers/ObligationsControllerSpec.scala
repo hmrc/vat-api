@@ -170,7 +170,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
         val auditResponse: AuditResponse = AuditResponse(OK, None, Some(mtdJson))
         MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
-          UserDetails("Individual", None, "client-Id"), auditResponse)).once
+          UserDetails("Individual", None, "client-Id"), auditResponse)).once()
       }
     }
 
@@ -191,7 +191,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(error.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
-              UserDetails("Individual", None, "client-Id"), auditResponse)).once
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once()
           }
         }
 
@@ -226,7 +226,7 @@ class ObligationsControllerSpec extends ControllerBaseSpec
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
             MockedAuditService.verifyAuditEvent(AuditEvents.auditObligations(correlationId,
-              UserDetails("Individual", None, "client-Id"), auditResponse)).once
+              UserDetails("Individual", None, "client-Id"), auditResponse)).once()
           }
         }
 

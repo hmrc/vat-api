@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,37 +97,28 @@ object Totalisations {
 case class FinancialDataResponse(totalisations: Option[Totalisations], documentDetails: Option[Seq[DocumentDetail]])
 
 object FinancialDataResponse {
-  private val readIfResponse: Reads[FinancialDataResponse] = (
-    (JsPath \ "getFinancialData" \ "financialDetails" \ "totalisation").readNullable[Totalisations] and
-      (JsPath \ "getFinancialData" \ "financialDetails" \ "documentDetails").readNullable[Seq[DocumentDetail]]
-  )(FinancialDataResponse.apply _)
-  private val readHipResponse: Reads[FinancialDataResponse] = (
-    (JsPath \ "success" \ "financialData" \ "totalisation").readNullable[Totalisations] and
-      (JsPath \ "success" \ "financialData" \ "documentDetails").readNullable[Seq[DocumentDetail]]
-  )(FinancialDataResponse.apply _)
 
   implicit val reads: Reads[FinancialDataResponse] = { json =>
-    if ((json \ "getFinancialData").isDefined) {
-      readIfResponse.reads(json)
-    } else if ((json \ "success").isDefined) {
-      readHipResponse.reads(json)
-    } else {
-      JsError("Unrecognised FinancialDataResponse format")
+    (json \ "success" \ "financialData").toOption match {
+      case None => JsError("Unrecognised FinancialDataResponse format")
+      case Some(_) =>
+        ((JsPath \ "success" \ "financialData" \ "totalisation").readNullable[Totalisations] and
+          (JsPath \ "success" \ "financialData" \ "documentDetails").readNullable[Seq[DocumentDetail]])(FinancialDataResponse.apply _).reads(json)
     }
   }
 
   implicit val writes: OWrites[FinancialDataResponse] = Json.writes[FinancialDataResponse]
 }
 
-// Despite the name HIP 'errors' are always singular even if request has multiple issues
-case class FinancialDataErrorsHIP(errors: FinancialDataErrorHIP)
+// Despite the name, 'errors' field is always singular even if request has multiple issues
+case class FinancialDataErrors(errors: FinancialDataError)
 
-object FinancialDataErrorsHIP {
-  implicit val format: OFormat[FinancialDataErrorsHIP] = Json.format[FinancialDataErrorsHIP]
+object FinancialDataErrors {
+  implicit val format: OFormat[FinancialDataErrors] = Json.format[FinancialDataErrors]
 }
 
-case class FinancialDataErrorHIP(processingDate: String, code: String, text: String)
+case class FinancialDataError(processingDate: String, code: String, text: String)
 
-object FinancialDataErrorHIP {
-  implicit val format: Format[FinancialDataErrorHIP] = Json.format[FinancialDataErrorHIP]
+object FinancialDataError {
+  implicit val format: Format[FinancialDataError] = Json.format[FinancialDataError]
 }

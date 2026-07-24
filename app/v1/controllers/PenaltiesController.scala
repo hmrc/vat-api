@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import config.AppConfig
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, ControllerComponents, Result }
 import utils.{ EndpointLogContext, IdGenerator, Logging }
@@ -38,8 +37,7 @@ class PenaltiesController @Inject()(val authService: EnrolmentsAuthService,
                                     service: PenaltiesService,
                                     auditService: AuditService,
                                     cc: ControllerComponents,
-                                    val idGenerator: IdGenerator,
-                                    appConfig: AppConfig)(implicit ec: ExecutionContext)
+                                    val idGenerator: IdGenerator)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc)
     with BaseController
     with Logging {

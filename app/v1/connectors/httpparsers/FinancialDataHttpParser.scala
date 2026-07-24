@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import utils.Logging
 import v1.connectors.Outcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.response.financialData.{ FinancialDataErrorsHIP, FinancialDataResponse }
+import v1.models.response.financialData.{ FinancialDataErrors, FinancialDataResponse }
 
 object FinancialDataHttpParser extends Logging {
 
@@ -32,7 +32,7 @@ object FinancialDataHttpParser extends Logging {
     def read(method: String, url: String, response: HttpResponse): Outcome[FinancialDataResponse] = {
       val responseCorrelationId = retrieveCorrelationId(response)
       response.status match {
-        case OK | CREATED =>
+        case OK =>
           response.json.validate[FinancialDataResponse] match {
             case JsSuccess(model, _) => Right(ResponseWrapper(responseCorrelationId, model))
             case JsError(errors) =>
@@ -50,15 +50,15 @@ object FinancialDataHttpParser extends Logging {
     }
 
     def errorHelper(jsonString: JsValue): MtdError = {
-      jsonString.validate[FinancialDataErrorsHIP] match {
-        case JsSuccess(errorsHIP, _) => convertToMtdErrorsHIP(errorsHIP)
+      jsonString.validate[FinancialDataErrors] match {
+        case JsSuccess(errors, _) => convertToMtdErrors(errors)
         case JsError(errors) =>
           MtdError("SERVER_ERROR", s"Unable to validate json error response with errors: $errors", Some(jsonString))
       }
     }
 
-    private def convertToMtdErrorsHIP(errorsHIP: FinancialDataErrorsHIP): MtdError = {
-      val error = errorsHIP.errors
+    private def convertToMtdErrors(errors: FinancialDataErrors): MtdError = {
+      val error = errors.errors
       error.code match {
         case "002"                                        => DownstreamError // Invalid Tax Regime
         case "003"                                        => DownstreamError // Request could not be processed (ETMP issue)
