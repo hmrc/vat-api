@@ -25,8 +25,8 @@ import v1.models.domain.Vrn
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
-import v1.models.request.submit.{SubmitRequest, SubmitRequestBody}
-import v1.models.response.obligations.{Obligation, ObligationsResponse}
+import v1.models.request.submit.{ SubmitRequest, SubmitRequestBody }
+import v1.models.response.obligations.{ Obligation, ObligationsResponse }
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -41,17 +41,17 @@ class AssistObligationServiceSpec extends ServiceSpec {
   private val today: LocalDate  = LocalDate.parse("2026-05-12")
 
   private val submitRequestBody: SubmitRequestBody = SubmitRequestBody(
-    periodKey                    = Some(periodKey),
-    vatDueSales                  = Some(7000.00),
-    vatDueAcquisitions           = Some(3000.00),
-    totalVatDue                  = Some(10000.00),
-    vatReclaimedCurrPeriod       = Some(1000.00),
-    netVatDue                    = Some(9000.00),
-    totalValueSalesExVAT         = Some(1000),
-    totalValuePurchasesExVAT     = Some(200),
+    periodKey = Some(periodKey),
+    vatDueSales = Some(7000.00),
+    vatDueAcquisitions = Some(3000.00),
+    totalVatDue = Some(10000.00),
+    vatReclaimedCurrPeriod = Some(1000.00),
+    netVatDue = Some(9000.00),
+    totalValueSalesExVAT = Some(1000),
+    totalValuePurchasesExVAT = Some(200),
     totalValueGoodsSuppliedExVAT = Some(100),
-    totalAcquisitionsExVAT       = Some(540),
-    finalised                    = None
+    totalAcquisitionsExVAT = Some(540),
+    finalised = None
   )
 
   private val submitRequest: SubmitRequest = SubmitRequest(Vrn(vrn), submitRequestBody)
@@ -63,11 +63,11 @@ class AssistObligationServiceSpec extends ServiceSpec {
   private def obligation(periodKey: String, end: String): Obligation =
     Obligation(
       periodKey = periodKey,
-      start     = "2026-01-01",
-      end       = end,
-      due       = "2026-05-07",
-      status    = "O",
-      received  = None
+      start = "2026-01-01",
+      end = end,
+      due = "2026-05-07",
+      status = "O",
+      received = None
     )
 
   private def obligationsResponse(obligations: Obligation*): ObligationsResponse =
@@ -210,9 +210,8 @@ class AssistObligationServiceSpec extends ServiceSpec {
 
         MockObligationsConnector
           .retrieveObligations(obligationsRequest)
-          .returns(Future.successful(Left(ResponseWrapper(
-            correlationId,
-            DesErrors(List(DesErrorCode("INVALID_IDTYPE"), DesErrorCode("INVALID_IDNUMBER")))))))
+          .returns(Future.successful(
+            Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("INVALID_IDTYPE"), DesErrorCode("INVALID_IDNUMBER")))))))
 
         await(service.retrieveOpenObligation(submitRequest, today)) shouldBe
           Left(ErrorWrapper(correlationId, ServiceUnavailableError))
@@ -228,7 +227,7 @@ class AssistObligationServiceSpec extends ServiceSpec {
           Left(ErrorWrapper(correlationId, ServiceUnavailableError))
       }
 
-      "return the inbound correlation ID even when DES returns its own" in new Test {
+      "return the txr correlation ID even when DES returns its own" in new Test {
 
         MockObligationsConnector
           .retrieveObligations(obligationsRequest)

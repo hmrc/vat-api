@@ -24,7 +24,7 @@ import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.controllers.{ AuthorisedController, BaseController }
 import v1.models.errors._
 import v1.models.request.submit.SubmitRawData
-import v1.services.{ EnrolmentsAuthService, AssistObligationService }
+import v1.services.{ AssistObligationService, EnrolmentsAuthService }
 
 import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
