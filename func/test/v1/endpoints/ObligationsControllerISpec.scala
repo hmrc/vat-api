@@ -19,38 +19,35 @@ package v1.endpoints
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.WSRequest
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
 import v1.fixtures.ObligationsFixture
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub, DesStub}
+import v1.stubs.{ AuditStub, AuthStub, DesStub }
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 
 class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFixture {
 
   private trait Test {
 
-    val vrn: String = "123456789"
-    val fromDate: String = "2017-01-01"
-    val toDate: String = "2017-12-01"
-    val emptyDate = ""
+    val vrn: String       = "123456789"
+    val fromDate: String  = "2017-01-01"
+    val toDate: String    = "2017-12-01"
+    private val emptyDate = ""
 
-    val oblStatus: String = ""
-    val oblStatusF: String = "F"
-    val oblStatusO: String = "O"
-
-    val correlationId: String = "X-ID"
+    val oblStatusF: String         = "F"
+    private val oblStatusO: String = "O"
 
     val desJson: JsValue = obligationsDesJson
     val mtdJson: JsValue = obligationsMtdJson
 
     //Obligation with status = "F"
-    def uri: String = s"/$vrn/obligations?from=$fromDate&to=$toDate&status=$oblStatusF"
+    private def uri: String = s"/$vrn/obligations?from=$fromDate&to=$toDate&status=$oblStatusF"
+
     def mtdQueryParams: Seq[(String, String)] =
       Seq(
         ("from", fromDate),
@@ -59,30 +56,22 @@ class ObligationsControllerISpec extends IntegrationBaseSpec with ObligationsFix
       )
 
     def desUrl: String = s"/enterprise/obligation-data/vrn/$vrn/VATC"
+
     val desQueryParams: Map[String, String] =
       Map(
-        "from" -> fromDate,
-        "to" -> toDate,
+        "from"   -> fromDate,
+        "to"     -> toDate,
         "status" -> oblStatusF,
       )
 
-    //With Status = "O"
-    def uriOmitted: String = s"/$vrn/obligations?from=$emptyDate&to=$emptyDate&status=$oblStatusO"
-    def mtdQueryParamsOmitted: Seq[(String, String)] =
-      Seq(
-        ("from", emptyDate),
-        ("to", emptyDate),
-        ("status", oblStatusO)
-      )
-
     def desUrlOmitted: String = s"/enterprise/obligation-data/vrn/$vrn/VATC"
+
     val desQueryParamsOmitted: Map[String, String] =
       Map(
-        "from" -> emptyDate,
-        "to" -> emptyDate,
+        "from"   -> emptyDate,
+        "to"     -> emptyDate,
         "status" -> oblStatusO,
       )
-
 
     def setupStubs(): StubMapping
 

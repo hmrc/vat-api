@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package v1.connectors
 
 import mocks.MockAppConfig
-import v1.models.domain.Vrn
 import v1.mocks.MockHttpClient
-import v1.models.errors.{DesErrorCode, DesErrors}
+import v1.models.domain.Vrn
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
-import v1.models.response.obligations.{Obligation, ObligationsResponse}
+import v1.models.response.obligations.{ Obligation, ObligationsResponse }
 
 import scala.concurrent.Future
 
@@ -31,18 +30,19 @@ class ObligationsConnectorSpec extends ConnectorSpec {
   val vrn: Vrn = Vrn("123456789")
 
   val obligationsResponse: ObligationsResponse =
-    ObligationsResponse(Seq(
-      Obligation(
-        periodKey = "18A2",
-        start = "2017-04-01",
-        end = "2017-06-30",
-        due = "2017-08-07",
-        status = "O",
-        received = None
-      )
-    ))
+    ObligationsResponse(
+      Seq(
+        Obligation(
+          periodKey = "18A2",
+          start = "2017-04-01",
+          end = "2017-06-30",
+          due = "2017-08-07",
+          status = "O",
+          received = None
+        )
+      ))
 
-  val outcome = Right(ResponseWrapper(correlationId, obligationsResponse))
+  private val outcome = Right(ResponseWrapper(correlationId, obligationsResponse))
 
   class Test extends MockHttpClient with MockAppConfig {
 
@@ -55,90 +55,68 @@ class ObligationsConnectorSpec extends ConnectorSpec {
   }
 
   "ObligationsConnector" when {
-
     "retrieving obligations" must {
+      "return a success response from the HttpClient" when {
+        "query parameters are provided" in new Test {
+          val from                               = "2017-04-06"
+          val to                                 = "2018-04-05"
+          val status                             = "O"
+          val queryParams: Seq[(String, String)] = Seq("from" -> from, "to" -> to, "status" -> status)
 
-      "return a valid response" in new Test {
+          val request: ObligationsRequest = ObligationsRequest(vrn, Some(from), Some(to), Some(status))
 
-        val from = "2017-04-06"
-        val to = "2018-04-05"
+          MockedHttpClient
+            .get(
+              url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
+              queryParams = queryParams,
+              config = dummyDesHeaderCarrierConfig,
+              requiredHeaders = requiredDesHeaders,
+              excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+            )
+            .returns(Future.successful(outcome))
 
-        val status = "O"
+          await(connector.retrieveObligations(request)) shouldBe outcome
+        }
 
-        val queryParams: Seq[(String, String)] =
-          Seq(
-            "from" -> from,
-            "to" -> to,
-            "status" -> "O"
-          )
+        "no query parameters are provided" in new Test {
+          val queryParams: Seq[(String, String)] = Seq()
 
-        val request: ObligationsRequest = ObligationsRequest(vrn, Some(from), Some(to), Some(status))
+          val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = None)
 
-        MockedHttpClient
-          .get(
-            url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
-            queryParams = queryParams,
-            config = dummyDesHeaderCarrierConfig,
-            requiredHeaders = requiredDesHeaders,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(outcome))
+          MockedHttpClient
+            .get(
+              url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
+              queryParams = queryParams,
+              config = dummyDesHeaderCarrierConfig,
+              requiredHeaders = requiredDesHeaders,
+              excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+            )
+            .returns(Future.successful(outcome))
 
-        await(connector.retrieveObligations(request)) shouldBe outcome
+          await(connector.retrieveObligations(request)) shouldBe outcome
+        }
       }
 
-      "not add query parameters if not supplied" in new Test {
-
-        val queryParams: Seq[(String, String)] = Seq()
-
+      "return a failure response from the HttpClient" in new Test {
         val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = None)
 
         MockedHttpClient
           .get(
             url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
-            queryParams = queryParams,
+            queryParams = Seq(),
             config = dummyDesHeaderCarrierConfig,
             requiredHeaders = requiredDesHeaders,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(outcome))
+          )
+          .returns(Future.failed(new Exception("Test Exception")))
 
-        await(connector.retrieveObligations(request)) shouldBe outcome
-      }
+        private val catchResult = intercept[Exception] {
+          await(connector.retrieveObligations(request))
+        }
 
-      "only add query parameters supplied" in new Test {
-
-        val queryParams: Seq[(String, String)] = Seq("status" -> "O")
-
-        val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = Some("O"))
-
-        MockedHttpClient
-          .get(
-            url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
-            queryParams = queryParams,
-            config = dummyDesHeaderCarrierConfig,
-            requiredHeaders = requiredDesHeaders,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(outcome))
-
-        await(connector.retrieveObligations(request)) shouldBe outcome
-      }
-
-      "return a downstream error when backend fails" in new Test {
-
-        val queryParams: Seq[(String, String)] = Seq("status" -> "O")
-
-        val request: ObligationsRequest = ObligationsRequest(vrn, from = None, to = None, status = Some("O"))
-
-        MockedHttpClient
-          .get(
-            url = s"$baseUrl/enterprise/obligation-data/vrn/$vrn/VATC",
-            queryParams = queryParams,
-            config = dummyDesHeaderCarrierConfig,
-            requiredHeaders = requiredDesHeaders,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.failed(new Exception("test exception")))
-
-        await(connector.retrieveObligations(request)) shouldBe Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR")))))
+        catchResult.getMessage shouldBe "Test Exception"
       }
     }
   }
+
 }

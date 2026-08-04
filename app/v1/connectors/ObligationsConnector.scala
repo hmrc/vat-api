@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,15 @@
 package v1.connectors
 
 import config.AppConfig
-import play.api.http.Status
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.pagerDutyLogging.{Endpoint, PagerDutyLogging, PagerDutyLoggingEndpointName}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
+import utils.pagerDutyLogging.{ Endpoint, PagerDutyLoggingEndpointName }
 import v1.controllers.UserRequest
-import v1.models.errors.DesErrorCode.NOT_FOUND_BPKEY
-import v1.models.errors.{ConnectorError, DesErrorCode, DesErrors}
-import v1.models.outcomes.ResponseWrapper
+import v1.models.errors.ConnectorError
 import v1.models.request.obligations.ObligationsRequest
 import v1.models.response.obligations.ObligationsResponse
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector { self =>
@@ -44,9 +40,7 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
     val vrn = request.vrn.vrn
 
     implicit val connectorError: ConnectorError =
-      ConnectorError(vrn, hc.requestId.fold("") { requestId =>
-        requestId.value
-      })
+      ConnectorError(vrn, hc.requestId.fold("")(_.value))
     implicit val pagerDutyLoggingEndpointName: PagerDutyLoggingEndpointName.Value = Endpoint.RetrieveObligations.toLoggerMessage
 
     val queryParams: Seq[(String, String)] =
@@ -58,31 +52,6 @@ class ObligationsConnector @Inject()(val http: HttpClient, val appConfig: AppCon
         case (key, Some(value)) => key -> value
       }
 
-    get(
-      uri = DesUri[ObligationsResponse](s"enterprise/obligation-data/vrn/$vrn/VATC"),
-      queryParams = queryParams
-    ).andThen {
-      case Success(Left(ResponseWrapper(_, DesErrors(errorCodes)))) if errorCodes.exists(_.code == NOT_FOUND_BPKEY) =>
-        warnLog(s"[ObligationsConnector] [retrieveObligations] - Backend returned $NOT_FOUND_BPKEY error")
-    }.recover {
-      case e =>
-
-        val logDetails = s"request failed. ${e.getMessage}"
-
-        errorLog(ConnectorError.log(
-          logContext = "[ObligationsConnector][retrieveObligations]",
-          vrn = vrn,
-          details = logDetails,
-        ))
-
-        PagerDutyLogging.log(
-          pagerDutyLoggingEndpointName = Endpoint.RetrieveObligations.requestFailedMessage,
-          status = Status.INTERNAL_SERVER_ERROR,
-          body = logDetails,
-          f = errorLog(_),
-          affinityGroup = userRequest.userDetails.userType
-        )
-
-        Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("DOWNSTREAM_ERROR"))))) }
+    get(uri = DesUri[ObligationsResponse](s"enterprise/obligation-data/vrn/$vrn/VATC"), queryParams = queryParams)
   }
 }
