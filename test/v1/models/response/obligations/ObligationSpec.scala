@@ -19,6 +19,8 @@ package v1.models.response.obligations
 import play.api.libs.json.Json
 import support.UnitSpec
 
+import java.time.LocalDate
+
 class ObligationSpec extends UnitSpec {
 
   "Obligation" should {
@@ -120,6 +122,38 @@ class ObligationSpec extends UnitSpec {
 
         Json.toJson(obligation) shouldBe json
       }
+    }
+  }
+
+  "hasEnded" should {
+
+    val obligation = Obligation(
+      periodKey = "#001",
+      start     = "2017-04-06",
+      end       = "2017-07-05",
+      due       = "2017-08-05",
+      status    = "O",
+      received  = None
+    )
+
+    "return Some(true) when today is after the end date" in {
+      obligation.hasEnded(LocalDate.parse("2017-07-06")) shouldBe Some(true)
+    }
+
+    "return Some(false) when today is the end date, as today must be strictly after it" in {
+      obligation.hasEnded(LocalDate.parse("2017-07-05")) shouldBe Some(false)
+    }
+
+    "return Some(false) when today is before the end date" in {
+      obligation.hasEnded(LocalDate.parse("2017-07-04")) shouldBe Some(false)
+    }
+
+    "return None when the end date cannot be parsed" in {
+      obligation.copy(end = "not-a-date").hasEnded(LocalDate.parse("2017-07-06")) shouldBe None
+    }
+
+    "return None when the end date is empty" in {
+      obligation.copy(end = "").hasEnded(LocalDate.parse("2017-07-06")) shouldBe None
     }
   }
 }

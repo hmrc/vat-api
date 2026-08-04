@@ -18,6 +18,8 @@ package v1.models.errors
 
 import play.api.libs.json.Json
 
+import java.time.LocalDate
+
 // Parser Errors
 object InvalidFromError extends MtdError(
   code = "INVALID_DATE_FROM",
@@ -114,3 +116,28 @@ object RuleOBLDateRangeTooLargeError extends MtdError(
 // Service Errors
 object InvalidStatusErrorDes extends MtdError("INVALID_STATUS","The provided data is failed validation, invalid status")
 
+object NoOpenObligation extends MtdError("PERIOD_KEY_INVALID", "The supplied period key does not match an open obligation")
+
+// Internal (TxR assist) obligation matching outcomes
+sealed trait OpenObligationMatchError {
+  def error: MtdError
+  def detail: String
+}
+
+object OpenObligationMatchError {
+
+  case class NoMatchingObligation(requested: String, available: Seq[String]) extends OpenObligationMatchError {
+    val error: MtdError = NoOpenObligation
+    val detail: String  = s"no open obligation matching periodKey : $requested, open periodKeys returned : ${available.mkString(",")}"
+  }
+
+  case class PeriodNotEnded(periodKey: String, end: String, today: LocalDate) extends OpenObligationMatchError {
+    val error: MtdError = TaxPeriodNotEnded
+    val detail: String  = s"periodKey : $periodKey ends $end, which is not before $today"
+  }
+
+  case class UnreadableEndDate(periodKey: String, rawEnd: String) extends OpenObligationMatchError {
+    val error: MtdError = DownstreamError
+    val detail: String  = s"periodKey : $periodKey has an unparseable inboundCorrespondenceToDate : '$rawEnd'"
+  }
+}
