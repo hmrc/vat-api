@@ -17,14 +17,16 @@
 package v1.models.response.obligations
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{ JsPath, Json, OWrites, Reads }
 
-case class Obligation(periodKey: String,
-                      start: String,
-                      end: String,
-                      due: String,
-                      status: String,
-                      received: Option[String])
+import java.time.LocalDate
+import scala.util.Try
+
+case class Obligation(periodKey: String, start: String, end: String, due: String, status: String, received: Option[String]) {
+
+  def isEnded(date: String): Boolean = Try(LocalDate.parse(date)).isSuccess
+  // def hasEnded(today: LocalDate): Option[Boolean] = Try(LocalDate.parse(end)).toOption.map(today.isAfter)
+}
 
 object Obligation {
 
@@ -37,5 +39,5 @@ object Obligation {
       (JsPath \ "inboundCorrespondenceDueDate").read[String] and
       (JsPath \ "status").read[String] and
       (JsPath \ "inboundCorrespondenceDateReceived").readNullable[String]
-    )(Obligation.apply _)
+  )(Obligation.apply _)
 }

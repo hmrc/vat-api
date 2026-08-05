@@ -9,7 +9,7 @@ vat-api has these endpoints:
   - GET penalties
   - GET financial-details (retrieves the financial details relating to a late submission or late payment penalty)
   - GET information (retrieves information about a VAT customer)
-  - POST validate (internal only - validate a vat return)
+  - POST validate (internal only - validate and retrieve obligations for a vat return)
 
 ## Prerequisites 
 - Scala 2.13.x
