@@ -40,18 +40,18 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
     val desQueryParams: Map[String, String] = Map("status" -> "O")
 
     lazy val validRequestJson: JsValue = Json.parse(s"""
-                                                  |{
-                                                  |  "periodKey": "$periodKey",
-                                                  |  "vatDueSales": 100.00,
-                                                  |  "vatDueAcquisitions": 100.00,
-                                                  |  "totalVatDue": 200.00,
-                                                  |  "vatReclaimedCurrPeriod": 100.00,
-                                                  |  "netVatDue": 100.00,
-                                                  |  "totalValueSalesExVAT": 500,
-                                                  |  "totalValuePurchasesExVAT": 500,
-                                                  |  "totalValueGoodsSuppliedExVAT": 500,
-                                                  |  "totalAcquisitionsExVAT": 500
-                                                  |}
+         |{
+         |  "periodKey": "$periodKey",
+         |  "vatDueSales": 100.00,
+         |  "vatDueAcquisitions": 100.00,
+         |  "totalVatDue": 200.00,
+         |  "vatReclaimedCurrPeriod": 100.00,
+         |  "netVatDue": 100.00,
+         |  "totalValueSalesExVAT": 500,
+         |  "totalValuePurchasesExVAT": 500,
+         |  "totalValueGoodsSuppliedExVAT": 500,
+         |  "totalAcquisitionsExVAT": 500
+         |}
     """.stripMargin)
 
     def uri: String = s"/internal/validate/$vrn"
@@ -131,32 +131,32 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
       "a request is made with an invalid monetary value" in new Test {
 
         val invalidMonetaryJson: JsValue = Json.parse(s"""
-                                                         |{
-                                                         |  "periodKey": "$periodKey",
-                                                         |  "vatDueSales": 100.00,
-                                                         |  "vatDueAcquisitions": 100.00,
-                                                         |  "totalVatDue": 200.00,
-                                                         |  "vatReclaimedCurrPeriod": 100.00,
-                                                         |  "netVatDue": 100.00,
-                                                         |  "totalValueSalesExVAT": 500,
-                                                         |  "totalValuePurchasesExVAT": 500,
-                                                         |  "totalValueGoodsSuppliedExVAT": 1000000000000000000000,
-                                                         |  "totalAcquisitionsExVAT": 500
-                                                         |}
+             |{
+             |  "periodKey": "$periodKey",
+             |  "vatDueSales": 100.00,
+             |  "vatDueAcquisitions": 100.00,
+             |  "totalVatDue": 200.00,
+             |  "vatReclaimedCurrPeriod": 100.00,
+             |  "netVatDue": 100.00,
+             |  "totalValueSalesExVAT": 500,
+             |  "totalValuePurchasesExVAT": 500,
+             |  "totalValueGoodsSuppliedExVAT": 1000000000000000000000,
+             |  "totalAcquisitionsExVAT": 500
+             |}
     """.stripMargin)
 
         val expectedError: JsValue = Json.parse("""
-                                                  |{
-                                                  |  "code": "INVALID_REQUEST",
-                                                  |  "message": "Invalid request",
-                                                  |  "errors": [
-                                                  |    {
-                                                  |      "code": "INVALID_MONETARY_AMOUNT",
-                                                  |      "message": "The value must be between -9999999999999 and 9999999999999",
-                                                  |      "path": "/totalValueGoodsSuppliedExVAT"
-                                                  |    }
-                                                  |  ]
-                                                  |}
+            |{
+            |  "code": "INVALID_REQUEST",
+            |  "message": "Invalid request",
+            |  "errors": [
+            |    {
+            |      "code": "INVALID_MONETARY_AMOUNT",
+            |      "message": "The value must be between -9999999999999 and 9999999999999",
+            |      "path": "/totalValueGoodsSuppliedExVAT"
+            |    }
+            |  ]
+            |}
     """.stripMargin)
 
         override def setupStubs(): StubMapping = {
@@ -174,38 +174,38 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
       "a request is made with multiple field validation failures" in new Test {
 
         val invalidRequestJson: JsValue = Json.parse(s"""
-                                                        |{
-                                                        |  "periodKey": "$periodKey",
-                                                        |  "vatDueSales": 100.00,
-                                                        |  "vatDueAcquisitions": 100.00,
-                                                        |  "totalVatDue": 200.00,
-                                                        |  "vatReclaimedCurrPeriod": 10000000000000000000000.00,
-                                                        |  "netVatDue": 100.00,
-                                                        |  "totalValueSalesExVAT": 500,
-                                                        |  "totalValuePurchasesExVAT": 500,
-                                                        |  "totalValueGoodsSuppliedExVAT": 500,
-                                                        |  "totalAcquisitionsExVAT": 50000000000000000000000
-                                                        |}
+             |{
+             |  "periodKey": "$periodKey",
+             |  "vatDueSales": 100.00,
+             |  "vatDueAcquisitions": 100.00,
+             |  "totalVatDue": 200.00,
+             |  "vatReclaimedCurrPeriod": 10000000000000000000000.00,
+             |  "netVatDue": 100.00,
+             |  "totalValueSalesExVAT": 500,
+             |  "totalValuePurchasesExVAT": 500,
+             |  "totalValueGoodsSuppliedExVAT": 500,
+             |  "totalAcquisitionsExVAT": 50000000000000000000000
+             |}
     """.stripMargin)
 
         val multipleErrors: JsValue = Json.parse(
           """
-                                                   |{
-                                                   |  "code": "INVALID_REQUEST",
-                                                   |  "message": "Invalid request",
-                                                   |  "errors": [
-                                                   |    {
-                                                   |      "code": "INVALID_MONETARY_AMOUNT",
-                                                   |      "message": "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
-                                                   |      "path": "/vatReclaimedCurrPeriod"
-                                                   |    },
-                                                   |    {
-                                                   |      "code": "INVALID_MONETARY_AMOUNT",
-                                                   |      "message": "The value must be between -9999999999999 and 9999999999999",
-                                                   |      "path": "/totalAcquisitionsExVAT"
-                                                   |    }
-                                                   |  ]
-                                                   |}
+            |{
+            |  "code": "INVALID_REQUEST",
+            |  "message": "Invalid request",
+            |  "errors": [
+            |    {
+            |      "code": "INVALID_MONETARY_AMOUNT",
+            |      "message": "amount should be a monetary value (to 2 decimal places), between -9,999,999,999,999.99 and 9,999,999,999,999.99",
+            |      "path": "/vatReclaimedCurrPeriod"
+            |    },
+            |    {
+            |      "code": "INVALID_MONETARY_AMOUNT",
+            |      "message": "The value must be between -9999999999999 and 9999999999999",
+            |      "path": "/totalAcquisitionsExVAT"
+            |    }
+            |  ]
+            |}
     """.stripMargin)
 
         override def setupStubs(): StubMapping = {
