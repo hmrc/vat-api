@@ -44,7 +44,7 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
 
     EitherT(connector.retrieveObligations(request))
       .leftMap { errorResponse =>
-        warnLog(s"[ObligationsService][retrieveObligations] - Backend returned errors: ${getErrorCodesList(errorResponse)}")
+        warnLog(s"[ObligationsService][retrieveObligations] - Backend returned errors: ${getErrorCodesAsFormattedList(errorResponse)}")
         mapDesErrors(desErrorMap)(errorResponse)
       }
       .value
@@ -66,10 +66,12 @@ class ObligationsService @Inject()(connector: ObligationsConnector) extends DesR
       }
   }
 
-  private def getErrorCodesList(errorResponse: ResponseWrapper[DesError]): String =
+  private def getErrorCodesAsFormattedList(errorResponse: ResponseWrapper[DesError]): String =
     errorResponse match {
-      case ResponseWrapper(_, DesErrors(errorCodes))        => errorCodes.map(_.code).mkString(", ")
-      case ResponseWrapper(_, OutboundError(error, errors)) => error.code + errors.fold("")(_.map(_.code).mkString(", "))
+      case ResponseWrapper(_, DesErrors(errorCodes)) =>
+        errorCodes.map(_.code).mkString(", ")
+      case ResponseWrapper(_, OutboundError(error, errors)) =>
+        (error.code +: errors.fold(Seq.empty[String])(_.map(_.code))).mkString(", ")
     }
 
   private val desErrorMap: Map[String, MtdError] =
