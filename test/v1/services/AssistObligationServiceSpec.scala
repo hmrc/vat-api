@@ -18,6 +18,8 @@ package v1.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import support.LogCapturing
+import utils.pagerDutyLogging.Endpoint
 import v1.controllers.UserRequest
 import v1.mocks.connectors.MockObligationsConnector
 import v1.models.auth.UserDetails
@@ -31,7 +33,7 @@ import v1.models.response.obligations.{ Obligation, ObligationsResponse }
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class AssistObligationServiceSpec extends ServiceSpec {
+class AssistObligationServiceSpec extends ServiceSpec with LogCapturing {
 
   implicit val userRequest: UserRequest[AnyContentAsEmpty.type] =
     UserRequest(UserDetails("Individual", None, "id"), FakeRequest())
@@ -235,6 +237,36 @@ class AssistObligationServiceSpec extends ServiceSpec {
 
         await(service.retrieveOpenObligation(submitRequest, today)) shouldBe
           Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+      }
+
+      "return ServiceUnavailableError when the connector call throws an exception" in new Test {
+
+        MockObligationsConnector
+          .retrieveObligations(obligationsRequest)
+          .returns(Future.failed(new RuntimeException("connection reset")))
+
+        await(service.retrieveOpenObligation(submitRequest, today)) shouldBe
+          Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+      }
+
+      "log the failure, raise a PagerDuty alert, and return ServiceUnavailableError when the connector throws" in new Test {
+
+        private val exceptionMessage = "connection reset"
+
+        MockObligationsConnector
+          .retrieveObligations(obligationsRequest)
+          .returns(Future.failed(new RuntimeException(exceptionMessage)))
+
+        withCaptureOfLoggingFrom(service.logger) { logs =>
+          val result = await(service.retrieveOpenObligation(submitRequest, today))
+
+          val allLogs = logs.map(_.getMessage).mkString
+
+          allLogs should include(s"Request failed with error: $exceptionMessage")
+          allLogs should include(Endpoint.RetrieveObligations.requestFailedMessage.toString)
+
+          result shouldBe Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+        }
       }
     }
   }

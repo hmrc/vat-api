@@ -16,7 +16,9 @@
 
 package v1.services
 
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.pagerDutyLogging.{ Endpoint, PagerDutyLogging }
 import utils.{ EndpointLogContext, Logging }
 import v1.connectors.ObligationsConnector
 import v1.controllers.UserRequest
@@ -32,7 +34,7 @@ import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 /** Retrieves the open VAT obligation matching a submitted return's period key, for the internal
-  * TxR assist flow. Separate from [[ObligationsService]] (which serves the public obligations endpoint)
+  * TxR assist flow. Separate from ObligationsService which serves the public obligations endpoint
   */
 @Singleton
 class AssistObligationService @Inject()(connector: ObligationsConnector) extends Logging {
@@ -50,30 +52,48 @@ class AssistObligationService @Inject()(connector: ObligationsConnector) extends
 
     infoLog(s"$logContext retrieving open obligations for VRN : $vrn, periodKey : $periodKey, correlationId : $correlationId")
 
-    connector.retrieveObligations(obligationsRequest).map {
+    connector
+      .retrieveObligations(obligationsRequest)
+      .map {
 
-      case Right(ResponseWrapper(desCorrelationId, obligationsResponse)) =>
-        findOpenObligation(obligationsResponse, periodKey, today) match {
+        case Right(ResponseWrapper(desCorrelationId, obligationsResponse)) =>
+          findOpenObligation(obligationsResponse, periodKey, today) match {
 
-          case Right(obligation) =>
-            infoLog(
-              s"$logContext matched open obligation for periodKey : $periodKey, VRN : $vrn, " +
-                s"correlationId : $correlationId, desCorrelationId : $desCorrelationId")
-            Right(ResponseWrapper(correlationId, obligation))
+            case Right(obligation) =>
+              infoLog(
+                s"$logContext matched open obligation for periodKey : $periodKey, VRN : $vrn, " +
+                  s"correlationId : $correlationId, desCorrelationId : $desCorrelationId")
+              Right(ResponseWrapper(correlationId, obligation))
 
-          case Left(failure) =>
-            infoLog(
-              s"$logContext ${failure.detail} for VRN : $vrn, " +
-                s"correlationId : $correlationId, desCorrelationId : $desCorrelationId")
-            Left(ErrorWrapper(correlationId, failure.error))
-        }
+            case Left(failure) =>
+              infoLog(
+                s"$logContext ${failure.detail} for VRN : $vrn, " +
+                  s"correlationId : $correlationId, desCorrelationId : $desCorrelationId")
+              Left(ErrorWrapper(correlationId, failure.error))
+          }
 
-      case Left(ResponseWrapper(desCorrelationId, desError)) =>
-        warnLog(
-          s"$logContext obligations lookup failed for VRN : $vrn, correlationId : $correlationId, " +
-            s"desCorrelationId : $desCorrelationId, downstreamError : ${describe(desError)}")
-        Left(ErrorWrapper(correlationId, ServiceUnavailableError))
-    }
+        case Left(ResponseWrapper(desCorrelationId, desError)) =>
+          warnLog(
+            s"$logContext obligations lookup failed for VRN : $vrn, correlationId : $correlationId, " +
+              s"desCorrelationId : $desCorrelationId, downstreamError : ${describe(desError)}")
+          Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+      }
+      .recover {
+        case error =>
+          val details = s"Request failed with error: ${error.getMessage}"
+
+          errorLog(ConnectorError.log("[AssistObligationService][retrieveOpenObligation]", vrn, details = details))
+
+          PagerDutyLogging.log(
+            pagerDutyLoggingEndpointName = Endpoint.RetrieveObligations.requestFailedMessage,
+            status = INTERNAL_SERVER_ERROR,
+            body = details,
+            f = errorLog(_),
+            affinityGroup = userRequest.userDetails.userType
+          )
+
+          Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+      }
   }
 
   private def describe(desError: DesError): String = desError match {

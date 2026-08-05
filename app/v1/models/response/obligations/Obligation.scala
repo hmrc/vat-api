@@ -24,8 +24,8 @@ import scala.util.Try
 
 case class Obligation(periodKey: String, start: String, end: String, due: String, status: String, received: Option[String]) {
 
-  def isEnded(date: String): Boolean = Try(LocalDate.parse(date)).isSuccess
-  // def hasEnded(today: LocalDate): Option[Boolean] = Try(LocalDate.parse(end)).toOption.map(today.isAfter)
+  def hasEnded(today: LocalDate): Option[Boolean] = Try(LocalDate.parse(end)).toOption.map(today.isAfter)
+
 }
 
 object Obligation {
