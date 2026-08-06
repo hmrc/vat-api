@@ -23,17 +23,23 @@ import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.WSRequest
 import play.api.test.Helpers.AUTHORIZATION
 import support.IntegrationBaseSpec
+import v1.fixtures.ObligationsFixture
 import v1.models.errors._
-import v1.stubs.{ AuditStub, AuthStub }
+import v1.stubs.{ AuditStub, AuthStub, DesStub }
 
-class AssistReturnControllerISpec extends IntegrationBaseSpec {
+class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFixture {
 
   private trait Test {
 
-    val vrn: String       = "123456789"
-    val periodKey: String = "AB12"
+    val vrn: String           = "123456789"
+    val periodKey: String     = "18A2"
+    val correlationId: String = "X-ID"
 
-    val validRequestJson: JsValue = Json.parse(s"""
+    def desUrl: String = s"/enterprise/obligation-data/vrn/$vrn/VATC"
+
+    val desQueryParams: Map[String, String] = Map("status" -> "O")
+
+    lazy val validRequestJson: JsValue = Json.parse(s"""
          |{
          |  "periodKey": "$periodKey",
          |  "vatDueSales": 100.00,
@@ -48,7 +54,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
          |}
     """.stripMargin)
 
-    def uri: String = s"/internal/validate/$vrn"
+    private def uri: String = s"/internal/validate/$vrn"
 
     def setupStubs(): StubMapping
 
@@ -57,28 +63,70 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
       buildRequest(uri)
         .withHttpHeaders(
           (ACCEPT, "application/vnd.hmrc.1.0+json"),
-          (AUTHORIZATION, "Bearer 123")
+          (AUTHORIZATION, "Bearer 123"),
+          ("X-CorrelationId", correlationId)
         )
     }
   }
 
-  "Validate VAT Return endpoint" should {
+  "Validate VAT return and retrieve obligation endpoint" should {
 
-    "return a 204 No Content" when {
-      "a valid request is made" in new Test {
+    "return a 200 with the matched obligation" when {
+
+      "the return is valid and an ended open obligation matches the period key" in new Test {
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams, OK, obligationsDesJson)
         }
 
         private val response = await(request.post(validRequestJson))
-        response.status shouldBe NO_CONTENT
-        response.body shouldBe ""
+
+        response.status shouldBe OK
+        response.json shouldBe assistObligationMtdJson("18A2", "2017-04-01", "2017-06-30", "2017-08-07")
+        response.header("X-CorrelationId") shouldBe Some(correlationId)
+        response.header("Content-Type") shouldBe Some("application/json")
       }
     }
 
     "return a 400 status code" when {
+
+      "the period key does not match any open obligation" in new Test {
+
+        override val periodKey: String = "ZZ99"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET, desUrl, desQueryParams, OK, obligationsDesJson)
+        }
+
+        private val response = await(request.post(validRequestJson))
+
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.toJson(NoOpenObligation)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+      "the matched obligation's period has not ended" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET,
+                            desUrl,
+                            desQueryParams,
+                            OK,
+                            openObligationDesJson(periodKey, from = "2999-01-01", to = "2999-03-31", due = "2999-05-07"))
+        }
+
+        private val response = await(request.post(validRequestJson))
+
+        response.status shouldBe BAD_REQUEST
+        response.json shouldBe Json.toJson(TaxPeriodNotEnded)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
 
       "a request is made with an invalid monetary value" in new Test {
 
@@ -117,6 +165,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
         }
 
         private val response = await(request.post(invalidMonetaryJson))
+
         response.status shouldBe BAD_REQUEST
         response.json shouldBe expectedError
         response.header("Content-Type") shouldBe Some("application/json")
@@ -165,6 +214,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
         }
 
         private val response = await(request.post(invalidRequestJson))
+
         response.status shouldBe BAD_REQUEST
         response.json shouldBe multipleErrors
         response.header("Content-Type") shouldBe Some("application/json")
@@ -180,10 +230,41 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
         }
 
         private val response = await(request.post(validRequestJson))
+
         response.status shouldBe BAD_REQUEST
         response.json shouldBe Json.toJson(VrnFormatError)
         response.header("Content-Type") shouldBe Some("application/json")
       }
+    }
+
+    "return a 503 status code" when {
+
+      def downstreamErrorTest(desStatus: Int, desCode: String): Unit =
+        s"DES returns $desStatus $desCode" in new Test {
+
+          override def setupStubs(): StubMapping = {
+            AuditStub.audit()
+            AuthStub.authorised()
+            DesStub.onError(DesStub.GET, desUrl, desQueryParams, desStatus, Json.obj("code" -> desCode, "reason" -> "downstream failure").toString)
+          }
+
+          private val response = await(request.post(validRequestJson))
+
+          response.status shouldBe SERVICE_UNAVAILABLE
+          response.json shouldBe Json.toJson(ServiceUnavailableError)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+
+      val input = Seq(
+        (BAD_REQUEST, "INVALID_IDNUMBER"),
+        (BAD_REQUEST, "INVALID_IDTYPE"),
+        (NOT_FOUND, "NOT_FOUND"),
+        (FORBIDDEN, "NOT_FOUND_BPKEY"),
+        (INTERNAL_SERVER_ERROR, "SERVER_ERROR"),
+        (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE")
+      )
+
+      input.foreach(args => (downstreamErrorTest _).tupled(args))
     }
 
     "return the error according to spec" when {
@@ -200,13 +281,14 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec {
           }
 
           private val response = await(request.post(validRequestJson))
+
           response.status shouldBe expectedStatus
           response.json shouldBe Json.toJson(expectedBody)
           response.header("Content-Type") shouldBe Some("application/json")
         }
 
       val input = Seq(
-        ("badVrn", "AB12", BAD_REQUEST, VrnFormatError),
+        ("badVrn", "18A2", BAD_REQUEST, VrnFormatError),
         ("123456789", "badPeriodKey", BAD_REQUEST, BodyPeriodKeyFormatError)
       )
 

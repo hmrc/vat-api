@@ -16,177 +16,168 @@
 
 package v1.controllers.internal
 
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContent, Result}
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ AnyContent, Result }
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.mocks.MockIdGenerator
 import v1.controllers.ControllerBaseSpec
-import v1.mocks.requestParsers.MockAssistReturnRequestParser
-import v1.mocks.services.MockEnrolmentsAuthService
-import v1.models.domain.Vrn
+import v1.mocks.services.{ MockAssistReturnService, MockEnrolmentsAuthService }
 import v1.models.errors._
-import v1.models.request.submit.{SubmitRawData, SubmitRequest, SubmitRequestBody}
+import v1.models.outcomes.ResponseWrapper
+import v1.models.request.submit.SubmitRawData
+import v1.models.response.obligations.Obligation
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AssistReturnControllerSpec
-  extends ControllerBaseSpec
-    with MockEnrolmentsAuthService
-    with MockAssistReturnRequestParser
-    with MockIdGenerator {
+class AssistReturnControllerSpec extends ControllerBaseSpec with MockEnrolmentsAuthService with MockAssistReturnService {
 
   val vrn: String           = "123456789"
+  val periodKey: String     = "18A2"
   val correlationId: String = "X-ID"
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
     val controller: AssistReturnController = new AssistReturnController(
-      mockEnrolmentsAuthService,
-      mockAssistReturnRequestParser,
-      cc,
-      mockIdGenerator
+      authService = mockEnrolmentsAuthService,
+      assistReturnService = mockAssistReturnService,
+      cc = cc
     )
 
     MockEnrolmentsAuthService.authoriseUser()
-    MockIdGenerator.getUid.returns(correlationId).anyNumberOfTimes()
   }
 
   val requestBodyJson: JsValue = Json.parse(
-    """
-      |{
-      |   "periodKey": "#001",
-      |   "vatDueSales": 7000.00,
-      |   "vatDueAcquisitions": 3000.00,
-      |   "totalVatDue": 10000,
-      |   "vatReclaimedCurrPeriod": 1000,
-      |   "netVatDue": 9000,
-      |   "totalValueSalesExVAT": 1000,
-      |   "totalValuePurchasesExVAT": 200,
-      |   "totalValueGoodsSuppliedExVAT": 100,
-      |   "totalAcquisitionsExVAT": 540
-      |}
-      |""".stripMargin
+    s"""
+       |{
+       |   "periodKey": "$periodKey",
+       |   "vatDueSales": 7000.00,
+       |   "vatDueAcquisitions": 3000.00,
+       |   "totalVatDue": 10000,
+       |   "vatReclaimedCurrPeriod": 1000,
+       |   "netVatDue": 9000,
+       |   "totalValueSalesExVAT": 1000,
+       |   "totalValuePurchasesExVAT": 200,
+       |   "totalValueGoodsSuppliedExVAT": 100,
+       |   "totalAcquisitionsExVAT": 540
+       |}
+       |""".stripMargin
   )
 
-  val requestBody: SubmitRequestBody = SubmitRequestBody(
-    periodKey                    = Some("#001"),
-    vatDueSales                  = Some(7000.00),
-    vatDueAcquisitions           = Some(3000),
-    totalVatDue                  = Some(10000),
-    vatReclaimedCurrPeriod       = Some(1000),
-    netVatDue                    = Some(9000),
-    totalValueSalesExVAT         = Some(1000),
-    totalValuePurchasesExVAT     = Some(200),
-    totalValueGoodsSuppliedExVAT = Some(100),
-    totalAcquisitionsExVAT       = Some(540),
-    finalised                    = None
+  val rawRequest: SubmitRawData = SubmitRawData(vrn, AnyContent(requestBodyJson))
+
+  val obligation: Obligation = Obligation(
+    periodKey = periodKey,
+    start = "2026-01-01",
+    end = "2026-03-31",
+    due = "2026-05-07",
+    status = "O",
+    received = None
   )
 
-  val rawData: SubmitRawData =
-    SubmitRawData(vrn, AnyContent(requestBodyJson))
+  val obligationJson: JsValue = Json.parse(
+    s"""
+       |{
+       |  "periodKey": "$periodKey",
+       |  "start": "2026-01-01",
+       |  "end": "2026-03-31",
+       |  "due": "2026-05-07",
+       |  "status": "O"
+       |}
+       |""".stripMargin
+  )
 
-  val parsedRequest: SubmitRequest =
-    SubmitRequest(Vrn(vrn), requestBody)
+  private def postRequest(body: JsValue = requestBodyJson) =
+    fakePostRequest(body).withHeaders("X-CorrelationId" -> correlationId)
 
-  "validateReturn" when {
+  "validateReturnAndRetrieveObligation" when {
 
-    "a valid request is supplied" should {
-      "return 204 No Content with a correlation ID header" in new Test {
+    "a valid request is made" should {
+      "return the matched obligation on a successful service call" in new Test {
 
-        MockAssistReturnRequestParser
-          .parse(rawData)
-          .returns(Right(parsedRequest))
+        MockAssistReturnService
+          .validateAndRetrieveOpenObligation(rawRequest)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, obligation))))
 
-        private val result: Future[Result] =
-          controller.validateReturn(vrn)(
-            fakePostRequest(requestBodyJson).withHeaders("X-CorrelationId" -> correlationId)
+        private val result = controller.validateReturnAndRetrieveObligation(vrn)(postRequest())
+
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe obligationJson
+        contentType(result) shouldBe Some("application/json")
+        header("X-CorrelationId", result) shouldBe Some(correlationId)
+      }
+    }
+
+    "return the error as per spec" when {
+
+      "multiple validation errors occur" must {
+        "return 400 with all errors nested under INVALID_REQUEST" in new Test {
+
+          val expectedError: JsValue = Json.parse(
+            """
+              |{
+              |  "code": "INVALID_REQUEST",
+              |  "message": "Invalid request",
+              |  "errors": [
+              |    {
+              |      "code": "VAT_TOTAL_VALUE",
+              |      "message": "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
+              |      "path": "/totalVatDue"
+              |    },
+              |    {
+              |      "code": "VAT_NET_VALUE",
+              |      "message": "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
+              |      "path": "/netVatDue"
+              |    }
+              |  ]
+              |}
+              |""".stripMargin
           )
 
-        status(result) shouldBe NO_CONTENT
-        header("X-CorrelationId", result) shouldBe Some(correlationId)
-      }
-    }
+          MockAssistReturnService
+            .validateAndRetrieveOpenObligation(rawRequest)
+            .returns(Future.successful(Left(ErrorWrapper(correlationId, BadRequestError, Some(List(VATTotalValueRuleError, VATNetValueRuleError))))))
 
-    "the request body fails a single validation rule" should {
-      "return 400 with the error" in new Test {
+          private val result: Future[Result] = controller.validateReturnAndRetrieveObligation(vrn)(postRequest())
 
-        MockAssistReturnRequestParser
-          .parse(rawData)
-          .returns(Left(ErrorWrapper(correlationId, VrnFormatError, None)))
-
-        private val result: Future[Result] =
-          controller.validateReturn(vrn)(fakePostRequest(requestBodyJson))
-
-        status(result) shouldBe BAD_REQUEST
-        contentAsJson(result) shouldBe Json.toJson(VrnFormatError)
-        header("X-CorrelationId", result) shouldBe Some(correlationId)
-      }
-    }
-
-    "the request body fails multiple validation rules" should {
-      "return 400 with all errors nested under INVALID_REQUEST" in new Test {
-
-        val expectedError: JsValue = Json.parse(
-          s"""
-             |{
-             |  "code": "INVALID_REQUEST",
-             |  "message": "Invalid request",
-             |  "errors": [
-             |    {
-             |      "code": "VAT_TOTAL_VALUE",
-             |      "message": "totalVatDue should be equal to vatDueSales + vatDueAcquisitions",
-             |      "path": "/totalVatDue"
-             |    },
-             |    {
-             |      "code": "VAT_NET_VALUE",
-             |      "message": "netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod",
-             |      "path": "/netVatDue"
-             |    }
-             |  ]
-             |}
-             |""".stripMargin
-        )
-
-        MockAssistReturnRequestParser
-          .parse(rawData)
-          .returns(Left(ErrorWrapper(correlationId, BadRequestError, Some(List(VATTotalValueRuleError, VATNetValueRuleError)))))
-
-        private val result: Future[Result] =
-          controller.validateReturn(vrn)(fakePostRequest(requestBodyJson))
-
-        status(result) shouldBe BAD_REQUEST
-        contentAsJson(result) shouldBe expectedError
-        header("X-CorrelationId", result) shouldBe Some(correlationId)
-      }
-    }
-
-    "the parser returns a specific error" must {
-      def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit =
-        s"return $expectedStatus when a ${error.code} error is returned from the parser" in new Test {
-
-          MockAssistReturnRequestParser
-            .parse(rawData)
-            .returns(Left(ErrorWrapper(correlationId, error, None)))
-
-          val result: Future[Result] =
-            controller.validateReturn(vrn)(fakePostRequest(requestBodyJson))
-
-          status(result) shouldBe expectedStatus
-          contentAsJson(result) shouldBe Json.toJson(error)
+          status(result) shouldBe BAD_REQUEST
+          contentAsJson(result) shouldBe expectedError
           header("X-CorrelationId", result) shouldBe Some(correlationId)
         }
+      }
 
-      val input = Seq(
-        (VrnFormatError, BAD_REQUEST),
-        (BodyPeriodKeyFormatError, BAD_REQUEST),
-        (MandatoryFieldRuleError, BAD_REQUEST),
-        (StringFormatRuleError, BAD_REQUEST),
-        (UnMappedPlayRuleError, BAD_REQUEST)
-      )
+      "service errors occur" must {
+        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit =
+          s"return a $mtdError error from the service" in new Test {
 
-      input.foreach(args => (errorsFromParserTester _).tupled(args))
+            MockAssistReturnService
+              .validateAndRetrieveOpenObligation(rawRequest)
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
+
+            val result: Future[Result] = controller.validateReturnAndRetrieveObligation(vrn)(postRequest())
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(mtdError)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+          }
+
+        val input = Seq(
+          // Validation failures — 400
+          (VrnFormatError, BAD_REQUEST),
+          (BodyPeriodKeyFormatError, BAD_REQUEST),
+          (MandatoryFieldRuleError, BAD_REQUEST),
+          (StringFormatRuleError, BAD_REQUEST),
+          (UnMappedPlayRuleError, BAD_REQUEST),
+          // Obligation outcomes
+          (TaxPeriodNotEnded, BAD_REQUEST),
+          (NoOpenObligation, BAD_REQUEST),
+          // Obligation lookup failures
+          (ServiceUnavailableError, SERVICE_UNAVAILABLE),
+          (DownstreamError, SERVICE_UNAVAILABLE)
+        )
+
+        input.foreach(args => (serviceErrors _).tupled(args))
+      }
     }
   }
 }

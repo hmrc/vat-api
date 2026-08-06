@@ -17,48 +17,49 @@
 package v1.controllers.internal
 
 import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Action, AnyContent, ControllerComponents }
+import play.api.mvc.{ Action, AnyContent, ControllerComponents, Result }
 import utils._
-import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.controllers.{ AuthorisedController, BaseController }
+import v1.models.errors._
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.SubmitRawData
-import v1.services.EnrolmentsAuthService
+import v1.services.{ AssistReturnService, EnrolmentsAuthService }
 
 import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
-                                       requestParser: AssistReturnRequestParser,
-                                       cc: ControllerComponents,
-                                       idGenerator: IdGenerator)(implicit ec: ExecutionContext)
+class AssistReturnController @Inject()(val authService: EnrolmentsAuthService, assistReturnService: AssistReturnService, cc: ControllerComponents)(
+    implicit ec: ExecutionContext)
     extends AuthorisedController(cc)
     with BaseController
     with Logging {
 
-  private val endpointLogContext: EndpointLogContext =
-    EndpointLogContext(controllerName = "AssistReturnController", endpointName = "validateVatReturn")
+  private implicit val endpointLogContext: EndpointLogContext =
+    EndpointLogContext(controllerName = "AssistReturnController", endpointName = "validateReturnAndRetrieveObligation")
 
-  def validateReturn(vrn: String): Action[JsValue] =
+  def validateReturnAndRetrieveObligation(vrn: String): Action[JsValue] =
     authorisedAction(vrn).async(parse.json) { implicit request =>
       implicit val correlationId: String = request.headers.get("X-CorrelationId").getOrElse("no-correlation-id-found")
 
       val rawRequest = SubmitRawData(vrn, AnyContent(request.body))
 
-      val result = requestParser.parseRequest(rawRequest) match {
-        case Right(_) =>
-          infoLog(
-            s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-              s"VAT return validation PASSED for VRN : $vrn with correlationId : $correlationId")
-          NoContent.withApiHeaders(correlationId)
+      assistReturnService.validateAndRetrieveOpenObligation(rawRequest).map {
+
+        case Right(ResponseWrapper(corrId, obligation)) =>
+          Ok(Json.toJson(obligation)).withApiHeaders(corrId)
 
         case Left(errorWrapper) =>
-          infoLog(
-            s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-              s"VAT return validation FAILED for VRN : $vrn with correlationId : ${errorWrapper.correlationId}, error : ${errorWrapper.error.message}")
-          BadRequest(Json.toJson(errorWrapper)).withApiHeaders(errorWrapper.correlationId)
+          errorResult(errorWrapper)
       }
-
-      Future.successful(result)
     }
+
+  /** Only obligation-lookup failures produce 5xx. Everything else is a 400: parser validation errors, TAX_PERIOD_NOT_ENDED,
+    * and an unmatched period key.
+    */
+  private def errorResult(errorWrapper: ErrorWrapper): Result =
+    (errorWrapper.error match {
+      case ServiceUnavailableError | DownstreamError => ServiceUnavailable(Json.toJson(errorWrapper))
+      case _                                         => BadRequest(Json.toJson(errorWrapper))
+    }).withApiHeaders(errorWrapper.correlationId)
 }
