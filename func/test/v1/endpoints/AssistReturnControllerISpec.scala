@@ -54,7 +54,7 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
          |}
     """.stripMargin)
 
-    def uri: String = s"/internal/validate/$vrn"
+    private def uri: String = s"/internal/validate/$vrn"
 
     def setupStubs(): StubMapping
 

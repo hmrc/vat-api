@@ -16,29 +16,26 @@
 
 package v1.controllers.internal
 
-import cats.data.EitherT
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.{ Action, AnyContent, ControllerComponents, Result }
 import utils._
-import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.controllers.{ AuthorisedController, BaseController }
 import v1.models.errors._
+import v1.models.outcomes.ResponseWrapper
 import v1.models.request.submit.SubmitRawData
-import v1.services.{ AssistObligationService, EnrolmentsAuthService }
+import v1.services.{ AssistReturnService, EnrolmentsAuthService }
 
 import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
-                                       requestParser: AssistReturnRequestParser,
-                                       obligationsService: AssistObligationService,
-                                       cc: ControllerComponents)(implicit ec: ExecutionContext)
+class AssistReturnController @Inject()(val authService: EnrolmentsAuthService, assistReturnService: AssistReturnService, cc: ControllerComponents)(
+    implicit ec: ExecutionContext)
     extends AuthorisedController(cc)
     with BaseController
     with Logging {
 
-  implicit val endpointLogContext: EndpointLogContext =
+  private implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(controllerName = "AssistReturnController", endpointName = "validateReturnAndRetrieveObligation")
 
   def validateReturnAndRetrieveObligation(vrn: String): Action[JsValue] =
@@ -47,19 +44,19 @@ class AssistReturnController @Inject()(val authService: EnrolmentsAuthService,
 
       val rawRequest = SubmitRawData(vrn, AnyContent(request.body))
 
-      val result = for {
-        parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest))
-        obligation    <- EitherT(obligationsService.retrieveOpenObligation(parsedRequest))
-      } yield {
-        infoLog(
-          s"$endpointLogContext VAT return validated and open obligation matched for VRN : $vrn, " +
-            s"periodKey : ${obligation.responseData.periodKey}, correlationId : ${obligation.correlationId}")
-        Ok(Json.toJson(obligation.responseData)).withApiHeaders(obligation.correlationId)
-      }
+      assistReturnService.validateAndRetrieveOpenObligation(rawRequest).map {
 
-      result.leftMap(errorResult).merge
+        case Right(ResponseWrapper(corrId, obligation)) =>
+          Ok(Json.toJson(obligation)).withApiHeaders(corrId)
+
+        case Left(errorWrapper) =>
+          errorResult(errorWrapper)
+      }
     }
 
+  /** Only obligation-lookup failures produce 5xx. Everything else is a 400: parser validation errors, TAX_PERIOD_NOT_ENDED,
+    * and an unmatched period key.
+    */
   private def errorResult(errorWrapper: ErrorWrapper): Result =
     (errorWrapper.error match {
       case ServiceUnavailableError | DownstreamError => ServiceUnavailable(Json.toJson(errorWrapper))

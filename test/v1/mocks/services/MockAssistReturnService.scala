@@ -21,23 +21,23 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.EndpointLogContext
 import v1.controllers.UserRequest
-import v1.models.request.submit.SubmitRequest
+import v1.models.request.submit.SubmitRawData
 import v1.models.response.obligations.Obligation
-import v1.services.{ AssistObligationService, ServiceOutcome }
+import v1.services.{ AssistReturnService, ServiceOutcome }
 
 import java.time.LocalDate
 import scala.concurrent.{ ExecutionContext, Future }
 
-trait MockAssistObligationService extends MockFactory {
+trait MockAssistReturnService extends MockFactory {
 
-  val mockAssistObligationService: AssistObligationService = mock[AssistObligationService]
+  val mockAssistReturnService: AssistReturnService = mock[AssistReturnService]
 
-  object MockAssistObligationService {
+  object MockAssistReturnService {
 
-    def retrieveOpenObligation(request: SubmitRequest): CallHandler[Future[ServiceOutcome[Obligation]]] =
+    def validateAndRetrieveOpenObligation(rawData: SubmitRawData): CallHandler[Future[ServiceOutcome[Obligation]]] =
       (
-        mockAssistObligationService
-          .retrieveOpenObligation(_: SubmitRequest, _: LocalDate)(
+        mockAssistReturnService
+          .validateAndRetrieveOpenObligation(_: SubmitRawData, _: LocalDate)(
             _: HeaderCarrier,
             _: ExecutionContext,
             _: EndpointLogContext,
@@ -45,6 +45,6 @@ trait MockAssistObligationService extends MockFactory {
             _: String
           )
         )
-        .expects(request, *, *, *, *, *, *)
+        .expects(rawData, *, *, *, *, *, *)
   }
 }

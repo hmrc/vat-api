@@ -16,17 +16,20 @@
 
 package v1.services
 
+import cats.data.EitherT
+import cats.implicits._
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.pagerDutyLogging.{ Endpoint, PagerDutyLogging }
 import utils.{ EndpointLogContext, Logging }
 import v1.connectors.ObligationsConnector
 import v1.controllers.UserRequest
+import v1.controllers.requestParsers.AssistReturnRequestParser
 import v1.models.errors.OpenObligationMatchError.{ NoMatchingObligation, PeriodNotEnded, UnreadableEndDate }
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.obligations.ObligationsRequest
-import v1.models.request.submit.SubmitRequest
+import v1.models.request.submit.{ SubmitRawData, SubmitRequest }
 import v1.models.response.obligations.{ Obligation, ObligationsResponse }
 
 import java.time.LocalDate
@@ -37,23 +40,42 @@ import scala.concurrent.{ ExecutionContext, Future }
   * TxR assist flow. Separate from ObligationsService which serves the public obligations endpoint
   */
 @Singleton
-class AssistObligationService @Inject()(connector: ObligationsConnector) extends Logging {
+class AssistReturnService @Inject()(requestParser: AssistReturnRequestParser, connector: ObligationsConnector) extends Logging {
 
-  def retrieveOpenObligation(request: SubmitRequest, today: LocalDate = LocalDate.now())(
+  def validateAndRetrieveOpenObligation(rawRequest: SubmitRawData, today: LocalDate = LocalDate.now())(
       implicit hc: HeaderCarrier,
       ec: ExecutionContext,
       logContext: EndpointLogContext,
       userRequest: UserRequest[_],
       correlationId: String): Future[ServiceOutcome[Obligation]] = {
 
-    val vrn                = request.vrn.vrn
-    val periodKey          = request.body.periodKey.getOrElse("no-period-key-found")
-    val obligationsRequest = ObligationsRequest(vrn = request.vrn, from = None, to = None, status = Some("O"))
+    val result = for {
+      parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawRequest)).leftMap { errorWrapper =>
+        infoLog(
+          s"$logContext VAT return validation FAILED for VRN : ${rawRequest.vrn}, " +
+            s"correlationId : ${errorWrapper.correlationId}, errors : ${describeValidationError(errorWrapper)}")
+        errorWrapper
+      }
+
+      obligation <- EitherT(retrieveOpenObligation(parsedRequest, today))
+    } yield obligation
+
+    result.value
+  }
+
+  private def retrieveOpenObligation(request: SubmitRequest, today: LocalDate)(implicit hc: HeaderCarrier,
+                                                                               ec: ExecutionContext,
+                                                                               logContext: EndpointLogContext,
+                                                                               userRequest: UserRequest[_],
+                                                                               correlationId: String): Future[ServiceOutcome[Obligation]] = {
+
+    val vrn       = request.vrn.vrn
+    val periodKey = request.body.periodKey.getOrElse("no-period-key-found")
 
     infoLog(s"$logContext retrieving open obligations for VRN : $vrn, periodKey : $periodKey, correlationId : $correlationId")
 
     connector
-      .retrieveObligations(obligationsRequest)
+      .retrieveObligations(ObligationsRequest(vrn = request.vrn, from = None, to = None, status = Some("O")))
       .map {
 
         case Right(ResponseWrapper(desCorrelationId, obligationsResponse)) =>
@@ -75,14 +97,14 @@ class AssistObligationService @Inject()(connector: ObligationsConnector) extends
         case Left(ResponseWrapper(desCorrelationId, desError)) =>
           warnLog(
             s"$logContext obligations lookup failed for VRN : $vrn, correlationId : $correlationId, " +
-              s"desCorrelationId : $desCorrelationId, downstreamError : ${describe(desError)}")
+              s"desCorrelationId : $desCorrelationId, downstreamError : ${describeDesError(desError)}")
           Left(ErrorWrapper(correlationId, ServiceUnavailableError))
       }
       .recover {
         case error =>
           val details = s"Request failed with error: ${error.getMessage}"
 
-          errorLog(ConnectorError.log("[AssistObligationService][retrieveOpenObligation]", vrn, details = details))
+          errorLog(ConnectorError.log("[AssistReturnService][retrieveOpenObligation]", vrn, details = details))
 
           PagerDutyLogging.log(
             pagerDutyLoggingEndpointName = Endpoint.RetrieveObligations.requestFailedMessage,
@@ -96,15 +118,11 @@ class AssistObligationService @Inject()(connector: ObligationsConnector) extends
       }
   }
 
-  private def describe(desError: DesError): String = desError match {
-    case DesErrors(codes)        => codes.map(_.code).mkString(",")
-    case OutboundError(error, _) => error.code
-  }
-
   private def findOpenObligation(obligationsResponse: ObligationsResponse,
                                  periodKey: String,
                                  today: LocalDate): Either[OpenObligationMatchError, Obligation] =
     obligationsResponse.obligations.find(_.periodKey == periodKey) match {
+
       case None =>
         Left(NoMatchingObligation(periodKey, obligationsResponse.obligations.map(_.periodKey)))
 
@@ -115,4 +133,12 @@ class AssistObligationService @Inject()(connector: ObligationsConnector) extends
           case Some(false) => Left(PeriodNotEnded(periodKey, obligation.end, today))
         }
     }
+
+  private def describeValidationError(errorWrapper: ErrorWrapper): String =
+    errorWrapper.errors.fold(errorWrapper.error.code)(_.map(_.code).mkString(", "))
+
+  private def describeDesError(desError: DesError): String = desError match {
+    case DesErrors(codes)        => codes.map(_.code).mkString(", ")
+    case OutboundError(error, _) => error.code
+  }
 }
