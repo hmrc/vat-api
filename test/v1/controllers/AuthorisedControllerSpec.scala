@@ -20,6 +20,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.IdGenerator
 import v1.mocks.services.MockEnrolmentsAuthService
 import v1.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import v1.services.EnrolmentsAuthService
@@ -34,8 +35,13 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
     val hc: HeaderCarrier = HeaderCarrier()
     val authorisedController: TestController = new TestController()
 
+    val mockIdGenerator: IdGenerator = new IdGenerator {
+      override def getUid: String = "test-correlation-id"
+    }
+
     class TestController extends AuthorisedController(cc) {
       override val authService: EnrolmentsAuthService = mockEnrolmentsAuthService
+      override val idGenerator: IdGenerator = mockIdGenerator
 
       def action(vrn: String): Action[AnyContent] = authorisedAction(vrn).async {
         Future.successful(Ok(Json.obj()))
