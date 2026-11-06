@@ -169,7 +169,8 @@ class AssistReturnControllerSpec extends ControllerBaseSpec with MockEnrolmentsA
           (StringFormatRuleError, BAD_REQUEST),
           (UnMappedPlayRuleError, BAD_REQUEST),
           // Obligation outcomes
-          (TaxPeriodNotEnded, BAD_REQUEST),
+          (TaxPeriodNotEnded, FORBIDDEN),
+          (RuleInsolventTraderError, FORBIDDEN),
           (NoOpenObligation, BAD_REQUEST),
           // Obligation lookup failures
           (ServiceUnavailableError, SERVICE_UNAVAILABLE),

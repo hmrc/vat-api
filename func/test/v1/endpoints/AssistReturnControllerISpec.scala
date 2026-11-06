@@ -109,25 +109,6 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
         response.header("Content-Type") shouldBe Some("application/json")
       }
 
-      "the matched obligation's period has not ended" in new Test {
-
-        override def setupStubs(): StubMapping = {
-          AuditStub.audit()
-          AuthStub.authorised()
-          DesStub.onSuccess(DesStub.GET,
-                            desUrl,
-                            desQueryParams,
-                            OK,
-                            openObligationDesJson(periodKey, from = "2999-01-01", to = "2999-03-31", due = "2999-05-07"))
-        }
-
-        private val response = await(request.post(validRequestJson))
-
-        response.status shouldBe BAD_REQUEST
-        response.json shouldBe Json.toJson(TaxPeriodNotEnded)
-        response.header("Content-Type") shouldBe Some("application/json")
-      }
-
       "a request is made with an invalid monetary value" in new Test {
 
         val invalidMonetaryJson: JsValue = Json.parse(s"""
@@ -233,6 +214,43 @@ class AssistReturnControllerISpec extends IntegrationBaseSpec with ObligationsFi
 
         response.status shouldBe BAD_REQUEST
         response.json shouldBe Json.toJson(VrnFormatError)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+    }
+
+    "return a 403 status code" when {
+
+      "the matched obligation's period has not ended" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onSuccess(DesStub.GET,
+            desUrl,
+            desQueryParams,
+            OK,
+            openObligationDesJson(periodKey, from = "2999-01-01", to = "2999-03-31", due = "2999-05-07"))
+        }
+
+        private val response = await(request.post(validRequestJson))
+
+        response.status shouldBe FORBIDDEN
+        response.json shouldBe Json.toJson(TaxPeriodNotEnded)
+        response.header("Content-Type") shouldBe Some("application/json")
+      }
+
+      "the obligations lookup reports an insolvent trader" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          DesStub.onError(DesStub.GET, desUrl, desQueryParams, UNPROCESSABLE_ENTITY, Json.obj("code" -> "INSOLVENT_TRADER", "reason" -> "insolvent trader").toString)
+        }
+
+        private val response = await(request.post(validRequestJson))
+
+        response.status shouldBe FORBIDDEN
+        response.json shouldBe Json.toJson(RuleInsolventTraderError)
         response.header("Content-Type") shouldBe Some("application/json")
       }
     }
