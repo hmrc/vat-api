@@ -466,7 +466,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/Submit400ErrorResponse'
                 - example:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
@@ -476,36 +476,77 @@ paths:
                   value:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
+                "invalidPeriodKey (wrong format)":
+                   description: The value that was supplied for the period key was incorrectly formatted.
+                   value:
+                     code: INVALID_REQUEST
+                     message: Invalid request
+                     errors:
+                       - code: PERIOD_KEY_INVALID
+                         message: period key should be a 4 character string
+                         path: /periodKey
                 invalidPeriodKey:
                   description: Invalid period key
                   value:
                     code: PERIOD_KEY_INVALID
                     message: Invalid period key
-                invalidRequest:
-                  description: Invalid request
-                  value:
-                    code: INVALID_REQUEST
-                    message: Invalid request
                 invalidTotalValue:
                   description: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
                   value:
-                    code: VAT_TOTAL_VALUE
-                    message: totalVatDue should be equal to the sum of vatDueSales and vatDueAcquisitions
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: VAT_TOTAL_VALUE
+                        message: totalVatDue should be equal to vatDueSales + vatDueAcquisitions
+                        path: /totalVatDue
                 invalidNetValue:
                   description: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
                   value:
-                    code: VAT_NET_VALUE
-                    message: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: VAT_NET_VALUE
+                        message: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                        path: /netVatDue
                 invalidNumericValue:
-                  description: Please provide a numeric field
+                  description: The value that was supplied was not in a valid numeric format.
                   value:
-                    code: INVALID_NUMERIC_VALUE
-                    message: please provide a numeric field
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: INVALID_NUMERIC_VALUE
+                        message: please provide a numeric field
+                        path: /vatDueSales
                 invalidMonetaryAmount:
-                  description: The monetary amount is invalid
+                  description: A monetary amount is outside the permitted range or has more than 2 decimal places.
                   value:
-                    code: INVALID_MONETARY_AMOUNT
-                    message: amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: INVALID_MONETARY_AMOUNT
+                        message: amount should be a monetary value (to 2 decimal places), between 0 and 99,999,999,999.99
+                        path: /netVatDue
+                mandatoryFieldMissing:
+                  description: A mandatory field is missing.
+                  value:
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: MANDATORY_FIELD_MISSING
+                        message: a mandatory field is missing
+                        path: /totalVatDue
+                multipleValidationErrors:
+                  description: Multiple validation errors occurred.
+                  value:
+                    code: INVALID_REQUEST
+                    message: Invalid request
+                    errors:
+                      - code: VAT_NET_VALUE
+                        message: netVatDue should be the difference between the largest and the smallest values among totalVatDue and vatReclaimedCurrPeriod
+                        path: /netVatDue
+                      - code: VAT_TOTAL_VALUE
+                        message: totalVatDue should be equal to vatDueSales + vatDueAcquisitions
+                        path: /totalVatDue
         '403':
           description: ''
           headers: {}
@@ -1706,6 +1747,48 @@ paths:
       deprecated: false
 components:
   schemas:
+    Submit400ErrorResponse:
+      title: Submit400ErrorResponse
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code.
+          example: 'VRN_INVALID'
+        message:
+          type: string
+          description: A human-readable description of the error.
+          example: 'The provided VRN is invalid'
+        errors:
+          type: array
+          description: An array that is only present if error code INVALID_REQUEST is returned. It lists each field that failed validation.
+          items:
+            $ref: '#/components/schemas/Submit400ErrorItem'
+
+    Submit400ErrorItem:
+      title: Submit400ErrorItem
+      required:
+        - code
+        - message
+        - path
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code.
+          example: 'INVALID_MONETARY_AMOUNT'
+        message:
+          type: string
+          description: A human-readable description of the error.
+          example: 'Amount should be a monetary value (to 2 decimal places)'
+        path:
+          type: string
+          description: The name of the request field that is the focus of the error message.
+          example: /vatDueSales
+
     errorResponse:
       title: errorResponse
       required:
