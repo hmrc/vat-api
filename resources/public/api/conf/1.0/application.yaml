@@ -1764,11 +1764,12 @@ components:
           example: 'The provided VRN is invalid'
         errors:
           type: array
+          description: An array that is only present if error code INVALID_REQUEST is returned. It lists each field that failed validation.
           items:
             $ref: '#/components/schemas/Submit400ErrorItem'
 
     Submit400ErrorItem:
-      title: Feedback400ErrorItem
+      title: Submit400ErrorItem
       required:
         - code
         - message
