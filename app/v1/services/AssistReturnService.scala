@@ -36,8 +36,7 @@ import java.time.LocalDate
 import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
-/** Retrieves the open VAT obligation matching a submitted return's period key, for the internal
-  * TxR assist flow. Separate from ObligationsService which serves the public obligations endpoint
+/** Retrieves the open VAT obligation matching a submitted return's period key (for the internal TxR assist flow only)
   */
 @Singleton
 class AssistReturnService @Inject()(requestParser: AssistReturnRequestParser, connector: ObligationsConnector) extends Logging {
@@ -95,10 +94,11 @@ class AssistReturnService @Inject()(requestParser: AssistReturnRequestParser, co
           }
 
         case Left(ResponseWrapper(desCorrelationId, desError)) =>
+          val error = obligationsLookupError(desError)
           warnLog(
             s"$logContext obligations lookup failed for VRN : $vrn, correlationId : $correlationId, " +
-              s"desCorrelationId : $desCorrelationId, downstreamError : ${describeDesError(desError)}")
-          Left(ErrorWrapper(correlationId, ServiceUnavailableError))
+              s"desCorrelationId : $desCorrelationId, downstreamError : ${describeDesError(desError)}, returning : ${error.code}")
+          Left(ErrorWrapper(correlationId, error))
       }
       .recover {
         case error =>
@@ -136,6 +136,12 @@ class AssistReturnService @Inject()(requestParser: AssistReturnRequestParser, co
 
   private def describeValidationError(errorWrapper: ErrorWrapper): String =
     errorWrapper.errors.fold(errorWrapper.error.code)(_.map(_.code).mkString(", "))
+
+  // An insolvent trader can never succeed hence different from service unavailable
+  private def obligationsLookupError(desError: DesError): MtdError = desError match {
+    case DesErrors(codes) if codes.exists(_.code == "INSOLVENT_TRADER") => RuleInsolventTraderError
+    case _                                                              => ServiceUnavailableError
+  }
 
   private def describeDesError(desError: DesError): String = desError match {
     case DesErrors(codes)        => codes.map(_.code).mkString(", ")

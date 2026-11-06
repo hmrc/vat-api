@@ -215,7 +215,33 @@ class AssistReturnServiceSpec extends ServiceSpec with LogCapturing {
 
     "the obligations call fails" must {
 
-      "collapse every downstream error code to ServiceUnavailableError" when {
+      "return RuleInsolventTraderError" when {
+
+        "the connector returns INSOLVENT_TRADER" in new Test {
+          parseSucceeds()
+
+          MockObligationsConnector
+            .retrieveObligations(obligationsRequest)
+            .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode("INSOLVENT_TRADER"))))))
+
+          await(service.validateAndRetrieveOpenObligation(rawRequest, today)) shouldBe
+            Left(ErrorWrapper(correlationId, RuleInsolventTraderError))
+        }
+
+        "INSOLVENT_TRADER is returned alongside other error codes" in new Test {
+          parseSucceeds()
+
+          MockObligationsConnector
+            .retrieveObligations(obligationsRequest)
+            .returns(Future.successful(
+              Left(ResponseWrapper(correlationId, DesErrors(List(DesErrorCode("SERVER_ERROR"), DesErrorCode("INSOLVENT_TRADER")))))))
+
+          await(service.validateAndRetrieveOpenObligation(rawRequest, today)) shouldBe
+            Left(ErrorWrapper(correlationId, RuleInsolventTraderError))
+        }
+      }
+
+      "collapse every other downstream error code to ServiceUnavailableError" when {
 
         def downstreamError(desErrorCode: String): Unit =
           s"a $desErrorCode error is returned from the connector" in new Test {

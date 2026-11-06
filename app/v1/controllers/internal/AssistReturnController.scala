@@ -54,12 +54,11 @@ class AssistReturnController @Inject()(val authService: EnrolmentsAuthService, a
       }
     }
 
-  /** Only obligation-lookup failures produce 5xx. Everything else is a 400: parser validation errors, TAX_PERIOD_NOT_ENDED,
-    * and an unmatched period key.
-    */
+  // Obligation lookup failures return 503. Validation errors and a period key with no open obligation return 400 //
   private def errorResult(errorWrapper: ErrorWrapper): Result =
     (errorWrapper.error match {
-      case ServiceUnavailableError | DownstreamError => ServiceUnavailable(Json.toJson(errorWrapper))
-      case _                                         => BadRequest(Json.toJson(errorWrapper))
+      case ServiceUnavailableError | DownstreamError      => ServiceUnavailable(Json.toJson(errorWrapper))
+      case RuleInsolventTraderError | TaxPeriodNotEnded   => Forbidden(Json.toJson(errorWrapper))
+      case _                                              => BadRequest(Json.toJson(errorWrapper))
     }).withApiHeaders(errorWrapper.correlationId)
 }
