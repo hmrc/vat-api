@@ -226,7 +226,7 @@ paths:
                       code: VRN_INVALID
                       message: The provided VRN is invalid
               examples:
-                invalidNino:
+                invalidVrn:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
@@ -709,7 +709,7 @@ paths:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
               examples:
-                invalidNino:
+                invalidVrn:
                   description: The provided VRN is invalid
                   value:
                     code: VRN_INVALID
@@ -895,7 +895,7 @@ paths:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
               examples:
-                invalidNino:
+                invalidVrn:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
@@ -1076,7 +1076,7 @@ paths:
                     code: VRN_INVALID
                     message: The provided VRN is invalid
               examples:
-                invalidNino:
+                invalidVrn:
                   description: Invalid VRN
                   value:
                     code: VRN_INVALID
