@@ -3,3 +3,4 @@ repoVisibility: public_0C3F0CE3E6E6448FAD341E7BFA50FCD333E06A20CFF05FCACE61154DD
 test-repositories:
   - mtd-vat-api-performance-tests
   - mtd-vat-api-acceptance-tests
+serviceNowMapping: SNSVC0021058
