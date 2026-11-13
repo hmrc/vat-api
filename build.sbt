@@ -39,7 +39,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     Runtime / unmanagedClasspath += baseDirectory.value / "resources"
   )
-  .settings(resolvers += Resolver.jcenterRepo, resolvers += Resolver.sonatypeRepo("snapshots"))
   .settings(PlayKeys.playDefaultPort := 9675)
   .settings(SilencerSettings())
 
